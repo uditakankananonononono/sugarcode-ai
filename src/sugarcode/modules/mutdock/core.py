@@ -132,6 +132,7 @@ def live_mutation_context(gene: str, position: int, mutant_aa: str, smiles: str,
 
 def structure_resistance_scan(identifier: str, drugs: dict[str, str],
                               pocket_index: int = 0, chain: str | None = None,
+                              ligand_resname: str | None = None,
                               offline: bool = False) -> dict:
     """Cross-drug resistance forecast on a REAL structure pocket.
 
@@ -141,21 +142,34 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
     """
     from ..alpha_fold_ui.core import _real_pockets
     from ..docking_studio.core import AA3_TO_1 as _A3
-    from ...bio.structures import fetch_pdb, fetch_alphafold
-    if len(identifier) == 4 and identifier[0].isdigit():
+    from ...bio.structures import fetch_pdb, fetch_alphafold, ligand_pocket
+    is_pdb = len(identifier) == 4 and identifier[0].isdigit()
+    pocket_source = "geometry"
+    if ligand_resname and is_pdb:
+        # co-crystal ligand pocket: the experimentally observed binding site
+        lp = ligand_pocket(identifier, ligand_resname, chain=chain, offline=offline)
         s = fetch_pdb(identifier, offline=offline)
+        residues = s["residues"]
+        if chain:
+            residues = [r for r in residues if r["chain"] == chain]
+        lining = lp["lining"]
+        chosen = {r["resnum"] for r in lining}
+        pockets = [{"residues": sorted(chosen)}]
+        pocket_source = f"co-crystal ligand {lp['ligand']} ({lp['n_lining']} residues within {lp['radius_A']} A)"
     else:
-        s = fetch_alphafold(identifier, offline=offline)
-    residues = s["residues"]
-    if chain:
-        residues = [r for r in residues if r["chain"] == chain]
-    pockets = _real_pockets(residues)
-    if not pockets:
-        raise ValueError(f"no geometry pocket in {identifier}")
-    if pocket_index >= len(pockets):
-        raise IndexError(f"pocket_index {pocket_index} out of range - {len(pockets)} found")
-    chosen = set(pockets[pocket_index]["residues"])
-    lining = [r for r in residues if r["resnum"] in chosen]
+        if ligand_resname and not is_pdb:
+            pocket_source = "geometry (ligand_resname ignored - needs a PDB co-structure)"
+        s = fetch_pdb(identifier, offline=offline) if is_pdb else fetch_alphafold(identifier, offline=offline)
+        residues = s["residues"]
+        if chain:
+            residues = [r for r in residues if r["chain"] == chain]
+        pockets = _real_pockets(residues)
+        if not pockets:
+            raise ValueError(f"no geometry pocket in {identifier}")
+        if pocket_index >= len(pockets):
+            raise IndexError(f"pocket_index {pocket_index} out of range - {len(pockets)} found")
+        chosen = set(pockets[pocket_index]["residues"])
+        lining = [r for r in residues if r["resnum"] in chosen]
     # binding-site validation (drop 18): for the UniProt/AlphaFold path, compare
     # the geometry pocket against UniProt-annotated BINDING features.
     binding_validation = None
@@ -188,6 +202,25 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
                 }
             else:
                 binding_validation = {"status": "no annotated BINDING features for this protein"}
+            # UniProt feature awareness (drop 20): natural variants at lining
+            # residues - a "resistance hotspot" that is a known tolerated
+            # natural variant should be flagged, not overcalled.
+            if isinstance(binding_validation, dict):
+                nvar = [f for f in feats if f.get("type") == "Natural variant"]
+                lining_nums = {r["resnum"] for r in lining}
+                hits = []
+                for f in nvar:
+                    loc = f.get("location", {})
+                    b = (loc.get("start") or {}).get("value")
+                    if b is not None and int(b) in lining_nums:
+                        hits.append({"resnum": int(b),
+                                     "description": (f.get("description") or "")[:100]})
+                binding_validation["natural_variants_in_pocket"] = hits[:10]
+                if hits:
+                    binding_validation["caveat"] = (
+                        f"{len(hits)} pocket residue(s) have annotated natural variants - "
+                        "variation at these positions may be tolerated; weigh resistance "
+                        "calls accordingly")
         except Exception as e:
             binding_validation = {"status": f"validation lookup failed: {type(e).__name__}: {e}"}
     else:
@@ -211,6 +244,7 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
     scan.update({
         "structure": {"identifier": identifier, "source": s["source"],
                       "chain": chain, "pocket_index": pocket_index,
+                      "pocket_source": pocket_source,
                       "n_pockets_found": len(pockets),
                       "lining": [f"{r['resname']}{r['resnum']}" for r in lining]},
         "binding_site_validation": binding_validation,

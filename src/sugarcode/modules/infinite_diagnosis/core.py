@@ -62,3 +62,42 @@ def _biomarkers(hits: list[dict]) -> list[str]:
     for h in hits[:5]:
         out.append(f"{h['name']}-derived candidate marker panel")
     return out
+
+
+# --- drop 20: joint symptom x variant view -------------------------------------
+def joint_case_view(symptoms: list[str], variants: list[dict],
+                    offline: bool = False) -> dict:
+    """Joint view: rarenet symptom matching + the live variant evidence panel.
+
+    Symptoms and variants are scored independently and then crossed: a variant
+    with strong molecular support in a gene whose disease matches the symptom
+    cluster is the lead hypothesis. Named sources per component; the joint
+    call is a ranking for a clinician, never a diagnosis."""
+    from ..rarenet_ai.core import diagnose, variant_evidence_panel
+    sym = diagnose(symptoms)
+    panel = variant_evidence_panel(variants, offline=offline)
+    sym_diseases = {d["disease"]: d for d in sym.get("candidates", [])}
+    # gene membership from the differential's own disease records (structured,
+    # not text overlap)
+    diff_genes = {g.upper() for d in sym_diseases.values() for g in d.get("genes", [])}
+    joint = []
+    for v in panel["panel"]:
+        gene = (v.get("gene") or "").upper()
+        gene_in_diff = gene in diff_genes
+        lead = v["support_score"] >= 0.75 and (gene_in_diff or not sym_diseases)
+        joint.append({
+            "gene": gene, "hgvs": v.get("hgvs") or v.get("change"),
+            "support_score": v["support_score"],
+            "evidence_class": v["evidence_class"],
+            "gene_named_in_symptom_differential": gene_in_diff,
+            "lead_hypothesis": lead,
+        })
+    return {
+        "symptom_differential": sym.get("candidates"),
+        "variant_panel_summary": joint,
+        "top_hypothesis": next((j for j in joint if j["lead_hypothesis"]), None),
+        "limits": ["gene-disease membership comes from rarenet's curated rare-disease "
+                   "records (small set); a gene absent there is not evidence against",
+                   "symptom frequencies are heuristic"],
+        "disclaimer": panel["disclaimer"],
+    }

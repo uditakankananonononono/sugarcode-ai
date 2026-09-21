@@ -248,6 +248,30 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### Co-crystal pockets, feature awareness, joint case view (drop 20)
+
+```python
+from sugarcode.modules.mutdock import structure_resistance_scan
+from sugarcode.modules.infinite_diagnosis.core import joint_case_view
+
+structure_resistance_scan("1IEP", {"imatinib": "..."}, ligand_resname="STI")
+joint_case_view(["intellectual disability", "seizures", "musty odor"],
+                [{"gene": "PAH", "hgvs": "c.1A>G", "variant_id": "12-1-A-G"}])
+```
+
+MutDock can now run resistance scans on the **experimentally observed binding
+site**: HETATM co-crystal ligands from real PDBs define the pocket. Live on
+1IEP: the imatinib pocket (46 residues within 6 A) contains T315 and Y253 -
+the actual documented imatinib-resistance sites. MutDock also flags lining
+residues with annotated natural variants (TP53: 110 annotated, caveat
+stated). Infinite Diagnosis crosses the symptom differential with the live
+variant panel on structured gene membership: PKU-shaped symptoms + a
+strong-support PAH variant = lead hypothesis, plainly labeled. Honest catches
+this drop: a symptom normalization bug (spaces vs underscores made
+user-entered symptoms silently never match), and my joint view reading a
+nonexistent "differential" key (always-empty) - both caught by live runs and
+locked with tests.
+
 ### RareNet combined evidence panel (drop 19 - diagnostic-workflow capstone)
 
 ```python

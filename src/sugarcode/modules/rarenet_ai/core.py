@@ -24,7 +24,7 @@ def diagnose(symptoms: list[str], variants: list[dict] | None = None,
     Score = symptom overlap (weighted by symptom specificity) + variant support
     + omics corroboration; explainable per-candidate evidence chain.
     """
-    sym = {s.lower() for s in symptoms}
+    sym = {s.lower().replace(" ", "_") for s in symptoms}
     variant_genes = {v.get("gene", "").upper() for v in (variants or [])}
     omics = omics or {}
     cands = []

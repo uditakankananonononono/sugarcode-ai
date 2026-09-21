@@ -204,3 +204,57 @@ def interface_area(pdb_id: str, chain_a: str, chain_b: str,
             "interface_class": ("strong/stable" if bsa > 1500 else "transient/weak" if bsa > 600 else "minimal contact"),
             "method": "Shrake-Rupley SASA difference; BSA = (SA+SB-SAB)/2",
             "source": "RCSB PDB (live)" if not offline else "RCSB PDB (cache)"}
+
+
+def parse_pdb_hetatm(text: str) -> list[dict]:
+    """HETATM records grouped as ligands: [{resname, chain, resnum, atoms, centroid}]."""
+    groups: dict[tuple, list] = {}
+    for line in text.splitlines():
+        if not line.startswith("HETATM"):
+            continue
+        resname = line[17:20].strip()
+        if resname == "HOH":
+            continue
+        key = (resname, line[21].strip(), int(line[22:26]))
+        groups.setdefault(key, []).append(
+            (float(line[30:38]), float(line[38:46]), float(line[46:54])))
+    out = []
+    for (resname, chain, resnum), xyzs in groups.items():
+        if len(xyzs) < 4:  # ions/singletons are not ligands of interest
+            continue
+        c = tuple(sum(p[k] for p in xyzs) / len(xyzs) for k in range(3))
+        out.append({"resname": resname, "chain": chain, "resnum": resnum,
+                    "n_atoms": len(xyzs), "centroid": c, "atoms": xyzs})
+    return out
+
+
+def ligand_pocket(pdb_id: str, ligand_resname: str, radius: float = 6.0,
+                  chain: str | None = None, offline: bool = False) -> dict:
+    """Residues lining the REAL binding site of a co-crystallized ligand.
+
+    Pocket = protein residues with any CA (or atom) within `radius` of the
+    ligand centroid envelope - the experimentally observed binding site, not a
+    geometry guess."""
+    pdb_id = pdb_id.lower()
+    text = _get(f"{RCSB_FILE}/{pdb_id}.pdb", offline=offline).decode(errors="replace")
+    ligs = [l for l in parse_pdb_hetatm(text)
+            if l["resname"].upper() == ligand_resname.upper()]
+    if not ligs:
+        have = sorted({l["resname"] for l in parse_pdb_hetatm(text)})
+        raise StructureError(f"ligand {ligand_resname!r} not in {pdb_id}; have {have}")
+    parsed = parse_pdb(text)
+    residues = parsed["residues"]
+    if chain:
+        residues = [r for r in residues if r["chain"] == chain]
+    latoms = [a for l in ligs for a in l["atoms"]]
+    lining = []
+    for r in residues:
+        d2min = min(sum((r["ca"][k] - a[k]) ** 2 for k in range(3)) for a in latoms)
+        if d2min <= radius ** 2:
+            lining.append({**r, "dist_to_ligand_A": round(d2min ** 0.5, 2)})
+    if not lining:
+        raise StructureError(f"no residues within {radius} A of {ligand_resname} in {pdb_id}")
+    return {"pdb_id": pdb_id, "ligand": ligand_resname.upper(),
+            "ligand_instances": len(ligs), "radius_A": radius,
+            "lining": lining, "n_lining": len(lining),
+            "source": "RCSB PDB co-crystal ligand (live)" if not offline else "RCSB PDB (cache)"}
