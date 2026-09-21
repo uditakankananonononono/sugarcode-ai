@@ -111,3 +111,23 @@ def answer(question: str) -> dict:
                        "and synthesizes with citations - local graph has genes: "
                        + ", ".join(sorted(GENES))),
             "followups": ["narrow the question to a gene or variant"]}
+
+
+def live_gene_context(gene: str, offline: bool = False) -> dict:
+    """Ground a gene query in live UniProt data; local knowledge slice is the
+    fallback, never a silent substitute - the source is named either way."""
+    from ...bio import uniprot
+    try:
+        rec = uniprot.search(gene, offline=offline)
+        if rec:
+            domains = [f for f in rec["features"] if f["type"] in ("Domain", "Region")]
+            return {"gene": gene, "source": "UniProt (live)",
+                    "protein_name": rec["protein_name"], "length": rec["length"],
+                    "mass_Da": rec["mass"], "n_features": len(rec["features"]),
+                    "domains": domains[:10], "go_terms": rec["go_terms"][:10]}
+    except Exception as e:
+        return {"gene": gene, "source": "local knowledge slice",
+                "warning": f"live lookup failed: {type(e).__name__}: {e}",
+                "local": GENES.get(gene)}
+    return {"gene": gene, "source": "local knowledge slice",
+            "warning": "no reviewed UniProt entry", "local": GENES.get(gene)}

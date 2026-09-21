@@ -63,3 +63,43 @@ def _pathway_links(symbol: str) -> list[dict]:
         "EGFR": ["RTK signaling", "MAPK cascade", "cell proliferation"],
     }
     return [{"pathway": p, "source": "built-in reference"} for p in known.get(symbol.upper(), [])]
+
+
+def live_gene_profile(symbol: str, organism: str = "human", offline: bool = False) -> dict:
+    """Live multi-source gene profile: NCBI Gene + UniProt, merged.
+
+    Falls back per-source: a source that fails is reported as unavailable,
+    never silently dropped or invented.
+    """
+    from ...bio import entrez, uniprot
+    out = {"symbol": symbol, "organism": organism, "sources": {}}
+    try:
+        uid = entrez.gene_id(symbol, organism, offline=offline)
+        if uid:
+            summ = entrez.esummary("gene", [uid], offline=offline)[uid]
+            out["sources"]["ncbi_gene"] = {
+                "uid": uid, "name": summ.get("name"),
+                "description": summ.get("description"),
+                "chromosome": summ.get("chromosome"),
+                "map_location": summ.get("maplocation"),
+                "aliases": summ.get("otheraliases", ""),
+            }
+        else:
+            out["sources"]["ncbi_gene"] = {"error": "symbol not found"}
+    except Exception as e:  # connector failure is reported, not hidden
+        out["sources"]["ncbi_gene"] = {"error": f"{type(e).__name__}: {e}"}
+    try:
+        org_id = 9606 if organism == "human" else 10090
+        rec = uniprot.search(symbol, organism_id=org_id, offline=offline)
+        out["sources"]["uniprot"] = rec or {"error": "no reviewed entry"}
+    except Exception as e:
+        out["sources"]["uniprot"] = {"error": f"{type(e).__name__}: {e}"}
+    # local analysis still runs on the fetched sequence when available
+    seq = (out["sources"].get("uniprot") or {}).get("sequence", "")
+    if seq:
+        out["protein_stats"] = {
+            "length": len(seq),
+            "hydrophobic_fraction": round(sum(1 for a in seq if a in "AILMFWVY") / len(seq), 3),
+            "charged_fraction": round(sum(1 for a in seq if a in "DEKRH") / len(seq), 3),
+        }
+    return out

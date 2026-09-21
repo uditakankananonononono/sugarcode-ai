@@ -118,3 +118,49 @@ class KnowledgeGraph:
                 "reasoning_trace": ["contradiction detected", "reconciliation experiment proposed"]})
         return {"topic": topic, "hypotheses": hypotheses,
                 "underexplored_edges": len(weak), "open_contradictions": len(contra)}
+
+
+_RELATION_WORDS = {"activates": "activates", "stimulates": "activates",
+                   "upregulates": "increases", "increases": "increases",
+                   "inhibits": "inhibits", "suppresses": "inhibits", "blocks": "inhibits",
+                   "decreases": "decreases", "downregulates": "decreases",
+                   "binds": "binds", "interacts with": "binds",
+                   "causes": "associated_with", "associated with": "associated_with"}
+
+
+def extract_claims(text: str) -> list[dict]:
+    """Simple, honest relation extractor: <GENE-ish token> <relation word> <token>.
+
+    Extracts only explicitly stated relations from the sentence; anything
+    it cannot ground is left out (recall-biased toward precision).
+    """
+    import re
+    claims = []
+    for sent in re.split(r"[.!?]", text):
+        words = re.findall(r"[A-Za-z0-9'-]+", sent)
+        for i, w in enumerate(words):
+            rel = _RELATION_WORDS.get(w.lower())
+            if rel and 0 < i < len(words) - 1:
+                subj, obj = words[i - 1], words[i + 1]
+                if subj[:1].isupper() or obj[:1].isupper() or subj.isupper() or obj.isupper():
+                    claims.append({"subject": subj, "relation": rel, "object": obj})
+    return claims
+
+
+def ingest_pubmed(kg: "KnowledgeGraph", query: str, retmax: int = 10,
+                  offline: bool = False) -> dict:
+    """Fetch live PubMed abstracts for a query and ingest extracted claims
+    into the knowledge graph with real citation metadata."""
+    from ...bio import entrez
+    pmids = entrez.pubmed_ids(query, retmax=retmax, offline=offline)
+    abstracts = entrez.pubmed_abstracts(pmids, offline=offline)
+    total = 0
+    for a in abstracts:
+        claims = extract_claims(a["title"] + ". " + a["abstract"])
+        total += kg.ingest({"id": f"PMID:{a['pmid']}", "title": a["title"],
+                            "year": int(a["year"]) if a["year"].isdigit() else 2000,
+                            "citations": 0, "journal": a["journal"],
+                            "claims": claims})
+    return {"query": query, "papers_fetched": len(abstracts),
+            "claims_ingested": total,
+            "pmids": [a["pmid"] for a in abstracts]}

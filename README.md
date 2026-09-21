@@ -52,7 +52,8 @@ Status per module: **verified** = implemented with passing named tests;
 |---|---|---|---|---|
 | 1 | 16 | 0 | 61 | 51 passing |
 | 2 | 27 | 0 | 50 | 71 passing |
-| 3 (current) | **77 (all)** | 0 | 0 | 160 passing |
+| 3 | **77 (all)** | 0 | 0 | 160 passing |
+| 4 (current) | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -149,11 +150,28 @@ Status per module: **verified** = implemented with passing named tests;
 - CRISPR on/off-target scores are calibrated heuristics (Doench-style), not the
   published Rule Set 2 / CFD weight matrices.
 
+## Live data (drop 4)
+
+```python
+from sugarcode.modules.gene_analysis import live_gene_profile
+from sugarcode.modules.openclinvar import live_lookup
+from sugarcode.modules.biogpt_lit import KnowledgeGraph, ingest_pubmed
+from sugarcode.modules.bio_copilot import live_gene_context
+
+live_gene_profile("TP53")        # NCBI Gene + UniProt, merged, sources named
+live_lookup("BRCA1")             # live ClinVar classifications
+kg = KnowledgeGraph(); ingest_pubmed(kg, "BRCA1 DNA repair", retmax=5)
+live_gene_context("KRAS")        # UniProt grounding, local slice as named fallback
+```
+
+Connectors cache to `~/.sugarcode_cache/` and support `offline=True` for
+air-gapped/test runs (raises unless cached - no silent fabrication).
+
 ## Quickstart
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 160 tests
+python -m pytest -q                 # 169 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

@@ -136,3 +136,25 @@ def clinical_summary(gene: str, variant: str, **kwargs) -> dict:
         },
         "same_gene_reference_variants": comparisons,
     }
+
+
+def live_lookup(gene: str, retmax: int = 20, offline: bool = False) -> dict:
+    """Live ClinVar variant set for a gene, mapped onto the local ACMG-style
+    interpretation frame so live data flows through the same report shape."""
+    from ...bio import entrez
+    variants = entrez.clinvar_variants(gene, retmax=retmax, offline=offline)
+    counts = {}
+    for v in variants:
+        sig = v["significance"] or "uncertain"
+        counts[sig] = counts.get(sig, 0) + 1
+    pathogenic = [v for v in variants if "athogenic" in (v["significance"] or "")
+                  and "Likely" not in v["significance"] and not v["significance"].startswith("Likely benign")]
+    return {
+        "gene": gene, "source": "NCBI ClinVar (live)",
+        "n_variants": len(variants),
+        "significance_counts": counts,
+        "variants": variants,
+        "pathogenic_or_likely": [v for v in variants
+                                 if "athogenic" in (v["significance"] or "")],
+        "note": "live classification pulled at query time; review_status shown per variant",
+    }
