@@ -167,7 +167,31 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
     with review-status-weighted strength (expert panel > single submitter);
     when it does not, that absence is stated, not papered over."""
     r = interpret_variant(gene, variant, **kwargs)
-    from ...bio import entrez
+    # gene-level gnomAD constraint (drop 18): LOF intolerance is real ACMG
+    # context for loss-of-function consequences; attached in all code paths.
+    from ...bio import entrez, gnomad
+    LOF = {"frameshift", "nonsense", "stop_gained", "splice_acceptor", "splice_donor"}
+    try:
+        c = gnomad.gene_constraint(gene, offline=offline)
+        r["gnomad_constraint"] = c
+        cons = kwargs.get("consequence", "")
+        if c.get("lof_constrained") and cons in LOF:
+            r["evidence"].append({
+                "rule": "GNOMAD_CONSTRAINT",
+                "weight": 0.3,
+                "detail": (f"gene strongly LOF-constrained (pLI {c['pli']:.3f}, "
+                           f"LOEUF {c['loeuf']:.3f}); {cons} is a LOF consequence"),
+            })
+        elif cons in LOF:
+            r["evidence"].append({
+                "rule": "GNOMAD_CONSTRAINT",
+                "weight": 0.0,
+                "detail": (f"gene not strongly LOF-constrained (LOEUF "
+                           f"{(c.get('loeuf') or 0):.3f}); constraint adds no "
+                           "pathogenic support here"),
+            })
+    except Exception as e:
+        r["gnomad_constraint"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
     try:
         matched = entrez.clinvar_exact(gene, variant, offline=offline)
     except Exception as e:

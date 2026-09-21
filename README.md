@@ -248,6 +248,25 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### gnomAD constraint, specificity checks, pocket validation (drop 18)
+
+```python
+from sugarcode.bio import gnomad
+from sugarcode.modules.openclinvar import interpret_variant_live
+
+gnomad.gene_constraint("SCN1A")                 # pLI 1.0, LOEUF 0.107 - constrained
+interpret_variant_live("SCN1A", "c.100dup", consequence="frameshift")
+```
+
+OpenClinVar now weighs **gnomAD gene constraint** for LOF consequences - and
+says no honestly: TP53 (LOEUF 0.418) adds zero support, SCN1A (0.107) adds
+real support, missense consequences get no constraint evidence at all.
+NeoHunter takes an optional GRCh38 variant_id and runs a gnomAD population
+frequency check as a second tumor-specificity test. MutDock validates its
+geometry pockets against UniProt-annotated BINDING features, with plain
+verdicts when they do not overlap (may be allosteric/unannotated - or a false
+positive; the user sees the doubt).
+
 ### ClinVar priors, mutdock Vina baseline, live gnomAD frequencies (drop 16)
 
 ```python

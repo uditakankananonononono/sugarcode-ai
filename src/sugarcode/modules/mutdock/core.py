@@ -156,6 +156,42 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
         raise IndexError(f"pocket_index {pocket_index} out of range - {len(pockets)} found")
     chosen = set(pockets[pocket_index]["residues"])
     lining = [r for r in residues if r["resnum"] in chosen]
+    # binding-site validation (drop 18): for the UniProt/AlphaFold path, compare
+    # the geometry pocket against UniProt-annotated BINDING features.
+    binding_validation = None
+    if not (len(identifier) == 4 and identifier[0].isdigit()):
+        try:
+            # direct record fetch by accession
+            from ...bio.uniprot import _get as _upget, BASE as _UPBASE
+            import json as _json
+            data = _json.loads(_upget(f"{_UPBASE}/{identifier}.json", offline=offline))
+            feats = data.get("features", [])
+            sites = [f for f in feats if f.get("type") == "Binding site"]
+            site_res = set()
+            for f in sites:
+                loc = f.get("location", {})
+                b, e = (loc.get("start") or {}).get("value"), (loc.get("end") or {}).get("value")
+                if b and e:
+                    site_res.update(range(int(b), int(e) + 1))
+            if site_res:
+                overlap = len(chosen & site_res)
+                binding_validation = {
+                    "annotated_binding_residues": len(site_res),
+                    "pocket_residues_in_annotated_sites": overlap,
+                    "overlap_fraction": round(overlap / max(len(chosen), 1), 3),
+                    "verdict": ("geometry pocket overlaps annotated binding sites"
+                                if overlap > 0 else
+                                "geometry pocket does NOT overlap any annotated binding site - "
+                                "may be an unannotated/allosteric pocket or a false positive"),
+                    "source": f"UniProt {identifier} BINDING features (live)" if not offline
+                              else f"UniProt {identifier} BINDING features (cache)",
+                }
+            else:
+                binding_validation = {"status": "no annotated BINDING features for this protein"}
+        except Exception as e:
+            binding_validation = {"status": f"validation lookup failed: {type(e).__name__}: {e}"}
+    else:
+        binding_validation = {"status": "PDB input - UniProt mapping not available (SIFTS not wired); skipped"}
     pocket_seq = "".join(_A3.get(r["resname"], "G") for r in lining)
     start = lining[0]["resnum"] - 1
     scan = resistance_scan(pocket_seq, drugs, pocket_start=start)
@@ -177,6 +213,7 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
                       "chain": chain, "pocket_index": pocket_index,
                       "n_pockets_found": len(pockets),
                       "lining": [f"{r['resname']}{r['resnum']}" for r in lining]},
+        "binding_site_validation": binding_validation,
         "wt_vina_baseline": vina_wt,
         "wt_vina_note": ("Vina-form WT affinity on real pocket CA coordinates "
                          "(Trott & Olson 2010 terms); mutant ddG comes from the "

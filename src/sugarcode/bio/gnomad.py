@@ -67,3 +67,29 @@ def variant_frequency(variant_id: str, dataset: str = "gnomad_r4",
             "exome": v.get("exome"), "genome": v.get("genome"),
             "max_af": max((v.get("exome") or {}).get("af") or 0.0,
                           (v.get("genome") or {}).get("af") or 0.0)}
+
+
+def gene_constraint(gene: str, dataset: str = "gnomad_r4", offline: bool = False) -> dict:
+    """gnomAD gene constraint scores: pLI, LOF Z, o/e LOF + upper (LOEUF), missense Z.
+
+    High pLI / low LOEUF = strong selection against loss-of-function: LOF
+    variants in such genes are more likely deleterious (context for ACMG-style
+    weighing, not a classification by itself)."""
+    q = ('{ gene(gene_symbol: "%s", reference_genome: GRCh38) { symbol '
+         'gnomad_constraint { pli lof_z oe_lof oe_lof_upper mis_z oe_mis } } }' % gene)
+    data = _post(q, offline=offline)
+    if data.get("errors") and not (data.get("data") or {}).get("gene"):
+        raise GnomADError(f"gnomAD errors: {data['errors']}")
+    g = (data.get("data") or {}).get("gene")
+    if not g or not g.get("gnomad_constraint"):
+        return {"gene": gene, "status": "no constraint scores (gene absent from gnomAD r4)"}
+    c = g["gnomad_constraint"]
+    loeuf = c.get("oe_lof_upper")
+    return {"gene": gene, "dataset": dataset, "pli": c.get("pli"),
+            "lof_z": c.get("lof_z"), "oe_lof": c.get("oe_lof"),
+            "loeuf": loeuf, "mis_z": c.get("mis_z"), "oe_mis": c.get("oe_mis"),
+            "lof_constrained": bool(loeuf is not None and loeuf < 0.35),
+            "interpretation": ("strongly LOF-constrained (LOEUF < 0.35): heterozygous LOF "
+                               "variants are strongly selected against"
+                               if loeuf is not None and loeuf < 0.35
+                               else "not strongly LOF-constrained (LOEUF >= 0.35 or unknown)")}

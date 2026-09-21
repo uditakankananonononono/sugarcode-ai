@@ -96,6 +96,7 @@ def _vaccine(top: list[dict]) -> dict:
 # --- drop 15: live UniProt sequence + variant priors ---------------------------
 def find_neoantigens_live(gene: str, mutation_pos: int, mutant_aa: str,
                           hla: str = "A*02:01", organism_id: int = 9606,
+                          variant_id: str | None = None,
                           offline: bool = False) -> dict:
     """Neoantigen scan on the REAL UniProt sequence with variant priors.
 
@@ -159,7 +160,31 @@ def find_neoantigens_live(gene: str, mutation_pos: int, mutant_aa: str,
                            for f in priors[:5]],
         "variant_prior_count": len(priors),
         "clinvar_prior": clinvar_prior,
+        "gnomad_frequency": _gnomad_specificity(variant_id, offline),
         "sequence_source": f"UniProt {rec['accession']} (live)" if not offline
                            else f"UniProt {rec['accession']} (cache)",
     })
     return scan
+
+
+def _gnomad_specificity(variant_id: str | None, offline: bool) -> dict:
+    """Second tumor-specificity check (drop 18): population frequency of the
+    exact variant. Present-and-common -> also in normal tissue, weakens the
+    neoantigen premise; absent -> consistent with tumor-specific."""
+    if not variant_id:
+        return {"status": "no GRCh38 variant_id supplied - check skipped"}
+    try:
+        from ...bio import gnomad
+        f = gnomad.variant_frequency(variant_id, offline=offline)
+        if not f["present"]:
+            f["specificity_note"] = ("no population carriers - consistent with "
+                                     "tumor-specific (or germline ultra-rare)")
+        else:
+            af = f.get("max_af") or 0.0
+            f["specificity_note"] = (
+                f"present in population (max AF {af:.4g}) - variant likely also in "
+                "normal tissue; weigh neoantigen call accordingly" if af > 0 else
+                "present with zero AF reported")
+        return f
+    except Exception as e:
+        return {"status": f"lookup failed: {type(e).__name__}: {e}"}

@@ -1,11 +1,11 @@
-# SugarCode AI - honest status (as of drop 16 / this push)
+# SugarCode AI - honest status (as of drop 18 / this push)
 
 This document is the current truth ledger. It says what is verified against
 real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **255 passed, 0 failed** (hermetic fixtures; live calls verified
+Test suite: **264 passed, 0 failed** (hermetic fixtures; live calls verified
 outside pytest and recorded below).
 
 ## Tier 1 - verified against live external data
@@ -14,7 +14,9 @@ outside pytest and recorded below).
 |---|---|---|
 | crispr_opt | Off-target = published CFD (Doench 2016), on-target = Doench 2014 Rule Set 1; both vendored verbatim, cross-validated 500/500 vs CRISPOR reference | CRISPOR distribution (maximilianh/crisporWebsite) |
 | crispr_cargo, phageforge | CFD scan inherited from crispr_opt for real guides | same provenance |
-| openclinvar | Live ClinVar exact-variant evidence; near-miss titles rejected; conflicting classifications weight 0. BRCA1 c.5266dup -> Pathogenic, expert panel | NCBI ClinVar (Entrez) |
+| openclinvar | Live ClinVar exact-variant evidence; near-miss titles rejected; conflicting classifications weight 0. BRCA1 c.5266dup -> Pathogenic, expert panel. Plus gnomAD gene constraint (pLI/LOEUF): supports LOF evidence only in truly constrained genes (SCN1A LOEUF 0.107 yes, TP53 0.418 honestly no) | NCBI ClinVar, gnomAD r4 |
+| neohunter specificity | gnomAD population frequency as second tumor-specificity check (when a GRCh38 variant_id is supplied; skipped honestly otherwise) | gnomAD r4 |
+| mutdock pocket validation | geometry pockets compared against UniProt-annotated BINDING features; non-overlap verdicts stated plainly (P04637: annotated sites are DNA-binding, geometry pocket flagged honestly) | UniProt, AlphaFold DB |
 | rarenet_ai | Live ClinVar gene context + gnomAD population frequency. P72R AF 0.716 (common, ruled out); R273H absent (ultra-rare, stated) | NCBI ClinVar, gnomAD r4 GraphQL |
 | neohunter | Real UniProt sequence + WT-residue validation + published variant priors + live ClinVar germline caveat. TP53 R273H: 9 priors, top 9-mer NSFEVHVCA | UniProt, NCBI ClinVar |
 | mutdock | Real structure pockets (true residue numbering), Vina-form WT baseline per drug. 1TUP chain B live | RCSB PDB, AlphaFold DB |
