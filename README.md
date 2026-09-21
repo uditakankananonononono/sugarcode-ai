@@ -248,6 +248,27 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### RareNet combined evidence panel (drop 19 - diagnostic-workflow capstone)
+
+```python
+from sugarcode.modules.rarenet_ai.core import variant_evidence_panel
+
+variant_evidence_panel([
+    {"gene": "TP53", "hgvs": "p.Arg273His", "variant_id": "17-7674221-C-T"},
+    {"gene": "TP53", "hgvs": "p.Pro72Arg", "variant_id": "17-7676154-G-C"},
+])
+```
+
+One panel per patient variant: live ClinVar classification (exact phrase
+query + title verification - rarenet now uses the same discipline as
+openclinvar after a live run exposed gene-page scans missing first-page-past
+variants), gnomAD frequency/rarity, and gene constraint, combined into a
+support score with every component named and weighted in the open. Live-
+verified: TP53 R273H -> strong support (2.5: ClinVar Pathogenic + absent from
+gnomAD), P72R -> evidence against (-3.5: Benign + AF 0.716), SCN1A frameshift
+-> moderate via LOEUF 0.107. Explicitly not a diagnosis - clinician
+adjudicates; the disclaimer is in the output itself.
+
 ### gnomAD constraint, specificity checks, pocket validation (drop 18)
 
 ```python

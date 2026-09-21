@@ -93,13 +93,20 @@ def enrich_variants_live(variants: list[dict], retmax: int = 10,
             out.append(ev)
             continue
         try:
-            entries = entrez.clinvar_variants(gene, retmax=retmax, offline=offline)
             notation = v.get("hgvs") or v.get("change") or ""
-            matched = [e for e in entries
-                       if notation and notation.split(":")[-1] in e["title"]]
+            if notation:
+                # exact phrase query + title verification (same discipline as
+                # openclinvar): gene-page scans miss variants past the first page
+                entries = entrez.clinvar_exact(gene, notation, offline=offline)
+                needle = notation.split(":")[-1].replace(" ", "")
+                matched = [e for e in entries if needle and needle in e["title"].replace(" ", "")]
+            else:
+                entries = entrez.clinvar_variants(gene, retmax=retmax, offline=offline)
+                matched = []
             path = [e for e in entries if "athogenic" in (e["significance"] or "")]
             ev["clinvar"] = {
                 "status": "live",
+                "query": ("exact" if notation else "gene-page"),
                 "gene_entries": len(entries),
                 "pathogenic_or_likely": len(path),
                 "exact_match": matched,
@@ -131,3 +138,69 @@ def enrich_variants_live(variants: list[dict], retmax: int = 10,
             ev["gnomad"] = {"status": "no GRCh38 variant_id - skipped"}
         out.append(ev)
     return out
+
+
+# --- drop 19: combined variant evidence panel (diagnostic-workflow capstone) ---
+def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
+    """One panel per patient variant: live ClinVar classification, gnomAD
+    population frequency + rarity, and gene constraint (pLI/LOEUF) - combined
+    into a named-component support score. This aggregates evidence for a
+    clinician; it does NOT diagnose. Every component names its source; every
+    failure is reported, none hidden."""
+    from ...bio import gnomad
+    enriched = enrich_variants_live(variants, offline=offline)
+    constraint_cache: dict[str, dict] = {}
+    panel = []
+    for ev in enriched:
+        gene = (ev.get("gene") or "").upper()
+        if gene and gene not in constraint_cache:
+            try:
+                constraint_cache[gene] = gnomad.gene_constraint(gene, offline=offline)
+            except Exception as e:
+                constraint_cache[gene] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+        c = constraint_cache.get(gene, {})
+        components = []
+        score = 0.0
+        cl = ev.get("clinvar", {})
+        if cl.get("exact_match"):
+            sig = (cl["exact_match"][0]["significance"] or "").lower()
+            if "pathogenic" in sig and "benign" not in sig and "conflicting" not in sig:
+                score += 2.0
+                components.append("ClinVar pathogenic classification (+2.0)")
+            elif "benign" in sig:
+                score -= 2.0
+                components.append("ClinVar benign classification (-2.0)")
+            else:
+                components.append("ClinVar entry conflicting/uncertain (0)")
+        g = ev.get("gnomad", {})
+        if g.get("present") is False:
+            score += 0.5
+            components.append("absent from gnomAD - consistent with rare (+0.5)")
+        elif g.get("present") and (g.get("max_af") or 0) > 0.01:
+            score -= 1.5
+            components.append(f"common in population (AF {g['max_af']:.3g}) (-1.5)")
+        elif g.get("present"):
+            score += 0.25
+            components.append(f"rare in population (AF {g.get('max_af', 0):.3g}) (+0.25)")
+        LOF = {"frameshift", "nonsense", "stop_gained", "splice_acceptor", "splice_donor"}
+        cons = ev.get("consequence", "")
+        if c.get("lof_constrained") and cons in LOF:
+            score += 0.5
+            components.append(f"LOF consequence in constrained gene (LOEUF {c['loeuf']:.3g}) (+0.5)")
+        panel.append({**ev, "gene_constraint": c,
+                      "support_score": round(score, 2),
+                      "score_components": components,
+                      "evidence_class": ("strong support" if score >= 2.0 else
+                                         "moderate support" if score >= 0.75 else
+                                         "little/no support" if score >= -0.5 else "evidence against")})
+    panel.sort(key=lambda p: -p["support_score"])
+    return {
+        "panel": panel,
+        "n_variants": len(panel),
+        "scoring": {"clinvar_pathogenic": 2.0, "clinvar_benign": -2.0,
+                    "gnomad_absent": 0.5, "gnomad_common_af>1%": -1.5,
+                    "gnomad_rare": 0.25, "lof_in_constrained_gene": 0.5},
+        "disclaimer": ("evidence aggregation only - component weights are ours, "
+                       "sources named per component; a clinician adjudicates. "
+                       "Not a diagnosis."),
+    }

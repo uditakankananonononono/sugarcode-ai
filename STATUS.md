@@ -1,11 +1,11 @@
-# SugarCode AI - honest status (as of drop 18 / this push)
+# SugarCode AI - honest status (as of drop 19 / this push)
 
 This document is the current truth ledger. It says what is verified against
 real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **264 passed, 0 failed** (hermetic fixtures; live calls verified
+Test suite: **269 passed, 0 failed** (hermetic fixtures; live calls verified
 outside pytest and recorded below).
 
 ## Tier 1 - verified against live external data
@@ -16,6 +16,7 @@ outside pytest and recorded below).
 | crispr_cargo, phageforge | CFD scan inherited from crispr_opt for real guides | same provenance |
 | openclinvar | Live ClinVar exact-variant evidence; near-miss titles rejected; conflicting classifications weight 0. BRCA1 c.5266dup -> Pathogenic, expert panel. Plus gnomAD gene constraint (pLI/LOEUF): supports LOF evidence only in truly constrained genes (SCN1A LOEUF 0.107 yes, TP53 0.418 honestly no) | NCBI ClinVar, gnomAD r4 |
 | neohunter specificity | gnomAD population frequency as second tumor-specificity check (when a GRCh38 variant_id is supplied; skipped honestly otherwise) | gnomAD r4 |
+| rarenet_ai panel | Combined per-variant evidence panel (ClinVar + gnomAD frequency + gene constraint) with named components and weights, ranked, clinician-adjudicates disclaimer. Live-verified: R273H strong support (2.5), P72R evidence against (-3.5) | NCBI ClinVar, gnomAD r4 |
 | mutdock pocket validation | geometry pockets compared against UniProt-annotated BINDING features; non-overlap verdicts stated plainly (P04637: annotated sites are DNA-binding, geometry pocket flagged honestly) | UniProt, AlphaFold DB |
 | rarenet_ai | Live ClinVar gene context + gnomAD population frequency. P72R AF 0.716 (common, ruled out); R273H absent (ultra-rare, stated) | NCBI ClinVar, gnomAD r4 GraphQL |
 | neohunter | Real UniProt sequence + WT-residue validation + published variant priors + live ClinVar germline caveat. TP53 R273H: 9 priors, top 9-mer NSFEVHVCA | UniProt, NCBI ClinVar |
