@@ -1,0 +1,464 @@
+[
+ {
+  "name": "Neuro-Hub (Dashboard)",
+  "slug": "neuro_hub_dashboard",
+  "start": 2,
+  "chars": 366
+ },
+ {
+  "name": "Bio-Copilot",
+  "slug": "bio_copilot",
+  "start": 3,
+  "chars": 8060
+ },
+ {
+  "name": "SynBio Wizard",
+  "slug": "synbio_wizard",
+  "start": 13,
+  "chars": 5946
+ },
+ {
+  "name": "Neuro-Pipeline",
+  "slug": "neuro_pipeline",
+  "start": 21,
+  "chars": 4160
+ },
+ {
+  "name": "ChemGPT Engine",
+  "slug": "chemgpt_engine",
+  "start": 27,
+  "chars": 4582
+ },
+ {
+  "name": "BioGPT Lit",
+  "slug": "biogpt_lit",
+  "start": 34,
+  "chars": 4051
+ },
+ {
+  "name": "GenomeGPT",
+  "slug": "genomegpt",
+  "start": 42,
+  "chars": 4586
+ },
+ {
+  "name": "Gene Analysis",
+  "slug": "gene_analysis",
+  "start": 50,
+  "chars": 4410
+ },
+ {
+  "name": "Gene Explorer",
+  "slug": "gene_explorer",
+  "start": 58,
+  "chars": 4406
+ },
+ {
+  "name": "CRISPR Opt",
+  "slug": "crispr_opt",
+  "start": 66,
+  "chars": 4409
+ },
+ {
+  "name": "CRISPR Cargo",
+  "slug": "crispr_cargo",
+  "start": 74,
+  "chars": 4245
+ },
+ {
+  "name": "CRISPR Muse",
+  "slug": "crispr_muse",
+  "start": 82,
+  "chars": 7858
+ },
+ {
+  "name": "Epi-Edit",
+  "slug": "epi_edit",
+  "start": 95,
+  "chars": 4368
+ },
+ {
+  "name": "Prime Design",
+  "slug": "prime_design",
+  "start": 103,
+  "chars": 4216
+ },
+ {
+  "name": "Dark Genome",
+  "slug": "dark_genome",
+  "start": 111,
+  "chars": 4533
+ },
+ {
+  "name": "RNA Decoder",
+  "slug": "rna_decoder",
+  "start": 119,
+  "chars": 4206
+ },
+ {
+  "name": "DeepSplice",
+  "slug": "deepsplice",
+  "start": 127,
+  "chars": 3662
+ },
+ {
+  "name": "OpenClinVar",
+  "slug": "openclinvar",
+  "start": 135,
+  "chars": 4041
+ },
+ {
+  "name": "STR-Scope",
+  "slug": "str_scope",
+  "start": 143,
+  "chars": 3708
+ },
+ {
+  "name": "Codon Opt",
+  "slug": "codon_opt",
+  "start": 151,
+  "chars": 7965
+ },
+ {
+  "name": "Alpha-Fold UI",
+  "slug": "alpha_fold_ui",
+  "start": 170,
+  "chars": 4082
+ },
+ {
+  "name": "Docking Studio",
+  "slug": "docking_studio",
+  "start": 178,
+  "chars": 3990
+ },
+ {
+  "name": "EvoFold 4D",
+  "slug": "evofold_4d",
+  "start": 188,
+  "chars": 3842
+ },
+ {
+  "name": "MutDock",
+  "slug": "mutdock",
+  "start": 198,
+  "chars": 3951
+ },
+ {
+  "name": "Protein Painter",
+  "slug": "protein_painter",
+  "start": 208,
+  "chars": 4121
+ },
+ {
+  "name": "Bio-Material",
+  "slug": "bio_material",
+  "start": 216,
+  "chars": 3642
+ },
+ {
+  "name": "Syn-Bio Studio",
+  "slug": "syn_bio_studio",
+  "start": 224,
+  "chars": 3418
+ },
+ {
+  "name": "MetaboDesigner",
+  "slug": "metabodesigner",
+  "start": 232,
+  "chars": 3077
+ },
+ {
+  "name": "Promoter Lib",
+  "slug": "promoter_lib",
+  "start": 240,
+  "chars": 3092
+ },
+ {
+  "name": "Synthetic Life",
+  "slug": "synthetic_life",
+  "start": 248,
+  "chars": 5141
+ },
+ {
+  "name": "BioFactory 1-A",
+  "slug": "biofactory_1_a",
+  "start": 258,
+  "chars": 3292
+ },
+ {
+  "name": "Robotic Flow",
+  "slug": "robotic_flow",
+  "start": 266,
+  "chars": 2697
+ },
+ {
+  "name": "Syn-Stab AI",
+  "slug": "syn_stab_ai",
+  "start": 274,
+  "chars": 2647
+ },
+ {
+  "name": "Cell-Free Opt",
+  "slug": "cell_free_opt",
+  "start": 282,
+  "chars": 369
+ },
+ {
+  "name": "Stability AI",
+  "slug": "stability_ai",
+  "start": 283,
+  "chars": 374
+ },
+ {
+  "name": "Living Computer",
+  "slug": "living_computer",
+  "start": 284,
+  "chars": 7256
+ },
+ {
+  "name": "Bio-Switch",
+  "slug": "bio_switch",
+  "start": 307,
+  "chars": 3776
+ },
+ {
+  "name": "PhageForge",
+  "slug": "phageforge",
+  "start": 317,
+  "chars": 402
+ },
+ {
+  "name": "Cell-Twin",
+  "slug": "cell_twin",
+  "start": 318,
+  "chars": 370
+ },
+ {
+  "name": "Fate Predictor",
+  "slug": "fate_predictor",
+  "start": 319,
+  "chars": 367
+ },
+ {
+  "name": "CellFateNet",
+  "slug": "cellfatenet",
+  "start": 320,
+  "chars": 12643
+ },
+ {
+  "name": "Organoid AI",
+  "slug": "organoid_ai",
+  "start": 350,
+  "chars": 344
+ },
+ {
+  "name": "Virtual Cell",
+  "slug": "virtual_cell",
+  "start": 351,
+  "chars": 398
+ },
+ {
+  "name": "BioImage AI",
+  "slug": "bioimage_ai",
+  "start": 352,
+  "chars": 365
+ },
+ {
+  "name": "CellPainter",
+  "slug": "cellpainter",
+  "start": 353,
+  "chars": 397
+ },
+ {
+  "name": "CellPainter 4D",
+  "slug": "cellpainter_4d",
+  "start": 354,
+  "chars": 358
+ },
+ {
+  "name": "SynDroid",
+  "slug": "syndroid",
+  "start": 355,
+  "chars": 14675
+ },
+ {
+  "name": "Tissue Eng",
+  "slug": "tissue_eng",
+  "start": 400,
+  "chars": 382
+ },
+ {
+  "name": "Infinite Diagnosis",
+  "slug": "infinite_diagnosis",
+  "start": 401,
+  "chars": 390
+ },
+ {
+  "name": "CAR-T Designer",
+  "slug": "car_t_designer",
+  "start": 402,
+  "chars": 388
+ },
+ {
+  "name": "Living Tx",
+  "slug": "living_tx",
+  "start": 403,
+  "chars": 371
+ },
+ {
+  "name": "NeoHunter",
+  "slug": "neohunter",
+  "start": 404,
+  "chars": 14403
+ },
+ {
+  "name": "Gene-Tx Opt",
+  "slug": "gene_tx_opt",
+  "start": 441,
+  "chars": 354
+ },
+ {
+  "name": "Vector Opt",
+  "slug": "vector_opt",
+  "start": 442,
+  "chars": 382
+ },
+ {
+  "name": "Organoid Screen",
+  "slug": "organoid_screen",
+  "start": 443,
+  "chars": 387
+ },
+ {
+  "name": "NeuroPlan AI",
+  "slug": "neuroplan_ai",
+  "start": 444,
+  "chars": 346
+ },
+ {
+  "name": "NeoDti Engine",
+  "slug": "neodti_engine",
+  "start": 445,
+  "chars": 362
+ },
+ {
+  "name": "Liquid Biopsy",
+  "slug": "liquid_biopsy",
+  "start": 446,
+  "chars": 16786
+ },
+ {
+  "name": "RareNet AI",
+  "slug": "rarenet_ai",
+  "start": 490,
+  "chars": 347
+ },
+ {
+  "name": "OncoCircuit",
+  "slug": "oncocircuit",
+  "start": 491,
+  "chars": 379
+ },
+ {
+  "name": "PDX Insight",
+  "slug": "pdx_insight",
+  "start": 492,
+  "chars": 364
+ },
+ {
+  "name": "MicroAiverse",
+  "slug": "microaiverse",
+  "start": 493,
+  "chars": 365
+ },
+ {
+  "name": "Microbiome Exp",
+  "slug": "microbiome_exp",
+  "start": 494,
+  "chars": 376
+ },
+ {
+  "name": "Micro-Tx",
+  "slug": "micro_tx",
+  "start": 495,
+  "chars": 15455
+ },
+ {
+  "name": "Microbiome Rx",
+  "slug": "microbiome_rx",
+  "start": 539,
+  "chars": 374
+ },
+ {
+  "name": "Riboswitch",
+  "slug": "riboswitch",
+  "start": 540,
+  "chars": 373
+ },
+ {
+  "name": "Phage-Tx",
+  "slug": "phage_tx",
+  "start": 541,
+  "chars": 368
+ },
+ {
+  "name": "Phage Designer",
+  "slug": "phage_designer",
+  "start": 542,
+  "chars": 378
+ },
+ {
+  "name": "BioPrint Pro",
+  "slug": "bioprint_pro",
+  "start": 543,
+  "chars": 12396
+ },
+ {
+  "name": "BioPlayground",
+  "slug": "bioplayground",
+  "start": 581,
+  "chars": 389
+ },
+ {
+  "name": "DNA-to-Code",
+  "slug": "dna_to_code",
+  "start": 582,
+  "chars": 395
+ },
+ {
+  "name": "BioSimVR",
+  "slug": "biosimvr",
+  "start": 583,
+  "chars": 356
+ },
+ {
+  "name": "SynLife Evo",
+  "slug": "synlife_evo",
+  "start": 584,
+  "chars": 12041
+ },
+ {
+  "name": "Omega Stats",
+  "slug": "omega_stats",
+  "start": 621,
+  "chars": 363
+ },
+ {
+  "name": "Enterprise Bio",
+  "slug": "enterprise_bio",
+  "start": 622,
+  "chars": 395
+ },
+ {
+  "name": "Ecosystem",
+  "slug": "ecosystem",
+  "start": 623,
+  "chars": 359
+ },
+ {
+  "name": "Nexus Support",
+  "slug": "nexus_support",
+  "start": 624,
+  "chars": 330
+ }
+]
