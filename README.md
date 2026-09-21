@@ -1,5 +1,7 @@
 # SugarCode AI
 
+**Current honest status: see [STATUS.md](STATUS.md)** - what is verified, thin, and Missing, updated each push.
+
 A multi-omic bio-design platform organized as a network of specialized modules on the
 **Omega OS v7.0** framework. Built line-by-line from the SugarCode AI spec doc
 (`spec/` holds the full per-module spec corpus extracted from the source document).
