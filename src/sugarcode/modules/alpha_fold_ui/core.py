@@ -167,3 +167,70 @@ def _binding_pockets(seq: str, ss: list[str], conf: list[float]) -> list[dict]:
         else:
             i += 1
     return pockets
+
+
+def _real_pockets(residues: list[dict], radius: float = 9.0, min_size: int = 12) -> list[dict]:
+    """Pocket candidates from real C-alpha geometry: cluster spatially dense
+    neighborhoods (many CAs within radius = concave/enclosed regions)."""
+    import numpy as np
+    coords = np.array([r["ca"] for r in residues])
+    n = len(coords)
+    density = np.zeros(n, dtype=int)
+    for i in range(n):
+        d = np.linalg.norm(coords - coords[i], axis=1)
+        density[i] = int(((d > 1e-6) & (d < radius)).sum())
+    threshold = np.percentile(density, 75)
+    hot = np.where(density >= threshold)[0]
+    pockets, current = [], []
+    for idx in hot:
+        if current and idx - current[-1] > 3:
+            if len(current) >= min_size // 3:
+                pockets.append(current)
+            current = []
+        current.append(int(idx))
+    if len(current) >= min_size // 3:
+        pockets.append(current)
+    out = []
+    for p in sorted(pockets, key=len, reverse=True)[:3]:
+        c = coords[p].mean(axis=0)
+        out.append({
+            "residues": [residues[i]["resnum"] for i in p],
+            "center": [round(float(v), 1) for v in c],
+            "mean_density": round(float(density[p].mean()), 1),
+            "mean_plddt_or_b": round(sum(residues[i]["bfactor"] for i in p) / len(p), 1),
+            "druggability_prior": round(min(1.0, float(density[p].mean()) / 40), 2),
+        })
+    return out
+
+
+def analyze_real_structure(identifier: str, offline: bool = False) -> dict:
+    """Full structure analysis on a REAL experimental/AlphaFold structure.
+
+    identifier: 4-char PDB id (experimental) or UniProt accession (AlphaFold).
+    Real coordinates, real confidence (pLDDT/B-factors), geometry-based pockets.
+    """
+    from ...bio.structures import fetch_pdb, fetch_alphafold
+    if len(identifier) == 4 and identifier[0].isdigit():
+        s = fetch_pdb(identifier, offline=offline)
+        confidence_kind = "crystallographic B-factor"
+    else:
+        s = fetch_alphafold(identifier, offline=offline)
+        confidence_kind = "AlphaFold pLDDT"
+    residues = s["residues"]
+    bs = [r["bfactor"] for r in residues]
+    pockets = _real_pockets(residues)
+    return {
+        "identifier": identifier, "source": s["source"],
+        "n_residues": s["n_residues"], "chains": s["chains"],
+        "confidence_kind": confidence_kind,
+        "confidence_stats": {"mean": round(sum(bs) / len(bs), 2),
+                             "min": round(min(bs), 2), "max": round(max(bs), 2)},
+        **({"mean_plddt": s["mean_plddt"],
+            "fraction_low_confidence": s["fraction_low_confidence"]}
+           if "mean_plddt" in s else
+           {"method": s.get("method"), "resolution_A": s.get("resolution_A")}),
+        "pockets": pockets,
+        "title": s.get("title", ""),
+        "note": ("real coordinates from " + s["source"] +
+                 "; pockets computed from C-alpha density, not the Chou-Fasman stand-in"),
+    }

@@ -53,7 +53,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 1 | 16 | 0 | 61 | 51 passing |
 | 2 | 27 | 0 | 50 | 71 passing |
 | 3 | **77 (all)** | 0 | 0 | 160 passing |
-| 4 (current) | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
+| 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
+| 5 (current) | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -167,11 +168,24 @@ live_gene_context("KRAS")        # UniProt grounding, local slice as named fallb
 Connectors cache to `~/.sugarcode_cache/` and support `offline=True` for
 air-gapped/test runs (raises unless cached - no silent fabrication).
 
+### Real structures (drop 5)
+
+```python
+from sugarcode.modules.alpha_fold_ui import analyze_real_structure
+analyze_real_structure("P04637")   # AlphaFold DB: 393 res, real pLDDT, pockets
+analyze_real_structure("1TUP")     # RCSB PDB: experimental coords, resolution
+```
+
+`src/sugarcode/bio/structures.py` fetches from RCSB and AlphaFold DB (EBI),
+parses C-alpha traces with confidence (pLDDT / B-factors), and finds pockets
+from real coordinate density - replacing the Chou-Fasman stand-in for any
+protein with a known structure.
+
 ## Quickstart
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 169 tests
+python -m pytest -q                 # 175 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
