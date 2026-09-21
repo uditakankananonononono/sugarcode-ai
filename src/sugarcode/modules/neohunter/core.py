@@ -120,6 +120,35 @@ def find_neoantigens_live(gene: str, mutation_pos: int, mutant_aa: str,
     priors = [f for f in rec["features"]
               if f["type"] in ("Natural variant", "Mutagenesis")
               and f["begin"] is not None and f["begin"] <= mutation_pos <= (f["end"] or f["begin"])]
+    # ClinVar germline prior: a germline-classified variant is present in normal
+    # tissue too, so it is NOT tumor-specific - that caveat matters for a
+    # neoantigen call and must be stated, not hidden.
+    AA3 = {"A": "Ala", "R": "Arg", "N": "Asn", "D": "Asp", "C": "Cys", "Q": "Gln",
+           "E": "Glu", "G": "Gly", "H": "His", "I": "Ile", "L": "Leu", "K": "Lys",
+           "M": "Met", "F": "Phe", "P": "Pro", "S": "Ser", "T": "Thr", "W": "Trp",
+           "Y": "Tyr", "V": "Val"}
+    clinvar_prior = None
+    try:
+        from ...bio import entrez
+        notation = f"p.{AA3[wt_aa]}{mutation_pos}{AA3[mutant_aa]}"
+        hits = entrez.clinvar_exact(gene, notation, offline=offline)
+        hits = [h for h in hits if notation.split(".")[-1].replace("*", "Ter") in h["title"]
+                or f"{wt_aa}{mutation_pos}{mutant_aa}" in h["title"]
+                or f"{AA3[wt_aa]}{mutation_pos}{AA3[mutant_aa]}" in h["title"]]
+        if hits:
+            h0 = hits[0]
+            sig = (h0["significance"] or "").lower()
+            clinvar_prior = {
+                "notation": notation, "significance": h0["significance"],
+                "review_status": h0["review_status"], "title": h0["title"],
+                "tumor_specificity_caveat": (
+                    "germline-classified variant: present in normal tissue - "
+                    "not tumor-specific, weigh neoantigen call accordingly"
+                    if "pathogenic" in sig or "benign" in sig
+                    else "classification not definitive for germline status"),
+            }
+    except Exception as e:
+        clinvar_prior = {"status": f"lookup failed: {type(e).__name__}: {e}"}
     scan = find_neoantigens(tumor, seq, mutation_pos - 1, hlas=[hla])
     scan.update({
         "gene": gene,
@@ -129,6 +158,7 @@ def find_neoantigens_live(gene: str, mutation_pos: int, mutant_aa: str,
         "variant_priors": [{"type": f["type"], "description": f["description"][:120]}
                            for f in priors[:5]],
         "variant_prior_count": len(priors),
+        "clinvar_prior": clinvar_prior,
         "sequence_source": f"UniProt {rec['accession']} (live)" if not offline
                            else f"UniProt {rec['accession']} (cache)",
     })

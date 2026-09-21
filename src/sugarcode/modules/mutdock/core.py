@@ -159,11 +159,28 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
     pocket_seq = "".join(_A3.get(r["resname"], "G") for r in lining)
     start = lining[0]["resnum"] - 1
     scan = resistance_scan(pocket_seq, drugs, pocket_start=start)
+    # Vina-form WT baseline affinity on the real pocket coordinates (drop 16).
+    # Mutant ddG still comes from the feature scorer - the vina baseline is a
+    # real-coordinate WT anchor, labeled as such, not a fake re-dock.
+    from ..docking_studio.vina import dock_vina_grid
+    pocket_atoms = [{"element": "C", "xyz": r["ca"]} for r in lining]
+    vina_wt = {}
+    for name, smi in drugs.items():
+        try:
+            v = dock_vina_grid(pocket_atoms, smi)
+            vina_wt[name] = {"vina_score": v["vina_score"],
+                             "estimated_dg_kcal_mol": v["estimated_dg_kcal_mol"]}
+        except Exception as e:
+            vina_wt[name] = {"status": f"vina scoring failed: {type(e).__name__}"}
     scan.update({
         "structure": {"identifier": identifier, "source": s["source"],
                       "chain": chain, "pocket_index": pocket_index,
                       "n_pockets_found": len(pockets),
                       "lining": [f"{r['resname']}{r['resnum']}" for r in lining]},
+        "wt_vina_baseline": vina_wt,
+        "wt_vina_note": ("Vina-form WT affinity on real pocket CA coordinates "
+                         "(Trott & Olson 2010 terms); mutant ddG comes from the "
+                         "feature scorer - mutants are NOT re-docked"),
         "note": "hotspot positions use real structure residue numbering",
     })
     return scan

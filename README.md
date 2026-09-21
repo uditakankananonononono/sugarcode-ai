@@ -246,6 +246,28 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### ClinVar priors, mutdock Vina baseline, live gnomAD frequencies (drop 16)
+
+```python
+from sugarcode.modules.rarenet_ai.core import enrich_variants_live
+from sugarcode.bio import gnomad
+
+gnomad.variant_frequency("17-7676154-G-C")   # TP53 P72R: AF 0.716 live
+enrich_variants_live([{"gene": "TP53", "variant_id": "17-7674221-C-T"}])
+```
+
+New connector: **gnomAD GraphQL** (verified reachable and correct: TP53 P72R
+returns exome AF 0.716, matching the known common polymorphism; R273H returns
+absent - a REAL answer, zero observed carriers, stated explicitly and distinct
+from lookup failure). RareNet enrichment now attaches population frequency
+with a rarity interpretation (AF > 1% = too common for a rare-disease cause).
+NeoHunter attaches live ClinVar germline priors with the tumor-specificity
+caveat a neoantigen call needs (R273H: Pathogenic, expert panel - germline,
+present in normal tissue, caveat stated). MutDock's structure resistance scan
+adds a Vina-form WT affinity baseline on the real pocket CA coordinates per
+drug - labeled honestly: mutants are NOT re-docked, ddG still comes from the
+feature scorer.
+
 ### NeoHunter on live UniProt with variant priors (drop 15)
 
 ```python

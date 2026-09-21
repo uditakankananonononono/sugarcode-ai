@@ -111,5 +111,23 @@ def enrich_variants_live(variants: list[dict], retmax: int = 10,
             }
         except Exception as e:
             ev["clinvar"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+        # gnomAD population frequency (drop 16): rarity is core rare-disease
+        # evidence. Absence is a real answer; failures reported.
+        vid = v.get("variant_id") or v.get("gnomad_id")
+        if vid:
+            try:
+                from ...bio import gnomad
+                f = gnomad.variant_frequency(vid, offline=offline)
+                if f["present"]:
+                    af = f.get("max_af") or 0.0
+                    f["rarity_interpretation"] = (
+                        "too common for a rare-disease cause (AF > 1%)" if af > 0.01
+                        else "rare (AF < 1%) - compatible with rare-disease causality" if af > 0
+                        else "present but zero AF reported")
+                ev["gnomad"] = f
+            except Exception as e:
+                ev["gnomad"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+        else:
+            ev["gnomad"] = {"status": "no GRCh38 variant_id - skipped"}
         out.append(ev)
     return out
