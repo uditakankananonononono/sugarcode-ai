@@ -47,7 +47,7 @@ def test_trials_v2_mapping(tmp_path):
       "outcomesModule": {"primaryOutcomes": [{"measure": "Overall survival"}]}}}]}
     http = CachedHTTPClient(tmp_path, min_interval=0, transport=lambda *_: json.dumps(payload).encode())
     row = ClinicalTrialsClient(tmp_path, http=http).search("cancer")[0]
-    assert row.sample_size == 42 and row.endpoints == ["Overall survival"]
+    assert row.sample_size == 42 and row.endpoints == ["primary: Overall survival"]
     assert row.url.endswith("NCT00000001") and row.effect_direction == "Missing"
 
 
@@ -57,3 +57,24 @@ def test_extraction_does_not_invent_and_table_deduplicates():
     b = EvidenceRecord("PubMed", "1", "Different title", "v")
     table = build_evidence_table([a, b])
     assert len(table) == 1 and "raw" not in table[0]
+
+
+
+def test_trials_result_values_and_population_are_verbatim(tmp_path):
+    study = {
+        "protocolSection": {
+            "identificationModule": {"nctId": "NCT00000002", "briefTitle": "Result study"},
+            "statusModule": {}, "designModule": {},
+            "eligibilityModule": {"sex": "ALL", "minimumAge": "18 Years", "maximumAge": "65 Years", "healthyVolunteers": False},
+            "outcomesModule": {"primaryOutcomes": [{"measure": "Pain score", "timeFrame": "Week 12"}]},
+        },
+        "resultsSection": {"outcomeMeasuresModule": {"outcomeMeasures": [
+            {"title": "Pain score", "analyses": [{"paramType": "MEAN_DIFFERENCE", "paramValue": "-1.2", "pValue": "0.03", "statisticalMethod": "t-test"}]}
+        ]}},
+    }
+    http = CachedHTTPClient(tmp_path, min_interval=0, transport=lambda *_: json.dumps({"studies": [study]}).encode())
+    row = ClinicalTrialsClient(tmp_path, http=http).search("pain")[0]
+    assert row.population == "ALL; 18 Years to 65 Years; healthy volunteers: false"
+    assert row.endpoints == ["primary: Pain score (Week 12)"]
+    assert "MEAN_DIFFERENCE; -1.2; p=0.03" in row.effect_text
+    assert row.effect_direction == "reported_not_inferred"
