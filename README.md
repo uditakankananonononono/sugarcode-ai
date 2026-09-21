@@ -49,7 +49,8 @@ Status per module: **verified** = implemented with passing named tests;
 
 | Drop | Verified | Thin | Specified (pending) | Tests |
 |---|---|---|---|---|
-| 1 (this drop) | 16 | 0 | 61 | 51 passing |
+| 1 | 16 | 0 | 61 | 51 passing |
+| 2 (current) | 27 | 0 | 50 | 71 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -71,6 +72,17 @@ Status per module: **verified** = implemented with passing named tests;
 | omega_stats | metric recording, per-metric aggregates, sub-network rollup |
 | ecosystem | SDK snippet generation, plugin manifest contract, machine-readable API reference |
 | dna_to_code | 6 biology->Python concept translations with executable analogies |
+| gene_analysis | integrated gene profile: ORF/protein stats, regulatory landscape, variant interpretation, CRISPR targets, publication trends |
+| crispr_cargo | LNP/AAV/VLP/PNP vehicle ranking per payload+tissue, one-compartment PK model, delivery blueprints with composition specs |
+| crispr_muse | policy-gradient gRNA generator with GC/off-target rewards and simulated NGS feedback loop |
+| epi_edit | CRISPRa/i guide placement (promoter windows), chromatin accessibility track, histone-mark map, fold-change prediction |
+| openclinvar | ACMG-flavored evidence-weighted interpretation (BA1/PM2/PS3/PP1 rules), curated exemplars, patient-friendly reports, VCF parsing |
+| genomegpt | k-mer z-score anomalies, TF/CTCF motif scan, convergent-CTCF chromatin loop prediction, motif-disruption variant reading |
+| alpha_fold_ui | Chou-Fasman secondary prediction, pLDDT/PAE analogs, idealized C-alpha backbone, real PDB output, pocket candidates |
+| docking_studio | SMILES feature parsing (atoms, LogP, RO5), complementarity energy terms (vdW/H-bond/electrostatic/desolvation), Kd estimate, virtual screening |
+| evofold_4d | anisotropic network model normal modes (3Nx3N Hessian), hinge detection, open/closed transition traces with RMSD, PTM stiffening perturbation |
+| mutdock | class-change ddG + docking rescore per mutation, resistance hotspots, cross-drug resistance forecast |
+| protein_painter | intent->fold-template design, propensity-guided sampling with active-site placement, fold verification + stability ranking |
 
 ### Known limits (named, not hidden)
 

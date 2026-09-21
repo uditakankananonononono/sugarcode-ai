@@ -32,7 +32,10 @@ SUBNETWORKS: dict[str, str] = {
 _VERIFIED = {"neuro_hub", "gene_explorer", "crispr_opt", "codon_opt", "prime_design",
              "deepsplice", "str_scope", "rna_decoder", "promoter_lib", "dark_genome",
              "virtual_cell", "synbio_studio", "living_computer", "omega_stats",
-             "ecosystem", "dna_to_code"}
+             "ecosystem", "dna_to_code",
+             "gene_analysis", "crispr_cargo", "crispr_muse", "epi_edit", "openclinvar",
+             "genomegpt", "alpha_fold_ui", "docking_studio", "evofold_4d", "mutdock",
+             "protein_painter"}
 
 _MODULES: list[tuple[str, str, str, str]] = [
     # slug, name, subnetwork, summary
