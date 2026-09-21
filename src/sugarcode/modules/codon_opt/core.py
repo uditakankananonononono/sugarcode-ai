@@ -77,6 +77,7 @@ def tasep_simulate(dna: str, table: dict[str, float] | None = None,
     if n == 0:
         raise ValueError("empty coding sequence")
     hop = np.array([max(w.get(c, 0.05), 0.05) * 10.0 for c in codons])  # /s
+    dwell = [round(1.0 / max(h, 1e-9), 4) for h in hop]  # seconds per codon
     lattice = np.zeros(n, dtype=int)
     rng = np.random.default_rng(42)
     density = np.zeros(n)
@@ -100,7 +101,7 @@ def tasep_simulate(dna: str, table: dict[str, float] | None = None,
         if choice == 0:
             lattice[0] = 1
         else:
-            i = choice
+            i = choice - 1  # rates[0] is initiation; rates[k] hops lattice[k-1]
             lattice[i] = 0
             if i == n - 1:
                 completions += 1
@@ -113,6 +114,11 @@ def tasep_simulate(dna: str, table: dict[str, float] | None = None,
             if density[i] > 0.6 and density[i] > density[i - 1] and density[i] >= density[i + 1]]
     return {
         "codons": n,
+        "dwell_times_s": dwell,
+        "dwell_provenance": ("derived from vendored published codon-usage table "
+                             "(dwell = 1/(10*w), the tRNA-abundance approximation of "
+                             "Dana & Tuller 2014). Empirical Ribo-seq-calibrated rates "
+                             "are Missing: no verifiable machine-readable source found."),
         "sim_time_s": round(t, 2),
         "proteins_completed": completions,
         "output_rate_per_s": round(completions / t, 4) if t > 0 else 0.0,

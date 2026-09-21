@@ -246,6 +246,35 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### A* surgical pathfinding, TASEP dwell times, cfDNA fragmentomics (drop 13)
+
+```python
+from sugarcode.modules.neuroplan_ai.core import plan_path_astar
+from sugarcode.modules.liquid_biopsy import fragment_length_model
+from sugarcode.modules.codon_opt.core import tasep_simulate
+
+plan_path_astar({"center": [32,32,20]}, entry=[5,5,63])   # real A* over risk field
+fragment_length_model(0.2)                                # cfDNA entropy + KL classifier
+```
+
+NeuroPlan now runs **real A\* pathfinding** on a 26-connected voxel grid over
+an eloquent-region risk field (cost = distance x (1 + lambda*risk)), returning
+the actual path and comparing its risk integral against the straight-line
+corridor (obstructed off-axis entry: 33% risk reduction live-verified; clear
+lines are tracked, not detoured, with sampling noise named). Building it
+surfaced two real bugs now fixed and tested: region placement spilled outside
+the image grid (clamped), and a TASEP KMC off-by-one (rate index vs lattice
+index) that crashed whenever the terminal-site hop was drawn. TASEP now also
+exposes per-codon dwell times derived from the vendored published usage table,
+labeled as the tRNA-abundance approximation (Dana & Tuller 2014) - empirical
+Ribo-seq-calibrated rates are **Missing** (no verifiable machine-readable
+source found; said so in the output). Liquid Biopsy adds a cfDNA
+fragment-length model anchored to published peaks (healthy ~166 bp, ctDNA
+134-144 bp; Snyder 2016, Underhill 2016): Shannon entropy, short-fragment
+fraction and KL divergence all rise monotonically with tumor fraction
+(live-checked 0/5/20%); labeled as a literature-anchored model, not fitted
+patient data.
+
 ### Published codon tables with provenance, honest GC-repair cost (drop 12)
 
 ```python

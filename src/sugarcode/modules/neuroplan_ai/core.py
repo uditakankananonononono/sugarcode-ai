@@ -51,7 +51,9 @@ def _place_regions(image_size, center, radius) -> dict:
         dx = ((h % 100) - 50) * 1.5
         dy = (((h // 100) % 100) - 50) * 1.5
         dz = (((h // 10000) % 100) - 50) * 1.5
-        pos = [center[0] + dx, center[1] + dy, center[2] + dz]
+        pos = [min(max(center[0] + dx, 2.0), image_size[0] - 3.0),
+               min(max(center[1] + dy, 2.0), image_size[1] - 3.0),
+               min(max(center[2] + dz, 2.0), image_size[2] - 3.0)]  # keep regions inside the grid
         dist = math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
         out[name] = {**props, "position": pos, "distance_to_tumor_mm": round(dist, 1)}
     return out
@@ -106,3 +108,109 @@ def _neurotwin(center, radius, corridor, regions) -> dict:
             "predicted_deficits": deficits,
             "preserved_functions": [r["function"] for rn, r in regions.items()
                                     if rn != corridor.get("nearest_eloquent")][:4]}
+
+
+# --- drop 13: real A* corridor pathfinding over a voxel risk field -------------
+def _risk_field_fn(regions: dict, sigma: float = 12.0):
+    """risk(p) = sum_i w_i * exp(-d^2 / 2 sigma^2) over eloquent regions."""
+    import math as _m
+    regs = [(r["position"], r["risk_weight"]) for r in regions.values()]
+    def risk(p):
+        total = 0.0
+        for pos, w in regs:
+            d2 = sum((p[k] - pos[k]) ** 2 for k in range(3))
+            total += w * _m.exp(-d2 / (2 * sigma * sigma))
+        return total
+    return risk
+
+
+def plan_path_astar(tumor: dict, entry: list[float] | None = None,
+                    image_size: tuple[int, int, int] = (64, 64, 64),
+                    risk_lambda: float = 8.0, max_expand: int = 400000) -> dict:
+    """A* shortest-risk path from a scalp entry point to the tumor center over
+    the eloquent-region risk field. Cost per step = euclidean * (1 + lambda *
+    risk(midpoint)); 26-connected grid, euclidean heuristic (admissible since
+    risk term is >= 1). Returns the voxel path and compares it against the
+    straight-line corridor it replaces."""
+    import heapq
+    import math as _m
+    center = [float(c) for c in tumor["center"]]
+    radius = tumor.get("radius_mm", 20)
+    regions = _place_regions(image_size, [int(c) for c in center], radius)
+    risk = _risk_field_fn(regions)
+    if entry is None:
+        entry = [center[0], center[1], float(image_size[2] - 1)]  # superior entry
+    start = tuple(int(round(e)) for e in entry)
+    goal = tuple(int(round(c)) for c in center)
+
+    def in_bounds(p):
+        return all(0 <= p[k] < image_size[k] for k in range(3))
+
+    def h(p):
+        return _m.sqrt(sum((p[k] - goal[k]) ** 2 for k in range(3)))
+
+    neigh = [(dx, dy, dz) for dx in (-1, 0, 1) for dy in (-1, 0, 1)
+             for dz in (-1, 0, 1) if (dx, dy, dz) != (0, 0, 0)]
+    dist = {start: 0.0}
+    prev = {}
+    pq = [(h(start), 0.0, start)]
+    expanded = 0
+    while pq:
+        _, g, p = heapq.heappop(pq)
+        if g > dist.get(p, float("inf")):
+            continue
+        if p == goal:
+            break
+        expanded += 1
+        if expanded > max_expand:
+            raise RuntimeError("A* exceeded expansion budget - grid too large or risk field blocking")
+        for d in neigh:
+            q = (p[0] + d[0], p[1] + d[1], p[2] + d[2])
+            if not in_bounds(q):
+                continue
+            step = _m.sqrt(d[0] ** 2 + d[1] ** 2 + d[2] ** 2)
+            mid = tuple((p[k] + q[k]) / 2 for k in range(3))
+            cost = step * (1.0 + risk_lambda * risk(mid))
+            ng = g + cost
+            if ng < dist.get(q, float("inf")):
+                dist[q] = ng
+                prev[q] = p
+                heapq.heappush(pq, (ng + h(q), ng, q))
+    if goal not in dist:
+        raise RuntimeError("A* found no path - risk field fully blocks the target")
+    path = []
+    p = goal
+    while p != start:
+        path.append(p)
+        p = prev[p]
+    path.append(start)
+    path.reverse()
+
+    def line_risk_integral(a, b, n=200):
+        total = 0.0
+        for i in range(n):
+            t = i / (n - 1)
+            pt = tuple(a[k] + t * (b[k] - a[k]) for k in range(3))
+            total += risk(pt)
+        return total / n * _m.sqrt(sum((a[k] - b[k]) ** 2 for k in range(3)))
+
+    straight = line_risk_integral(start, goal)
+    path_risk = sum(risk(tuple(float(c) for c in p)) for p in path) / len(path) * sum(
+        _m.sqrt(sum((path[i + 1][k] - path[i][k]) ** 2 for k in range(3)))
+        for i in range(len(path) - 1))
+    min_clear = min(_m.sqrt(sum((p[k] - r["position"][k]) ** 2 for k in range(3)))
+                    for p in path for r in regions.values())
+    return {
+        "method": "A* over eloquent-region risk field (26-connected, euclidean heuristic)",
+        "entry": list(start), "target": list(goal),
+        "path_length_voxels": len(path),
+        "path": [list(p) for p in path],
+        "nodes_expanded": expanded,
+        "path_risk_integral": round(path_risk, 3),
+        "straight_line_risk_integral": round(straight, 3),
+        "risk_reduction_vs_straight": round(1 - path_risk / straight, 4) if straight > 0 else 0.0,
+        "note": ("small negative reductions are line-sampling noise - path tracks the "
+                 "straight corridor when it is already clear" if straight > 0 and
+                 -0.1 < 1 - path_risk / straight < 0.05 else None),
+        "min_clearance_mm": round(min_clear, 2),
+    }
