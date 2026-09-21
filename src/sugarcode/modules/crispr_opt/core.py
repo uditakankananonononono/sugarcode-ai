@@ -159,3 +159,64 @@ def _browser_track(seq: str, pam: str, guides: list[dict], tracks: list[dict]) -
                "features": t.get("features", [])} for i, t in enumerate(tracks)],
         ],
     }
+
+
+# ---- Published CFD off-target model (Doench 2016) - verifiably sourced ----
+import json as _json
+from pathlib import Path as _Path
+
+_DATA = _Path(__file__).parent / "data"
+_CFD_MM = _json.load(open(_DATA / "cfd_mm_scores.json"))
+_CFD_PAM = _json.load(open(_DATA / "cfd_pam_scores.json"))
+_COMPLEMENT = {"A": "T", "T": "A", "U": "A", "C": "G", "G": "C"}
+
+
+def cfd_score(wt_guide: str, off_guide: str, pam2: str = "GG") -> float:
+    """Published CFD off-target score (Doench et al. 2016, matrices vendored
+    verbatim from the CRISPOR distribution - see data/PROVENANCE.md).
+
+    wt_guide / off_guide: 20-nt protospacers (same length).
+    pam2: the off-target site's 2-nt PAM core ('GG' for NGG).
+    Returns activity fraction 0-1 (1 = as active as on-target).
+    """
+    if len(wt_guide) != len(off_guide):
+        raise ValueError("guides must be same length")
+    pam2 = pam2.upper()
+    if pam2 not in _CFD_PAM:
+        raise KeyError(f"PAM {pam2!r} not in published matrix")
+    wt = wt_guide.upper().replace("T", "U")
+    off = off_guide.upper().replace("T", "U")
+    score = 1.0
+    for i, (w, o) in enumerate(zip(wt, off), 1):
+        if w != o:
+            key = f"r{w}:d{_COMPLEMENT[o]},{i}"
+            score *= _CFD_MM[key]
+    return round(score * _CFD_PAM[pam2], 6)
+
+
+def score_off_targets_cfd(guide: str, background: str,
+                          max_mismatches: int = 4) -> list[dict]:
+    """Genome scan with the PUBLISHED CFD model: candidate sites within
+    max_mismatches are scored by the real Doench matrices, PAM-aware."""
+    guide = guide.upper()
+    out = []
+    for strand, s in (("+", background.upper()),
+                      ("-", str.maketrans("ACGT", "TGCA"))):
+        seq = s if strand == "+" else background.upper().translate(str.maketrans("ACGT", "TGCA"))[::-1]
+        for i in range(len(seq) - 23 + 1):
+            protospacer = seq[i:i + 20]
+            pam = seq[i + 20:i + 23]
+            if len(pam) < 3 or pam[1:] != "GG":
+                continue
+            mm = sum(1 for a, b in zip(guide, protospacer) if a != b)
+            if mm == 0 or mm > max_mismatches:
+                continue
+            score = cfd_score(guide, protospacer, "GG")
+            if score < 0.001:
+                continue
+            out.append({"position": i, "strand": strand,
+                        "off_sequence": protospacer, "mismatches": mm,
+                        "cfd_score": score,
+                        "risk": "high" if score >= 0.3 else "medium" if score >= 0.05 else "low"})
+    out.sort(key=lambda x: -x["cfd_score"])
+    return out

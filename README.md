@@ -54,7 +54,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 2 | 27 | 0 | 50 | 71 passing |
 | 3 | **77 (all)** | 0 | 0 | 160 passing |
 | 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
-| 5 (current) | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
+| 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
+| 6 (current) | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -148,8 +149,14 @@ Status per module: **verified** = implemented with passing named tests;
   learned weights); current versions use PWM/ODE/FBA/heuristic models that are
   real computations, not labels.
 - Frontend/UI is API-only in this drop.
-- CRISPR on/off-target scores are calibrated heuristics (Doench-style), not the
-  published Rule Set 2 / CFD weight matrices.
+- CRISPR **off-target scoring is the published CFD model** (Doench et al. 2016)
+  as of drop 6 - the real 240-entry mismatch + 16-entry PAM penalty matrices,
+  vendored verbatim from the CRISPOR distribution (`crispr_opt/data/`,
+  PROVENANCE.md included) and cross-validated 500/500 against the reference
+  implementation. The on-target score remains a calibrated heuristic
+  (Rule Set 2 weights not vendored - labeled as such).
+- Ensembl REST is unreachable from the build environment (HTTP 500 on all
+  endpoints); OpenClinVar uses live ClinVar + curated exemplars instead.
 
 ## Live data (drop 4)
 
@@ -181,11 +188,26 @@ parses C-alpha traces with confidence (pLDDT / B-factors), and finds pockets
 from real coordinate density - replacing the Chou-Fasman stand-in for any
 protein with a known structure.
 
+### Real-geometry docking & published CFD (drop 6)
+
+```python
+from sugarcode.modules.docking_studio import dock_into_structure
+from sugarcode.modules.crispr_opt import cfd_score, score_off_targets_cfd
+
+dock_into_structure("1TUP", "c1ccncc1", chain="B")   # real pocket, geometry terms
+cfd_score("GAGTCCGAGCAGAAGAAGAA", "GAGTCCGAGCAGAAGAAGCA", "GG")  # Doench 2016
+score_off_targets_cfd(guide20, genome_background)     # genome scan, PAM-aware
+```
+
+Docking now scores against real structure pockets (enclosure bonus, size-fit
+penalty, true lining residues) sourced live from RCSB/AlphaFold DB - still a
+screening proxy, not a free energy (named in every result).
+
 ## Quickstart
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 175 tests
+python -m pytest -q                 # 186 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

@@ -125,3 +125,77 @@ def virtual_screen(pocket_residues: str, library: list[str], top_n: int = 10) ->
     return {"pocket_length": len(pocket_residues), "screened": len(scored),
             "hits": scored[:top_n],
             "best": scored[0] if scored else None}
+
+
+AA3_TO_1 = {
+    "ALA": "A", "ARG": "R", "ASN": "N", "ASP": "D", "CYS": "C", "GLN": "Q",
+    "GLU": "E", "GLY": "G", "HIS": "H", "ILE": "I", "LEU": "L", "LYS": "K",
+    "MET": "M", "PHE": "F", "PRO": "P", "SER": "S", "THR": "T", "TRP": "W",
+    "TYR": "Y", "VAL": "V",
+}
+
+
+def _geometry_terms(pocket_residues_full: list[dict], lig: dict) -> dict:
+    """Geometry-informed terms from REAL coordinates (named as such):
+    enclosure bonus (buried pockets bind better) and size-fit penalty
+    (ligand much larger than the pocket cannot be accommodated)."""
+    import numpy as np
+    coords = np.array([r["ca"] for r in pocket_residues_full])
+    center = coords.mean(axis=0)
+    span = float(np.linalg.norm(coords - center, axis=1).max())
+    n = len(coords)
+    enclosure = min(1.0, n / 25.0)              # more lining residues -> more enclosed
+    enclosure_bonus = round(-0.9 * enclosure, 2)
+    # crude pocket "volume" ~ sphere spanning the lining residues; ligand size ~ heavy atoms
+    fit_ratio = lig["heavy_atoms"] / max(8.0, n * 1.6)
+    size_penalty = round(2.5 * max(0.0, fit_ratio - 1.0), 2)
+    return {"enclosure_bonus": enclosure_bonus, "size_fit_penalty": size_penalty,
+            "pocket_span_A": round(span, 1), "pocket_residues": n,
+            "pocket_center": [round(float(v), 1) for v in center]}
+
+
+def dock_into_structure(identifier: str, smiles: str, pocket_index: int = 0,
+                        chain: str | None = None, offline: bool = False) -> dict:
+    """Dock into a REAL structure: live PDB/AlphaFold coordinates, geometry
+    pockets (via Alpha Fold UI's real-coordinate detector), composition
+    complementarity plus enclosure/size-fit terms. Provenance is explicit."""
+    from ..alpha_fold_ui.core import _real_pockets
+    from ...bio.structures import fetch_pdb, fetch_alphafold
+    if len(identifier) == 4 and identifier[0].isdigit():
+        s = fetch_pdb(identifier, offline=offline)
+    else:
+        s = fetch_alphafold(identifier, offline=offline)
+    residues = s["residues"]
+    if chain:
+        residues = [r for r in residues if r["chain"] == chain]
+    pockets = _real_pockets(residues)
+    if not pockets:
+        raise ValueError(f"no geometry pocket found in {identifier}"
+                         + (f" chain {chain}" if chain else ""))
+    if pocket_index >= len(pockets):
+        raise IndexError(f"pocket_index {pocket_index} out of range - {len(pockets)} found")
+    chosen = set(pockets[pocket_index]["residues"])
+    lining = [r for r in residues if r["resnum"] in chosen]
+    pocket_seq = "".join(AA3_TO_1.get(r["resname"], "G") for r in lining)
+    base = dock(pocket_seq, smiles, pocket_start=lining[0]["resnum"] - 1)
+    geom = _geometry_terms(lining, base["ligand"])
+    dg = round(base["binding_dg_kcal_mol"] + geom["enclosure_bonus"]
+               + geom["size_fit_penalty"], 2)
+    kd_um = round(1e6 * math.exp(dg / 0.593), 3) if dg < 10 else float("inf")
+    base.update({
+        "structure": {"identifier": identifier, "source": s["source"],
+                      "chain": chain, "n_residues": s["n_residues"],
+                      **({"resolution_A": s.get("resolution_A"), "method": s.get("method")}
+                         if "resolution_A" in s or "method" in s else
+                         {"mean_plddt": s.get("mean_plddt")})},
+        "pocket": {"index": pocket_index, "n_pockets_found": len(pockets),
+                   "center": geom["pocket_center"], "span_A": geom["pocket_span_A"],
+                   "lining_residues": [f"{r['resname']}{r['resnum']}{r['chain']}"
+                                       for r in lining]},
+        "geometry_terms": geom,
+        "binding_dg_kcal_mol": dg,
+        "estimated_kd_uM": kd_um,
+        "scoring_note": ("composition complementarity + real-geometry enclosure/size-fit; "
+                         "no force-field minimization - a screening proxy, not a free energy"),
+    })
+    return base
