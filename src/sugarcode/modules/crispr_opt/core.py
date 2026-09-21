@@ -1,4 +1,5 @@
 from __future__ import annotations
+import math
 from ...bio.sequence import clean_dna, reverse_complement, gc_content, find_motif
 
 PAMS = {
@@ -118,24 +119,44 @@ def design_guides(seq: str, pam: str = "NGG", background: str | None = None,
                   top_n: int = 5, regulatory_tracks: list[dict] | None = None) -> dict:
     """Full design pass: enumerate, filter GC 40-60%, score on/off-target, rank."""
     cands = _extract_guides(seq, pam)
+    s = clean_dna(seq)
     graded = []
     for c in cands:
         gc = gc_content(c["guide"])
-        on = score_on_target(c["guide"])
+        # on-target: published Doench 2014 RS1 when the 30-mer context exists
+        # inside the sequence; labeled heuristic at sequence edges
+        ctx = _context_30mer(s, c["start"]) if c["strand"] == "+" else None
+        if c["strand"] == "-":
+            a, b = c["start"] - 6, c["end"] + 4
+            if a >= 0 and b <= len(s):
+                from ...bio.sequence import reverse_complement
+                ctx = reverse_complement(s[a:b])
+        if ctx:
+            on = doench2014_ontarget(ctx)
+            on_model = "doench2014_rs1"
+        else:
+            on = score_on_target(c["guide"])
+            on_model = "heuristic_edge_fallback"
         hairpin = _hairpin_score(c["guide"])
-        offs = score_off_targets(c["guide"], background, max_mismatches=3) if background else []
-        off_risk = sum(o["risk"] for o in offs if o["mismatches"] > 0)
+        # off-target: published CFD (Doench 2016) scan
+        offs = score_off_targets_cfd(c["guide"], background, max_mismatches=3) if background else []
+        off_risk = sum(o["cfd_score"] for o in offs)
         # GC filter per spec (40-60% optimal window), hairpin suppresses folding
         composite = on * (1.0 - 0.5 * hairpin) / (1.0 + off_risk)
         if not (0.20 <= gc <= 0.80):
             continue
         graded.append({**c, "gc": round(gc, 3), "on_target": round(on, 3),
+                       "on_target_model": on_model,
                        "hairpin_fraction": round(hairpin, 3),
                        "off_target_risk": round(off_risk, 3),
+                       "off_target_model": "cfd_doench2016" if background else None,
+                       "top_off_targets": offs[:3],
                        "composite": round(composite, 4)})
     graded.sort(key=lambda x: -x["composite"])
     return {
         "pam": pam,
+        "scoring_models": {"on_target": "doench2014_rs1 (published) with heuristic edge fallback",
+                           "off_target": "cfd_doench2016 (published)"},
         "candidates": len(cands),
         "guides": graded[:top_n],
         "pam_track": pam_sites(seq, pam),
@@ -220,3 +241,39 @@ def score_off_targets_cfd(guide: str, background: str,
                         "risk": "high" if score >= 0.3 else "medium" if score >= 0.05 else "low"})
     out.sort(key=lambda x: -x["cfd_score"])
     return out
+
+
+# ---- Published Doench 2014 (Rule Set 1) on-target model - verifiably sourced ----
+_DOENCH_PARAMS = [(p, m, w) for p, m, w in
+                  _json.load(open(_DATA / "doench2014_params.json"))]
+_DOENCH_INTERCEPT = 0.59763615
+_DOENCH_GC_HIGH = -0.1665878
+_DOENCH_GC_LOW = -0.2026259
+
+
+def doench2014_ontarget(seq30: str) -> float:
+    """Published Rule Set 1 on-target activity (Doench et al. 2014, table
+    vendored verbatim from CRISPOR - see data/PROVENANCE.md).
+
+    Input: 30-mer = 4 bp 5' flank + 20 bp guide + 3 bp PAM + 3 bp 3' flank.
+    Returns activity 0-1 (logistic). Rule Set 2 is NOT vendored (see
+    PROVENANCE.md) - this is RS1, labeled as such.
+    """
+    seq = seq30.upper()
+    if len(seq) != 30:
+        raise ValueError("needs a 30-mer: 4bp flank + 20bp guide + NGG + 3bp flank")
+    guide = seq[4:24]
+    gc = guide.count("G") + guide.count("C")
+    score = _DOENCH_INTERCEPT + abs(10 - gc) * (_DOENCH_GC_LOW if gc <= 10 else _DOENCH_GC_HIGH)
+    for pos, model, weight in _DOENCH_PARAMS:
+        if seq[pos:pos + len(model)] == model:
+            score += weight
+    return round(1.0 / (1.0 + math.exp(-score)), 4)
+
+
+def _context_30mer(seq: str, guide_start: int, guide_len: int = 20) -> str | None:
+    """Build the Doench 30-mer when flanks exist inside the sequence."""
+    a, b = guide_start - 4, guide_start + guide_len + 6  # +3 PAM +3 flank
+    if a < 0 or b > len(seq):
+        return None
+    return seq[a:b]

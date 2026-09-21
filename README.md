@@ -55,7 +55,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 3 | **77 (all)** | 0 | 0 | 160 passing |
 | 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
 | 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
-| 6 (current) | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
+| 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
+| 7 (current) | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -150,11 +151,14 @@ Status per module: **verified** = implemented with passing named tests;
   real computations, not labels.
 - Frontend/UI is API-only in this drop.
 - CRISPR **off-target scoring is the published CFD model** (Doench et al. 2016)
-  as of drop 6 - the real 240-entry mismatch + 16-entry PAM penalty matrices,
-  vendored verbatim from the CRISPOR distribution (`crispr_opt/data/`,
-  PROVENANCE.md included) and cross-validated 500/500 against the reference
-  implementation. The on-target score remains a calibrated heuristic
-  (Rule Set 2 weights not vendored - labeled as such).
+  as of drop 6, and **on-target scoring is the published Doench 2014 (Rule Set 1)
+  model** as of drop 7 - both vendored verbatim from the CRISPOR distribution
+  (`crispr_opt/data/`, PROVENANCE.md included) and cross-validated 500/500
+  against the reference implementations. `design_guides` now scores with the
+  published models end-to-end; guides at sequence edges (no 30-mer context)
+  are labeled `heuristic_edge_fallback`, never silently. Rule Set 2
+  (Fusi/Azimuth) is **Missing**: its pickled sklearn model is not portably
+  loadable on modern stacks - labeled, not faked.
 - Ensembl REST is unreachable from the build environment (HTTP 500 on all
   endpoints); OpenClinVar uses live ClinVar + curated exemplars instead.
 
@@ -192,12 +196,18 @@ protein with a known structure.
 
 ```python
 from sugarcode.modules.docking_studio import dock_into_structure
-from sugarcode.modules.crispr_opt import cfd_score, score_off_targets_cfd
+from sugarcode.modules.crispr_opt import (design_guides, cfd_score,
+                                          score_off_targets_cfd, doench2014_ontarget)
 
 dock_into_structure("1TUP", "c1ccncc1", chain="B")   # real pocket, geometry terms
 cfd_score("GAGTCCGAGCAGAAGAAGAA", "GAGTCCGAGCAGAAGAAGCA", "GG")  # Doench 2016
+doench2014_ontarget(seq30)                            # Doench 2014 RS1, needs 30-mer
 score_off_targets_cfd(guide20, genome_background)     # genome scan, PAM-aware
+design_guides(locus, background=genome)               # published models end-to-end
 ```
+
+An end-to-end connector workflow (gene grounding -> structure -> pocket ->
+dock -> provenance-labeled report) is covered by `tests/test_e2e_connectors.py`.
 
 Docking now scores against real structure pockets (enclosure bonus, size-fit
 penalty, true lining residues) sourced live from RCSB/AlphaFold DB - still a
@@ -207,7 +217,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 186 tests
+python -m pytest -q                 # 193 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
