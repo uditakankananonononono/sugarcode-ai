@@ -61,6 +61,9 @@ def _patch_combo(monkeypatch):
         return {"pdb_id": pdb, "ligand": lig, "ligand_instances": 1, "radius_A": 6.0,
                 "lining": lining, "n_lining": len(lining), "source": "fixture"}
     monkeypatch.setattr(st, "ligand_pocket", fake_pocket)
+    from sugarcode.bio import uniprot as up
+    monkeypatch.setattr(up, "binding_sites", lambda g, offline=False:
+                        {"status": "no UniProt entry", "gene": g})
 
 
 def test_allosteric_override_changes_resistance_call(monkeypatch):

@@ -62,6 +62,37 @@ def score_acceptor(seq15: str, matrix: str = "real") -> float:
     return round(normalized_score(s, lod), 4)
 
 
+def site_class(window: str, site_type: str = "donor") -> str:
+    """Terminal-dinucleotide class of a splice-site window.
+
+    Donor (9-nt window, +1/+2 at offsets 3/4): "GT" or "GC" (U2/major
+    spliceosome), "AT" (U12/minor, AT-AC intron), else "other".
+    Acceptor (15-nt window, -2/-1 at offsets 12/13): "AG" (U2), "AC"
+    (U12), else "other".
+    The learned PWMs apply to GT donors (and GC via the documented swap)
+    and AG acceptors ONLY. Scoring an AT-AC or other-class site with them
+    is not applicable - the extended SCN1A golden (drop 26) caught real
+    pathogenic +1 variants at two AT-AC introns scoring delta=0 ("minimal
+    effect"), a dangerously wrong answer, before this check existed.
+    """
+    s = clean_dna(window)
+    if site_type == "donor":
+        if len(s) != 9:
+            raise ValueError("donor window must be 9 nt")
+        term = s[3:5]
+        return term if term in ("GT", "GC", "AT") else "other"
+    if len(s) != 15:
+        raise ValueError("acceptor window must be 15 nt")
+    term = s[12:14]
+    return term if term in ("AG", "AC") else "other"
+
+
+def pwm_applicable(window: str, site_type: str = "donor") -> bool:
+    """Whether the learned GT-AG PWMs may score this window's site class."""
+    cls = site_class(window, site_type)
+    return cls in ("GT", "GC") if site_type == "donor" else cls == "AG"
+
+
 def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
                    matrix: str = "real") -> dict:
     """Compare splice strength of ref vs alt sequence at a site.
@@ -94,8 +125,16 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
         consequence = "strengthened site - altered isoform balance possible"
     else:
         consequence = "minimal predicted effect on splicing"
+    cls = site_class(ref_window, site_type)
+    applicable = cls in ("GT", "GC") if site_type == "donor" else cls == "AG"
+    if not applicable:
+        consequence = (f"atypical site class ({cls} terminal dinucleotide"
+                       f"{' - U12/minor spliceosome intron' if cls in ('AT', 'AC') else ''})"
+                       " - GT-AG PWM not applicable; scores not interpretable")
     return {
         "site_type": site_type,
+        "site_class": cls,
+        "pwm_applicable": applicable,
         "ref_score": rs, "alt_score": as_, "delta": delta,
         "consequence": consequence,
         "isoform_prediction": _isoform_call(site_type, delta),
@@ -205,17 +244,39 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False) -> d
         if w[idx] != refb:
             return {"gene": gene, "notation": notation, "status": "ref mismatch",
                     "detail": f"junction window has {w[idx]} at +{k}, ClinVar says {refb}"}
+        if not pwm_applicable(w, "donor"):
+            return {"gene": gene, "notation": notation, "status": "atypical_site_class",
+                    "site_type": "donor", "site_class": site_class(w, "donor"),
+                    "detail": "minor-spliceosome (AT-AC) or non-canonical donor - "
+                              "GT-AG PWM not applicable; not scored",
+                    "source": jm["source"]}
         r = variant_at(w, idx, altb, "donor")
-        return {"gene": gene, "notation": notation, "status": "natural_site",
-                "site_type": "donor", **r, "source": jm["source"]}
+        out = {"gene": gene, "notation": notation, "status": "natural_site",
+               "site_type": "donor", **r, "source": jm["source"]}
+        if r["delta"] <= -0.15:
+            esc = _exon_skip_context(jm, "donor", n)
+            if esc:
+                out["exon_context"] = esc
+        return out
     if sign == "-" and k <= 14 and n in jm["acceptors"]:
         w = jm["acceptors"][n]; idx = 14 - k
         if w[idx] != refb:
             return {"gene": gene, "notation": notation, "status": "ref mismatch",
                     "detail": f"junction window has {w[idx]} at -{k}, ClinVar says {refb}"}
+        if not pwm_applicable(w, "acceptor"):
+            return {"gene": gene, "notation": notation, "status": "atypical_site_class",
+                    "site_type": "acceptor", "site_class": site_class(w, "acceptor"),
+                    "detail": "minor-spliceosome (AT-AC) or non-canonical acceptor - "
+                              "GT-AG PWM not applicable; not scored",
+                    "source": jm["source"]}
         r = variant_at(w, idx, altb, "acceptor")
-        return {"gene": gene, "notation": notation, "status": "natural_site",
-                "site_type": "acceptor", **r, "source": jm["source"]}
+        out = {"gene": gene, "notation": notation, "status": "natural_site",
+               "site_type": "acceptor", **r, "source": jm["source"]}
+        if r["delta"] <= -0.15:
+            esc = _exon_skip_context(jm, "acceptor", n)
+            if esc:
+                out["exon_context"] = esc
+        return out
     # deeper intronic: cryptic scan on real context (strand-aware)
     gpos = _gpos_of(jm, n, sign, k)
     if gpos is None:
@@ -234,6 +295,33 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False) -> d
     r = cryptic_scan(ref_ctx, alt_ctx)
     return {"gene": gene, "notation": notation, "status": "cryptic_scan", **r,
             "source": jm["source"]}
+
+
+def _exon_skip_context(jm: dict, site_type: str, n: int) -> dict | None:
+    """If the destroyed site causes skipping of its exon, is that exon
+    in-frame? Donor loss at c.N+k skips the exon ENDING at cDNA N; acceptor
+    loss at c.N-k skips the exon STARTING at cDNA N. Exon lengths are real
+    (RefSeqGene CDS spans). Skipping is the common outcome, not the only one
+    (intron retention / cryptic use also occur) - labeled as conditional.
+    """
+    exons = jm.get("exons") or []
+    ex = None
+    if site_type == "donor":
+        ex = next((e for e in exons if e["cdna_end"] == n), None)
+    else:
+        ex = next((e for e in exons if e["cdna_start"] == n), None)
+    if not ex:
+        return None
+    ln = ex["length"]
+    if ln % 3 == 0:
+        outcome = (f"in-frame exon ({ln} nt = {ln // 3} aa): if skipping occurs, "
+                   "an in-frame deletion results - potentially milder than LoF, "
+                   "though domain-critical deletions can still be pathogenic")
+    else:
+        outcome = (f"out-of-frame exon ({ln} nt): if skipping occurs, a frameshift "
+                   "and likely premature termination codon result (LoF mechanism)")
+    return {"skipped_exon": ex, "in_frame": ln % 3 == 0,
+            "conditional_prediction": outcome}
 
 
 def _gpos_of(jm: dict, n: int, sign: str, k: int) -> int | None:

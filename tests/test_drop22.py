@@ -108,6 +108,9 @@ def test_combo_screen_live_axes(monkeypatch):
         "pdb_id": pdb, "ligand": lig, "ligand_instances": 1, "radius_A": 6.0,
         "lining": lining, "n_lining": len(lining), "source": "fixture"})
 
+    from sugarcode.bio import uniprot as up
+    monkeypatch.setattr(up, "binding_sites", lambda g, offline=False:
+                        {"status": "no UniProt entry", "gene": g})
     r = screen_with_structure("colon", ["drugA", "drugB", "unknownDrug"],
                               "ABL1", "1IEP", "STI", mutations=["T315I", "D800N"])
     assert r["chembl_target"]["chembl_id"] == "CHEMBL1862"
@@ -148,5 +151,8 @@ def test_combo_wt_mismatch_named(monkeypatch):
         "pdb_id": pdb, "ligand": lig, "ligand_instances": 1, "radius_A": 6.0,
         "lining": [{"resname": "THR", "resnum": 315, "chain": "A", "ca": [0, 0, 0]}],
         "n_lining": 1, "source": "fixture"})
+    from sugarcode.bio import uniprot as up
+    monkeypatch.setattr(up, "binding_sites", lambda g, offline=False:
+                        {"status": "no UniProt entry", "gene": g})
     r = screen_with_structure("colon", ["drugA"], "ABL1", "1IEP", "STI", mutations=["A315I"])
     assert r["mutation_reports"][0]["effects"]["drugA"]["status"] == "wt mismatch"

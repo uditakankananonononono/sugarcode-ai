@@ -110,11 +110,17 @@ def junction_map(gene: str, offline: bool = False) -> dict:
         else:
             donors[cdna_of(a)] = _rc(seq[a-7:a+2])
             acceptors[cdna_of(d)] = _rc(seq[d-1:d+14])
+    exons = []
+    n = 0
+    for a, b in spans:
+        ln = b - a + 1
+        exons.append({"cdna_start": n + 1, "cdna_end": n + ln, "length": ln})
+        n += ln
     return {"status": "ok", "gene": gene, "accession": acc,
             "donors": {k: v for k, v in donors.items() if k is not None},
             "acceptors": {k: v for k, v in acceptors.items() if k is not None},
             "sequence": seq, "cdna_of": cdna_of, "strand": strand,
-            "cds_spans": spans,
+            "cds_spans": spans, "exons": exons,
             "source": f"NCBI RefSeqGene {acc} ({'cache' if offline else 'live'})"}
 
 

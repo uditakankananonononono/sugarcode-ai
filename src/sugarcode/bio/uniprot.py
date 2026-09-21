@@ -77,3 +77,22 @@ def search(gene: str, organism_id: int = 9606, reviewed: bool = True,
         "go_terms": go,
         "comments": [c.get("commentType") for c in e.get("comments", [])],
     }
+
+
+def binding_sites(gene: str, offline: bool = False) -> dict:
+    """Annotated binding/active-site features for a gene's best UniProt entry.
+
+    Numbering is UniProt canonical. Verified for ABL1 (P00519, 1130 aa):
+    the kinase-domain features match clinical 1a numbering - gatekeeper
+    T315 sits immediately before the annotated 316-322 ATP-binding stretch
+    and E255 inside the 248-256 P-loop annotation.
+    """
+    rec = search(gene, offline=offline)
+    if not rec:
+        return {"status": "no UniProt entry", "gene": gene}
+    sites = [f for f in rec["features"]
+             if f["type"] in ("Binding site", "Active site")]
+    return {"status": "ok", "gene": gene, "accession": rec["accession"],
+            "sites": sites,
+            "numbering": "UniProt canonical",
+            "source": f"UniProt {rec['accession']} ({'cache' if offline else 'live'})"}

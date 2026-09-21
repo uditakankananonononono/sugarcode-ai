@@ -124,6 +124,32 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
                 "n_lining": len(lining), "source": lp["source"],
                 "resnum_offset": 0}
 
+    # 2b. UniProt binding annotations (drop 26): a mutation OUTSIDE the
+    # co-crystal lining can still sit in an annotated binding site - the
+    # drop-22 5MO4 lesson (default pocket missed asciminib's allosteric
+    # site). We annotate honestly; we never silently re-score on it.
+    bind: dict = {"status": "not queried"}
+    try:
+        from ...bio import uniprot as _up
+        bind = _up.binding_sites(target_gene, offline=offline)
+    except Exception as e:  # UniProt down -> say so, never fabricate
+        bind = {"status": f"binding annotation unavailable: {e}"}
+
+    def _binding_note(pos_canonical: int) -> str | None:
+        if bind.get("status") != "ok":
+            return None
+        hits = [s for s in bind["sites"]
+                if s["begin"] is not None and s["end"] is not None
+                and s["begin"] - 3 <= pos_canonical <= s["end"] + 3]
+        if not hits:
+            return None
+        desc = "; ".join(f"{s['type']} {s['begin']}-{s['end']}"
+                         + (f" ({s['description']})" if s["description"] else "")
+                         for s in hits)
+        return (f"within/adjacent (+/-3 aa) UniProt binding annotation: {desc} "
+                f"[{bind['accession']}] - a pocket override may apply for "
+                "compounds binding this site")
+
     default_pocket = _load_pocket(pdb_id, ligand_resname, chain)
     pocket_map: dict[str, dict] = {}
     for name in compounds:
@@ -156,13 +182,17 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
             pk = pocket_map[name]
             pos = pos_canonical + pk.get("resnum_offset", 0)
             if pos not in pk["resnums"]:
-                per_comp_effect[name] = {
+                eff = {
                     "status": "outside pocket",
                     "detail": f"residue {pos_canonical} (structure #{pos}) not in the "
                               f"{pk['n_lining']} lining residues of "
                               f"{pk['pdb_id']}:{pk['ligand']} - no structural resistance "
                               "evidence for this compound's site",
                     "affinity_loss_fold": 1.0}
+                note = _binding_note(pos_canonical)
+                if note:
+                    eff["binding_annotation"] = note
+                per_comp_effect[name] = eff
                 continue
             idx = pk["resnums"].index(pos)
             if pk["seq"][idx] != wt:
