@@ -69,3 +69,12 @@ def test_oversized_ligand_penalized():
 def test_offline_raises():
     with pytest.raises(structures.StructureError):
         dock_into_structure("1fix", "CCO", offline=True)
+
+
+def test_structure_resistance_scan_real_lining():
+    from sugarcode.modules.mutdock import structure_resistance_scan
+    r = structure_resistance_scan("1fix", {"drugA": "CCO", "drugB": "c1ccccc1"})
+    assert r["structure"]["source"] == "RCSB PDB (live)"
+    assert r["structure"]["lining"]  # real SER ball residues
+    assert set(r["per_drug"]) == {"drugA", "drugB"}
+    assert "real structure residue numbering" in r["note"]

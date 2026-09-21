@@ -32,3 +32,24 @@ def write_fasta(records: list[dict], line_width: int = 60) -> str:
         seq = r["sequence"]
         out.extend(seq[i:i + line_width] for i in range(0, len(seq), line_width))
     return "\n".join(out) + "\n"
+
+
+def stream_fasta(path: str):
+    """Streaming FASTA reader: yields {id, description, sequence} one record at
+    a time without loading the file - the honest way to scan large backgrounds
+    (chromosomes, genomes) that do not fit comfortably in memory."""
+    with open(path) as fh:
+        header, chunks = None, []
+        for line in fh:
+            line = line.rstrip("\n")
+            if line.startswith(">"):
+                if header is not None:
+                    yield {"id": header.split()[0],
+                           "description": header,
+                           "sequence": "".join(chunks)}
+                header, chunks = line[1:], []
+            elif line:
+                chunks.append(line.strip())
+        if header is not None:
+            yield {"id": header.split()[0], "description": header,
+                   "sequence": "".join(chunks)}

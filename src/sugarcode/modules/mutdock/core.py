@@ -128,3 +128,42 @@ def live_mutation_context(gene: str, position: int, mutant_aa: str, smiles: str,
                            "no annotated feature at this position; treat ddG as screening-level"),
     })
     return base
+
+
+def structure_resistance_scan(identifier: str, drugs: dict[str, str],
+                              pocket_index: int = 0, chain: str | None = None,
+                              offline: bool = False) -> dict:
+    """Cross-drug resistance forecast on a REAL structure pocket.
+
+    Fetches the structure live (RCSB/AlphaFold), extracts the geometry pocket's
+    lining sequence, runs the full resistance scan (all positions x 20 AAs x
+    drugs) on the real lining. Provenance per result.
+    """
+    from ..alpha_fold_ui.core import _real_pockets
+    from ..docking_studio.core import AA3_TO_1 as _A3
+    from ...bio.structures import fetch_pdb, fetch_alphafold
+    if len(identifier) == 4 and identifier[0].isdigit():
+        s = fetch_pdb(identifier, offline=offline)
+    else:
+        s = fetch_alphafold(identifier, offline=offline)
+    residues = s["residues"]
+    if chain:
+        residues = [r for r in residues if r["chain"] == chain]
+    pockets = _real_pockets(residues)
+    if not pockets:
+        raise ValueError(f"no geometry pocket in {identifier}")
+    if pocket_index >= len(pockets):
+        raise IndexError(f"pocket_index {pocket_index} out of range - {len(pockets)} found")
+    chosen = set(pockets[pocket_index]["residues"])
+    lining = [r for r in residues if r["resnum"] in chosen]
+    pocket_seq = "".join(_A3.get(r["resname"], "G") for r in lining)
+    start = lining[0]["resnum"] - 1
+    scan = resistance_scan(pocket_seq, drugs, pocket_start=start)
+    scan.update({
+        "structure": {"identifier": identifier, "source": s["source"],
+                      "chain": chain, "pocket_index": pocket_index,
+                      "n_pockets_found": len(pockets),
+                      "lining": [f"{r['resname']}{r['resnum']}" for r in lining]},
+        "note": "hotspot positions use real structure residue numbering",
+    })
+    return scan

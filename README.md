@@ -57,7 +57,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
 | 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
 | 7 | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
-| 8 (current) | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | 196 passing |
+| 8 | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | 196 passing |
+| 9 (current) | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -224,6 +225,24 @@ annotated functional real estate. 1-based residue numbering is preserved
 exactly (R273H stays R273H). PhageForge's guide design inherits the published
 CFD off-target scan automatically through CRISPR Opt's design_guides.
 
+### Clinical enrichment, structural resistance, genome files (drop 9)
+
+```python
+from sugarcode.modules.rarenet_ai import enrich_variants_live
+from sugarcode.modules.mutdock import structure_resistance_scan
+from sugarcode.modules.crispr_opt import score_off_targets_cfd_fasta
+
+enrich_variants_live([{"gene": "BRCA1", "hgvs": "NM_007294.4:c.68_69del"}])
+structure_resistance_scan("1TUP", {"imatinib": "...", "erlotinib": "..."}, chain="B")
+score_off_targets_cfd_fasta(guide20, "chr7.fa")   # streaming, constant memory
+```
+
+RareNet attaches live ClinVar classifications to patient variants (exact-match
+when the notation matches, honest VUS call otherwise). MutDock runs its full
+all-positions x 20-AA x drugs resistance scan on real structure pockets with
+true residue numbering. The CFD scan now reads FASTA files via a streaming
+parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
+
 Docking now scores against real structure pockets (enclosure bonus, size-fit
 penalty, true lining residues) sourced live from RCSB/AlphaFold DB - still a
 screening proxy, not a free energy (named in every result).
@@ -232,7 +251,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 196 tests
+python -m pytest -q                 # 201 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

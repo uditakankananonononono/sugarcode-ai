@@ -53,3 +53,20 @@ def test_genome_scan_finds_planted_offtarget():
 def test_scan_ignores_distant_sites():
     hits = score_off_targets_cfd(G, "A" * 200)
     assert hits == []
+
+
+def test_streaming_fasta_scan(tmp_path):
+    from sugarcode.modules.crispr_opt import score_off_targets_cfd_fasta
+    from sugarcode.bio.fasta import stream_fasta
+    fa = tmp_path / "bg.fa"
+    fa.write_text(">chr1 description here\n" + "T" * 30 + "\n"
+                  + G[:18] + "CA" + "AGG" + "\n" + "T" * 30 + "\n"
+                  ">chr2\n" + "A" * 100 + "\n")
+    recs = list(stream_fasta(str(fa)))
+    assert [r["id"] for r in recs] == ["chr1", "chr2"]
+    assert recs[0]["description"] == "chr1 description here"
+    r = score_off_targets_cfd_fasta(G, str(fa))
+    assert r["records_scanned"][1]["length"] == 100
+    assert len(r["hits"]) >= 1
+    assert r["hits"][0]["record"] == "chr1"
+    assert r["total_bases"] == len("T" * 30 + G[:18] + "CA" + "AGG" + "T" * 30) + 100

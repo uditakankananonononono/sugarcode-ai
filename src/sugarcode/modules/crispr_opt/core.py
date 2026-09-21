@@ -277,3 +277,26 @@ def _context_30mer(seq: str, guide_start: int, guide_len: int = 20) -> str | Non
     if a < 0 or b > len(seq):
         return None
     return seq[a:b]
+
+
+def score_off_targets_cfd_fasta(guide: str, fasta_path: str,
+                                max_mismatches: int = 4) -> dict:
+    """CFD off-target scan over a FASTA FILE (streaming - constant memory).
+
+    Each record (chromosome/contig) is scanned on both strands; hits carry the
+    record id and coordinates. Suited to real reference files, not toy strings.
+    """
+    from ...bio.fasta import stream_fasta
+    hits, scanned = [], []
+    for rec in stream_fasta(fasta_path):
+        scanned.append({"id": rec["id"], "length": len(rec["sequence"])})
+        for h in score_off_targets_cfd(guide, rec["sequence"], max_mismatches):
+            h["record"] = rec["id"]
+            hits.append(h)
+    hits.sort(key=lambda x: -x["cfd_score"])
+    return {"guide": guide, "source_file": fasta_path,
+            "records_scanned": scanned, "total_bases": sum(r["length"] for r in scanned),
+            "hits": hits,
+            "high_risk": [h for h in hits if h["risk"] == "high"],
+            "model": "cfd_doench2016 (published)",
+            "note": "streaming scan - memory constant in file size"}

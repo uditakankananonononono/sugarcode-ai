@@ -72,3 +72,44 @@ def _treatments(disease: str) -> list[dict]:
           "duchenne_md": [{"name": "exon-skipping (eteplirsen, mutation-dependent)", "type": "genetic"},
                           {"name": "corticosteroids", "type": "supportive"}]}
     return tx.get(disease, [{"name": "symptomatic management + clinical trial search", "type": "supportive"}])
+
+
+def enrich_variants_live(variants: list[dict], retmax: int = 10,
+                         offline: bool = False) -> list[dict]:
+    """Attach live ClinVar classifications to patient variants.
+
+    For each variant with a gene symbol, queries ClinVar live and attaches the
+    gene's current pathogenic/likely-pathogenic entries plus any title that
+    matches the variant's own notation (e.g. c. / p. change). Sources named;
+    failures reported, never hidden.
+    """
+    from ...bio import entrez
+    out = []
+    for v in variants:
+        gene = (v.get("gene") or "").upper()
+        ev = dict(v)
+        if not gene:
+            ev["clinvar"] = {"status": "no gene symbol - skipped"}
+            out.append(ev)
+            continue
+        try:
+            entries = entrez.clinvar_variants(gene, retmax=retmax, offline=offline)
+            notation = v.get("hgvs") or v.get("change") or ""
+            matched = [e for e in entries
+                       if notation and notation.split(":")[-1] in e["title"]]
+            path = [e for e in entries if "athogenic" in (e["significance"] or "")]
+            ev["clinvar"] = {
+                "status": "live",
+                "gene_entries": len(entries),
+                "pathogenic_or_likely": len(path),
+                "exact_match": matched,
+                "interpretation_hint": (
+                    "this exact variant is classified " + matched[0]["significance"]
+                    if matched else
+                    f"gene has {len(path)} pathogenic/likely entries; this variant not matched - "
+                    "VUS until classified"),
+            }
+        except Exception as e:
+            ev["clinvar"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+        out.append(ev)
+    return out
