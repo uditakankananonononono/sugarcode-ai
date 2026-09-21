@@ -12,7 +12,7 @@ class TestEvidencePanel:
     def test_pathogenic_plus_absent_is_strong(self, monkeypatch):
         self._patch(monkeypatch,
                     [{"uid": "1", "title": "NM_000546.6(TP53):c.818G>A (p.Arg273His)",
-                      "significance": "Pathogenic", "review_status": "x", "condition": "LFS"}],
+                      "significance": "Pathogenic", "review_status": "reviewed by expert panel", "condition": "LFS"}],
                     {"variant_id": "v", "present": False},
                     {"gene": "TP53", "lof_constrained": False})
         from sugarcode.modules.rarenet_ai.core import variant_evidence_panel
@@ -25,7 +25,7 @@ class TestEvidencePanel:
     def test_benign_plus_common_is_against(self, monkeypatch):
         self._patch(monkeypatch,
                     [{"uid": "1", "title": "NM_000546.6(TP53):c.215C>G (p.Pro72Arg)",
-                      "significance": "Benign", "review_status": "x", "condition": "x"}],
+                      "significance": "Benign", "review_status": "reviewed by expert panel", "condition": "x"}],
                     {"variant_id": "v", "present": True, "max_af": 0.716},
                     {"gene": "TP53", "lof_constrained": False})
         from sugarcode.modules.rarenet_ai.core import variant_evidence_panel

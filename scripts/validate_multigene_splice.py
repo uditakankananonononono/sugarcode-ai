@@ -10,7 +10,14 @@ from sugarcode.bio import entrez
 from sugarcode.modules.deepsplice import variant_at
 from gb_parse import parse_genbank, transcript_exons
 
-GENES = {"BRCA2": "NG_012772.3", "MLH1": "NG_007109.2", "CFTR": "NG_016465.4"}
+GENES = {"BRCA2": "NG_012772.3", "MLH1": "NG_007109.2", "CFTR": "NG_016465.4",
+         "MSH2": "NG_007110.2", "TP53": "NG_017013.2", "NF1": "NG_009018.1"}
+
+# ClinVar names variants on specific transcript versions; the record's
+# span-matching can pick an isoform name on ties (TP53: NM_001126114.2 ties
+# canonical NM_000546.5). Override with the transcript ClinVar uses; the
+# junction MAP is unaffected (it comes from the canonical CDS spans).
+TX_OVERRIDE = {"TP53": "NM_000546"}
 
 
 def load_gene(acc: str):
@@ -50,8 +57,19 @@ def load_gene(acc: str):
             acceptors[cdna_of(d)] = revcomp(seq[d-1:d+14])
     donors = {k: v for k, v in donors.items() if k is not None}
     acceptors = {k: v for k, v in acceptors.items() if k is not None}
-    tx = next((f["qualifiers"].get("transcript_id", "") for f in gb["features"]
-               if f["key"] == "mRNA" and len(f["spans"]) >= len(cds["spans"])), "")
+    # tx name = mRNA sharing the most spans with this CDS (the first mRNA
+    # with >= spans is NOT reliable: TP53's record lists NM_001126118.1
+    # before canonical NM_000546.5)
+    cds_set = set(cds["spans"])
+    tx = ""
+    best = -1
+    for f in gb["features"]:
+        if f["key"] != "mRNA":
+            continue
+        shared = len(cds_set & set(f["spans"]))
+        if shared > best:
+            best = shared
+            tx = f["qualifiers"].get("transcript_id", "")
     return donors, acceptors, tx, seq
 
 
@@ -99,7 +117,7 @@ def main():
     summary = {}
     for sym, acc in GENES.items():
         donors, acceptors, tx, seq = load_gene(acc)
-        nm = tx.rsplit(".", 1)[0]
+        nm = TX_OVERRIDE.get(sym, tx.rsplit(".", 1)[0])
         pc = build_cases(clinvar_splice(sym, nm, "pathogenic"), donors, acceptors, "pathogenic")
         bc = build_cases(clinvar_splice(sym, nm, "benign"), donors, acceptors, "benign")
         json.dump({"source": f"ClinVar live query 2026-09-22 + RefSeqGene {acc} windows "

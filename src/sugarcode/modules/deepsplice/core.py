@@ -25,10 +25,12 @@ SEED_ACCEPTOR_LOD = log_odds_matrix(build_pwm(_ACCEPTOR_SITES))
 try:
     DONOR_LOD = _splice.donor_lod()
     ACCEPTOR_LOD = _splice.acceptor_lod()
+    GC_DONOR_LOD = _splice.gc_donor_lod()
     PWM_SOURCE = "real RefSeqGene junctions (1,170 GT-AG sites, 29 genes, title-verified)"
 except _splice.SpliceDataMissing:
     DONOR_LOD = SEED_DONOR_LOD
     ACCEPTOR_LOD = SEED_ACCEPTOR_LOD
+    GC_DONOR_LOD = SEED_DONOR_LOD
     PWM_SOURCE = "consensus-seed fallback (vendored splice data missing)"
 
 
@@ -36,8 +38,20 @@ def score_donor(seq9: str, matrix: str = "real") -> float:
     s = clean_dna(seq9)
     if len(s) != 9:
         raise ValueError("donor window must be 9 nt")
-    lod = DONOR_LOD if matrix == "real" else SEED_DONOR_LOD
+    if matrix == "real":
+        # GC-AG donors route to the swapped matrix (bio/splice.gc_donor_lod) -
+        # the BRCA2 c.7976+2C>G/A golden miss traced to this scope gap.
+        lod = GC_DONOR_LOD if s[3:5] == "GC" else DONOR_LOD
+    else:
+        lod = SEED_DONOR_LOD
     return round(normalized_score(s, lod), 4)
+
+
+def _donor_lod_for(ref_window: str) -> list[dict[str, float]]:
+    """Matrix for a ref/alt PAIR: the REF window's class decides. Scoring the
+    alt against its own class made GT->GC conversions look tolerated
+    (multi-gene golden caught it: +2T>C pathogenic variants scored ~0)."""
+    return GC_DONOR_LOD if clean_dna(ref_window)[3:5] == "GC" else DONOR_LOD
 
 
 def score_acceptor(seq15: str, matrix: str = "real") -> float:
@@ -55,9 +69,14 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
     Windows: 9 nt for donor, 15 nt for acceptor. Returns strength scores,
     delta and a consequence classification.
     """
-    scorer = score_donor if site_type == "donor" else score_acceptor
-    rs, as_ = scorer(ref_window, matrix), scorer(alt_window, matrix)
+    if site_type == "donor" and matrix == "real":
+        rs = round(normalized_score(clean_dna(ref_window), _donor_lod_for(ref_window)), 4)
+        as_ = round(normalized_score(clean_dna(alt_window), _donor_lod_for(ref_window)), 4)
+    else:
+        scorer = score_donor if site_type == "donor" else score_acceptor
+        rs, as_ = scorer(ref_window, matrix), scorer(alt_window, matrix)
     delta = round(as_ - rs, 4)
+    gc_donor = site_type == "donor" and clean_dna(ref_window)[3:5] == "GC"
     # Bands calibrated 2026-09-21 on the BRCA1 ClinVar golden set (186
     # pathogenic / 20 benign splice SNVs on NM_007294; fixture
     # tests/fixtures/brca1_splice_golden.json): at -0.15, sensitivity 0.81
@@ -82,6 +101,9 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
         "isoform_prediction": _isoform_call(site_type, delta),
         "pwm_source": PWM_SOURCE if matrix == "real" else "consensus-seed",
         "threshold_calibration": "BRCA1 ClinVar golden set (186 path/20 benign), 2026-09-21",
+        **({"gc_donor": True,
+            "gc_note": "GC-AG site scored with the swapped +2 matrix (approximation, "
+                       "see bio/splice.gc_donor_lod)"} if gc_donor else {}),
     }
 
 
@@ -157,6 +179,78 @@ def cryptic_scan(ref_seq: str, alt_seq: str, site_threshold: float = 0.75,
                            "weak events non-discriminating (83% path vs 84% benign); "
                            "CFTR c.3718-2477C>T literature case detected (0.68->0.92)"),
             "pwm_source": PWM_SOURCE}
+
+
+def live_splice_assessment(gene: str, notation: str, offline: bool = False) -> dict:
+    """Splice assessment of one ClinVar-style notation (c.N+k / c.N-k SNV)
+    against the gene's REAL RefSeqGene junction map.
+
+    Natural-site variants (donor +1..+6, acceptor -1..-14): window delta via
+    the learned PWM. Deeper variants: cryptic_scan on +/-60 nt of real intronic
+    context. Everything else: named out-of-scope, never guessed.
+    """
+    import re as _re
+    from ...bio import splice as _sp
+    m = _re.fullmatch(r"c\.(\d+)([+-])(\d+)([ACGT])>([ACGT])", notation.strip())
+    if not m:
+        return {"gene": gene, "notation": notation, "status": "unparseable",
+                "detail": "expected form c.135-1G>A or c.212+1G>A"}
+    n, sign, k, refb, altb = int(m.group(1)), m.group(2), int(m.group(3)), m.group(4), m.group(5)
+    jm = _sp.junction_map(gene, offline=offline)
+    if jm["status"] != "ok":
+        return {"gene": gene, "notation": notation, "status": jm["status"]}
+    seq = jm["sequence"]
+    if sign == "+" and k <= 6 and n in jm["donors"]:
+        w = jm["donors"][n]; idx = 3 + k - 1
+        if w[idx] != refb:
+            return {"gene": gene, "notation": notation, "status": "ref mismatch",
+                    "detail": f"junction window has {w[idx]} at +{k}, ClinVar says {refb}"}
+        r = variant_at(w, idx, altb, "donor")
+        return {"gene": gene, "notation": notation, "status": "natural_site",
+                "site_type": "donor", **r, "source": jm["source"]}
+    if sign == "-" and k <= 14 and n in jm["acceptors"]:
+        w = jm["acceptors"][n]; idx = 14 - k
+        if w[idx] != refb:
+            return {"gene": gene, "notation": notation, "status": "ref mismatch",
+                    "detail": f"junction window has {w[idx]} at -{k}, ClinVar says {refb}"}
+        r = variant_at(w, idx, altb, "acceptor")
+        return {"gene": gene, "notation": notation, "status": "natural_site",
+                "site_type": "acceptor", **r, "source": jm["source"]}
+    # deeper intronic: cryptic scan on real context (strand-aware)
+    gpos = _gpos_of(jm, n, sign, k)
+    if gpos is None:
+        return {"gene": gene, "notation": notation, "status": "outside scope",
+                "detail": "exonic or beyond mapped junctions"}
+    from ...bio.genbank import revcomp as _rc
+    CTX = 60
+    if jm["strand"] == 1:
+        ref_ctx = seq[gpos-1-CTX:gpos+CTX]
+    else:
+        ref_ctx = _rc(seq[gpos-1-CTX:gpos+CTX])
+    if len(ref_ctx) != 2 * CTX + 1 or ref_ctx[CTX] != refb:
+        return {"gene": gene, "notation": notation, "status": "ref mismatch",
+                "detail": "context base does not match ClinVar ref"}
+    alt_ctx = ref_ctx[:CTX] + altb + ref_ctx[CTX+1:]
+    r = cryptic_scan(ref_ctx, alt_ctx)
+    return {"gene": gene, "notation": notation, "status": "cryptic_scan", **r,
+            "source": jm["source"]}
+
+
+def _gpos_of(jm: dict, n: int, sign: str, k: int) -> int | None:
+    """Genomic position of c.N(sign)k from the CDS spans directly.
+
+    + strand: donor c.N+k anchors at span end b -> b+k; acceptor c.N-k anchors
+    at next span start c -> c-k. - strand mirrors with revcomp handled by the
+    caller. Anchor must carry cDNA coordinate n exactly."""
+    spans = jm["cds_spans"]; strand = jm["strand"]
+    cum = 0
+    for (a, b), (c, d) in zip(spans, spans[1:]):
+        cum += b - a + 1
+        if sign == "+" and cum == n:        # last coding base of this exon
+            return (b + k) if strand == 1 else (a - k)
+        if sign == "-" and cum + 1 == n:    # first coding base of next exon
+            return (c - k) if strand == 1 else (d + k)
+    return None
 
 
 def _isoform_call(site_type: str, delta: float) -> str:

@@ -163,13 +163,19 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
         score = 0.0
         cl = ev.get("clinvar", {})
         if cl.get("exact_match"):
-            sig = (cl["exact_match"][0]["significance"] or "").lower()
+            from ..openclinvar.core import clinvar_stars, STAR_WEIGHT
+            m0 = cl["exact_match"][0]
+            sig = (m0["significance"] or "").lower()
+            stars = clinvar_stars(m0.get("review_status"))
+            # base 2.0 is calibrated on 3-star (expert panel, weight 0.8);
+            # other tiers scale proportionally (drop 25)
+            w = round(2.0 * STAR_WEIGHT[stars] / 0.8, 2)
             if "pathogenic" in sig and "benign" not in sig and "conflicting" not in sig:
-                score += 2.0
-                components.append("ClinVar pathogenic classification (+2.0)")
+                score += w
+                components.append(f"ClinVar pathogenic, {stars}-star review (+{w})")
             elif "benign" in sig:
-                score -= 2.0
-                components.append("ClinVar benign classification (-2.0)")
+                score -= w
+                components.append(f"ClinVar benign, {stars}-star review (-{w})")
             else:
                 components.append("ClinVar entry conflicting/uncertain (0)")
         g = ev.get("gnomad", {})
@@ -182,6 +188,42 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
         elif g.get("present"):
             score += 0.25
             components.append(f"rare in population (AF {g.get('max_af', 0):.3g}) (+0.25)")
+        # splice evidence (drop 25): natural-site delta on the gene's real
+        # RefSeqGene junction map; deep-intronic -> cryptic_scan. Weak
+        # perturbations are NOT evidence (BRCA1-validated) and add nothing.
+        hgvs = ev.get("hgvs") or ev.get("change") or ""
+        import re as _re
+        if gene and _re.fullmatch(r"(?:[A-Z0-9_\.]+\()?c\.\d+[+-]\d+[ACGT]>[ACGT]\)?",
+                                  hgvs.replace(" ", "")) or _re.fullmatch(
+                                  r"c\.\d+[+-]\d+[ACGT]>[ACGT]", hgvs.replace(" ", "")):
+            try:
+                from ..deepsplice import live_splice_assessment
+                sa = live_splice_assessment(gene, hgvs.split(":")[-1].split("(")[-1].rstrip(")"),
+                                            offline=offline)
+                ev["splice_assessment"] = {k: v for k, v in sa.items()
+                                           if k in ("status", "site_type", "delta",
+                                                    "consequence", "verdict", "source",
+                                                    "strong_findings")}
+                if sa.get("status") == "natural_site":
+                    d = sa["delta"]
+                    if d <= -0.15:
+                        score += 1.5
+                        components.append(f"predicted loss of natural {sa['site_type']} "
+                                          f"site (delta {d:+.2f}, RefSeqGene map) (+1.5)")
+                    elif d <= -0.05:
+                        score += 0.5
+                        components.append(f"weakened {sa['site_type']} site (delta {d:+.2f}) (+0.5)")
+                    else:
+                        components.append(f"minimal splice-site effect (delta {d:+.2f}) (0)")
+                elif sa.get("status") == "cryptic_scan" and sa.get("strong_findings"):
+                    score += 1.0
+                    f0 = sa["strong_findings"][0]
+                    components.append(f"NEW cryptic {f0['site_type']} site "
+                                      f"({f0['ref_score']:.2f}->{f0['alt_score']:.2f}) (+1.0)")
+                elif sa.get("status") == "cryptic_scan":
+                    components.append("no strong cryptic-site signal (0)")
+            except Exception as e:
+                ev["splice_assessment"] = {"status": f"assessment failed: {type(e).__name__}: {e}"}
         LOF = {"frameshift", "nonsense", "stop_gained", "splice_acceptor", "splice_donor"}
         cons = ev.get("consequence", "")
         if c.get("lof_constrained") and cons in LOF:
@@ -197,7 +239,10 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
     return {
         "panel": panel,
         "n_variants": len(panel),
-        "scoring": {"clinvar_pathogenic": 2.0, "clinvar_benign": -2.0,
+        "scoring": {"clinvar_pathogenic_3star": 2.0, "clinvar_benign_3star": -2.0,
+                    "clinvar_star_scaling": "x STAR_WEIGHT/0.8 (4-star 2.5, 2-star 1.5, 1-star 0.75, 0-star 0.38)",
+                    "splice_natural_site_loss": 1.5, "splice_site_weakened": 0.5,
+                    "splice_new_cryptic_site": 1.0,
                     "gnomad_absent": 0.5, "gnomad_common_af>1%": -1.5,
                     "gnomad_rare": 0.25, "lof_in_constrained_gene": 0.5},
         "disclaimer": ("evidence aggregation only - component weights are ours, "

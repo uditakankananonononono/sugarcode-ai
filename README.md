@@ -72,7 +72,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_opt | PAM enumeration both strands, GC 40-60% filter, position-weighted on-target score, seed-weighted off-target scan, hairpin check, browser-track payload |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, GC-window repair, motif avoidance, CHI tRNA-strain index, TASEP ribosome-flow KMC simulation, FBA constraint export |
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
-| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes); variant delta + isoform calls calibrated on a 642-case, 4-gene ClinVar golden set (99.6% of 519 canonical sites called loss), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
+| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes); variant delta + isoform calls calibrated on a 1,240-case, 7-gene ClinVar golden set (100% of 1,042 canonical sites called loss, incl. GC-donor sites), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -123,7 +123,7 @@ Status per module: **verified** = implemented with passing named tests;
 | neuroplan_ai | tumor segmentation volume, corridor optimization around eloquent regions, risk class + surgical plan |
 | neodti_engine | drug-target-pathway-disease graph walk, therapeutic resilience index, disease alias resolution, docking hook |
 | liquid_biopsy | error-rate-aware ctDNA calling (beta-binomial floor), denoise, serial-monitoring plan |
-| rarenet_ai | phenotype-driven rare-disease matching + variant integration, ranked differentials |
+| rarenet_ai | phenotype-driven rare-disease matching + unified variant evidence panel (star-tiered ClinVar, gnomAD, splice assessment, constraint), ranked differentials |
 | oncocircuit | two-input AND-gate tumor sensing circuits, promoter logic, payload delivery design |
 | pdx_insight | PDX fidelity index (mutation retention, expression concordance, stroma, drift), verdict + CRISPR repair |
 | microbiome_exp | 16S alpha diversity (Shannon/Simpson), functional potential, dysbiosis-disease flags |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 318 tests
+python -m pytest -q                 # 330 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
