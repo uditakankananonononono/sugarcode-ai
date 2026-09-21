@@ -42,7 +42,7 @@ def design_phage(target_gene_seq: str, resistance_marker: str = "NDM-1",
         "specificity": {
             "kill_mechanism": "CRISPR cuts resistance gene; lytic cycle destroys host",
             "microbiome_sparing": round(0.6 + 0.3 * (1 - 0.5 * marker["essentiality"]), 2),
-            "off_target_assessment": "guides screened against supplied background; extend to full microbiome DB later",
+            "off_target_assessment": "guides screened with the published CFD model (Doench 2016) against the supplied phage genome; extend to full microbiome DB later",
         },
         "engineering_steps": [
             f"clone CRISPR array into {backbone} genome via homologous recombination",

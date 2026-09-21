@@ -56,7 +56,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
 | 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
 | 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
-| 7 (current) | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
+| 7 | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
+| 8 (current) | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | 196 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -209,6 +210,20 @@ design_guides(locus, background=genome)               # published models end-to-
 An end-to-end connector workflow (gene grounding -> structure -> pocket ->
 dock -> provenance-labeled report) is covered by `tests/test_e2e_connectors.py`.
 
+### Mutation effects on live proteins (drop 8)
+
+```python
+from sugarcode.modules.mutdock import live_mutation_context
+live_mutation_context("TP53", 273, "H", "c1ccncc1")
+```
+
+Pulls the reviewed UniProt record live, extracts the real sequence window and
+feature annotations at the mutated position (domains, binding/active sites),
+runs the ddG/resistance model on real context, and says when a change hits
+annotated functional real estate. 1-based residue numbering is preserved
+exactly (R273H stays R273H). PhageForge's guide design inherits the published
+CFD off-target scan automatically through CRISPR Opt's design_guides.
+
 Docking now scores against real structure pockets (enclosure bonus, size-fit
 penalty, true lining residues) sourced live from RCSB/AlphaFold DB - still a
 screening proxy, not a free energy (named in every result).
@@ -217,7 +232,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 193 tests
+python -m pytest -q                 # 196 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

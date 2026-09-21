@@ -86,3 +86,45 @@ def resistance_scan(pocket_residues: str, drugs: dict[str, str],
                                       "positions threaten multiple drugs - prioritize for "
                                       "next-generation analog design."),
     }
+
+
+def live_mutation_context(gene: str, position: int, mutant_aa: str, smiles: str,
+                          window: int = 12, offline: bool = False) -> dict:
+    """Mutation effect grounded in a LIVE UniProt record: real sequence window
+    around the mutated position, real feature annotations (domains, binding
+    sites, active sites) deciding whether the change hits functional real estate.
+
+    position is 1-based. Falls back with a named warning, never silently.
+    """
+    from ...bio import uniprot
+    rec = uniprot.search(gene, offline=offline)
+    if not rec or not rec.get("sequence"):
+        return {"gene": gene, "source": "unavailable",
+                "warning": "no reviewed UniProt entry with sequence",
+                "fallback": "use mutation_effect with a manually supplied pocket"}
+    seq = rec["sequence"]
+    if not (1 <= position <= len(seq)):
+        raise ValueError(f"{gene} is {len(seq)} aa; position {position} out of range")
+    wt_aa = seq[position - 1]
+    lo = max(0, position - 1 - window // 2)
+    hi = min(len(seq), position + window // 2)
+    pocket = seq[lo:hi]
+    idx = position - 1 - lo
+    base = mutation_effect(pocket, smiles, idx, mutant_aa, pocket_start=lo,
+                           drug_name=f"{gene}-ligand")
+    feats = [f for f in rec["features"]
+             if f.get("begin") and f.get("end")
+             and f["begin"] <= position <= f["end"]
+             and f["type"] in ("Domain", "Binding site", "Active site", "Site", "Region")]
+    base.update({
+        "gene": gene, "source": "UniProt (live)",
+        "accession": rec["accession"], "protein_name": rec["protein_name"],
+        "wt_residue": wt_aa,
+        "window": {"start": lo + 1, "end": hi, "sequence": pocket},
+        "functional_features_at_position": feats,
+        "in_functional_site": bool(feats),
+        "interpretation": ("mutation lands in annotated functional real estate - "
+                           "resistance call carries extra weight" if feats else
+                           "no annotated feature at this position; treat ddG as screening-level"),
+    })
+    return base
