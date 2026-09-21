@@ -107,3 +107,100 @@ def fetch_alphafold(uniprot_acc: str, offline: bool = False) -> dict:
             "mean_plddt": mean_plddt,
             "fraction_low_confidence": round(low_conf, 3),
             "paE_url": entry.get("paeDocUrl"), **parsed}
+
+
+# --- drop 14: Shrake-Rupley solvent accessibility + interface areas -------------
+VDW_RADII = {"C": 1.70, "N": 1.55, "O": 1.52, "S": 1.80, "P": 1.80, "DEFAULT": 1.70}
+
+
+def sasa_shrake_rupley(atoms: list[dict], probe: float = 1.4, n_points: int = 96) -> dict:
+    """Shrake & Rupley (1973) solvent-accessible surface area per atom.
+
+    atoms: [{element, xyz:(x,y,z)}]. Each atom gets n_points on a sphere of
+    radius r_vdw + probe; a point is accessible if no other atom's sphere
+    covers it. Returns per-atom A^2 and total."""
+    import math
+    pts = []
+    inc = math.pi * (3 - math.sqrt(5))  # fibonacci sphere
+    for i in range(n_points):
+        y = 1 - (i / (n_points - 1)) * 2
+        r = math.sqrt(max(0.0, 1 - y * y))
+        th = inc * i
+        pts.append((math.cos(th) * r, y, math.sin(th) * r))
+    radii = [VDW_RADII.get(a.get("element", "C"), VDW_RADII["DEFAULT"]) + probe for a in atoms]
+    coords = [a["xyz"] for a in atoms]
+    rmax = max(radii)
+    # spatial hash: only atoms within rmax + ri can bury a point of atom i
+    cell = 2 * rmax
+    grid = {}
+    for j, (x, y, z) in enumerate(coords):
+        grid.setdefault((int(x // cell), int(y // cell), int(z // cell)), []).append(j)
+    def neighbors(x, y, z, reach):
+        c0 = (int(x // cell), int(y // cell), int(z // cell))
+        n = int(reach // cell) + 1
+        out = []
+        for dx in range(-n, n + 1):
+            for dy in range(-n, n + 1):
+                for dz in range(-n, n + 1):
+                    out.extend(grid.get((c0[0] + dx, c0[1] + dy, c0[2] + dz), []))
+        return out
+    out = []
+    for i, (x, y, z) in enumerate(coords):
+        acc = 0
+        cand = neighbors(x, y, z, rmax + radii[i])
+        for px, py, pz in pts:
+            sx, sy, sz = x + radii[i] * px, y + radii[i] * py, z + radii[i] * pz
+            buried = False
+            for j in cand:
+                if i == j:
+                    continue
+                ox, oy, oz = coords[j]
+                if (sx - ox) ** 2 + (sy - oy) ** 2 + (sz - oz) ** 2 < radii[j] ** 2:
+                    buried = True
+                    break
+            if not buried:
+                acc += 1
+        out.append(round(4 * math.pi * radii[i] ** 2 * acc / n_points, 3))
+    return {"per_atom_A2": out, "total_A2": round(sum(out), 2), "probe_A": probe,
+            "method": "Shrake-Rupley 1973, fibonacci sphere"}
+
+
+def parse_pdb_atoms(text: str) -> list[dict]:
+    """Full-atom parse: [{element, xyz, chain, resnum, atom}] for interface math."""
+    atoms = []
+    for line in text.splitlines():
+        if not line.startswith("ATOM"):
+            continue
+        el = line[76:78].strip() or line[12:16].strip()[0]
+        atoms.append({"element": el,
+                      "xyz": (float(line[30:38]), float(line[38:46]), float(line[46:54])),
+                      "chain": line[21].strip(), "resnum": int(line[22:26]),
+                      "atom": line[12:16].strip()})
+    if not atoms:
+        raise StructureError("no ATOM records parsed")
+    return atoms
+
+
+def interface_area(pdb_id: str, chain_a: str, chain_b: str,
+                   offline: bool = False) -> dict:
+    """Buried surface area of a real protein-protein interface (RCSB complex).
+
+    BSA = (SASA(A) + SASA(B) - SASA(AB)) / 2 - the standard interface metric."""
+    pdb_id = pdb_id.lower()
+    text = _get(f"{RCSB_FILE}/{pdb_id}.pdb", offline=offline).decode(errors="replace")
+    atoms = parse_pdb_atoms(text)
+    a = [x for x in atoms if x["chain"] == chain_a]
+    b = [x for x in atoms if x["chain"] == chain_b]
+    if not a or not b:
+        raise StructureError(f"chains {chain_a}/{chain_b} not both present; have "
+                             f"{sorted({x['chain'] for x in atoms})}")
+    s_a = sasa_shrake_rupley(a)["total_A2"]
+    s_b = sasa_shrake_rupley(b)["total_A2"]
+    s_ab = sasa_shrake_rupley(a + b)["total_A2"]
+    bsa = (s_a + s_b - s_ab) / 2
+    return {"pdb_id": pdb_id, "chains": [chain_a, chain_b],
+            "sasa_A": s_a, "sasa_B": s_b, "sasa_complex": s_ab,
+            "buried_surface_area_A2": round(bsa, 1),
+            "interface_class": ("strong/stable" if bsa > 1500 else "transient/weak" if bsa > 600 else "minimal contact"),
+            "method": "Shrake-Rupley SASA difference; BSA = (SA+SB-SAB)/2",
+            "source": "RCSB PDB (live)" if not offline else "RCSB PDB (cache)"}

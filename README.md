@@ -246,6 +246,29 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### Vina-form scoring + real SASA interfaces (drop 14)
+
+```python
+from sugarcode.modules.docking_studio.vina import dock_vina_structure
+from sugarcode.bio.structures import interface_area
+
+dock_vina_structure("1TUP", "CC(=O)Oc1ccccc1C(=O)O", chain="B")  # Vina form, real pocket
+interface_area("1TUP", "B", "C")                                  # buried surface area
+```
+
+Docking Studio gains a **Vina-form empirical scoring function**: the five
+Trott & Olson 2010 terms (gauss1/gauss2/repulsion/hydrophobic/hbond, published
+weights) evaluated pairwise over real pocket coordinates with a translation
+grid, torsion penalty counted from rotatable bonds. Term ramps verified
+against the published functional forms (hbond ramp, hydrophobic ramp - two
+sign bugs caught by hand-check before shipping). Honest limits in every
+result: rigid linear ligand embedding (no conformer generator available), no
+torsional sampling. Structures connector gains **Shrake-Rupley SASA** (1973,
+fibonacci sphere, spatial-hashed for real PDB sizes; analytic checks: isolated
+carbon = 120.76 A^2, contact burial, non-interaction at 20 A) and
+**interface_area** (BSA = (SA+SB-SAB)/2) on live RCSB complexes - 1TUP B-C
+interface measured at 347 A^2 from real coordinates.
+
 ### A* surgical pathfinding, TASEP dwell times, cfDNA fragmentomics (drop 13)
 
 ```python
