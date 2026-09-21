@@ -75,3 +75,46 @@ class TestSASA:
         monkeypatch.setattr(structures, "_get", lambda url, offline=False: pdb.encode())
         with pytest.raises(structures.StructureError):
             structures.interface_area("9FIX", "A", "Z")
+
+
+# --- drop 15: neohunter live UniProt -------------------------------------------
+class TestNeoHunterLive:
+    SEQ = "M" + "E" * 271 + "R" + "A" * 120  # 392 aa, R at position 273
+
+    def _fx_record(self):
+        return {"accession": "P04637", "sequence": self.SEQ, "length": len(self.SEQ),
+                "features": [{"type": "Natural variant",
+                              "description": "in LFS; germline mutation; somatic",
+                              "begin": 273, "end": 273},
+                             {"type": "Mutagenesis", "description": "loss of function",
+                              "begin": 273, "end": 273},
+                             {"type": "Region", "description": "unrelated",
+                              "begin": 100, "end": 120}]}
+
+    def test_live_scan_validates_and_attaches_priors(self, monkeypatch):
+        from sugarcode.bio import uniprot
+        monkeypatch.setattr(uniprot, "search", lambda g, organism_id=9600, offline=False: self._fx_record())
+        from sugarcode.modules.neohunter import find_neoantigens_live
+        r = find_neoantigens_live("TP53", 273, "H")
+        assert r["mutation"] == "R273H"
+        assert r["wt_residue_validated"] is True
+        assert r["variant_prior_count"] == 2  # Region feature excluded
+        assert len(r["candidates"]) == 9  # nine 9-mers span the mutation
+        assert all("H" in c["peptide"] for c in r["candidates"])
+
+    def test_position_out_of_range_refused(self, monkeypatch):
+        from sugarcode.bio import uniprot
+        monkeypatch.setattr(uniprot, "search", lambda g, organism_id=9600, offline=False: self._fx_record())
+        from sugarcode.modules.neohunter import find_neoantigens_live
+        import pytest as _pt
+        with _pt.raises(ValueError):
+            find_neoantigens_live("TP53", 999, "H")
+
+    def test_lookup_failure_raises_not_fabricates(self, monkeypatch):
+        from sugarcode.bio import uniprot
+        def boom(g, organism_id=9600, offline=False): raise uniprot.UniProtError("offline")
+        monkeypatch.setattr(uniprot, "search", boom)
+        from sugarcode.modules.neohunter import find_neoantigens_live
+        import pytest as _pt
+        with _pt.raises(uniprot.UniProtError):
+            find_neoantigens_live("TP53", 273, "H")

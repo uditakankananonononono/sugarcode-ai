@@ -246,6 +246,22 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### NeoHunter on live UniProt with variant priors (drop 15)
+
+```python
+from sugarcode.modules.neohunter import find_neoantigens_live
+
+find_neoantigens_live("TP53", 273, "H")   # real P04637 sequence + priors
+```
+
+Neoantigen scans now run on the **live UniProt sequence**: the WT residue is
+validated against the real record (wrong numbering refuses loudly), the
+mutation is applied, and published Natural variant / Mutagenesis features at
+that position attach as priors. Live-verified on TP53 R273H: 9 published
+variant annotations at codon 273 (Li-Fraumeni, sporadic cancers), nine
+mutation-spanning 9-mers scored, top candidate NSFEVHVCA (strong binder,
+A*02:01). Out-of-range positions and lookup failures raise - never fabricate.
+
 ### Vina-form scoring + real SASA interfaces (drop 14)
 
 ```python

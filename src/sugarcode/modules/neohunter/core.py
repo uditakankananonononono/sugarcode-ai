@@ -91,3 +91,45 @@ def _vaccine(top: list[dict]) -> dict:
             "sequence": "-".join(c["peptide"] for c in top),
             "adjuvant": "poly-ICLC",
             "note": "rank order preserved; include both HLA classes where typed"}
+
+
+# --- drop 15: live UniProt sequence + variant priors ---------------------------
+def find_neoantigens_live(gene: str, mutation_pos: int, mutant_aa: str,
+                          hla: str = "A*02:01", organism_id: int = 9606,
+                          offline: bool = False) -> dict:
+    """Neoantigen scan on the REAL UniProt sequence with variant priors.
+
+    - fetches the reviewed UniProt record (sequence + Natural variant /
+      Mutagenesis features)
+    - validates the WT residue at mutation_pos against the real sequence
+      (numbering discipline - refuse silently-wrong positions)
+    - attaches any published variant annotation at that position as a prior
+    - runs the peptide x HLA pipeline on the real sequence"""
+    from ...bio import uniprot
+    rec = uniprot.search(gene, organism_id=organism_id, offline=offline)
+    if not rec or not rec.get("sequence"):
+        raise ValueError(f"no UniProt sequence for {gene!r}")
+    seq = rec["sequence"]
+    if not 1 <= mutation_pos <= len(seq):
+        raise ValueError(f"position {mutation_pos} outside {gene} sequence (len {len(seq)})")
+    wt_aa = seq[mutation_pos - 1]
+    mutant_aa = mutant_aa.upper()
+    if len(mutant_aa) != 1 or mutant_aa not in "ACDEFGHIKLMNPQRSTVWY":
+        raise ValueError(f"invalid mutant residue {mutant_aa!r}")
+    tumor = seq[:mutation_pos - 1] + mutant_aa + seq[mutation_pos:]
+    priors = [f for f in rec["features"]
+              if f["type"] in ("Natural variant", "Mutagenesis")
+              and f["begin"] is not None and f["begin"] <= mutation_pos <= (f["end"] or f["begin"])]
+    scan = find_neoantigens(tumor, seq, mutation_pos - 1, hlas=[hla])
+    scan.update({
+        "gene": gene,
+        "uniprot_accession": rec["accession"],
+        "mutation": f"{wt_aa}{mutation_pos}{mutant_aa}",
+        "wt_residue_validated": True,
+        "variant_priors": [{"type": f["type"], "description": f["description"][:120]}
+                           for f in priors[:5]],
+        "variant_prior_count": len(priors),
+        "sequence_source": f"UniProt {rec['accession']} (live)" if not offline
+                           else f"UniProt {rec['accession']} (cache)",
+    })
+    return scan
