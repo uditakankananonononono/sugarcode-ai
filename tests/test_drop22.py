@@ -116,8 +116,8 @@ def test_combo_screen_live_axes(monkeypatch):
     assert by["unknownDrug"]["status"].startswith("no ChEMBL")
     # T315I in pocket: both drugs get a resistance fold on top of ChEMBL potency
     t315 = next(m for m in r["mutation_reports"] if m["mutation"] == "T315I")
-    assert t315["status"] == "in pocket"
     assert set(t315["effects"]) == {"drugA", "drugB"}
+    assert all(e["status"] == "in pocket" for e in t315["effects"].values())
     # fold must equal the mutdock mutation_effect on the same pocket, and
     # effective IC50 must be ChEMBL potency x fold - the combo is the point
     from sugarcode.modules.mutdock.core import mutation_effect
@@ -128,7 +128,7 @@ def test_combo_screen_live_axes(monkeypatch):
     assert by["drugB"]["wt_potency_nM"] == 500.0
     # D800N outside pocket: named, not silently dropped
     d800 = next(m for m in r["mutation_reports"] if m["mutation"] == "D800N")
-    assert d800["status"] == "outside co-crystal pocket"
+    assert all(e["status"] == "outside pocket" for e in d800["effects"].values())
     # hit is the most potent compound after adjustment
     assert r["hit"] in ("drugA", "drugB")
 
@@ -149,4 +149,4 @@ def test_combo_wt_mismatch_named(monkeypatch):
         "lining": [{"resname": "THR", "resnum": 315, "chain": "A", "ca": [0, 0, 0]}],
         "n_lining": 1, "source": "fixture"})
     r = screen_with_structure("colon", ["drugA"], "ABL1", "1IEP", "STI", mutations=["A315I"])
-    assert r["mutation_reports"][0]["status"] == "wt mismatch"
+    assert r["mutation_reports"][0]["effects"]["drugA"]["status"] == "wt mismatch"

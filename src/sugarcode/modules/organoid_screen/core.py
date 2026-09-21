@@ -55,7 +55,8 @@ def _network(mutations: list[str], top: list[str]) -> dict:
 def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
                           pdb_id: str, ligand_resname: str,
                           mutations: list[str] | None = None,
-                          chain: str | None = None, offline: bool = False) -> dict:
+                          chain: str | None = None, offline: bool = False,
+                          pockets: dict[str, dict] | None = None) -> dict:
     """Organoid screen grounded in live data on both axes:
 
     potency    - real ChEMBL measured IC50/Ki/Kd (nM) of each compound
@@ -66,6 +67,13 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
     Effective IC50 = ChEMBL potency x product(affinity loss folds).
     Every compound carries its own provenance and honest status; a compound
     with no ChEMBL record or a mutation outside the pocket says so.
+
+    pockets: optional per-compound pocket overrides
+    {"asciminib": {"pdb_id": "5MO4", "ligand": "AY7", "chain": "A"}} for
+    compounds that bind a DIFFERENT site than the default pocket (e.g.
+    allosteric inhibitors). Drop-22 finding made this necessary: applying the
+    imatinib ATP-site pocket to asciminib ranked the clinically T315I-active
+    drug last - each compound must be scored on its own observed binding site.
     """
     import re as _re
     from ...bio import chembl
@@ -99,20 +107,40 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
                         "source": f"ChEMBL {mol['chembl_id']} vs {target['chembl_id']} (live)"},
         }
 
-    # 2. co-crystal pocket (live RCSB)
-    lp = ligand_pocket(pdb_id, ligand_resname, chain=chain, offline=offline)
-    lining = lp["lining"]
-    if chain is None and lining:
-        chain = lining[0].get("chain") or None
-    if chain:
-        lining = [r for r in lining if r.get("chain") in (None, chain)]
-    seen = set()
-    lining = [r for r in lining if not ((r.get("chain"), r["resnum"]) in seen
-                                        or seen.add((r.get("chain"), r["resnum"])))]
-    pocket_seq = "".join(_A3.get(r["resname"], "G") for r in lining)
-    true_resnums = [r["resnum"] for r in lining]
+    # 2. co-crystal pocket(s) (live RCSB): default plus per-compound overrides
+    def _load_pocket(pid, lig, ch):
+        lp = ligand_pocket(pid, lig, chain=ch, offline=offline)
+        lining = lp["lining"]
+        if ch is None and lining:
+            ch = lining[0].get("chain") or None
+        if ch:
+            lining = [r for r in lining if r.get("chain") in (None, ch)]
+        seen = set()
+        lining = [r for r in lining if not ((r.get("chain"), r["resnum"]) in seen
+                                            or seen.add((r.get("chain"), r["resnum"])))]
+        return {"pdb_id": pid, "ligand": lp["ligand"], "chain": ch,
+                "seq": "".join(_A3.get(r["resname"], "G") for r in lining),
+                "resnums": [r["resnum"] for r in lining],
+                "n_lining": len(lining), "source": lp["source"],
+                "resnum_offset": 0}
 
-    # 3. mutations x pocket
+    default_pocket = _load_pocket(pdb_id, ligand_resname, chain)
+    pocket_map: dict[str, dict] = {}
+    for name in compounds:
+        ov = (pockets or {}).get(name)
+        pocket_map[name] = (_load_pocket(ov["pdb_id"], ov["ligand"], ov.get("chain"))
+                            if ov else default_pocket)
+        if ov:
+            # structure numbering - canonical numbering, e.g. +19 for ABL1
+            # 1a-numbered co-crystals (5MO4: gatekeeper T315 is numbered 334).
+            # Verified against the structure, never assumed: the wt check below
+            # fails loudly when the offset is wrong.
+            pocket_map[name]["resnum_offset"] = int(ov.get("resnum_offset", 0))
+    # default pocket fields for the report
+    pocket_seq = default_pocket["seq"]
+    true_resnums = default_pocket["resnums"]
+
+    # 3. mutations x each compound's OWN pocket
     mut_reports = []
     for mut in (mutations or []):
         m = _re.fullmatch(r"([A-Z])(\d+)([A-Z])", mut.strip())
@@ -120,28 +148,39 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
             mut_reports.append({"mutation": mut, "status": "unparseable - expected form T315I"})
             continue
         wt, pos_s, alt = m.group(1), m.group(2), m.group(3)
-        pos = int(pos_s)
-        if pos not in true_resnums:
-            mut_reports.append({"mutation": mut, "status": "outside co-crystal pocket",
-                                "detail": f"residue {pos} not among the {len(true_resnums)} "
-                                          f"lining residues of {pdb_id}:{ligand_resname.upper()} "
-                                          "- no structural resistance evidence"})
-            continue
-        idx = true_resnums.index(pos)
-        if pocket_seq[idx] != wt:
-            mut_reports.append({"mutation": mut, "status": "wt mismatch",
-                                "detail": f"pocket residue {pos} is {pocket_seq[idx]}, not {wt}"})
-            continue
-        effects = {}
+        pos_canonical = int(pos_s)
+        per_comp_effect: dict[str, dict] = {}
         for name, rec in per_compound.items():
             if rec.get("status") != "ok" or not rec.get("smiles"):
                 continue
-            e = mutation_effect(pocket_seq, rec["smiles"], idx, alt,
-                                resnums=true_resnums, drug_name=name)
-            effects[name] = {"ddg_kcal_mol": e["ddg_kcal_mol"],
-                             "affinity_loss_fold": e["affinity_change_fold"],
-                             "resistance_risk": e["resistance_risk"]}
-        mut_reports.append({"mutation": mut, "status": "in pocket", "effects": effects})
+            pk = pocket_map[name]
+            pos = pos_canonical + pk.get("resnum_offset", 0)
+            if pos not in pk["resnums"]:
+                per_comp_effect[name] = {
+                    "status": "outside pocket",
+                    "detail": f"residue {pos_canonical} (structure #{pos}) not in the "
+                              f"{pk['n_lining']} lining residues of "
+                              f"{pk['pdb_id']}:{pk['ligand']} - no structural resistance "
+                              "evidence for this compound's site",
+                    "affinity_loss_fold": 1.0}
+                continue
+            idx = pk["resnums"].index(pos)
+            if pk["seq"][idx] != wt:
+                per_comp_effect[name] = {
+                    "status": "wt mismatch",
+                    "detail": (f"{pk['pdb_id']} residue {pos} (canonical {pos_canonical}) "
+                               f"is {pk['seq'][idx]}, not {wt}"),
+                    "affinity_loss_fold": 1.0}
+                continue
+            e = mutation_effect(pk["seq"], rec["smiles"], idx, alt,
+                                resnums=pk["resnums"], drug_name=name)
+            per_comp_effect[name] = {
+                "status": "in pocket",
+                "pocket": f"{pk['pdb_id']}:{pk['ligand']}",
+                "ddg_kcal_mol": e["ddg_kcal_mol"],
+                "affinity_loss_fold": e["affinity_change_fold"],
+                "resistance_risk": e["resistance_risk"]}
+        mut_reports.append({"mutation": mut, "effects": per_comp_effect})
 
     # 4. combine
     ranking = []
@@ -153,8 +192,9 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
         fold = 1.0
         applied = []
         for mr in mut_reports:
-            if mr.get("status") == "in pocket" and name in mr.get("effects", {}):
-                fold *= mr["effects"][name]["affinity_loss_fold"]
+            eff = mr.get("effects", {}).get(name)
+            if eff and eff.get("status") == "in pocket":
+                fold *= eff["affinity_loss_fold"]
                 applied.append(mr["mutation"])
         ranking.append({
             "compound": name, "status": "ok",
@@ -168,12 +208,16 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
     return {
         "tissue": tissue, "target_gene": target_gene,
         "chembl_target": target,
-        "structure": {"pdb_id": pdb_id, "ligand": lp["ligand"],
-                      "chain": chain, "n_lining": len(lining),
+        "structure": {"pdb_id": pdb_id, "ligand": default_pocket["ligand"],
+                      "chain": default_pocket["chain"],
+                      "n_lining": default_pocket["n_lining"],
                       "lining_resnums": true_resnums,
-                      "source": lp["source"],
-                      "caveat": ("pocket is the co-crystal ligand's observed site; applying it "
-                                 "to other ATP-site compounds is an approximation")},
+                      "source": default_pocket["source"],
+                      "per_compound_pockets": {n: f"{pk['pdb_id']}:{pk['ligand']}"
+                                               for n, pk in pocket_map.items()},
+                      "caveat": ("each compound is scored on its own co-crystal pocket when an "
+                                 "override is given; compounds on the default pocket share the "
+                                 "default ligand's observed site as an approximation")},
         "mutation_reports": mut_reports,
         "ranking": ranking,
         "hit": next((r["compound"] for r in ranking if r.get("status") == "ok"), None),
