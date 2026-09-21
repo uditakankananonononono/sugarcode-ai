@@ -76,7 +76,7 @@ class TestBindingSiteValidation:
             for i in range(1, 15)]}
         monkeypatch.setattr(st, "fetch_alphafold", lambda i, offline=False: fx)
         monkeypatch.setattr(af, "_real_pockets", lambda res: [{"residues": [1, 2, 3, 4]}])
-        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1: {"scan": True})
+        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1, resnums=None: {"scan": True})
         monkeypatch.setattr(vina, "dock_vina_grid", lambda a, s: {"vina_score": -1.0, "estimated_dg_kcal_mol": -1.0})
         import sugarcode.bio.uniprot as up
         monkeypatch.setattr(up, "_get", lambda url, offline=False:

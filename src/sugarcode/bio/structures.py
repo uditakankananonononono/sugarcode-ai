@@ -218,9 +218,13 @@ def parse_pdb_hetatm(text: str) -> list[dict]:
         key = (resname, line[21].strip(), int(line[22:26]))
         groups.setdefault(key, []).append(
             (float(line[30:38]), float(line[38:46]), float(line[46:54])))
+    # crystallization additives/buffers are not drug ligands (drop 21 filter)
+    ADDITIVES = {"SO4", "PO4", "GOL", "EDO", "ACT", "CL", "NA", "MG", "CA", "ZN",
+                 "K", "MN", "FE", "CU", "NI", "CO", "HG", "CD", "DMS", "PEG",
+                 "MPD", "BME", "ACE", "FMT", "CIT", "TRS", "MES", "EPE"}
     out = []
     for (resname, chain, resnum), xyzs in groups.items():
-        if len(xyzs) < 4:  # ions/singletons are not ligands of interest
+        if len(xyzs) < 8 or resname in ADDITIVES:  # ions/additives are not ligands
             continue
         c = tuple(sum(p[k] for p in xyzs) / len(xyzs) for k in range(3))
         out.append({"resname": resname, "chain": chain, "resnum": resnum,

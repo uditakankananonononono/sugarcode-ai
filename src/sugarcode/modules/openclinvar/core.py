@@ -161,7 +161,7 @@ def live_lookup(gene: str, retmax: int = 20, offline: bool = False) -> dict:
 
 
 def interpret_variant_live(gene: str, variant: str, offline: bool = False,
-                           **kwargs) -> dict:
+                           variant_id: str | None = None, **kwargs) -> dict:
     """interpret_variant enriched with the LIVE ClinVar record for this exact
     variant: when ClinVar has a classification, it enters the evidence trace
     with review-status-weighted strength (expert panel > single submitter);
@@ -192,6 +192,20 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
             })
     except Exception as e:
         r["gnomad_constraint"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+    # gnomAD population frequency as evidence (drop 21, mirrors rarenet panel):
+    # common variants are benign evidence; absent is weak pathogenic support.
+    if variant_id:
+        try:
+            f = gnomad.variant_frequency(variant_id, offline=offline)
+            r["gnomad_frequency"] = f
+            if f.get("present") and (f.get("max_af") or 0) > 0.01:
+                r["evidence"].append({"rule": "GNOMAD_FREQUENCY", "weight": -0.8,
+                                      "detail": f"common in population (max AF {f['max_af']:.3g}) - too common for a rare-disease cause"})
+            elif f.get("present") is False:
+                r["evidence"].append({"rule": "GNOMAD_FREQUENCY", "weight": 0.2,
+                                      "detail": "absent from gnomAD - consistent with rare (weak support)"})
+        except Exception as e:
+            r["gnomad_frequency"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
     try:
         matched = entrez.clinvar_exact(gene, variant, offline=offline)
     except Exception as e:

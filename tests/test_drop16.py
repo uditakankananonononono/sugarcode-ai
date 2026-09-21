@@ -40,7 +40,7 @@ class TestMutDockVinaBaseline:
     def test_vina_baseline_per_drug(self, monkeypatch):
         from sugarcode.modules.mutdock import core as md
         import sugarcode.modules.docking_studio.vina as vina
-        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1: {"scan": True})
+        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1, resnums=None: {"scan": True})
         monkeypatch.setattr(vina, "dock_vina_grid",
                             lambda atoms, smi: {"vina_score": -1.0, "estimated_dg_kcal_mol": -1.0})
         # avoid structure fetch: patch the fetchers used inside structure_resistance_scan

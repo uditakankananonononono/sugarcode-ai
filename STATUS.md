@@ -1,11 +1,11 @@
-# SugarCode AI - honest status (as of drop 20 / this push)
+# SugarCode AI - honest status (as of drop 21 / this push)
 
 This document is the current truth ledger. It says what is verified against
 real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **276 passed, 0 failed** (hermetic fixtures; live calls verified
+Test suite: **283 passed, 0 failed** (hermetic fixtures; live calls verified
 outside pytest and recorded below).
 
 ## Tier 1 - verified against live external data
@@ -17,6 +17,8 @@ outside pytest and recorded below).
 | openclinvar | Live ClinVar exact-variant evidence; near-miss titles rejected; conflicting classifications weight 0. BRCA1 c.5266dup -> Pathogenic, expert panel. Plus gnomAD gene constraint (pLI/LOEUF): supports LOF evidence only in truly constrained genes (SCN1A LOEUF 0.107 yes, TP53 0.418 honestly no) | NCBI ClinVar, gnomAD r4 |
 | neohunter specificity | gnomAD population frequency as second tumor-specificity check (when a GRCh38 variant_id is supplied; skipped honestly otherwise) | gnomAD r4 |
 | rarenet_ai panel | Combined per-variant evidence panel (ClinVar + gnomAD frequency + gene constraint) with named components and weights, ranked, clinician-adjudicates disclaimer. Live-verified: R273H strong support (2.5), P72R evidence against (-3.5) | NCBI ClinVar, gnomAD r4 |
+| mutdock T315I golden | Live golden: 1IEP T315 correctly labeled (true non-contiguous numbering, single-chain), T315I ddG +0.468 / 2.2x affinity loss - direction and identity right, magnitude honestly low vs the ~100x clinical resistance (feature-model limit, stated). Numbering and two-chain dedupe bugs caught by the golden run | RCSB PDB |
+| openclinvar unified gnomAD | population frequency now evidence in interpret_variant_live too (common AF -0.8, absent +0.2), mirroring the rarenet panel | gnomAD r4 |
 | mutdock co-crystal pockets | Resistance scans on the experimentally observed binding site from real PDB HETATM ligands: 1IEP/imatinib pocket (46 residues) contains the gatekeeper T315 and Y253 - the actual known resistance sites | RCSB PDB co-structures |
 | infinite_diagnosis joint view | symptom differential x live variant panel crossed on structured gene membership; live: PKU symptoms + PAH variant -> lead hypothesis | rarenet + ClinVar + gnomAD |
 | mutdock pocket validation | geometry pockets compared against UniProt-annotated BINDING features; non-overlap verdicts stated plainly (P04637: annotated sites are DNA-binding, geometry pocket flagged honestly) | UniProt, AlphaFold DB |

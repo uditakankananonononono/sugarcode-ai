@@ -9,7 +9,7 @@ class TestLigandPocket:
         for i in range(1, 5):
             lines.append(f"ATOM  {i:>5}  CA  ALA A{i:>4}    "
                          f"{i * 4.0:8.3f}{0.0:8.3f}{0.0:8.3f}  1.00 10.00           C")
-        for j in range(5):
+        for j in range(9):
             lines.append(f"HETATM{j+1:>5}  C1  LIG B  99    "
                          f"{8.0 + j * 0.5:8.3f}{1.0:8.3f}{1.0:8.3f}  1.00 10.00           C")
         return "\n".join(lines) + "\nEND\n"
@@ -17,7 +17,7 @@ class TestLigandPocket:
     def test_pocket_from_cocrystal(self, monkeypatch):
         from sugarcode.bio import structures
         monkeypatch.setattr(structures, "_get", lambda url, offline=False: self._pdb_fixture().encode())
-        r = structures.ligand_pocket("9LIG", "LIG", radius=5.0)
+        r = structures.ligand_pocket("9LIG", "LIG", radius=3.5)
         resnums = {x["resnum"] for x in r["lining"]}
         assert 2 in resnums and 3 in resnums  # near the ligand
         assert 1 not in resnums or 4 not in resnums  # far end excluded
@@ -42,7 +42,7 @@ class TestLigandPocket:
                              "n_lining": 3, "lining": fx["residues"][2:5], "source": "fixture"})
         import sugarcode.modules.docking_studio.vina as vina
         monkeypatch.setattr(vina, "dock_vina_grid", lambda a, s: {"vina_score": -1.0, "estimated_dg_kcal_mol": -1.0})
-        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1: {"scan": True})
+        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1, resnums=None: {"scan": True})
         r = md.structure_resistance_scan("1FIX", {"drug": "CC"}, ligand_resname="LIG")
         assert "co-crystal ligand LIG" in r["structure"]["pocket_source"]
 
@@ -59,7 +59,7 @@ class TestFeatureAwareness:
             for i in range(1, 15)]}
         monkeypatch.setattr(st, "fetch_alphafold", lambda i, offline=False: fx)
         monkeypatch.setattr(af, "_real_pockets", lambda res: [{"residues": [3, 4]}])
-        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1: {"scan": True})
+        monkeypatch.setattr(md, "resistance_scan", lambda seq, drugs, pocket_start=1, resnums=None: {"scan": True})
         monkeypatch.setattr(vina, "dock_vina_grid", lambda a, s: {"vina_score": -1.0, "estimated_dg_kcal_mol": -1.0})
         feats = [{"type": "Natural variant", "description": "tolerated",
                   "location": {"start": {"value": 3}, "end": {"value": 3}}}]

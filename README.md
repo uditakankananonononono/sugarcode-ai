@@ -248,6 +248,20 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### T315I golden, true numbering, HETATM filter, unified gnomAD (drop 21)
+
+The T315I golden regression exposed two real bugs, both fixed and locked:
+resistance scans labeled positions with contiguous numbering, wrong for
+non-contiguous co-crystal linings (position 315 was printed as 262), and an
+unspecified chain pulled both 1IEP copies into one pocket (46 -> 23 residues).
+With true resnum labels and ligand-chain default: **T315I = ddG +0.468, 2.2x
+affinity loss - direction and identity correct, magnitude honestly far below
+the ~100x clinical resistance (feature-model limit, stated)**. HETATM parsing
+now filters crystallization additives (GOL/SO4/PEG/...) and <8-atom groups.
+OpenClinvar's interpret_variant_live now also weighs gnomAD population
+frequency (common AF = benign evidence, absent = weak support), unifying the
+two interpretation stacks; live on P72R both evidence lines agree.
+
 ### Co-crystal pockets, feature awareness, joint case view (drop 20)
 
 ```python

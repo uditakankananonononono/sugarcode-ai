@@ -22,7 +22,7 @@ def _cls(aa: str) -> str:
 
 def mutation_effect(pocket_residues: str, smiles: str, position: int,
                     mutant_aa: str, pocket_start: int = 1,
-                    drug_name: str = "drug") -> dict:
+                    drug_name: str = "drug", resnums: list[int] | None = None) -> dict:
     """Delta-delta-G of a point mutation on drug binding.
 
     Combines class-change contact penalty with pocket-complementarity shift
@@ -38,8 +38,9 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
     class_pen = DDG_CLASS_CHANGE.get((_cls(wt_aa), _cls(mutant_aa)), 0.5)
     ddg = round(0.6 * ddg_score + 0.4 * class_pen, 3)
     resistance = ("high" if ddg > 1.5 else "moderate" if ddg > 0.5 else "low")
+    true_num = resnums[position] if resnums else pocket_start + position + 1
     return {
-        "mutation": f"{wt_aa}{pocket_start + position + 1}{mutant_aa}",
+        "mutation": f"{wt_aa}{true_num}{mutant_aa}",
         "drug": drug_name,
         "wt_dg": wt["binding_dg_kcal_mol"], "mutant_dg": mt["binding_dg_kcal_mol"],
         "ddg_kcal_mol": ddg,
@@ -50,7 +51,9 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
 
 
 def resistance_scan(pocket_residues: str, drugs: dict[str, str],
-                    pocket_start: int = 1) -> dict:
+                    pocket_start: int = 1, resnums: list[int] | None = None) -> dict:
+    """resnums: true structure numbering per pocket index (non-contiguous
+    pockets MUST pass this - pocket_start assumes contiguity)."""
     """Forecast cross-drug resistance: scan all pocket positions x 20 AAs.
 
     Returns resistance hotspots (positions where many mutations hurt binding
@@ -66,17 +69,20 @@ def resistance_scan(pocket_residues: str, drugs: dict[str, str],
             for aa in "ACDEFGHIKLMNPQRSTVWY":
                 if aa == pocket_residues[pos]:
                     continue
-                r = mutation_effect(pocket_residues, smi, pos, aa, pocket_start, name)
+                r = mutation_effect(pocket_residues, smi, pos, aa, pocket_start, name,
+                                    resnums=resnums)
                 if r["ddg_kcal_mol"] > best_gain:
                     best_gain = r["ddg_kcal_mol"]
                     best_mut = r["mutation"]
             if best_gain > 1.0:
                 hotspot_counts[pos] = hotspot_counts.get(pos, 0) + 1
-            worst.append({"position": pocket_start + pos + 1,
+            true_num = resnums[pos] if resnums else pocket_start + pos + 1
+            worst.append({"position": true_num,
                           "max_ddg": round(best_gain, 3), "mutation": best_mut})
         per_drug[name] = {"positions": worst,
                           "most_vulnerable": max(worst, key=lambda w: w["max_ddg"])}
-    hotspots = [{"position": pocket_start + p + 1, "drugs_affected": c}
+    hotspots = [{"position": resnums[p] if resnums else pocket_start + p + 1,
+                 "drugs_affected": c}
                 for p, c in sorted(hotspot_counts.items(), key=lambda kv: -kv[1])]
     return {
         "drugs": list(drugs),
@@ -150,9 +156,14 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
         lp = ligand_pocket(identifier, ligand_resname, chain=chain, offline=offline)
         s = fetch_pdb(identifier, offline=offline)
         residues = s["residues"]
+        if chain is None and lp["lining"]:
+            chain = lp["lining"][0].get("chain") or None  # avoid two-chain duplicates
         if chain:
             residues = [r for r in residues if r["chain"] == chain]
-        lining = lp["lining"]
+            lp_lining = [r for r in lp["lining"] if r.get("chain") in (None, chain)]
+        else:
+            lp_lining = lp["lining"]
+        lining = lp_lining
         chosen = {r["resnum"] for r in lining}
         pockets = [{"residues": sorted(chosen)}]
         pocket_source = f"co-crystal ligand {lp['ligand']} ({lp['n_lining']} residues within {lp['radius_A']} A)"
@@ -225,9 +236,13 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
             binding_validation = {"status": f"validation lookup failed: {type(e).__name__}: {e}"}
     else:
         binding_validation = {"status": "PDB input - UniProt mapping not available (SIFTS not wired); skipped"}
+    seen = set()
+    lining = [r for r in lining if not ((r.get("chain"), r["resnum"]) in seen
+                                        or seen.add((r.get("chain"), r["resnum"])))]
     pocket_seq = "".join(_A3.get(r["resname"], "G") for r in lining)
+    true_resnums = [r["resnum"] for r in lining]
     start = lining[0]["resnum"] - 1
-    scan = resistance_scan(pocket_seq, drugs, pocket_start=start)
+    scan = resistance_scan(pocket_seq, drugs, pocket_start=start, resnums=true_resnums)
     # Vina-form WT baseline affinity on the real pocket coordinates (drop 16).
     # Mutant ddG still comes from the feature scorer - the vina baseline is a
     # real-coordinate WT anchor, labeled as such, not a fake re-dock.
