@@ -93,8 +93,14 @@ def answer(question: str) -> dict:
     for gene in GENES:
         if gene.lower() in q:
             info = GENES[gene]
+            live = live_gene_context(gene)
+            grounded = (f"Live UniProt: {live.get('protein_name', '?')}, "
+                        f"{live.get('length', info['protein_len'])} aa"
+                        if live.get("source") == "UniProt (live)"
+                        else f"local slice ({live.get('warning', 'live unavailable')})")
             return {"route": "gene_knowledge", "gene": gene,
-                    "answer": (f"{gene}: {info['protein_len']} aa, domains "
+                    "grounding": live.get("source"),
+                    "answer": (f"{gene}: {grounded}. Local: {info['protein_len']} aa, domains "
                                f"{list(info['domains'])}, hotspots {info['hotspots']}; "
                                f"pathway: {info['pathway']}"),
                     "followups": ["run mutation_to_phenotype for a specific variant",

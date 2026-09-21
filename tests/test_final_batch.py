@@ -160,9 +160,17 @@ def test_copilot_structured_outputs():
     assert len(lines) == 11  # 10 residues + END
 
 
-def test_copilot_answer_routing():
+def test_copilot_answer_routing(monkeypatch):
+    # keep unit tests hermetic: force the named local fallback path
+    import sugarcode.modules.bio_copilot.core as cc
+    monkeypatch.setattr(cc, "live_gene_context",
+                        lambda gene, offline=False: {"gene": gene,
+                                                     "source": "local knowledge slice",
+                                                     "warning": "test stub",
+                                                     "local": cc.GENES.get(gene)})
     r = answer("What is the function of TP53 hotspots?")
     assert r["route"] == "gene_knowledge"
+    assert r["grounding"] == "local knowledge slice"
     r2 = answer("how do I check a variant effect?")
     assert r2["route"] in ("variant_pipeline", "literature_synthesis")
 

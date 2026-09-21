@@ -103,3 +103,23 @@ def live_gene_profile(symbol: str, organism: str = "human", offline: bool = Fals
             "charged_fraction": round(sum(1 for a in seq if a in "DEKRH") / len(seq), 3),
         }
     return out
+
+
+def live_publication_trend(symbol: str, years: int = 5, offline: bool = False) -> dict:
+    """Real publication trend: per-year PubMed counts for the gene symbol."""
+    from ...bio import entrez
+    from datetime import datetime
+    now = datetime.now().year
+    counts = {}
+    for y in range(now - years + 1, now + 1):
+        data = entrez._get("esearch.fcgi", {"db": "pubmed",
+                                            "term": f"{symbol}[Title/Abstract] AND {y}[dp]",
+                                            "retmode": "json", "retmax": 0},
+                           offline=offline)
+        import json as _j
+        counts[y] = int(_j.loads(data)["esearchresult"]["count"])
+    vals = list(counts.values())
+    trend = ("rising" if len(vals) >= 2 and vals[-1] > vals[0] * 1.2 else
+             "falling" if len(vals) >= 2 and vals[-1] < vals[0] * 0.8 else "steady")
+    return {"symbol": symbol, "source": "PubMed (live)", "counts_by_year": counts,
+            "trend": trend, "note": "Title/Abstract mention counts per publication year"}

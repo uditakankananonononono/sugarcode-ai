@@ -1,0 +1,54 @@
+{
+ "ALDH": {
+  "chembl_id": "CHEMBL3542434",
+  "pref_name": "Aldehyde dehydrogenase"
+ },
+ "AMPK": {
+  "chembl_id": "CHEMBL2096907",
+  "pref_name": "AMP-activated protein kinase, AMPK"
+ },
+ "COX1": {
+  "chembl_id": "CHEMBL221",
+  "pref_name": "Prostaglandin G/H synthase 1"
+ },
+ "COX2": {
+  "chembl_id": "CHEMBL230",
+  "pref_name": "Prostaglandin G/H synthase 2"
+ },
+ "CRBN": {
+  "chembl_id": "CHEMBL3763008",
+  "pref_name": "Protein cereblon"
+ },
+ "ETC1": {
+  "chembl_id": "CHEMBL3039",
+  "pref_name": "NADH dehydrogenase [ubiquinone] iron-sulfur protein 2, mitochondrial"
+ },
+ "H2R": {
+  "chembl_id": "CHEMBL1941",
+  "pref_name": "Histamine H2 receptor"
+ },
+ "HMGCR": {
+  "chembl_id": "CHEMBL402",
+  "pref_name": "3-hydroxy-3-methylglutaryl-coenzyme A reductase"
+ },
+ "Hh_SMO": {
+  "chembl_id": "CHEMBL5971",
+  "pref_name": "Protein smoothened"
+ },
+ "PDE5": {
+  "chembl_id": "CHEMBL1827",
+  "pref_name": "cGMP-specific 3',5'-cyclic phosphodiesterase"
+ },
+ "TNFa": {
+  "chembl_id": "CHEMBL1825",
+  "pref_name": "Tumor necrosis factor"
+ },
+ "lanosterol14DM": {
+  "chembl_id": "CHEMBL1075110",
+  "pref_name": "Sterol 14-alpha demethylase"
+ },
+ "mTOR": {
+  "chembl_id": "CHEMBL2842",
+  "pref_name": "Serine/threonine-protein kinase mTOR"
+ }
+}

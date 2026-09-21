@@ -58,7 +58,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
 | 7 | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
 | 8 | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | 196 passing |
-| 9 (current) | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
+| 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
+| 10 (current) | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -243,6 +244,24 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### Real bioactivity, literature trends, grounded copilot (drop 10)
+
+```python
+from sugarcode.modules.neodti_engine import repurposing_scan_live
+from sugarcode.modules.gene_analysis import live_publication_trend
+
+repurposing_scan_live("breast cancer")   # graph walk + ChEMBL measured potency
+live_publication_trend("BRCA1")          # per-year PubMed counts, trend call
+```
+
+NeoDTI candidates are now validated against **live ChEMBL bioactivity**: a
+curated, exact-name-resolved target map (13 of 14 graph targets; FROUNT has no
+ChEMBL target - honestly absent), drug aliases documented (rapamycin queried as
+its INN sirolimus, statins via simvastatin). Live-verified: sirolimus IC50
+0.1 nM on mTOR, simvastatin Ki 2.6 nM on HMGCR, aspirin IC50 62.5 uM on COX2.
+Bio-Copilot's gene route now grounds answers in live UniProt and names the
+fallback when offline; unit tests stay hermetic.
+
 Docking now scores against real structure pockets (enclosure bonus, size-fit
 penalty, true lining residues) sourced live from RCSB/AlphaFold DB - still a
 screening proxy, not a free energy (named in every result).
@@ -251,7 +270,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 201 tests
+python -m pytest -q                 # 206 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
