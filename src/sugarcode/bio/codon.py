@@ -5,6 +5,7 @@ and H. sapiens tables; users may supply any custom table.
 """
 from __future__ import annotations
 import math
+from pathlib import Path
 from .sequence import STANDARD_CODE, clean_dna
 
 # per-thousand codon frequencies
@@ -124,3 +125,40 @@ def optimize_sequence(protein: str, table: dict[str, float] | None = None,
                         seq = tseq
                         break
     return "".join(codon_list)
+
+
+# --- published tables (Edinburgh Genome Foundry codon-usage-tables, see
+# bio/data/codon_tables/PROVENANCE.md) -----------------------------------------
+_DATA_DIR = Path(__file__).parent / "data" / "codon_tables"
+
+
+def load_published_table(species: str) -> dict[str, float]:
+    """Load a vendored published codon table (relative frequency per AA).
+
+    species: 'e_coli', 'h_sapiens' or 's_cerevisiae'. RNA codons are converted
+    to DNA. Values are relative frequencies within each amino acid - directly
+    usable for CAI/relative-adaptiveness (which normalizes per AA anyway)."""
+    import csv
+    f = _DATA_DIR / f"{species}.csv"
+    if not f.exists():
+        raise ValueError(f"no published table for {species!r}; have e_coli, h_sapiens, s_cerevisiae")
+    out = {}
+    for row in csv.DictReader(open(f)):
+        out[row["codon"].replace("U", "T")] = float(row["relative_frequency"])
+    return out
+
+
+ECOLI_PUBLISHED = load_published_table("e_coli_316407")
+HUMAN_PUBLISHED = load_published_table("h_sapiens_9606")
+YEAST_PUBLISHED = load_published_table("s_cerevisiae_4932")
+
+# published tables become the canonical defaults; memory-built tables kept as
+# named legacy fallbacks
+ECOLI_LEGACY = ECOLI_K12
+H_SAPIENS_LEGACY = H_SAPIENS
+HOST_TABLES.update({
+    "ecoli": ECOLI_PUBLISHED, "ecoli_published": ECOLI_PUBLISHED,
+    "h_sapiens_published": HUMAN_PUBLISHED, "human": HUMAN_PUBLISHED,
+    "s_cerevisiae": YEAST_PUBLISHED, "yeast": YEAST_PUBLISHED,
+    "ecoli_legacy": ECOLI_LEGACY, "h_sapiens_legacy": H_SAPIENS_LEGACY,
+})

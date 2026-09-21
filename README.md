@@ -246,6 +246,29 @@ all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
 
+### Published codon tables with provenance, honest GC-repair cost (drop 12)
+
+```python
+from sugarcode.bio import codon
+from sugarcode.modules.codon_opt import optimize
+
+codon.HOST_TABLES            # + ecoli/human/yeast published + legacy fallbacks
+optimize(protein, host="s_cerevisiae")   # real S. cerevisiae usage table
+```
+
+Codon usage tables are now **published data with provenance** instead of
+memory-built "Kazusa-style" numbers: Edinburgh Genome Foundry
+`codon-usage-tables` (E. coli K12, H. sapiens, S. cerevisiae) vendored verbatim
+with `bio/data/codon_tables/PROVENANCE.md` and cross-validated against the
+previous in-memory tables (E. coli top codons 21/21; human 20/21 with an exact
+AGA/AGG tie that memory broke the other way - documented, immaterial).
+Published tables are the canonical defaults; memory tables remain as named
+`*_legacy` fallbacks. Testing surfaced a real behavior worth surfacing:
+Codon Opt's GC-window repair can trade CAI for GC-band compliance (yeast
+default-band run dropped CAI 0.96 -> 0.69); `optimize()` now reports
+`cai_gc_repair_cost` and a note instead of silently returning the worse
+sequence.
+
 ### Live variant evidence, real-structure dynamics, molecule novelty (drop 11)
 
 ```python

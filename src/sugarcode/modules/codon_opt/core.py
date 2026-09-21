@@ -25,12 +25,19 @@ def optimize(protein: str, host: str = "ecoli_k12", gc_min: float = 0.40,
     opt = codonlib.optimize_sequence(protein.upper(), table, gc_min, gc_max, avoid_motifs)
     strain = _trna_strain(opt, table)
     flow = tasep_simulate(opt, table)
+    cai_naive = codonlib.cai(naive, table)
+    cai_opt = codonlib.cai(opt, table)
+    gc_repair_cost = round(max(0.0, cai_naive - cai_opt), 4)
     return {
         "host": host,
         "protein_length": len(protein),
         "optimized_dna": opt,
         "cai_before": round(codonlib.cai(before, table), 4),
-        "cai_after": round(codonlib.cai(opt, table), 4),
+        "cai_after": round(cai_opt, 4),
+        "cai_gc_repair_cost": gc_repair_cost,
+        "gc_repair_note": (f"GC-window repair traded {gc_repair_cost:.3f} CAI to keep GC inside "
+                           f"[{gc_min}, {gc_max}] - widen the band if native GC is preferred"
+                           if gc_repair_cost > 0.02 else None),
         "gc_content": round(gc_content(opt), 4),
         "gc_windows": [{"start": s, "gc": round(g, 3)} for s, g in gc_windows(opt, 60)],
         "chi_score": round(strain, 4),
