@@ -22,12 +22,20 @@ GENES = ["BRCA1","BRCA2","TP53","MLH1","MSH2","MSH6","PMS2","CFTR","PAH","PTEN",
 OUT = Path("src/sugarcode/bio/data/splice_sites")
 
 def refseqgene_accession(sym: str) -> str | None:
-    ids = entrez.esearch("nuccore", f"{sym}[gene] AND refseqgene[filter]", retmax=5)
+    """Pick the RefSeqGene record for THIS gene - the gene-name query also
+    returns neighboring loci (BRCA2's query returns ZAR1L NG_017006.2 first),
+    so the record title must contain the symbol."""
+    ids = entrez.esearch("nuccore", f"{sym}[gene] AND refseqgene[filter]", retmax=8)
+    fallback = None
     for uid, doc in entrez.esummary("nuccore", ids).items():
         acc = doc.get("accessionversion", "")
-        if acc.startswith("NG_"):
+        if not acc.startswith("NG_"):
+            continue
+        title = doc.get("title", "")
+        if f"({sym})" in title or f" {sym} " in title or title.startswith(f"Homo sapiens {sym} "):
             return acc
-    return None
+        fallback = fallback or acc
+    return fallback
 
 def junction_windows(seq: str, mrna: dict) -> list[tuple[str, str]]:
     """(donor9, acceptor15) per intron, transcript orientation."""

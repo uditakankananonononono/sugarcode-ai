@@ -1,7 +1,7 @@
 """Real human splice-site PWMs learned from RefSeqGene records.
 
-Data: 1,215 GT-AG splice junctions extracted live from NCBI RefSeqGene
-records for 28 clinically relevant genes (see data/splice_sites/PROVENANCE.md).
+Data: 1,170 GT-AG splice junctions extracted live from NCBI RefSeqGene
+records for 29 clinically relevant genes (title-verified accessions) (see data/splice_sites/PROVENANCE.md).
 Donor window: 9 nt (3 exonic + 6 intronic). Acceptor window: 15 nt
 (14 intronic + 1 exonic). Learned consensus: AAG|GTAAGT and (T)nCAG|G,
 matching the published mammalian consensus.

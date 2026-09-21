@@ -20,12 +20,12 @@ _ACCEPTOR_SITES = [
 SEED_DONOR_LOD = log_odds_matrix(build_pwm(_DONOR_SITES))
 SEED_ACCEPTOR_LOD = log_odds_matrix(build_pwm(_ACCEPTOR_SITES))
 
-# Default matrices: learned from 1,215 real GT-AG junctions across 28
+# Default matrices: learned from 1,170 real GT-AG junctions across 29
 # RefSeqGene records (bio/splice.py, data/splice_sites/PROVENANCE.md).
 try:
     DONOR_LOD = _splice.donor_lod()
     ACCEPTOR_LOD = _splice.acceptor_lod()
-    PWM_SOURCE = "real RefSeqGene junctions (1,215 GT-AG sites, 28 genes)"
+    PWM_SOURCE = "real RefSeqGene junctions (1,170 GT-AG sites, 29 genes, title-verified)"
 except _splice.SpliceDataMissing:
     DONOR_LOD = SEED_DONOR_LOD
     ACCEPTOR_LOD = SEED_ACCEPTOR_LOD

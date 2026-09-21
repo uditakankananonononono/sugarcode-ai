@@ -35,9 +35,9 @@ def test_learned_pwm_matches_published_consensus():
 
 def test_junctions_tsv_is_canonical_filtered_real_data():
     lines = (DATA / "junctions.tsv").read_text().splitlines()[1:]
-    assert len(lines) == 1260
+    assert len(lines) == 1213
     canon = [l for l in lines if l.endswith("\t1")]
-    assert len(canon) == 1215
+    assert len(canon) == 1170
     genes = {l.split("\t")[0] for l in lines}
     assert "BRCA1" in genes and "DMD" in genes and len(genes) >= 25
 

@@ -8,9 +8,9 @@
     },
     {
       "gene": "BRCA2",
-      "accession": "NG_017006.2",
-      "transcripts": 7,
-      "junctions": 16
+      "accession": "NG_012772.3",
+      "transcripts": 2,
+      "junctions": 29
     },
     {
       "gene": "TP53",
@@ -56,21 +56,21 @@
     },
     {
       "gene": "PTEN",
-      "accession": "NG_033079.1",
-      "transcripts": 0,
-      "junctions": 0
-    },
-    {
-      "gene": "APC",
-      "accession": "NG_016323.1",
+      "accession": "NG_007466.2",
       "transcripts": 1,
       "junctions": 8
     },
     {
-      "gene": "ATM",
-      "accession": "NG_054724.1",
+      "gene": "APC",
+      "accession": "NG_008481.4",
       "transcripts": 3,
-      "junctions": 56
+      "junctions": 46
+    },
+    {
+      "gene": "ATM",
+      "accession": "NG_009830.1",
+      "transcripts": 1,
+      "junctions": 62
     },
     {
       "gene": "RB1",
@@ -164,15 +164,15 @@
     },
     {
       "gene": "TSC1",
-      "accession": "NG_034227.1",
+      "accession": "NG_012386.1",
       "transcripts": 1,
-      "junctions": 10
+      "junctions": 22
     },
     {
       "gene": "TSC2",
-      "accession": "NG_008617.1",
-      "transcripts": 44,
-      "junctions": 174
+      "accession": "NG_005895.1",
+      "transcripts": 6,
+      "junctions": 50
     },
     {
       "gene": "VHL",

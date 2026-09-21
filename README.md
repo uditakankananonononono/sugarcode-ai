@@ -72,7 +72,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_opt | PAM enumeration both strands, GC 40-60% filter, position-weighted on-target score, seed-weighted off-target scan, hairpin check, browser-track payload |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, GC-window repair, motif avoidance, CHI tRNA-strain index, TASEP ribosome-flow KMC simulation, FBA constraint export |
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
-| deepsplice | splice PWMs learned from 1,215 real RefSeqGene GT-AG junctions (28 genes); variant delta + isoform consequence calls calibrated on a 206-case ClinVar BRCA1 golden set, cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
+| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes); variant delta + isoform calls calibrated on a 642-case, 4-gene ClinVar golden set (99.6% of 519 canonical sites called loss), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 311 tests
+python -m pytest -q                 # 318 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
