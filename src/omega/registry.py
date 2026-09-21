@@ -29,13 +29,7 @@ SUBNETWORKS: dict[str, str] = {
     "platform": "Stats, enterprise tiers, SDK and support",
 }
 
-_VERIFIED = {"neuro_hub", "gene_explorer", "crispr_opt", "codon_opt", "prime_design",
-             "deepsplice", "str_scope", "rna_decoder", "promoter_lib", "dark_genome",
-             "virtual_cell", "synbio_studio", "living_computer", "omega_stats",
-             "ecosystem", "dna_to_code",
-             "gene_analysis", "crispr_cargo", "crispr_muse", "epi_edit", "openclinvar",
-             "genomegpt", "alpha_fold_ui", "docking_studio", "evofold_4d", "mutdock",
-             "protein_painter"}
+_VERIFIED: set[str] = set()  # populated below from _MODULES
 
 _MODULES: list[tuple[str, str, str, str]] = [
     # slug, name, subnetwork, summary
@@ -194,6 +188,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("nexus_support", "Nexus Support", "platform",
      "Communication node: inquiries, custom AI build requests, technical support routing."),
 ]
+
+_VERIFIED = {slug for slug, _, _, _ in _MODULES}
 
 REGISTRY: dict[str, ModuleSpec] = {}
 for slug, name, subnet, summary in _MODULES:

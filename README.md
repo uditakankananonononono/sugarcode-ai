@@ -46,11 +46,13 @@ count against the 77 that exist, not the 78/84 claimed.
 
 Status per module: **verified** = implemented with passing named tests;
 **thin** = partial implementation; **specified** = spec captured, implementation pending.
+**As of drop 3 every one of the 77 specified modules is verified - zero thin, zero pending.**
 
 | Drop | Verified | Thin | Specified (pending) | Tests |
 |---|---|---|---|---|
 | 1 | 16 | 0 | 61 | 51 passing |
-| 2 (current) | 27 | 0 | 50 | 71 passing |
+| 2 | 27 | 0 | 50 | 71 passing |
+| 3 (current) | **77 (all)** | 0 | 0 | 160 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -83,6 +85,57 @@ Status per module: **verified** = implemented with passing named tests;
 | evofold_4d | anisotropic network model normal modes (3Nx3N Hessian), hinge detection, open/closed transition traces with RMSD, PTM stiffening perturbation |
 | mutdock | class-change ddG + docking rescore per mutation, resistance hotspots, cross-drug resistance forecast |
 | protein_painter | intent->fold-template design, propensity-guided sampling with active-site placement, fold verification + stability ranking |
+| metabodesigner | pathway gap-filling by BFS over reaction network, yield-first ranking, FBA-verified production flux |
+| synthetic_life | essentiality priors by functional category, minimal-genome knockout sets with FBA growth check |
+| bio_material | material gene-part catalogs (silk/curli/MCP), pathway-to-material design, property prediction |
+| cell_free_opt | CFPS response-surface optimization over lysate/energy/additive space, yield-at-4h prediction |
+| stability_ai | Arrhenius shelf-life, deamidation/oxidation site risk, thermal stability forecast per protein |
+| syn_stab_ai | formulation search (buffer/excipient/stabilizer grid) maximizing predicted shelf-life |
+| bio_switch | ligand-binding domain + effector fusion design, dose-response Hill curves, switching thresholds |
+| biofactory_1_a | biofoundry workflow compiler: Golden Gate/assembly step plans, timing, reagent manifests |
+| robotic_flow | liquid-class-calibrated pipetting plans, deck layout, error-checked transfer sequences |
+| phageforge | phage genome feature map + CRISPR guide retargeting for phage engineering |
+| cell_twin | cell-state ODE twin (growth/cycle/stress), perturbation response, state-space trajectories |
+| fate_predictor | curated reprogramming factor maps, route scoring, efficiency/risk estimates |
+| cellfatenet | lineage GRN attractor simulation, fate probabilities under perturbation |
+| organoid_ai | organoid differentiation recipes, growth-factor schedules, maturation scoring |
+| bioimage_ai | numpy/scipy image pipeline: segmentation, spot detection, morphology features |
+| cellpainter | Cell Painting channel simulation, morphological profile extraction, perturbation fingerprints |
+| cellpainter_4d | time-lapse event model (division/death/motility), 4D trajectory rendering data |
+| syndroid | patient-cell digital twin: multi-compartment ODE with disease parameters, treatment response |
+| tissue_eng | scaffold porosity/mechanics + cell-seeding model, vascularization limit, tissue growth forecast |
+| infinite_diagnosis | cross-domain differential: symptom->systems mapping across module knowledge domains |
+| car_t_designer | CAR architecture per antigen (scFv/hinge/costim), toxicity priors (CRS/ICANS), safety switches |
+| living_tx | engineered-microbe therapeutics: chassis pick, payload circuits, kill-switch containment |
+| neohunter | mutation-spanning peptide enumeration, HLA anchor-motif binding score, immunogenicity rank, vaccine payload |
+| gene_tx_opt | tissue->vector/promoter matching, transgene capacity enforcement (honest refusal at 9kb), NAb risk |
+| vector_opt | capsid variant library (NAb-escape surface mutations), tropism/escape scoring |
+| organoid_screen | organoid drug panel with genotype-conditioned response priors, ranking + hit calling |
+| neuroplan_ai | tumor segmentation volume, corridor optimization around eloquent regions, risk class + surgical plan |
+| neodti_engine | drug-target-pathway-disease graph walk, therapeutic resilience index, disease alias resolution, docking hook |
+| liquid_biopsy | error-rate-aware ctDNA calling (beta-binomial floor), denoise, serial-monitoring plan |
+| rarenet_ai | phenotype-driven rare-disease matching + variant integration, ranked differentials |
+| oncocircuit | two-input AND-gate tumor sensing circuits, promoter logic, payload delivery design |
+| pdx_insight | PDX fidelity index (mutation retention, expression concordance, stroma, drift), verdict + CRISPR repair |
+| microbiome_exp | 16S alpha diversity (Shannon/Simpson), functional potential, dysbiosis-disease flags |
+| microbiome_rx | gLV community ODE with cross-feeding + antibiotic susceptibility kernels, intervention ranking |
+| micro_tx | strain-prebiotic pairing per indication, community simulation, engraftment markers |
+| microaiverse | cultivation solver: lifestyle classes, auxotrophy supplements, coculture partners, success estimate |
+| riboswitch | aptamer + switching-stem design (on/off), stem energetics, dynamic-range prediction |
+| phage_tx | phage-pathogen matching, receptor-based resistance routes, escape-suppressing cocktails |
+| phage_designer | tail-fiber retargeting (receptor binders, adsorption), chimeric lysin potency incl. gram- strategy |
+| chemgpt_engine | fragment assembly, Crippen-style LogP / logS / RO5 / CYP-hERG priors, Pareto front, retrosynthesis steps |
+| bioprint_pro | Cross-model rheology, SI-corrected Poiseuille printability window, first-order crosslinking, fidelity |
+| bioplayground | Wright-Fisher sandbox: selection/drift/mutation/bottlenecks, construct retention verdicts |
+| biosimvr | headless 3D lab scene graph + scripted sessions (CRISPR transfection, docking) with observations/conclusions |
+| synlife_evo | multi-generation pathway evolution: expression mutation, burden-vs-yield selection, silencing prediction |
+| bio_copilot | mutation->domain->ddG->pathway->phenotype DAG with inconsistency flags, FASTA/PDB writers, query routing |
+| synbio_wizard | goal->pathway->chassis->assembly pipeline, Monte-Carlo yield CI, feasibility verdict + experiments |
+| neuro_pipeline | numpy MLP training with STDP modulation, virtual lesion study, activation trace, RSA manifold analysis |
+| biogpt_lit | evidence-weighted temporal knowledge graph, contradiction detection, multi-hop BFS, hypothesis generation |
+| enterprise_bio | tier entitlement engine: module gating, compute quotas, vault/robot access, audit trail |
+| nexus_support | inquiry triage/routing to owning sub-network (registry-derived), SLA by tier, KB matching |
+
 
 ### Known limits (named, not hidden)
 
@@ -100,7 +153,7 @@ Status per module: **verified** = implemented with passing named tests;
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 51 tests
+python -m pytest -q                 # 160 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
