@@ -1,0 +1,185 @@
+{
+  "genes": [
+    {
+      "gene": "BRCA1",
+      "accession": "NG_005905.2",
+      "transcripts": 10,
+      "junctions": 134
+    },
+    {
+      "gene": "BRCA2",
+      "accession": "NG_017006.2",
+      "transcripts": 7,
+      "junctions": 16
+    },
+    {
+      "gene": "TP53",
+      "accession": "NG_017013.2",
+      "transcripts": 12,
+      "junctions": 82
+    },
+    {
+      "gene": "MLH1",
+      "accession": "NG_007109.2",
+      "transcripts": 20,
+      "junctions": 108
+    },
+    {
+      "gene": "MSH2",
+      "accession": "NG_007110.2",
+      "transcripts": 1,
+      "junctions": 15
+    },
+    {
+      "gene": "MSH6",
+      "accession": "NG_007111.1",
+      "transcripts": 1,
+      "junctions": 9
+    },
+    {
+      "gene": "PMS2",
+      "accession": "NG_008466.1",
+      "transcripts": 2,
+      "junctions": 15
+    },
+    {
+      "gene": "CFTR",
+      "accession": "NG_016465.4",
+      "transcripts": 1,
+      "junctions": 26
+    },
+    {
+      "gene": "PAH",
+      "accession": "NG_008690.2",
+      "transcripts": 2,
+      "junctions": 13
+    },
+    {
+      "gene": "PTEN",
+      "accession": "NG_033079.1",
+      "transcripts": 0,
+      "junctions": 0
+    },
+    {
+      "gene": "APC",
+      "accession": "NG_016323.1",
+      "transcripts": 1,
+      "junctions": 8
+    },
+    {
+      "gene": "ATM",
+      "accession": "NG_054724.1",
+      "transcripts": 3,
+      "junctions": 56
+    },
+    {
+      "gene": "RB1",
+      "accession": "NG_009009.1",
+      "transcripts": 5,
+      "junctions": 44
+    },
+    {
+      "gene": "NF1",
+      "accession": "NG_009018.1",
+      "transcripts": 6,
+      "junctions": 118
+    },
+    {
+      "gene": "LDLR",
+      "accession": "NG_009060.1",
+      "transcripts": 1,
+      "junctions": 17
+    },
+    {
+      "gene": "HBB",
+      "accession": "NG_059281.1",
+      "transcripts": 1,
+      "junctions": 2
+    },
+    {
+      "gene": "SCN1A",
+      "accession": "NG_011906.1",
+      "transcripts": 1,
+      "junctions": 25
+    },
+    {
+      "gene": "MECP2",
+      "accession": "NG_007107.3",
+      "transcripts": 2,
+      "junctions": 5
+    },
+    {
+      "gene": "CHEK2",
+      "accession": "NG_008150.2",
+      "transcripts": 6,
+      "junctions": 27
+    },
+    {
+      "gene": "PALB2",
+      "accession": "NG_007406.1",
+      "transcripts": 4,
+      "junctions": 15
+    },
+    {
+      "gene": "MUTYH",
+      "accession": "NG_008189.1",
+      "transcripts": 2,
+      "junctions": 22
+    },
+    {
+      "gene": "KCNQ1",
+      "accession": "NG_016178.2",
+      "transcripts": 0,
+      "junctions": 0
+    },
+    {
+      "gene": "GJB2",
+      "accession": "NG_008358.1",
+      "transcripts": 1,
+      "junctions": 1
+    },
+    {
+      "gene": "F8",
+      "accession": "NG_011403.2",
+      "transcripts": 1,
+      "junctions": 25
+    },
+    {
+      "gene": "DMD",
+      "accession": "NG_012232.1",
+      "transcripts": 1,
+      "junctions": 78
+    },
+    {
+      "gene": "MYH7",
+      "accession": "NG_007884.1",
+      "transcripts": 1,
+      "junctions": 39
+    },
+    {
+      "gene": "PKD1",
+      "accession": "NG_008617.1",
+      "transcripts": 44,
+      "junctions": 174
+    },
+    {
+      "gene": "TSC1",
+      "accession": "NG_034227.1",
+      "transcripts": 1,
+      "junctions": 10
+    },
+    {
+      "gene": "TSC2",
+      "accession": "NG_008617.1",
+      "transcripts": 44,
+      "junctions": 174
+    },
+    {
+      "gene": "VHL",
+      "accession": "NG_008212.3",
+      "transcripts": 1,
+      "junctions": 2
+    }
+  ],
+  "missing": []
+}

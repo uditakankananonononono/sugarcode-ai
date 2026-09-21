@@ -97,6 +97,51 @@ def activities_for_target(chembl_id: str, max_n: int = 50,
     return out[:max_n]
 
 
+def molecule_search(name: str, offline: bool = False) -> dict | None:
+    """Resolve a drug/compound name to a ChEMBL molecule record.
+
+    Exact pref_name first, then exact synonym; returns chembl_id, name,
+    max_phase, SMILES. None when ChEMBL genuinely has no such molecule."""
+    q = urllib.parse.quote(name)
+    d = _get(f"{BASE}/molecule.json?pref_name__iexact={q}&limit=5", offline=offline)
+    mols = d.get("molecules", [])
+    if not mols:
+        d = _get(f"{BASE}/molecule.json?molecule_synonyms__molecule_synonym__iexact={q}&limit=5",
+                 offline=offline)
+        mols = d.get("molecules", [])
+    if not mols:
+        return None
+    m = mols[0]
+    return {"chembl_id": m.get("molecule_chembl_id"),
+            "name": m.get("pref_name") or name,
+            "max_phase": m.get("max_phase"),
+            "smiles": (m.get("molecule_structures") or {}).get("canonical_smiles")}
+
+
+def activities_for_molecule_target(molecule_id: str, target_id: str,
+                                   offline: bool = False) -> list[dict]:
+    """Measured activities of ONE molecule against ONE target (nM), best first."""
+    url = (f"{BASE}/activity.json?molecule_chembl_id={molecule_id}"
+           f"&target_chembl_id={target_id}"
+           f"&standard_type__in=IC50,Ki,Kd,EC50&standard_units=nM&limit=50")
+    d = _get(url, offline=offline)
+    out = []
+    for a in d.get("activities", []):
+        if a.get("standard_value") is None:
+            continue
+        try:
+            val = float(a["standard_value"])
+        except (TypeError, ValueError):
+            continue
+        out.append({"standard_type": a.get("standard_type"), "value_nM": val,
+                    "relation": a.get("standard_relation"),
+                    "assay_type": a.get("assay_type"),
+                    "pchembl": a.get("pchembl_value"),
+                    "document_year": a.get("document_year")})
+    out.sort(key=lambda x: x["value_nM"])
+    return out
+
+
 def molecule_info(chembl_id: str, offline: bool = False) -> dict:
     """Molecule record: name, max phase, SMILES, properties."""
     d = _get(f"{BASE}/molecule/{chembl_id}.json", offline=offline)

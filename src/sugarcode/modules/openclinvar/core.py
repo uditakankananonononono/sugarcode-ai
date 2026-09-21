@@ -153,11 +153,36 @@ def live_lookup(gene: str, retmax: int = 20, offline: bool = False) -> dict:
         "gene": gene, "source": "NCBI ClinVar (live)",
         "n_variants": len(variants),
         "significance_counts": counts,
-        "variants": variants,
+        "variants": [{**v, "stars": clinvar_stars(v.get("review_status"))}
+                     for v in variants],
         "pathogenic_or_likely": [v for v in variants
                                  if "athogenic" in (v["significance"] or "")],
         "note": "live classification pulled at query time; review_status shown per variant",
     }
+
+
+# ClinVar review-status star tiers (official 0-4 scale) and the evidence
+# weight each tier carries in the trace. 4 = practice guideline,
+# 3 = expert panel, 2 = multiple submitters no conflicts, 1 = single
+# submitter or conflicting, 0 = no assertion criteria.
+STAR_WEIGHT = {4: 1.0, 3: 0.8, 2: 0.6, 1: 0.3, 0: 0.15}
+STAR_STRENGTH = {4: "definitive", 3: "strong", 2: "moderate", 1: "supporting", 0: "weak"}
+
+
+def clinvar_stars(review_status: str | None) -> int:
+    """Map a ClinVar review_status string to its official 0-4 star tier."""
+    rs = (review_status or "").lower()
+    if "no assertion criteria" in rs or "no classification" in rs or "no interpretation" in rs:
+        return 0
+    if "practice guideline" in rs:
+        return 4
+    if "expert panel" in rs:
+        return 3
+    if "multiple submitters" in rs and "no conflicts" in rs:
+        return 2
+    if "criteria provided" in rs:  # single submitter or conflicting
+        return 1
+    return 0
 
 
 def interpret_variant_live(gene: str, variant: str, offline: bool = False,
@@ -219,9 +244,8 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
                              "query": f'{gene}[gene] AND "{variant.split(":")[-1]}"'}
         return r
     m = matched[0]
-    stars = ("expert panel" in (m["review_status"] or "").lower() or
-             "practice guideline" in (m["review_status"] or "").lower())
-    strength = "strong" if stars else "supporting"
+    stars = clinvar_stars(m["review_status"])
+    strength = STAR_STRENGTH[stars]
     sig = (m["significance"] or "").lower()
     if "conflicting" in sig or "uncertain" in sig:
         sign = 0.0
@@ -233,13 +257,15 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
         sign = 0.0
     r["evidence"].append({
         "rule": "CLINVAR_LIVE",
-        "weight": sign * (0.8 if stars else 0.4),
+        "weight": round(sign * STAR_WEIGHT[stars], 3),
         "detail": (f"live ClinVar: {m['significance']} "
-                   f"({m['review_status'] or 'review status unknown'})"),
+                   f"({m['review_status'] or 'review status unknown'}; "
+                   f"{stars}-star review)"),
     })
     r["clinvar_live"] = {
         "status": "matched", "title": m["title"],
         "significance": m["significance"], "review_status": m["review_status"],
+        "stars": stars,
         "evidence_strength_assigned": strength,
         "note": "classification shown alongside model evidence - clinician adjudicates",
     }

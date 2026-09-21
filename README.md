@@ -72,7 +72,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_opt | PAM enumeration both strands, GC 40-60% filter, position-weighted on-target score, seed-weighted off-target scan, hairpin check, browser-track payload |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, GC-window repair, motif avoidance, CHI tRNA-strain index, TASEP ribosome-flow KMC simulation, FBA constraint export |
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
-| deepsplice | donor (9 nt) / acceptor (15 nt) PWM log-odds scoring, variant delta, isoform consequence calls |
+| deepsplice | splice PWMs learned from 1,215 real RefSeqGene GT-AG junctions (28 genes); variant delta + isoform consequence calls calibrated on a 206-case ClinVar BRCA1 golden set |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -87,7 +87,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_cargo | LNP/AAV/VLP/PNP vehicle ranking per payload+tissue, one-compartment PK model, delivery blueprints with composition specs |
 | crispr_muse | policy-gradient gRNA generator with GC/off-target rewards and simulated NGS feedback loop |
 | epi_edit | CRISPRa/i guide placement (promoter windows), chromatin accessibility track, histone-mark map, fold-change prediction |
-| openclinvar | ACMG-flavored evidence-weighted interpretation (BA1/PM2/PS3/PP1 rules), curated exemplars, patient-friendly reports, VCF parsing |
+| openclinvar | ACMG-flavored evidence-weighted interpretation (BA1/PM2/PS3/PP1 rules), live ClinVar evidence with official 0-4 star review tiers, gnomAD frequency/constraint, curated exemplars, patient-friendly reports, VCF parsing |
 | genomegpt | k-mer z-score anomalies, TF/CTCF motif scan, convergent-CTCF chromatin loop prediction, motif-disruption variant reading |
 | alpha_fold_ui | Chou-Fasman secondary prediction, pLDDT/PAE analogs, idealized C-alpha backbone, real PDB output, pocket candidates |
 | docking_studio | SMILES feature parsing (atoms, LogP, RO5), complementarity energy terms (vdW/H-bond/electrostatic/desolvation), Kd estimate, virtual screening |
@@ -119,7 +119,7 @@ Status per module: **verified** = implemented with passing named tests;
 | neohunter | mutation-spanning peptide enumeration, HLA anchor-motif binding score, immunogenicity rank, vaccine payload |
 | gene_tx_opt | tissue->vector/promoter matching, transgene capacity enforcement (honest refusal at 9kb), NAb risk |
 | vector_opt | capsid variant library (NAb-escape surface mutations), tropism/escape scoring |
-| organoid_screen | organoid drug panel with genotype-conditioned response priors, ranking + hit calling |
+| organoid_screen | organoid drug panel, ranking + hit calling; live combo screen: real ChEMBL potency x co-crystal-pocket resistance folds -> effective IC50 |
 | neuroplan_ai | tumor segmentation volume, corridor optimization around eloquent regions, risk class + surgical plan |
 | neodti_engine | drug-target-pathway-disease graph walk, therapeutic resilience index, disease alias resolution, docking hook |
 | liquid_biopsy | error-rate-aware ctDNA calling (beta-binomial floor), denoise, serial-monitoring plan |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 206 tests
+python -m pytest -q                 # 306 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

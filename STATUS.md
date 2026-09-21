@@ -1,11 +1,11 @@
-# SugarCode AI - honest status (as of drop 21 / this push)
+# SugarCode AI - honest status (as of drop 22 / this push)
 
 This document is the current truth ledger. It says what is verified against
 real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **283 passed, 0 failed** (hermetic fixtures; live calls verified
+Test suite: **306 passed, 0 failed** (hermetic fixtures; live calls verified
 outside pytest and recorded below).
 
 ## Tier 1 - verified against live external data
@@ -20,6 +20,10 @@ outside pytest and recorded below).
 | mutdock T315I golden | Live golden: 1IEP T315 correctly labeled (true non-contiguous numbering, single-chain), T315I ddG +0.468 / 2.2x affinity loss - direction and identity right, magnitude honestly low vs the ~100x clinical resistance (feature-model limit, stated). Numbering and two-chain dedupe bugs caught by the golden run | RCSB PDB |
 | openclinvar unified gnomAD | population frequency now evidence in interpret_variant_live too (common AF -0.8, absent +0.2), mirroring the rarenet panel | gnomAD r4 |
 | mutdock co-crystal pockets | Resistance scans on the experimentally observed binding site from real PDB HETATM ligands: 1IEP/imatinib pocket (46 residues) contains the gatekeeper T315 and Y253 - the actual known resistance sites | RCSB PDB co-structures |
+| deepsplice real splice PWMs | Donor/acceptor PWMs learned from 1,215 real GT-AG junctions parsed out of 28 RefSeqGene records (genes incl. BRCA1/2, TP53, CFTR, DMD); learned consensus AAG|GTAAGT and (T)nCAG|G matches the published mammalian consensus. Vendored with PROVENANCE (accessions, method, GC-donor and AT-AC counts) | NCBI RefSeqGene |
+| deepsplice BRCA1 golden | ClinVar golden: 186 pathogenic + 20 benign NM_007294 splice SNVs mapped onto NG_005905.2 junction windows. All 150 canonical +/-1/+/-2 pathogenic variants called loss; calibrated thresholds (sens 0.81 / spec 0.95 at -0.15, fit stated as calibration, not independent validation). Known limits kept visible: deeper intronic pathogenic variants act via cryptic sites a fixed-window PWM cannot see; c.594-2A>C (ENIGMA-benign at conserved -2) is a documented false positive, locked in a regression test | NCBI ClinVar + RefSeqGene |
+| openclinvar star tiers | Official ClinVar 0-4 review-status tiers now weight the live evidence (4 guideline 1.0 / 3 expert panel 0.8 / 2 multi-submitter 0.6 / 1 single or conflicting 0.3 / 0 none 0.15); live: c.212+1G>A +0.8 (3-star), c.213-1G>T +0.3 (1-star), c.594-2A>C -0.8 (3-star benign) | NCBI ClinVar |
+| organoid_screen live combo | screen_with_structure: WT potency = real ChEMBL IC50/Ki/Kd per compound vs resolved target, resistance = co-crystal pocket (RCSB) + mutdock ddG for mutations in the lining; effective IC50 = potency x affinity-loss folds. Live ABL1 panel (imatinib/nilotinib/dasatinib/asciminib, 1IEP pocket, T315I+Y253F): real potencies 0.1-1.1 nM, folds 3.4-16.7 applied. Honest limit stated: pocket is the co-crystal ligand's ATP site - applying it to the allosteric asciminib ranks it last here while clinically it is the T315I-active drug; the caveat field says so | ChEMBL + RCSB PDB |
 | infinite_diagnosis joint view | symptom differential x live variant panel crossed on structured gene membership; live: PKU symptoms + PAH variant -> lead hypothesis | rarenet + ClinVar + gnomAD |
 | mutdock pocket validation | geometry pockets compared against UniProt-annotated BINDING features; non-overlap verdicts stated plainly (P04637: annotated sites are DNA-binding, geometry pocket flagged honestly) | UniProt, AlphaFold DB |
 | rarenet_ai | Live ClinVar gene context + gnomAD population frequency. P72R AF 0.716 (common, ruled out); R273H absent (ultra-rare, stated) | NCBI ClinVar, gnomAD r4 GraphQL |
@@ -39,7 +43,7 @@ outside pytest and recorded below).
 ## Tier 2 - real published algorithms (not learned weights)
 
 - virtual_cell: flux balance analysis via HiGHS linear programming
-- deepsplice, protein_painter, alpha_fold_ui: PWM log-odds / Chou-Fasman-style
+- protein_painter, alpha_fold_ui: PWM log-odds / Chou-Fasman-style
   statistical propensities (real computations, not trained models)
 - codon_opt: TASEP stochastic simulation (Gillespie KMC) + CAI (Sharp & Li 1987)
 - living_computer, synbio_wizard: stochastic kinetics (Gillespie)
@@ -63,7 +67,9 @@ continues drop by drop in order of scientific usefulness.
   found; TASEP dwells are the tRNA-abundance approximation, labeled as such.
 - Ensembl REST: unreachable from the build environment (HTTP 500, then
   connection timeouts on retries). Ensembl-dependent routes stay Missing.
-- Learned weights generally (GenomeGPT, DeepSplice-full, BioImage AI):
+- Genome-wide / SpliceAI-scale splice models: our PWMs are real but window-local;
+  deep long-range splice predictors are not available as verifiable free artifacts.
+- Learned weights generally (GenomeGPT, BioImage AI):
   unavailable as verifiable free artifacts; statistical substitutes are named
   per module.
 
