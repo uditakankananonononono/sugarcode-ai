@@ -110,3 +110,21 @@ def molecule_info(chembl_id: str, offline: bool = False) -> dict:
         "hba": props.get("hba"), "hbd": props.get("hbd"),
         "ro5_violations": props.get("num_ro5_violations"),
     }
+
+
+def similarity_search(smiles: str, cutoff: int = 80, limit: int = 10,
+                      offline: bool = False) -> list[dict]:
+    """ChEMBL server-side Tanimoto similarity scan (MACCS/2D). Returns nearest
+    known molecules with similarity percent, pref_name and max phase - real
+    novelty checking for generated molecules."""
+    enc = urllib.parse.quote(smiles, safe="")
+    url = f"{BASE}/similarity/{enc}/{cutoff}.json?limit={limit}"
+    data = _get(url, offline=offline)
+    out = []
+    for m in data.get("molecules", []):
+        out.append({"chembl_id": m.get("molecule_chembl_id"),
+                    "pref_name": m.get("pref_name"),
+                    "similarity": float(m.get("similarity", 0.0)),
+                    "max_phase": int(float(m.get("max_phase") or 0)),
+                    "smiles": (m.get("molecule_structures") or {}).get("canonical_smiles")})
+    return out

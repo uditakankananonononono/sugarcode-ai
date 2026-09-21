@@ -142,3 +142,43 @@ def perturbation_effect(coords: list[list[float]], site: int, kind: str = "phosp
         "interpretation": (f"{kind} at residue {site} stiffens the local network and "
                            "redistributes flexibility - shifting the open/closed equilibrium."),
     }
+
+
+def structure_dynamics(identifier: str, chain: str | None = None, n_modes: int = 6,
+                       offline: bool = False) -> dict:
+    """ANM normal modes on REAL structure coordinates (RCSB/AlphaFold), with the
+    classic validation: correlation between predicted fluctuations and measured
+    B-factors (X-ray) or pLDDT (AlphaFold, inverted)."""
+    from ...bio.structures import fetch_pdb, fetch_alphafold
+    if len(identifier) == 4 and identifier[0].isdigit():
+        s = fetch_pdb(identifier, offline=offline)
+        conf_kind = "b_factor"
+    else:
+        s = fetch_alphafold(identifier, offline=offline)
+        conf_kind = "plddt"
+    residues = s["residues"]
+    if chain:
+        residues = [r for r in residues if r["chain"] == chain]
+    coords = [list(r["ca"]) for r in residues]
+    result = anm_modes(coords, n_modes=n_modes)
+    fluct = np.array(result["fluctuation_profile"], dtype=float)
+    measured = np.array([r["bfactor"] for r in residues], dtype=float)
+    corr = None
+    if len(fluct) > 5 and fluct.std() > 0 and measured.std() > 0:
+        pred = fluct if conf_kind == "b_factor" else -fluct  # pLDDT is inverse disorder
+        corr = round(float(np.corrcoef(pred, measured)[0, 1]), 3)
+    result.update({
+        "structure": {"identifier": identifier, "source": s["source"],
+                      "chain": chain, "n_residues": len(residues)},
+        "validation": {
+            "kind": f"ANM fluctuation vs {'experimental B-factors' if conf_kind == 'b_factor' else 'pLDDT (inverted)'}",
+            "pearson_r": corr,
+            "verdict": ("good agreement - modes capture real flexibility" if corr and corr > 0.5
+                        else "weak agreement - interpret modes cautiously" if corr is not None
+                        else "insufficient variance to validate"),
+        },
+        "hinge_residues_real": [residues[i]["resnum"] for i in result["hinge_residues"]
+                                if i < len(residues)],
+        "note": "real C-alpha coordinates; 6 zero modes (rigid body) excluded automatically",
+    })
+    return result

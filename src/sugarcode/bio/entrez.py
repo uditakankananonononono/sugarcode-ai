@@ -127,3 +127,19 @@ def clinvar_variants(gene: str, retmax: int = 20, offline: bool = False) -> list
             "condition": (doc.get("trait_set") or [{}])[0].get("trait_name", ""),
         })
     return out
+
+
+def clinvar_exact(gene: str, notation: str, offline: bool = False) -> list[dict]:
+    """Targeted ClinVar lookup for one variant notation (e.g. 'c.68_69del',
+    'p.Arg273His'). Uses a quoted phrase query - far better than paging the
+    gene's whole variant set."""
+    needle = notation.split(":")[-1].strip('"')
+    ids = esearch("clinvar", f"{gene}[gene] AND \"{needle}\"", retmax=20, offline=offline)
+    out = []
+    for uid, doc in esummary("clinvar", ids, offline=offline).items():
+        germ = doc.get("germline_classification", {})
+        out.append({"uid": uid, "title": doc.get("title", ""),
+                    "significance": germ.get("description", "uncertain"),
+                    "review_status": germ.get("review_status", ""),
+                    "condition": (doc.get("trait_set") or [{}])[0].get("trait_name", "")})
+    return out

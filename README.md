@@ -146,9 +146,10 @@ Status per module: **verified** = implemented with passing named tests;
 
 ### Known limits (named, not hidden)
 
-- External database integrations (PubMed, NCBI, UniProt, ClinVar, AlphaFold) are
-  not yet wired; modules that need them use built-in reference data or physics/
-  statistics models. Live connectors are a later drop.
+- Live connectors for NCBI Entrez (Gene/PubMed/ClinVar), UniProt, RCSB,
+  AlphaFold DB and ChEMBL are wired and live-verified (drops 4-11), with disk
+  cache, throttling, retries and explicit offline/failure behavior. Coverage is
+  per-module; anything not wired says so in its output instead of fabricating.
 - No trained deep models yet (GenomeGPT, DeepSplice-full, BioImage AI etc. need
   learned weights); current versions use PWM/ODE/FBA/heuristic models that are
   real computations, not labels.
@@ -163,7 +164,8 @@ Status per module: **verified** = implemented with passing named tests;
   (Fusi/Azimuth) is **Missing**: its pickled sklearn model is not portably
   loadable on modern stacks - labeled, not faked.
 - Ensembl REST is unreachable from the build environment (HTTP 500 on all
-  endpoints); OpenClinVar uses live ClinVar + curated exemplars instead.
+  endpoints, later connection timeout on final retry - treated as unusable);
+  OpenClinVar uses live ClinVar + curated exemplars instead.
 
 ## Live data (drop 4)
 
@@ -243,6 +245,31 @@ when the notation matches, honest VUS call otherwise). MutDock runs its full
 all-positions x 20-AA x drugs resistance scan on real structure pockets with
 true residue numbering. The CFD scan now reads FASTA files via a streaming
 parser (`bio.fasta.stream_fasta`) - real reference files, constant memory.
+
+### Live variant evidence, real-structure dynamics, molecule novelty (drop 11)
+
+```python
+from sugarcode.modules.openclinvar import interpret_variant_live
+from sugarcode.modules.evofold_4d import structure_dynamics
+from sugarcode.modules.chemgpt_engine import similarity_check
+
+interpret_variant_live("BRCA1", "c.5266dup", consequence="frameshift")
+structure_dynamics("1TUP", chain="B")        # ANM modes on real 2.2 A coordinates
+similarity_check("CC(=O)Oc1ccccc1C(=O)O")    # -> ASPIRIN, 100%, phase 4
+```
+
+OpenClinVar now adds live ClinVar evidence to its ACMG-style weighing: a
+targeted phrase query, title-verified against the requested notation (ClinVar's
+phrase search returns near-misses - caught live when c.5266dup initially
+matched c.5484dup), with honest sign handling (conflicting/uncertain = weight
+0, not positive). EvoFold 4D runs ANM normal modes on real RCSB coordinates
+and validates fluctuations against experimental B-factors (1TUP chain B:
+Pearson r = 0.05, honestly reported as weak agreement). ChemGPT designs are
+checked against live ChEMBL server-side Tanimoto similarity - live-verified:
+aspirin matches itself at 100% with approved neighbors; an invented molecule
+correctly reports novel scaffold space. Failures raise/report, never fabricate.
+Ensembl REST remains unreachable from this network (final retry failed); the
+Ensembl-dependent route stays labeled Missing.
 
 ### Real bioactivity, literature trends, grounded copilot (drop 10)
 

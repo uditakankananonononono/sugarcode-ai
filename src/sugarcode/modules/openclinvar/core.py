@@ -158,3 +158,51 @@ def live_lookup(gene: str, retmax: int = 20, offline: bool = False) -> dict:
                                  if "athogenic" in (v["significance"] or "")],
         "note": "live classification pulled at query time; review_status shown per variant",
     }
+
+
+def interpret_variant_live(gene: str, variant: str, offline: bool = False,
+                           **kwargs) -> dict:
+    """interpret_variant enriched with the LIVE ClinVar record for this exact
+    variant: when ClinVar has a classification, it enters the evidence trace
+    with review-status-weighted strength (expert panel > single submitter);
+    when it does not, that absence is stated, not papered over."""
+    r = interpret_variant(gene, variant, **kwargs)
+    from ...bio import entrez
+    try:
+        matched = entrez.clinvar_exact(gene, variant, offline=offline)
+    except Exception as e:
+        r["clinvar_live"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+        return r
+    # phrase queries can return near-misses: verify the notation truly appears
+    needle = variant.split(":")[-1].replace(" ", "")
+    matched = [e for e in matched if needle and needle in e["title"].replace(" ", "")]
+    if not matched:
+        r["clinvar_live"] = {"status": "no live ClinVar entry for this exact variant",
+                             "query": f'{gene}[gene] AND "{variant.split(":")[-1]}"'}
+        return r
+    m = matched[0]
+    stars = ("expert panel" in (m["review_status"] or "").lower() or
+             "practice guideline" in (m["review_status"] or "").lower())
+    strength = "strong" if stars else "supporting"
+    sig = (m["significance"] or "").lower()
+    if "conflicting" in sig or "uncertain" in sig:
+        sign = 0.0
+    elif "benign" in sig and "pathogenic" not in sig:
+        sign = -1.0
+    elif "pathogenic" in sig:
+        sign = 1.0
+    else:
+        sign = 0.0
+    r["evidence"].append({
+        "rule": "CLINVAR_LIVE",
+        "weight": sign * (0.8 if stars else 0.4),
+        "detail": (f"live ClinVar: {m['significance']} "
+                   f"({m['review_status'] or 'review status unknown'})"),
+    })
+    r["clinvar_live"] = {
+        "status": "matched", "title": m["title"],
+        "significance": m["significance"], "review_status": m["review_status"],
+        "evidence_strength_assigned": strength,
+        "note": "classification shown alongside model evidence - clinician adjudicates",
+    }
+    return r

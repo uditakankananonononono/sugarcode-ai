@@ -97,3 +97,32 @@ def _retro(fragments: list[str]) -> list[dict]:
                       else "cross-coupling" if f in ("benzene", "pyridine", "imidazole")
                       else "alkylation"})
     return steps
+
+
+def similarity_check(smiles: str, cutoff: int = 80, limit: int = 10,
+                     offline: bool = False) -> dict:
+    """Check a designed molecule against live ChEMBL: nearest known compounds
+    (server-side Tanimoto), closest approved drug, and an honest novelty call.
+    Failures are reported, never hidden."""
+    from ...bio import chembl
+    try:
+        hits = chembl.similarity_search(smiles, cutoff=cutoff, limit=limit, offline=offline)
+    except Exception as e:
+        return {"smiles": smiles, "status": f"lookup failed: {type(e).__name__}: {e}",
+                "neighbors": [], "novelty": "unknown"}
+    if not hits:
+        return {"smiles": smiles, "status": "ok", "neighbors": [],
+                "novelty": f"no known molecule >= {cutoff}% similar in ChEMBL (novel scaffold space)",
+                "closest": None}
+    closest = hits[0]
+    approved = [h for h in hits if (h.get("max_phase") or 0) and h["max_phase"] >= 3]
+    novelty = ("close analog of known compounds" if closest["similarity"] >= 90
+               else "related to known chemotypes" if closest["similarity"] >= 80
+               else "novel at cutoff")
+    return {"smiles": smiles, "status": "ok", "cutoff": cutoff, "neighbors": hits,
+            "closest": {"chembl_id": closest["chembl_id"], "pref_name": closest["pref_name"],
+                        "similarity": closest["similarity"], "max_phase": closest["max_phase"]},
+            "approved_neighbors": [{"chembl_id": h["chembl_id"], "pref_name": h["pref_name"],
+                                    "similarity": h["similarity"], "max_phase": h["max_phase"]}
+                                   for h in approved],
+            "novelty": novelty}
