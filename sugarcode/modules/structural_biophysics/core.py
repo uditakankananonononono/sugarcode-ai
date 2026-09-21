@@ -276,3 +276,123 @@ def alanine_interface_scan(atoms: Sequence[Atom], chain_a: str, chain_b: str, *,
             "method": "fixed-coordinate computational alanine contact deletion scan",
             "limitations": ["side-chain and backbone relaxation are Missing", "desolvation and conformational entropy are Missing",
                             "priorities require experimental or higher-fidelity validation"]}
+
+
+def _rotation_matrix(axis: np.ndarray, angle: float) -> np.ndarray:
+    axis = np.asarray(axis, dtype=float)
+    norm = np.linalg.norm(axis)
+    if norm == 0: return np.eye(3)
+    x, y, z = axis / norm; c, s, q = cos(angle), sin(angle), 1.0-cos(angle)
+    return np.array([[c+x*x*q, x*y*q-z*s, x*z*q+y*s],
+                     [y*x*q+z*s, c+y*y*q, y*z*q-x*s],
+                     [z*x*q-y*s, z*y*q+x*s, c+z*z*q]])
+
+
+def transform_atoms(atoms: Sequence[Atom], rotation: np.ndarray | None = None,
+                    translation: Sequence[float] = (0.0, 0.0, 0.0),
+                    center: Sequence[float] | None = None) -> list[Atom]:
+    """Return atoms transformed rigidly without mutating the input."""
+    if not atoms: return []
+    rot = np.eye(3) if rotation is None else np.asarray(rotation, dtype=float)
+    if rot.shape != (3, 3): raise StructureInputError("rotation must be 3x3")
+    trans = np.asarray(translation, dtype=float)
+    if trans.shape != (3,): raise StructureInputError("translation must have three values")
+    xyz = _coords(atoms); pivot = xyz.mean(axis=0) if center is None else np.asarray(center, dtype=float)
+    moved = (xyz-pivot) @ rot.T + pivot + trans
+    return [Atom(**{**a.__dict__, "xyz": tuple(float(v) for v in p)}) for a, p in zip(atoms, moved)]
+
+
+def vina_atom_contributions(receptor: Sequence[Atom], ligand: Sequence[Atom], *,
+                            rotatable_bonds: int = 0, cutoff_A: float = 8.0) -> dict:
+    """Decompose the fixed-pose score over receptor and ligand atoms.
+
+    Pair terms are divided equally between the two participating atoms. The
+    global rotor penalty is returned separately because assigning it to atoms
+    would imply unsupported causality.
+    """
+    if not receptor or not ligand: raise StructureInputError("receptor and ligand atoms are required")
+    rc, lc = _coords(receptor), _coords(ligand)
+    rvalues = np.zeros(len(receptor)); lvalues = np.zeros(len(ligand))
+    pair_rows = []
+    for i, a in enumerate(receptor):
+        for j, b in enumerate(ligand):
+            d = float(np.linalg.norm(rc[i]-lc[j]))
+            if d > cutoff_A: continue
+            s = _surface_distance(a, b, d)
+            raw = {"gauss1": np.exp(-(s/.5)**2), "gauss2": np.exp(-((s-3)/2)**2),
+                   "repulsion": max(0.,-s)**2, "hydrophobic": 0., "hydrogen_bond": 0.}
+            if a.element in HYDROPHOBIC_ELEMENTS and b.element in HYDROPHOBIC_ELEMENTS:
+                raw["hydrophobic"] = 1. if s <= .5 else max(0.,1.5-s)
+            if ((a.element in DONOR_ELEMENTS and b.element in ACCEPTOR_ELEMENTS) or
+                (b.element in DONOR_ELEMENTS and a.element in ACCEPTOR_ELEMENTS)):
+                raw["hydrogen_bond"] = 1. if s <= -.7 else max(0.,-s/.7)
+            value = float(sum(raw[k]*VINA_WEIGHTS[k] for k in raw))
+            rvalues[i] += value/2; lvalues[j] += value/2
+            pair_rows.append((abs(value), {"receptor_atom": i, "ligand_atom": j,
+                                          "distance_A": round(d,3), "contribution_kcal_mol": round(value,5)}))
+    def rows(atoms, values):
+        out = [{"atom_index": i, "serial": a.serial, "name": a.name,
+                "residue_id": a.residue_id, "contribution_kcal_mol": round(float(v),5)}
+               for i,(a,v) in enumerate(zip(atoms,values))]
+        return sorted(out,key=lambda x: abs(x["contribution_kcal_mol"]),reverse=True)
+    rotor = rotatable_bonds*VINA_WEIGHTS["rotors"]
+    pair_sum = float(rvalues.sum()+lvalues.sum())
+    pair_rows.sort(key=lambda x:x[0],reverse=True)
+    return {"pair_score_kcal_mol": round(pair_sum,5), "global_rotor_penalty_kcal_mol": round(rotor,5),
+            "total_score_kcal_mol": round(pair_sum+rotor,5),
+            "receptor_atoms": rows(receptor,rvalues), "ligand_atoms": rows(ligand,lvalues),
+            "strongest_pairs": [row for _,row in pair_rows[:50]],
+            "accounting": "each pair contribution split equally across its two atoms; rotor penalty remains global"}
+
+
+def refine_pose(receptor: Sequence[Atom], ligand: Sequence[Atom], *, rotatable_bonds: int = 0,
+                translation_step_A: float = 1.0, rotation_step_degrees: float = 12.0,
+                rounds: int = 5, max_displacement_A: float = 4.0) -> dict:
+    """Deterministic rigid-body coordinate descent under the Vina-form score.
+
+    Six translations and six rotations are tested per iteration, with step
+    halving when no improvement occurs. Search is bounded around the input pose.
+    It refines a plausible pose; it is intentionally not represented as global
+    docking or flexible-ligand sampling.
+    """
+    if not receptor or not ligand: raise StructureInputError("receptor and ligand atoms are required")
+    if rounds < 1 or rounds > 50 or translation_step_A <= 0 or rotation_step_degrees <= 0:
+        raise StructureInputError("positive steps and rounds 1..50 required")
+    origin = _coords(ligand); current = list(ligand)
+    initial = vina_score(receptor,current,rotatable_bonds=rotatable_bonds)
+    best_score = initial["score_kcal_mol"]; history = [best_score]
+    tstep, astep = translation_step_A, rotation_step_degrees*pi/180
+    axes = np.eye(3)
+    accepted = 0
+    for _ in range(rounds):
+        candidates = []
+        for axis in axes:
+            for sign in (-1.,1.):
+                candidates.append(transform_atoms(current,translation=axis*sign*tstep))
+                candidates.append(transform_atoms(current,rotation=_rotation_matrix(axis,sign*astep)))
+        valid=[]
+        for cand in candidates:
+            displacement=float(np.max(np.linalg.norm(_coords(cand)-origin,axis=1)))
+            if displacement <= max_displacement_A:
+                valid.append((vina_score(receptor,cand,rotatable_bonds=rotatable_bonds)["score_kcal_mol"],cand))
+        if valid:
+            candidate_score,candidate=min(valid,key=lambda x:x[0])
+        else: candidate_score,candidate=best_score,current
+        if candidate_score < best_score-1e-8:
+            current,best_score=candidate,candidate_score; accepted+=1
+        else:
+            tstep/=2; astep/=2
+        history.append(best_score)
+    final = vina_score(receptor,current,rotatable_bonds=rotatable_bonds)
+    displacement=np.linalg.norm(_coords(current)-origin,axis=1)
+    return {"initial_score_kcal_mol": initial["score_kcal_mol"],
+            "refined_score_kcal_mol": final["score_kcal_mol"],
+            "score_improvement_kcal_mol": round(initial["score_kcal_mol"]-final["score_kcal_mol"],4),
+            "accepted_moves": accepted, "score_history_kcal_mol": history,
+            "max_atom_displacement_A": round(float(displacement.max()),4),
+            "rms_atom_displacement_A": round(float(np.sqrt(np.mean(displacement**2))),4),
+            "refined_ligand_xyz": [[round(v,5) for v in a.xyz] for a in current],
+            "final_atom_contributions": vina_atom_contributions(receptor,current,rotatable_bonds=rotatable_bonds),
+            "method": "bounded deterministic rigid-body coordinate descent under Vina-form score",
+            "limitations": ["ligand torsions, receptor flexibility, protonation, and waters are Missing",
+                            "local refinement only; no claim of globally optimal docked pose"]}

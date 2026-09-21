@@ -86,3 +86,25 @@ def test_invalid_inputs_fail_loudly():
     atoms = parse_pdb(complex_pdb())
     with pytest.raises(StructureInputError): analyze_interface(atoms,"A","Z",sphere_points=240)
     with pytest.raises(StructureInputError): shrake_rupley(atoms,sphere_points=5)
+
+
+def test_atom_contributions_conserve_score():
+    from sugarcode.modules.structural_biophysics import vina_atom_contributions
+    atoms=parse_pdb(complex_pdb()); rec=[x for x in atoms if x.chain=="A"]; lig=[x for x in atoms if x.chain=="L"]
+    total=vina_score(rec,lig,rotatable_bonds=3)["score_kcal_mol"]
+    parts=vina_atom_contributions(rec,lig,rotatable_bonds=3)
+    assert parts["total_score_kcal_mol"] == pytest.approx(total,abs=2e-4)
+    assert parts["strongest_pairs"]
+    assert sum(x["contribution_kcal_mol"] for x in parts["receptor_atoms"]) == pytest.approx(parts["pair_score_kcal_mol"]/2,abs=1e-3)
+
+
+def test_pose_refinement_relieves_clash_deterministically():
+    from sugarcode.modules.structural_biophysics import refine_pose, transform_atoms
+    atoms=parse_pdb(complex_pdb()); rec=[x for x in atoms if x.chain=="A"]; lig=[x for x in atoms if x.chain=="L"]
+    clashing=transform_atoms(lig,translation=(0,-4,0))
+    a=refine_pose(rec,clashing,rounds=8,max_displacement_A=5)
+    b=refine_pose(rec,clashing,rounds=8,max_displacement_A=5)
+    assert a == b
+    assert a["refined_score_kcal_mol"] < a["initial_score_kcal_mol"]
+    assert a["max_atom_displacement_A"] <= 5
+    assert "Missing" in a["limitations"][0]
