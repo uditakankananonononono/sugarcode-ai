@@ -1,6 +1,7 @@
 import math
 import pytest
 from sugarcode.modules.gene_analysis import *
+from sugarcode.modules.gene_analysis.core import _variant_features
 SEQ=('GCGC'*60)+'ATG'+('GCT'*40)+'TAA'+('ATGC'*60)+'AGG'+('TTGC'*40)
 
 def test_legacy_profile_full():
@@ -90,5 +91,5 @@ def test_unrelated_locus_context_changes_variant_mechanism():
 def test_variant_position_changes_codon_and_domain_overlap():
  seq='ATG'+('GCC'*20)+('ATA'*20)+'TAA'
  a=_variant_features({'variant':'c.10A>G','consequence':'missense'},seq)
- b=_variant_features({'variant':'c.120A>G','consequence':'missense'},seq)
+ b=_variant_features({'variant':'c.60A>G','consequence':'missense'},seq)
  assert a['position_fraction'] < b['position_fraction'] and a['local_context'] != b['local_context'] and a['domain_overlap'] != b['domain_overlap']
