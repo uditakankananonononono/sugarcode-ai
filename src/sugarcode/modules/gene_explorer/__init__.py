@@ -1,3 +1,3 @@
-"""Gene Explorer: maps the central dogma DNA -> mRNA -> protein for a gene."""
-from .core import explore, central_dogma_report
-__all__ = ["explore", "central_dogma_report"]
+"""Interactive central-dogma trace and mechanistic digital gene explorer."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]
