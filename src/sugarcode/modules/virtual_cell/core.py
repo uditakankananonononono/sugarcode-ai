@@ -98,3 +98,87 @@ def simulate_growth(model: MetabolicModel, hours: float = 8.0,
         t += dt
     return {"model_objective": model.objective, "trajectory": series,
             "final_biomass": series[-1]["biomass"], "glucose_exhausted": glucose <= 0}
+
+
+def regulatory_state(genes, interactions, initial=None, steps=12, threshold=0.5):
+    """Deterministic synchronous Boolean GRN simulation."""
+    if not genes or len(set(genes)) != len(genes):
+        raise ValueError("genes must be a non-empty unique list")
+    if steps < 1:
+        raise ValueError("steps must be at least 1")
+    unknown = {x for e in interactions for x in e[:2]} - set(genes)
+    if unknown:
+        raise ValueError(f"interaction references unknown genes: {sorted(unknown)}")
+    state = {g: float((initial or {}).get(g, 0.0)) for g in genes}
+    trajectory = [{g: round(v, 6) for g, v in state.items()}]
+    for _ in range(steps):
+        nxt = {}
+        for target in genes:
+            incoming = [(source, float(weight)) for source, dest, weight in interactions if dest == target]
+            signal = sum(state[source] * weight for source, weight in incoming)
+            nxt[target] = 1.0 if signal >= threshold else 0.0
+        state = nxt
+        trajectory.append({g: round(v, 6) for g, v in state.items()})
+        if len(trajectory) >= 2 and trajectory[-1] == trajectory[-2]:
+            break
+    return {"genes": list(genes), "trajectory": trajectory, "steady_state": trajectory[-1],
+            "converged": len(trajectory) < steps + 1, "model_status": "computational prediction; requires experimental validation"}
+
+
+def environment_response(model, conditions=None):
+    """Run FBA across named environmental bounds and report growth phenotypes."""
+    conditions = conditions or {"standard": {}, "glucose_limited": {"GLC_UP": (0, 2)}}
+    if not conditions:
+        raise ValueError("conditions must be a non-empty mapping")
+    results = {}
+    baseline = fba(model)["objective"]
+    for name, bounds in conditions.items():
+        sol = fba(model, bounds_override=bounds)
+        ratio = sol["objective"] / baseline if baseline else 0.0
+        results[name] = {"growth": sol["objective"], "growth_ratio": round(ratio, 6),
+                         "phenotype": "no growth" if ratio < .01 else "slow growth" if ratio < .7 else "robust growth",
+                         "fluxes": sol["fluxes"]}
+    return {"baseline_growth": baseline, "conditions": results,
+            "model_status": "computational prediction; requires experimental validation"}
+
+
+def couple_grn_metabolism(model, genes, interactions, reaction_rules, initial=None, steps=12):
+    """Couple steady GRN states to metabolic reaction availability."""
+    grn = regulatory_state(genes, interactions, initial, steps)
+    bounds = {}
+    for reaction, gene in reaction_rules.items():
+        if reaction not in model.reactions:
+            raise ValueError(f"unknown reaction {reaction!r}")
+        if gene not in grn["steady_state"]:
+            raise ValueError(f"unknown regulatory gene {gene!r}")
+        if grn["steady_state"][gene] < .5:
+            bounds[reaction] = (0.0, 0.0)
+    solution = fba(model, bounds_override=bounds)
+    return {"regulatory": grn, "disabled_reactions": sorted(bounds), "metabolic": solution,
+            "predicted_growth": solution["objective"], "model_status": "computational prediction; requires experimental validation"}
+
+
+def perturbation_screen(model, perturbations=None):
+    """Rank reaction knockouts by predicted growth impact."""
+    names = list(perturbations or model.reactions)
+    unknown = set(names) - set(model.reactions)
+    if unknown:
+        raise ValueError(f"unknown reactions: {sorted(unknown)}")
+    rows = [gene_knockout(model, name) for name in names]
+    rows.sort(key=lambda x: (x["growth_ratio"], x["knocked_out"]))
+    return {"wild_type_growth": fba(model)["objective"], "perturbations": rows,
+            "essential_reactions": [x["knocked_out"] for x in rows if x["lethality"] == "lethal"],
+            "model_status": "computational prediction; requires experimental validation"}
+
+
+def virtual_cell_report(model=None, genes=None, interactions=None, reaction_rules=None, conditions=None):
+    """End-to-end multi-scale cell hypothesis report."""
+    model = model or demo_model()
+    genes = genes or ["carbon_sensor", "respiration_gene"]
+    interactions = interactions or [("carbon_sensor", "carbon_sensor", 1), ("carbon_sensor", "respiration_gene", 1)]
+    initial = {genes[0]: 1}
+    coupled = couple_grn_metabolism(model, genes, interactions, reaction_rules or {"RESP": genes[-1]}, initial)
+    return {"baseline": fba(model), "regulatory_metabolic_coupling": coupled,
+            "environment": environment_response(model, conditions), "growth": simulate_growth(model, hours=2),
+            "perturbation_screen": perturbation_screen(model),
+            "limitations": ["predictions depend on model bounds and network assumptions", "no wet-lab validation was performed"]}
