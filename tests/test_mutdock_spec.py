@@ -21,3 +21,7 @@ def test_report_complete_honest():
  r=mutdock_report(P,{'a':'CC','b':'CCN'},[(0,'S'),(1,'D')]); assert r['epistasis'] and r['fitness'] and r['forecast'] and 'no trained GNN' in r['model_status']
 def test_diagnostics_honest_finite():
  d=mutdock_diagnostics(P,S,0,'S'); assert len(d)==14 and all(math.isfinite(x) for x in d.values())
+
+def test_hotspot_and_high_risk_are_reachable():
+ hits=[mutation_effect(P,S,p,a) for p in range(len(P)) for a in 'ACDEFGHIKLMNPQRSTVWY' if a!=P[p]]
+ assert any(x['hotspot'] for x in hits) and any(x['resistance_risk']=='high' for x in hits)
