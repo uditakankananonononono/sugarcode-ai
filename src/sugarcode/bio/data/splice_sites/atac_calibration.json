@@ -1,0 +1,164 @@
+{
+ "training_windows": {
+  "donor": 139,
+  "acceptor": 139
+ },
+ "circularity": {
+  "windows": [
+   {
+    "window": "AAGATAAGT",
+    "site_type": "donor",
+    "in_training": false
+   },
+   {
+    "window": "CTCATATCC",
+    "site_type": "donor",
+    "in_training": true
+   },
+   {
+    "window": "TAACAATAACCTACA",
+    "site_type": "acceptor",
+    "in_training": true
+   },
+   {
+    "window": "TGACGATATTCTACT",
+    "site_type": "acceptor",
+    "in_training": true
+   },
+   {
+    "window": "TGACTCTTCTCTACA",
+    "site_type": "acceptor",
+    "in_training": true
+   },
+   {
+    "window": "TGATTCTAAGCTACC",
+    "site_type": "acceptor",
+    "in_training": true
+   },
+   {
+    "window": "TTCATATCC",
+    "site_type": "donor",
+    "in_training": true
+   },
+   {
+    "window": "TTGACCCCACGCACG",
+    "site_type": "acceptor",
+    "in_training": true
+   },
+   {
+    "window": "TTTCTTTTCTATACT",
+    "site_type": "acceptor",
+    "in_training": false
+   }
+  ],
+  "note": "windows flagged in_training=True overlap the 139-intron training set (the SCN-family minor intron is in intronIC): their high ref scores are circular. Windows flagged False are INDEPENDENT of training. All 16 variant DELTAS are independent ClinVar evidence regardless."
+ },
+ "variant_deltas": [
+  {
+   "gene": "scn1a",
+   "notation": "c.4476+1A>C",
+   "delta": -0.158
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.4476+2T>C",
+   "delta": -0.158
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.384-1C>T",
+   "delta": -0.205
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.4477-1C>T",
+   "delta": -0.205
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.4477-2A>G",
+   "delta": -0.205
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.4476+1A>T",
+   "delta": -0.158
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.4476+1A>G",
+   "delta": -0.158
+  },
+  {
+   "gene": "scn1a",
+   "notation": "c.383+1A>G",
+   "delta": -0.158
+  },
+  {
+   "gene": "SCN2A",
+   "notation": "c.386+1A>C",
+   "delta": -0.158
+  },
+  {
+   "gene": "SCN2A",
+   "notation": "c.386+2T>C",
+   "delta": -0.158
+  },
+  {
+   "gene": "SCN2A",
+   "notation": "c.387-2A>G",
+   "delta": -0.205
+  },
+  {
+   "gene": "SCN8A",
+   "notation": "c.396-1C>T",
+   "delta": -0.205
+  },
+  {
+   "gene": "SCN9A",
+   "notation": "c.378-1C>T",
+   "delta": -0.205
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.392+2T>C",
+   "delta": -0.158
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.392+2T>G",
+   "delta": -0.158
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.393-2A>G",
+   "delta": -0.205
+  }
+ ],
+ "position_logodds": {
+  "acceptor_-2(A)": {
+   "A": 1.984569959430394,
+   "C": -6.139551352398794,
+   "G": -6.139551352398794,
+   "T": -6.139551352398794
+  },
+  "acceptor_-1(C)": {
+   "A": -6.139551352398794,
+   "C": 1.984569959430394,
+   "G": -6.139551352398794,
+   "T": -6.139551352398794
+  },
+  "donor_+1(A)": {
+   "A": 1.984569959430394,
+   "C": -6.139551352398794,
+   "G": -6.139551352398794,
+   "T": -6.139551352398794
+  },
+  "donor_+2(T)": {
+   "A": -6.139551352398794,
+   "C": -6.139551352398794,
+   "G": -6.139551352398794,
+   "T": 1.984569959430394
+  }
+ }
+}
