@@ -1,3 +1,3 @@
-"""Organoid Screen: virtual compound screening on patient organoid models."""
-from .core import screen, screen_with_structure
-__all__ = ["screen", "screen_with_structure"]
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
