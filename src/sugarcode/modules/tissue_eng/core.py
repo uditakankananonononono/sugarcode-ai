@@ -97,3 +97,92 @@ def _maturation(tissue: str) -> list[str]:
             "week 1: marker expression panel",
             "week 2-4: functional maturation under physiological loading",
             "endpoint: histology + mechanical test + function assay"]
+
+
+def calibrate_printing(tissue, ink_name=None, nozzle_um=250, target_fidelity=0.85):
+    """Calibrate extrusion parameters and estimate structural fidelity."""
+    key = tissue.lower()
+    if key not in TISSUES:
+        raise KeyError(f"unknown tissue {tissue!r}; have {sorted(TISSUES)}")
+    if ink_name is None:
+        ink = _pick_ink(TISSUES[key]["modulus_kpa"])
+    elif ink_name not in BIOINKS:
+        raise KeyError(f"unknown bioink {ink_name!r}; have {sorted(BIOINKS)}")
+    else:
+        ink = {"name": ink_name, **BIOINKS[ink_name]}
+    if nozzle_um <= 0 or not 0 < target_fidelity <= 1:
+        raise ValueError("nozzle_um must be positive and target_fidelity within (0, 1]")
+    pressure = 80 / max(ink["printability"], .2) * (250 / nozzle_um)
+    speed = 10 * ink["printability"] * (nozzle_um / 250) ** .5
+    fidelity = min(.99, .55 + .35 * ink["printability"] - .0002 * abs(nozzle_um - 250))
+    return {"tissue": key, "bioink": ink["name"], "nozzle_um": nozzle_um,
+            "pressure_kpa": round(pressure, 2), "speed_mm_s": round(speed, 2),
+            "predicted_fidelity": round(fidelity, 3), "target_fidelity": target_fidelity,
+            "target_met": fidelity >= target_fidelity,
+            "calibration_note": "computational starting point; calibrate on the specific printer"}
+
+
+def simulate_physiological_stress(tissue, cycles=1000, strain=0.05):
+    """Estimate cyclic mechanical response and fatigue safety."""
+    if cycles < 1 or not 0 < strain < 1:
+        raise ValueError("cycles must be at least 1 and strain within (0, 1)")
+    design = design_tissue(tissue)
+    modulus = design["mechanical_simulation"]["achievable_modulus_kpa"]
+    peak = modulus * strain * 1.2
+    retained = max(.05, math.exp(-cycles * strain / 50000))
+    failure = design["mechanical_simulation"]["failure_strain_estimate"]
+    return {"tissue": tissue.lower(), "cycles": cycles, "applied_strain": strain,
+            "peak_stress_kpa": round(peak, 4), "modulus_retention": round(retained, 4),
+            "failure_strain_estimate": failure, "safety_factor": round(failure / strain, 3),
+            "predicted_integrity": retained >= .8 and strain < failure,
+            "model_status": "simplified computational prediction; mechanical testing required"}
+
+
+def oxygen_profile(tissue, size_mm=(10,10,2), channel_spacing_um=None, points=11):
+    """Predict a symmetric oxygen profile between vascular channels."""
+    if points < 3:
+        raise ValueError("points must be at least 3")
+    key=tissue.lower()
+    if key not in TISSUES:
+        raise KeyError(f"unknown tissue {tissue!r}; have {sorted(TISSUES)}")
+    vascular=_vascularization(TISSUES[key],size_mm)
+    spacing=channel_spacing_um or vascular["channel_spacing_um"] or size_mm[2]*1000
+    if spacing <= 0:
+        raise ValueError("channel_spacing_um must be positive")
+    distances=[spacing*i/(points-1) for i in range(points)]
+    nearest=[min(x,spacing-x) for x in distances]
+    oxygen=[max(0,1-(d/200)**2)*100 for d in nearest]
+    return {"tissue":key,"channel_spacing_um":spacing,"distance_um":[round(x,2) for x in distances],
+            "oxygen_percent":[round(x,2) for x in oxygen],"minimum_oxygen_percent":round(min(oxygen),2),
+            "hypoxic":min(oxygen)<5,"recommended_max_spacing_um":400,
+            "model_status":"diffusion-only prediction; perfusion validation required"}
+
+
+def viability_forecast(tissue, days=28, initial_viability=0.95, perfused=True):
+    """Forecast cell viability during scaffold maturation."""
+    if days < 1 or not 0 < initial_viability <= 1:
+        raise ValueError("days must be positive and initial_viability within (0, 1]")
+    key=tissue.lower()
+    if key not in TISSUES:
+        raise KeyError(f"unknown tissue {tissue!r}; have {sorted(TISSUES)}")
+    need=TISSUES[key]["vascular_need"]
+    decay=.006 + need*(.004 if perfused else .025)
+    values=[round(initial_viability*math.exp(-decay*d),4) for d in range(days+1)]
+    return {"tissue":key,"days":list(range(days+1)),"viability_fraction":values,
+            "endpoint_viability":values[-1],"perfused":perfused,
+            "functional_viability":values[-1]>=.7,
+            "model_status":"computational forecast; confirm with Live/Dead assays"}
+
+
+def drug_testing_plan(tissue, compounds, replicates=3):
+    """Produce a randomized-ready in-vitro drug-testing layout."""
+    if not compounds:
+        raise ValueError("compounds must be a non-empty list")
+    if replicates < 2:
+        raise ValueError("replicates must be at least 2")
+    design=design_tissue(tissue)
+    groups=[{"compound":c,"replicate":r,"readouts":["viability","histology","tissue-specific function"]}
+            for c in ["vehicle_control",*compounds] for r in range(1,replicates+1)]
+    return {"tissue":tissue.lower(),"groups":groups,"sample_count":len(groups),
+            "bioink":design["bioink"]["name"],"include_blinded_analysis":True,
+            "limitations":["in-vitro response does not establish clinical efficacy","dose selection requires compound-specific evidence"]}
