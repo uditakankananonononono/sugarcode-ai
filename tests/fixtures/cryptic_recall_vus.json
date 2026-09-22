@@ -1,0 +1,363 @@
+{
+ "source": "cryptic_scan recall on drop-42 VUS (flanks from RefSeqGene records, +/-100 nt, transcript orientation); enrichment vs weak-VUS controls is the measured quantity - per-variant calls are NOT upgraded on this basis",
+ "results": {
+  "strong": {
+   "new": 0,
+   "natural_reclass": 18,
+   "strengthened": 0,
+   "n": 179,
+   "skipped": 0
+  },
+  "control": {
+   "new": 0,
+   "natural_reclass": 136,
+   "strengthened": 0,
+   "n": 1016,
+   "skipped": 8
+  }
+ },
+ "strong_with_cryptic": [
+  {
+   "gene": "BRCA1",
+   "notation": "c.4358-2A>T",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 91,
+     "ref_score": 0.742,
+     "alt_score": 0.7857,
+     "sequence": "TCCATTTAATGCAGT"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA1",
+   "notation": "c.4358-1G>T",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 90,
+     "ref_score": 0.742,
+     "alt_score": 0.7562,
+     "sequence": "TCCATTTAAATCAGT"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA1",
+   "notation": "c.594-1G>A",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 99,
+     "ref_score": 0.7389,
+     "alt_score": 0.7946,
+     "sequence": "AATGTGGGA"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA1",
+   "notation": "c.4358-2A>G",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 87,
+     "ref_score": 0.6332,
+     "alt_score": 0.8169,
+     "sequence": "TCATTCCATTTAAGG"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA1",
+   "notation": "c.670+1G>T",
+   "delta": -0.2539,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 96,
+     "ref_score": 0.5658,
+     "alt_score": 0.8197,
+     "sequence": "AAGGTTAAT"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA2",
+   "notation": "c.7976+2C>T",
+   "delta": -0.2539,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 96,
+     "ref_score": 0.7444,
+     "alt_score": 0.9983,
+     "sequence": "CAGGTAAGT"
+    }
+   ]
+  },
+  {
+   "gene": "BRCA2",
+   "notation": "c.68-1G>T",
+   "delta": -0.1837,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 93,
+     "ref_score": 0.7268,
+     "alt_score": 0.7687,
+     "sequence": "TTAAATATATTTAGG"
+    }
+   ]
+  },
+  {
+   "gene": "CHEK2",
+   "notation": "c.1260-1G>C",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 93,
+     "ref_score": 0.721,
+     "alt_score": 0.7535,
+     "sequence": "ATATTAACCCTTAGT"
+    }
+   ]
+  },
+  {
+   "gene": "CHEK2",
+   "notation": "c.1260-1G>T",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 93,
+     "ref_score": 0.721,
+     "alt_score": 0.7629,
+     "sequence": "ATATTAATCCTTAGT"
+    }
+   ]
+  },
+  {
+   "gene": "MYH7",
+   "notation": "c.4953+1G>T",
+   "delta": -0.2539,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 98,
+     "ref_score": 0.7124,
+     "alt_score": 0.7517,
+     "sequence": "AGTTACTCACCCAGA"
+    }
+   ]
+  },
+  {
+   "gene": "MYH7",
+   "notation": "c.5791-2A>G",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 87,
+     "ref_score": 0.6458,
+     "alt_score": 0.8295,
+     "sequence": "GTTTCCTTTCAAAGG"
+    }
+   ]
+  },
+  {
+   "gene": "MYH7",
+   "notation": "c.4520-1G>T",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 89,
+     "ref_score": 0.6648,
+     "alt_score": 0.7806,
+     "sequence": "TTCCCCACACATAGG"
+    }
+   ]
+  },
+  {
+   "gene": "NF1",
+   "notation": "c.289-1G>T",
+   "delta": -0.1837,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 96,
+     "ref_score": 0.7156,
+     "alt_score": 0.7594,
+     "sequence": "TTTATCAACCAAAGG"
+    }
+   ]
+  },
+  {
+   "gene": "NF1",
+   "notation": "c.1846-2A>G",
+   "delta": -0.1838,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 87,
+     "ref_score": 0.5842,
+     "alt_score": 0.768,
+     "sequence": "TTTATTTTTTTCTGG"
+    }
+   ]
+  },
+  {
+   "gene": "PTEN",
+   "notation": "c.79+5C>G",
+   "delta": -0.152,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 93,
+     "ref_score": 0.6697,
+     "alt_score": 0.7578,
+     "sequence": "CCTGTATGC"
+    }
+   ]
+  },
+  {
+   "gene": "RB1",
+   "notation": "c.501-2A>C",
+   "delta": -0.1837,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "acceptor",
+     "position": 89,
+     "ref_score": 0.7135,
+     "alt_score": 0.7699,
+     "sequence": "TTTTTCTTTTCCGGA"
+    }
+   ]
+  },
+  {
+   "gene": "TSC2",
+   "notation": "c.2838-2A>G",
+   "delta": -0.1837,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 98,
+     "ref_score": 0.6861,
+     "alt_score": 0.7626,
+     "sequence": "ATGGTCTGA"
+    }
+   ]
+  },
+  {
+   "gene": "TSC2",
+   "notation": "c.225+2T>C",
+   "delta": -0.2539,
+   "new_cryptic": 0,
+   "natural_reclass": 1,
+   "strengthened": 0,
+   "cryptic_findings": [],
+   "natural_findings": [
+    {
+     "type": "new_cryptic_site",
+     "site_type": "donor",
+     "position": 100,
+     "ref_score": 0.7499,
+     "alt_score": 0.7689,
+     "sequence": "CAGGTTTAT"
+    }
+   ]
+  }
+ ]
+}
