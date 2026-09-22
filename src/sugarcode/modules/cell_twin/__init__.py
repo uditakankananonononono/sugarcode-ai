@@ -1,3 +1,5 @@
-"""Cell-Twin: patient-cell digital twins + in silico drug trials."""
-from .core import create_twin, run_drug_trial
-__all__ = ["create_twin", "run_drug_trial"]
+"""Cell-Twin: multi-omic mechanistic cell twins and virtual drug trials."""
+from .core import (DRUG_ACTIONS, build_mechanistic_twin, combination_screen,
+ create_twin, enhancement_features, run_drug_trial, run_virtual_trial,
+ simulate_drug_response, validate_patient_omics)
+__all__=["DRUG_ACTIONS","build_mechanistic_twin","combination_screen","create_twin","enhancement_features","run_drug_trial","run_virtual_trial","simulate_drug_response","validate_patient_omics"]
