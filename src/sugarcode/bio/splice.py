@@ -172,7 +172,8 @@ def gc_donor_lod() -> list[dict[str, float]]:
     return log_odds_matrix(swapped)
 
 
-def utr_junction_map(gene: str, offline: bool = False) -> dict:
+def utr_junction_map(gene: str, offline: bool = False,
+                     transcript: str | None = None) -> dict:
     """5'-UTR-aware junction map (drop 33): junction windows keyed by c.
     number INCLUDING negative (5'-UTR) positions, built from the canonical
     transcript's mRNA exons with c.1 anchored at the paired CDS start.
@@ -199,6 +200,8 @@ def utr_junction_map(gene: str, offline: bool = False) -> dict:
         return {"status": "no CDS in record", "gene": gene, "accession": acc}
     strand = cds["strand"]
     cds_spans = _texons(cds)
+    if not cds_spans:
+        return {"status": "no CDS spans in record", "gene": gene, "accession": acc}
     cds_start = cds_spans[0][0] if strand == 1 else cds_spans[0][1]
     cds_end = cds_spans[-1][1] if strand == 1 else cds_spans[-1][0]
 
@@ -207,7 +210,20 @@ def utr_junction_map(gene: str, offline: bool = False) -> dict:
                    for a, b in f["spans"] for ca, cb in cds["spans"])
 
     mrnas = [f for f in gb["features"] if f["key"] == "mRNA"]
-    mrna = max(mrnas, key=overlap, default=None)
+    if transcript:
+        # explicit transcript (drop 40): match by accession prefix so
+        # NM_000546 selects NM_000546.5. Numbering then follows that
+        # transcript's exon walk - several CDS-paired isoforms can coexist
+        # (TP53: NM_001126118.1 vs NM_000546.5 differ in 3' exon structure,
+        # so c.*N differs between them).
+        mrna = next((f for f in mrnas
+                     if f["qualifiers"].get("transcript_id", "").startswith(
+                         transcript.split(".")[0])), None)
+        if not mrna:
+            return {"status": f"transcript {transcript} not on record",
+                    "gene": gene, "accession": acc}
+    else:
+        mrna = max(mrnas, key=overlap, default=None)
     if not mrna or overlap(mrna) == 0:
         return {"status": "no mRNA overlapping the CDS", "gene": gene, "accession": acc}
     tx = mrna["qualifiers"].get("transcript_id", "")
@@ -233,11 +249,13 @@ def utr_junction_map(gene: str, offline: bool = False) -> dict:
         walked += ln
 
     def cnum(w):
-        """c. number of the base at walked exonic index w (0-based)."""
+        """c. number of the base at walked exonic index w (0-based). 3'-UTR
+        bases get HGVS c.*N strings (c.*1 = first base after the CDS end) -
+        drop 40."""
         if w < utr_len:
             return -(utr_len - w)
         if w >= utr_len + cds_len:
-            return None                          # 3' UTR: c.*N unsupported
+            return f"*{w - (utr_len + cds_len) + 1}"
         return w - utr_len + 1
 
     donors, acceptors, exon_rows = {}, {}, []
@@ -257,12 +275,12 @@ def utr_junction_map(gene: str, offline: bool = False) -> dict:
                 acceptors[a_key] = (seq[na-15:na] if strand == 1
                                     else _rc(seq[nb-1:nb+14]))
         walked += ln
-    skipped_3utr = sum(1 for e in exon_rows
-                       if e["cdna_start"] is None or e["cdna_end"] is None)
+    n_3utr = sum(1 for e in exon_rows
+                 if isinstance(e["cdna_start"], str) or isinstance(e["cdna_end"], str))
     src = (f"NCBI RefSeqGene {acc} ({'cache' if offline else 'live'}), "
            f"mRNA {tx} exons with c.1 at the paired CDS start")
-    if skipped_3utr:
-        src += f"; {skipped_3utr} 3'-UTR exon(s) unnumbered (c.*N unsupported)"
+    if n_3utr:
+        src += f"; {n_3utr} 3'-UTR exon(s) numbered c.*N (drop 40)"
     return {"status": "ok", "gene": gene, "accession": acc, "transcript": tx,
             "donors": {k: v for k, v in donors.items() if k is not None},
             "acceptors": {k: v for k, v in acceptors.items() if k is not None},

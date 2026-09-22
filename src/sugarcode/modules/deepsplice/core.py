@@ -314,12 +314,24 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
     """
     import re as _re
     from ...bio import splice as _sp
-    m = _re.fullmatch(r"c\.(-?\d+)([+-])(\d+)([ACGT])>([ACGT])", notation.strip())
+    m = _re.fullmatch(r"c\.(-?\d+|\*\d+)([+-])(\d+)([ACGT])>([ACGT])",
+                      notation.strip())
     if not m:
         return {"gene": gene, "notation": notation, "status": "unparseable",
-                "detail": "expected form c.135-1G>A, c.212+1G>A or c.-23+1G>A (5' UTR)"}
-    n, sign, k, refb, altb = int(m.group(1)), m.group(2), int(m.group(3)), m.group(4), m.group(5)
-    if n < 0:
+                "detail": "expected form c.135-1G>A, c.212+1G>A, c.-23+1G>A (5' UTR) "
+                          "or c.*35+1G>A (3' UTR)"}
+    n = m.group(1)
+    n = int(n) if not n.startswith("*") else n
+    sign, k, refb, altb = m.group(2), int(m.group(3)), m.group(4), m.group(5)
+    if isinstance(n, str):
+        # 3'-UTR intron variant (drop 40): c.*N keys on the UTR map
+        # (TP53's last intron is 3'-UTR: donor c.*35, acceptor c.*36).
+        if transcript:
+            return {"gene": gene, "notation": notation, "status": "outside scope",
+                    "detail": "3'-UTR numbering with an explicit transcript map "
+                              "is not supported yet"}
+        jm = _sp.utr_junction_map(gene, offline=offline)
+    elif n < 0:
         # 5'-UTR intron variant (drop 33): CDS maps cannot see these - use
         # the mRNA-exon UTR map (GJB2's only intron is 5'-UTR: c.-23+1G>A).
         # drop 38: with an explicit transcript, the full-cDNA alignment map
@@ -504,8 +516,16 @@ def _exon_skip_context(jm: dict, site_type: str, n: int) -> dict | None:
     if not ex:
         return None
     ln = ex["length"]
+    if isinstance(ex["cdna_start"], str) or isinstance(ex["cdna_end"], str):
+        # 3'-UTR exon (drop 40): untranslated, no reading-frame consequence
+        return {"skipped_exon": ex, "in_frame": None, "utr": True,
+                "conditional_prediction": (
+                    f"3'-UTR exon ({ln} nt): if skipping occurs, untranslated "
+                    "sequence is lost - no reading-frame effect; consequences "
+                    "act through 3'-UTR regulation (polyA, miRNA sites, "
+                    "stability elements), not protein truncation")}
     if ex["cdna_start"] is None:
-        return None  # fully 3'-UTR exon (c.*N unnumbered) - no context
+        return None  # unnumbered exon - no context
     if ex["cdna_end"] is not None and ex["cdna_end"] < 0:
         # 5'-UTR exon (drop 33): frame language is meaningless here - the
         # skipped sequence is untranslated (GJB2 c.-23+1G>A skips exon 1).
