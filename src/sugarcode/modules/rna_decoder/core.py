@@ -90,3 +90,26 @@ def optimize_mrna(rna: str, cds_start: int = 0, cds_end: int | None = None) -> d
             "half_life": "extended via 3'UTR reader recruitment",
         },
     }
+
+import math
+import numpy as np
+MOD_MOTIFS={'m6A':'DRACH','m5C':'CG','psi':'TT','m1A':'GATC'}
+def nanopore_modification(signal,expected,noise_sd=.2):
+ a=np.asarray(signal,float); e=np.asarray(expected,float); z=(a-e)/(noise_sd+1e-9); p=1/(1+np.exp(-(np.abs(z)-2))); return {'z_scores':z.tolist(),'modification_probability':p.tolist(),'mean_probability':float(p.mean()),'status':'signal-deviation heuristic, not a trained nanopore basecaller'}
+def multi_modification_map(rna):
+ s=clean_dna(rna.replace('U','T')); out={}
+ for name,motif in MOD_MOTIFS.items(): out[name]=[{'position':p,'motif':s[p:p+len(motif)]} for p in find_motif(s,motif)]
+ return {'length':len(s),'modifications':out,'site_count':sum(map(len,out.values()))}
+def structure_ensemble(rna,window=20):
+ s=clean_dna(rna.replace('U','T')); rows=[]
+ for i in range(0,len(s),window):
+  w=s[i:i+window]; pair=sum(a==b for a,b in zip(w,w[::-1]))/max(1,len(w)); dg=-2*(w.count('G')+w.count('C'))-.5*(w.count('A')+w.count('T')); rows.append({'start':i,'pairing_probability':pair,'folding_dg_proxy':dg})
+ return {'windows':rows,'mean_pairing':sum(x['pairing_probability'] for x in rows)/len(rows),'total_dg_proxy':sum(x['folding_dg_proxy'] for x in rows)}
+def modification_kinetics(initial=.1,writer=1,eraser=.2,hours=24):
+ t=np.linspace(0,hours,121); equilibrium=writer/(writer+eraser); occ=equilibrium+(initial-equilibrium)*np.exp(-(writer+eraser)*t); return {'time_h':t.tolist(),'occupancy':occ.tolist(),'equilibrium':equilibrium}
+def functional_impact(rna,modifications):
+ struct=structure_ensemble(rna); burden=sum(len(v) for v in modifications.values()); translation=max(0,1+.03*len(modifications.get('psi',[]))-.02*len(modifications.get('m6A',[]))); immune=max(0,.5-.04*len(modifications.get('psi',[]))+.02*len(modifications.get('m1A',[]))); return {'translation_efficiency_relative':translation,'immune_activation_relative':immune,'stability_relative':1+.01*burden-.2*struct['mean_pairing'],'structure':struct}
+def design_rna(rna,delivery='LNP'):
+ base=optimize_mrna(rna); mods=multi_modification_map(rna); impact=functional_impact(rna,mods['modifications']); encapsulation=max(0,min(1,.8-.3*abs(gc_content(rna.replace('U','T'))-.5))) if delivery=='LNP' else .5; return {**base,'multi_modification_map':mods,'functional_impact':impact,'delivery':{'vehicle':delivery,'encapsulation_proxy':encapsulation},'validation':['direct RNA nanopore with matched control','miCLIP/MeRIP confirmation','ribosome profiling','innate immune panel'],'model_status':'Sequence motifs, folding proxies and explicit kinetics; no trained nanopore/transformer/GNN model and not clinically validated.'}
+def rna_diagnostics(r):
+ m=r['multi_modification_map']; i=r['functional_impact']; s=i['structure']; return {'length':float(m['length']),'site_count':float(m['site_count']),'m6a_count':float(len(m['modifications']['m6A'])),'m5c_count':float(len(m['modifications']['m5C'])),'psi_count':float(len(m['modifications']['psi'])),'m1a_count':float(len(m['modifications']['m1A'])),'translation_efficiency':i['translation_efficiency_relative'],'immune_activation':i['immune_activation_relative'],'stability':i['stability_relative'],'mean_pairing':s['mean_pairing'],'folding_dg':s['total_dg_proxy'],'encapsulation':r['delivery']['encapsulation_proxy']}
