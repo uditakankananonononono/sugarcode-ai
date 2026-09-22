@@ -234,3 +234,53 @@ def analyze_real_structure(identifier: str, offline: bool = False) -> dict:
         "note": ("real coordinates from " + s["source"] +
                  "; pockets computed from C-alpha density, not the Chou-Fasman stand-in"),
     }
+
+# Transparent evolutionary/geometry/physics extensions; no AlphaFold weights bundled.
+def msa_couplings(msa,sequence_weights=None):
+    rows=[''.join(a for a in s.upper() if a in CF or a=='-') for s in msa]
+    if not rows or len({len(x) for x in rows})!=1: raise ValueError('aligned equal-length sequences required')
+    n=len(rows[0]); w=np.asarray(sequence_weights if sequence_weights is not None else [1]*len(rows),float); w=w/w.sum(); alphabet='ACDEFGHIKLMNPQRSTVWY-'; couplings=np.zeros((n,n))
+    entropy=[]
+    for i in range(n):
+        p=np.array([sum(w[k] for k,r in enumerate(rows) if r[i]==a) for a in alphabet]); p=p[p>0]; entropy.append(float(-np.sum(p*np.log(p))))
+    for i in range(n):
+        for j in range(i+1,n):
+            joint={}; pi={}; pj={}
+            for k,r in enumerate(rows): joint[(r[i],r[j])]=joint.get((r[i],r[j]),0)+w[k]; pi[r[i]]=pi.get(r[i],0)+w[k]; pj[r[j]]=pj.get(r[j],0)+w[k]
+            mi=sum(p*math.log(p/(pi[a]*pj[b])) for (a,b),p in joint.items() if p); couplings[i,j]=couplings[j,i]=mi
+    return {'depth':len(rows),'length':n,'entropy':entropy,'mutual_information':couplings.tolist(),'effective_depth':1/float(np.sum(w*w))}
+
+def residue_graph(coords,cutoff=8):
+    c=np.asarray(coords,float); d=np.linalg.norm(c[:,None,:]-c[None,:,:],axis=2); edges=[{'source':i,'target':j,'distance_A':float(d[i,j])} for i in range(len(c)) for j in range(i+1,len(c)) if d[i,j]<=cutoff]; return {'nodes':len(c),'edges':edges,'distance_matrix':d.tolist()}
+
+def rigid_transform(coords,rotation,translation):
+    c=np.asarray(coords,float); r=np.asarray(rotation,float); t=np.asarray(translation,float); return c@r.T+t
+
+def graph_invariance(coords,rotation,translation,cutoff=8):
+    a=residue_graph(coords,cutoff); b=residue_graph(rigid_transform(coords,rotation,translation),cutoff); da=np.asarray(a['distance_matrix']); db=np.asarray(b['distance_matrix']); return {'max_distance_error':float(np.max(abs(da-db))),'edges_preserved':[(x['source'],x['target']) for x in a['edges']]==[(x['source'],x['target']) for x in b['edges']]}
+
+def physical_energy(coords,charges=None,sigma=3.8,epsilon=.1):
+    c=np.asarray(coords,float); q=np.asarray(charges if charges is not None else np.zeros(len(c)),float); lj=elec=0
+    for i in range(len(c)):
+        for j in range(i+2,len(c)):
+            r=max(.5,float(np.linalg.norm(c[i]-c[j]))); sr=(sigma/r)**6; lj+=4*epsilon*(sr*sr-sr); elec+=.05*q[i]*q[j]/r
+    return {'lennard_jones':lj,'electrostatic':elec,'total':lj+elec}
+
+def refine_coordinates(coords,charges=None,steps=20,learning_rate=.002):
+    x=np.asarray(coords,float).copy(); trajectory=[]
+    for _ in range(steps):
+        e=physical_energy(x,charges)['total']; trajectory.append(e); grad=np.zeros_like(x); h=1e-4
+        for i in range(len(x)):
+            for j in range(3):
+                x[i,j]+=h; ep=physical_energy(x,charges)['total']; x[i,j]-=h; grad[i,j]=(ep-e)/h
+        x-=learning_rate*np.clip(grad,-10,10)
+    trajectory.append(physical_energy(x,charges)['total']); return {'coordinates':x.tolist(),'energy_trajectory':trajectory,'converged':trajectory[-1]<=trajectory[0]}
+
+def mutation_stability(sequence,position,mutant):
+    seq=''.join(a for a in sequence.upper() if a in CF); position=int(position); wild=seq[position]; p0=CF[wild]; p1=CF[mutant]; hyd={'AILMFWVY'}; propensity_shift=(max(p1)-max(p0))/100; hydro_shift=float((mutant in hyd)-(wild in hyd)); ddg=.8*propensity_shift-1.2*hydro_shift; return {'position':position,'wild_type':wild,'mutant':mutant,'ddg_relative':ddg,'destabilizing':ddg>0}
+
+def folding_workspace(sequence,msa=None):
+    base=predict_structure(sequence); seq=''.join(a for a in sequence.upper() if a in CF); ss=list(base['secondary_structure']); coords=_backbone(seq,ss); charge=[1 if a in 'KR' else -1 if a in 'DE' else 0 for a in seq]; graph=residue_graph(coords); energy=physical_energy(coords,charge); couplings=msa_couplings(msa) if msa else None; return {**base,'coordinates':coords.tolist(),'residue_graph':graph,'energy':energy,'msa':couplings,'pair_representation':couplings['mutual_information'] if couplings else None,'model_status':'Chou-Fasman, MSA mutual information and explicit geometry/energy; no AlphaFold neural weights and pLDDT/PAE are analogs, not calibrated predictions.'}
+
+def structure_diagnostics(sequence,msa=None):
+    r=folding_workspace(sequence,msa); p=np.asarray(r['pae']); c=np.asarray(r['plddt_per_residue']); e=r['energy']; g=r['residue_graph']; return {'length':float(r['length']),'mean_plddt_analog':r['mean_plddt'],'plddt_std':float(c.std()),'plddt_min':float(c.min()),'pae_mean':float(p.mean()),'pae_max':float(p.max()),'helix_count':float(r['composition']['helix']),'strand_count':float(r['composition']['strand']),'coil_count':float(r['composition']['coil']),'graph_edges':float(len(g['edges'])),'lj_energy':e['lennard_jones'],'electrostatic_energy':e['electrostatic'],'total_energy':e['total'],'msa_effective_depth':float(r['msa']['effective_depth'] if r['msa'] else 0)}
