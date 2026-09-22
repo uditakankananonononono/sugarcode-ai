@@ -101,3 +101,65 @@ def _predict_effect(mode: str, guides: list[dict], open_frac: float) -> dict:
     fold = 1.0 + 6.0 * best * (1.0 - 0.5 * open_frac)
     return {"fold_change": round(fold, 3), "direction": "activation",
             "confidence": "largest gains on closed/naive chromatin"}
+
+# Explicit chromatin/network dynamics; no trained model and not clinically validated.
+import math, json
+import numpy as np
+from scipy.integrate import solve_ivp
+EFFECTORS={"KRAB":{"accessibility":-.55,"acetylation":-.45,"methylation":.35},"VP64":{"accessibility":.4,"acetylation":.35,"methylation":-.1},"p300":{"accessibility":.5,"acetylation":.65,"methylation":-.1},"TET1":{"accessibility":.25,"acetylation":.1,"methylation":-.7},"DNMT3A":{"accessibility":-.35,"acetylation":-.15,"methylation":.75}}
+
+def effector_response(effector,occupancy,baseline=None,cooperativity=2):
+    if effector not in EFFECTORS: raise ValueError("unknown effector")
+    if not 0<=occupancy<=1 or cooperativity<=0: raise ValueError("invalid occupancy/cooperativity")
+    baseline={"accessibility":.5,"acetylation":.5,"methylation":.5,**(baseline or {})}; recruited=occupancy**cooperativity/(.5**cooperativity+occupancy**cooperativity); changes=EFFECTORS[effector]
+    state={k:min(1,max(0,baseline[k]+recruited*changes[k])) for k in baseline}; expression=(state['accessibility']*.45+state['acetylation']*.4+(1-state['methylation'])*.15)
+    return {"effector":effector,"recruited_fraction":recruited,"state":state,"relative_expression":expression}
+
+def chromatin_graph(landscape,contacts=None):
+    nodes=landscape['track']; n=len(nodes); edges=[]
+    for i in range(n):
+        for j in range(i+1,n):
+            contact=float(contacts[i][j]) if contacts is not None else (1+abs(i-j))**-.8
+            if contact>.15: edges.append({"source":i,"target":j,"contact":contact})
+    return {"nodes":nodes,"edges":edges}
+
+def spread_epigenetic_state(graph,seeds,mark='H3K27me3',steps=5,reader_writer=.6,decay=.15):
+    n=len(graph['nodes']); state=np.zeros(n)
+    for i,v in seeds.items(): state[int(i)]=float(v)
+    adjacency=np.zeros((n,n))
+    for e in graph['edges']: adjacency[e['source'],e['target']]=adjacency[e['target'],e['source']]=e['contact']
+    rows=adjacency.sum(1,keepdims=True); norm=np.divide(adjacency,rows,out=np.zeros_like(adjacency),where=rows>0); history=[state.tolist()]
+    for _ in range(steps): state=np.clip((1-decay)*state+reader_writer*norm@state,0,1); history.append(state.tolist())
+    return {"mark":mark,"trajectory":history,"final":history[-1],"spread_distance_tiles":sum(x>.05 for x in state)}
+
+def competitive_occupancy(dcas_concentration,kd,tf_concentration=0,tf_kd=1):
+    if min(dcas_concentration,tf_concentration)<0 or min(kd,tf_kd)<=0: raise ValueError("invalid binding values")
+    d=dcas_concentration/kd; t=tf_concentration/tf_kd; return {"dcas":d/(1+d+t),"endogenous_tf":t/(1+d+t),"unbound":1/(1+d+t)}
+
+def expression_trajectory(effector,occupancy,hours=72,mrna_half_life=6,feedback=.1):
+    target=effector_response(effector,occupancy)['relative_expression']; decay=math.log(2)/mrna_half_life
+    def rhs(_t,y): return [target/(1+feedback*y[0])-decay*y[0]]
+    t=np.linspace(0,hours,145); sol=solve_ivp(rhs,(0,hours),[1],t_eval=t,rtol=1e-8,atol=1e-9)
+    return {"time_h":sol.t.tolist(),"relative_expression":sol.y[0].tolist(),"steady_state":target/decay,"reversible":True}
+
+def cell_state_effect(effector,occupancy,states):
+    return {name:effector_response(effector,occupancy,state) for name,state in states.items()}
+
+def regulatory_offtarget(hit,accessibility=.5,essential=False,enhancer=False):
+    sequence=float(hit.get('cfd_score',hit.get('binding_probability',0))); consequence=1 if essential else .75 if enhancer else .4; return {"sequence_binding":sequence,"accessibility":accessibility,"functional_weight":consequence,"regulatory_risk":sequence*accessibility*consequence}
+
+def multiplex_design(guides,max_guides=4,min_spacing=50):
+    ranked=sorted(guides,key=lambda x:-x.get('composite',0)); chosen=[]
+    for g in ranked:
+        if all(abs(g.get('start',0)-x.get('start',0))>=min_spacing for x in chosen): chosen.append(g)
+        if len(chosen)>=max_guides: break
+    return {"selected":chosen,"count":len(chosen),"spacing_bp":min_spacing,"combined_occupancy":1-float(np.prod([1-g.get('composite',0) for g in chosen]))}
+
+def epiedit_diagnostics(seq,effector='KRAB',occupancy=.7):
+    land=chromatin_landscape(seq); track=land['track']; graph=chromatin_graph(land); response=effector_response(effector,occupancy); access=np.array([t['accessibility'] for t in track]); gc=np.array([t['gc'] for t in track]); motifs=np.array([t['tf_motifs'] for t in track],float)
+    d={"length":float(land['length']),"tile_count":float(len(track)),"accessibility_mean":float(access.mean()),"accessibility_std":float(access.std()),"accessibility_min":float(access.min()),"accessibility_max":float(access.max()),"gc_mean":float(gc.mean()),"gc_std":float(gc.std()),"motif_mean":float(motifs.mean()),"motif_max":float(motifs.max()),"graph_nodes":float(len(graph['nodes'])),"graph_edges":float(len(graph['edges'])),"effector_occupancy":occupancy,"recruited_fraction":response['recruited_fraction'],"post_accessibility":response['state']['accessibility'],"post_acetylation":response['state']['acetylation'],"post_methylation":response['state']['methylation'],"relative_expression":response['relative_expression']}
+    for mark in HISTONE_MARKS: d[f'mark_fraction.{mark}']=sum(mark in t['marks'] for t in track)/len(track)
+    return d
+
+def compile_epigenome_edit(seq,target_span,mode='CRISPRi',effector=None,cell_states=None,background=None):
+    design=design_epigenome_edit(seq,target_span,mode,background); effector=effector or ('KRAB' if mode=='CRISPRi' else 'p300'); occ=design['guides'][0]['composite'] if design['guides'] else 0; graph=chromatin_graph(design['chromatin']); return {**design,"effector":effector,"effector_response":effector_response(effector,occ),"expression_trajectory":expression_trajectory(effector,occ),"domain_spread":spread_epigenetic_state(graph,{0:occ}) if graph['nodes'] else None,"cell_states":cell_state_effect(effector,occ,cell_states or {'target':{},'healthy':{'accessibility':.3}}),"multiplex":multiplex_design(design['guides']),"diagnostics":epiedit_diagnostics(seq,effector,occ),"vector_architecture":{"platform":"dCas9","effector":effector,"guide_count":min(4,len(design['guides'])),"status":"architecture only"},"validation":["CUT&RUN for effector-associated marks","ATAC-seq for accessibility","RNA-seq for target and network effects"],"model_status":"Transparent chromatin/network models; no trained model and not clinically validated."}

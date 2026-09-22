@@ -1,3 +1,3 @@
-"""Epi-Edit: CRISPRa/i epigenome engineering with chromatin landscape modeling."""
-from .core import chromatin_landscape, design_epigenome_edit
-__all__ = ["chromatin_landscape", "design_epigenome_edit"]
+"""Dynamic, context-aware epigenome perturbation design."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]
