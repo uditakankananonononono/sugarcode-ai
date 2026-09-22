@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # ChemGPT Engine
 
 ChemGPT Engine: A multi-parameter molecular optimization engine that generates novel chemical compounds with optimized ADMET profiles. It predicts critical properties like LogP and solubility while providing retrosynthetic pathways. ChemGPT balances therapeutic potential with synthetic feasibility, enabling the rapid discovery of small molecules tailored to specific biological targets and safety profiles. ChemGPT Engine can be elevated into a generative–predictive molecular design system that operates across the full chemical–biological stack, integrating transformer-based molecular language models with physics-informed scoring and synthesis-aware constraints. Instead of treating molecules as static SMILES strings, the engine would learn joint representations across graph structures, 3D conformers, and quantum-derived descriptors, enabling it to reason simultaneously about topology, stereochemistry, and electronic properties. A diffusion-based generative backbone—conditioned on target binding pockets, pharmacophore constraints, and ADMET priors—could iteratively sample chemically valid structures while optimizing along multiple objectives such as lipophilicity (LogP), aqueous solubility, permeability, and metabolic stability. These objectives would not be heuristically balanced but embedded into a Pareto optimization framework, allowing ChemGPT to explore trade-offs between potency, toxicity, and synthesizability in a controlled, interpretable manner.

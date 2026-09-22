@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # CRISPR Cargo
 
 CRISPR Cargo: An optimization module for delivery systems, suggesting the best LNPs or AAV serotypes for specific CRISPR payloads and target tissues. It generates pharmacokinetic models showing vehicle concentration over time. CRISPR Cargo helps researchers overcome delivery hurdles by ensuring that genetic payloads reach their intended destinations safely and effectively.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Bio-Material
 
 Bio-Material: An AI design engine for synthetic biomaterials that suggests genetic pathways for polymer production. It models material degradation under physiological conditions and predicts structure-function relationships. Bio-Material helps engineers create biocompatible scaffolds for regenerative medicine, ensuring that synthetic materials have the mechanical and chemical properties required for integration.

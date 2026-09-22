@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # CRISPR Opt
 
 CRISPR Opt: A deep-learning-based design tool for CRISPR guide RNAs, optimizing sequences for high on-target efficiency and minimal off-target risks. it includes a simulated genome browser that visualizes PAM sites and regulatory tracks. CRISPR Opt ensures that genomic editing experiments are precisely designed, helping researchers select the most effective sequences.

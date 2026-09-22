@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # BioPrint Pro
 
 BioPrint Pro: A calibration hub for high-fidelity 3D bioprinting that optimizes ink rheology, pressure, and crosslinking kinetics for biological scaffolds. It provides 3D molecular visualizations of bio-ink components and predicts structural integrity. BioPrint Pro enables the creation of high-resolution tissues for regenerative medicine, drug testing, and tissue modeling.

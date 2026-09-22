@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # OpenClinVar
 
 OpenClinVar: An explainable AI engine that interprets ClinVar variants for researchers and healthcare professionals. It provides plain-language explanations of pathogenicity and generates clinical summaries for decision-making. OpenClinVar bridges the gap between raw genetic data and clinical action, offering patient-friendly reports and comparative analysis to improve variant interpretation.

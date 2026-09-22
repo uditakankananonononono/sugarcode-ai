@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Epi-Edit
 
 Epi-Edit: A design tool for epigenome engineering that uses CRISPRa and CRISPRi to modulate gene expression without changing DNA sequences. It visualizes the local chromatin landscape, identifying histone marks and accessibility. Epi-Edit enables researchers to control gene activity through precise epigenetic modifications, offering a non-permanent method of gene regulation.

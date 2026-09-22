@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Alpha-Fold UI
 
 Alpha-Fold UI: A high-precision interface for protein structure prediction, generating 3D molecular coordinates from amino acid sequences. It provides pLDDT confidence scores and PAE data to evaluate reliability. Users can visualize predicted structures and download PDB files, enabling functional analysis of novel proteins and the identification of potential binding sites.

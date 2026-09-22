@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # NeoHunter
 
 NeoHunter: An identification engine for personalized neoantigens derived from tumor mutational data. It ranks peptide candidates by immunogenicity and predicts binding to specific patient HLA alleles. NeoHunter enables the design of personalized cancer vaccines that target the unique mutations of an individual's tumor, providing a high-precision approach.

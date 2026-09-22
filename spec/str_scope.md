@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # STR-Scope
 
 STR-Scope: A specialized analytics tool for Short Tandem Repeats (STRs) in cancer and rare disease datasets. It identifies repeat expansions as critical biomarkers and calculates a diagnostic potential index. STR-Scope uses graph neural networks to simulate how STR variations disrupt DNA repair pathways, offering a novel perspective on instability.

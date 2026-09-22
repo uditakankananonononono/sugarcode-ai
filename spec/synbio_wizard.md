@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # SynBio Wizard
 
 SynBio Wizard: A guided, multi-step pipeline for synthetic biology projects, taking users from goal definition to pathway design and chassis selection. It automates technical decision-making, providing feasibility assessments and assembly recommendations. This wizard ensures that genetic designs are built on solid foundations and are ready for standardized laboratory execution and synthesis. SynBio Wizard: A self-evolving, full-stack biological intelligence system that transforms synthetic biology into a programmable, simulation-driven, and continuously learning engineering discipline. Rather than operating as a linear design pipeline, it functions as a constraint-aware biological compiler that decomposes high-level user intent into multi-dimensional optimization problems across genomic, transcriptomic, proteomic, and metabolic layers. Given a natural language objective, the system constructs a design manifold constrained by codon adaptation index (CAI), GC content windows, ribosome binding site (RBS) strength (ΔG folding), promoter kinetics, transcription factor binding affinities, and host-specific metabolic burden. It integrates thermodynamic models (e.g., nearest-neighbor RNA folding), enzyme kinetics (Michaelis–Menten, kcat/Km optimization), and flux balance analysis (FBA) to generate pathway architectures that are not only theoretically valid but metabolically feasible under chassis-specific constraints such as ATP cost, redox balance, and precursor availability.

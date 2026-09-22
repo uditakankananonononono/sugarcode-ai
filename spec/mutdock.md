@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # MutDock
 
 MutDock: A predictive module that models how point mutations in a protein alter its affinity for existing drugs. It identifies resistance hotspots and forecasts cross-drug resistance across therapeutic alternatives. MutDock helps researchers and clinicians understand the molecular basis of drug resistance, enabling the development of personalized and effective treatment plans.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Bio-Copilot
 
 Bio-Copilot: An AI-native research assistant grounded in real-time PubMed data. It answers complex biological questions, simulates mutation-to-phenotype pathways, and generates structured scientific outputs like FASTA or PDB files. The Copilot facilitates high-level experimental planning through an intuitive natural language interface, providing researchers with instant access to synthesized biological knowledge. Bio-Copilot can be expanded into a full-stack AI research environment by integrating multi-modal biological data and advanced simulation pipelines. Beyond real-time PubMed synthesis, it should incorporate genomic, proteomic, and structural databases (e.g., Ensembl, UniProt, AlphaFold) to enable cross-layer reasoning from DNA to phenotype. The platform can include automated CRISPR guide RNA design, off-target prediction, and mutation impact analysis using tools like VEP.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Bio-Switch
 
 Bio-Switch: A design platform for molecular biosensors that trigger genetic signals in response to small molecules or environmental cues. It identifies optimal binding domains and couples them to reporter genes. Bio-Switch enables the development of real-time monitoring tools, providing high sensitivity for detecting metabolites, toxins, or biomarkers.

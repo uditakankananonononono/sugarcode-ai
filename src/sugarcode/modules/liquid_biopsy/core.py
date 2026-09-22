@@ -10,10 +10,11 @@ CTDNA_MARKERS = {
 
 def detect_ctdna(af_signal: list[float], tumor_type: str = "lung",
                  depth: int = 30000) -> dict:
-    """Detect ctDNA from allele-frequency traces with deep-learning-style filters.
+    """Detect ctDNA from allele-frequency traces with statistical filters.
 
     Pipeline: baseline estimation, error-rate-aware variant calling
     (beta-binomial), low-pass signal denoise, raw vs filtered comparison.
+    These are deterministic statistical filters, not a learned/deep model.
     """
     sig = np.asarray(af_signal, dtype=float)
     if sig.ndim != 1 or len(sig) < 8:
@@ -127,15 +128,20 @@ def _softmax(x, axis=-1):
 
 def transformer_denoise(fragment_features, *, heads: int = 4, seed: int = 17,
                         error_prior: float = 1e-3) -> dict:
-    """Contextual somatic-call denoising with a genuine transformer encoder.
+    """Contextual somatic-call denoising with a transformer-encoder computation.
 
     ``fragment_features`` is ``[fragments, positions, channels]``; channels are
     allele support, base quality (0..1), mapping quality (0..1), strand balance
     (0..1), and optional assay covariates. Multi-head scaled dot-product self
     attention, residual layer normalisation and a GELU feed-forward block are
-    evaluated directly in NumPy. The fixed seed makes this hermetic; supplying
-    assay-calibrated inputs is the live path. This is an inference model, not a
-    claim of clinical validation.
+    evaluated directly in NumPy.
+
+    IMPORTANT: every projection/attention/feed-forward weight is drawn from a
+    seeded random generator AT INFERENCE TIME. This is an UNTRAINED,
+    random-weight architecture - the attention mathematics is real, but no
+    weight carries learned signal. The fixed seed makes output hermetic and
+    reproducible; it does not make it trained or calibrated. Do not describe
+    this function as a trained transformer.
     """
     x = np.asarray(fragment_features, dtype=float)
     if x.ndim == 2:
@@ -185,9 +191,10 @@ def transformer_denoise(fragment_features, *, heads: int = 4, seed: int = 17,
         "attention": np.mean(np.stack(attentions), axis=0).tolist(),
         "architecture": {"type": "transformer_encoder", "heads": heads,
                          "d_model": d_model, "layers": 1,
+                         "weights": "random_untrained_seeded_at_inference",
                          "components": ["sinusoidal_position", "scaled_dot_product_attention",
                                         "residual_layer_norm", "GELU_feed_forward"]},
-        "calibration": "deterministic hermetic inference; clinical calibration required",
+        "calibration": "untrained random-weight computation, seeded for reproducibility; not trained, not clinically calibrated",
     }
 
 

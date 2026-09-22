@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # RNA Decoder
 
 RNA Decoder: A tool for predicting epitranscriptomic modifications like m6A from sequence data, using models trained on nanopore datasets. It visualizes modification maps and simulates the impact of synthetic RNA edits on translation efficiency. RNA Decoder allows for the design of optimized mRNA sequences, enhancing stability and expression for therapeutics.

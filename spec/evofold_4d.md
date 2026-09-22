@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # EvoFold 4D
 
 EvoFold 4D: A dynamics engine that predicts protein conformational transitions, such as moving between open and closed states. It models the impact of post-translational modifications and ligand binding on structural flexibility. EvoFold 4D provides temporal traces of morphological changes, offering a four-dimensional view of how protein function is governed.

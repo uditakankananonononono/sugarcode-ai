@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Prime Design
 
 Prime Design: A specialized tool for designing pegRNAs used in Prime Editing, enabling precise insertions, deletions, and point mutations. It identifies optimal reverse transcriptase templates and nicking sites to maximize efficiency. Prime Design performs off-target scans and stability analysis, ensuring that complex genomic changes are achieved with high fidelity.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Promoter Lib
 
 Promoter Lib: A generator for synthetic promoter libraries with predictable expression strengths and transcription factor compatibility. It visualizes regulatory motifs through heatmaps and predicts activity in host environments. Promoter Lib enables researchers to fine-tune gene expression levels with high precision, providing the control necessary for complex synthetic biology applications.

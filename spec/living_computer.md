@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Living Computer
 
 Living Computer: A compiler for cellular logic that designs gene circuits capable of processing biological information. it maps logical operations to genetic parts and simulates signal propagation. Living Computer analyzes stochastic noise, enabling the creation of biological machines that can sense environmental inputs and execute programmed responses with high fidelity.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Docking Studio
 
 Docking Studio: A molecular simulation module that predicts the binding affinity between proteins and small molecules. It identifies key residues in the binding pocket and suggests mutations to enhance interaction strength. Docking Studio provides 3D visualizations, allowing researchers to perform virtual screenings of chemical libraries and optimize lead compounds for discovery.

@@ -1,5 +1,8 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
+88 modules: the 77 from the spec corpus plus 11 beyond-spec published-model
+implementations, all registered (slugs equal their package directory names).
+
 The nine sub-networks are assigned from the module themes in the spec doc
 (the doc states "nine functional sub-networks" without naming them).
 """
@@ -40,7 +43,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("synbio_wizard", "SynBio Wizard", "core-intelligence",
      "Guided synthetic-biology compiler: goal definition to pathway design, chassis selection, feasibility and assembly recommendations."),
     ("neuro_pipeline", "Neuro-Pipeline", "core-intelligence",
-     "Neuro-symbolic MLOps: continual learning, circuit-level explainability, virtual lesion studies, hybrid simulation-learning loops."),
+     "Small numpy MLP with manual-gradient training, EWC continual-update, virtual lesion studies, activation traces and RSA analysis."),
     ("biogpt_lit", "BioGPT Lit", "core-intelligence",
      "Self-indexing scientific reasoning engine: entity/relationship extraction into a temporal knowledge graph, contradiction detection, hypothesis generation."),
     ("chemgpt_engine", "ChemGPT Engine", "fabrication-evolution",
@@ -56,7 +59,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("crispr_cargo", "CRISPR Cargo", "genome-editing",
      "Delivery-system optimization: LNP/AAV serotype selection per payload and tissue, pharmacokinetic concentration models."),
     ("crispr_muse", "CRISPR Muse", "genome-editing",
-     "RL-style gRNA generator refined through simulated lab feedback loops; multi-PAM compatibility."),
+     "gRNA generator refined through deterministic simulated feedback loops (not reinforcement learning); multi-PAM compatibility."),
     ("epi_edit", "Epi-Edit", "genome-editing",
      "Epigenome engineering via CRISPRa/i: chromatin landscape, histone marks and accessibility modeling."),
     ("prime_design", "Prime Design", "genome-editing",
@@ -148,7 +151,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("neodti_engine", "NeoDti Engine", "therapeutics",
      "Drug repurposing via graph learning on drug-target interactions; Therapeutic Resilience Index."),
     ("liquid_biopsy", "Liquid Biopsy", "therapeutics",
-     "ctDNA detection with deep-learning noise filters; biomarker selection, raw vs filtered signal."),
+     "ctDNA detection with error-rate-aware statistical filters (beta-binomial floor, smoothing); biomarker selection, raw vs filtered signal."),
     ("rarenet_ai", "RareNet AI", "therapeutics",
      "Rare-disease diagnostic reasoning over symptoms + multi-omics with explainable confidence."),
     ("oncocircuit", "OncoCircuit", "therapeutics",
@@ -187,6 +190,32 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Documentation and SDK hub: programmatic access snippets, plugin architecture, standards."),
     ("nexus_support", "Nexus Support", "platform",
      "Communication node: inquiries, custom AI build requests, technical support routing."),
+    # Beyond-spec modules: real published-model/computational implementations
+    # added after the 77-module spec corpus was fully built. Registered here so
+    # every package in src/sugarcode/modules/ is canonical (audit finding:
+    # registry/source mismatch). Slugs equal their package directory names.
+    ("cfd_offtarget", "CFD Off-Target", "genome-editing",
+     "Published Doench 2016 Cutting Frequency Determination SpCas9 off-target scoring, vendored exactly with provenance."),
+    ("crisprater", "CRISPRater", "genome-editing",
+     "Published CRISPRater linear sgRNA efficacy model (Labuhn et al. 2018), vendored exactly with provenance."),
+    ("mit_offtarget", "MIT Off-Target", "genome-editing",
+     "Published MIT/Hsu 2013 SpCas9 pairwise off-target scoring and aggregate guide specificity."),
+    ("structural_biophysics", "Structural Biophysics", "protein-engineering",
+     "Coordinate-based structural biophysics: Vina-style docking scores, SASA, interface desolvation, pose refinement."),
+    ("syn_bio_studio", "Syn-Bio Studio (spec slug)", "synthetic-biology",
+     "Circuit architecture compiler with Hill logic, toggle/oscillator ODE simulation and seeded Gillespie expression; no synthesis claims."),
+    ("dti_bench", "DTI Bench", "therapeutics",
+     "Target-conditioned drug-target interaction baselines (proteochemometric ridge) with cold-start validation on ChEMBL pairs."),
+    ("pgx_guidelines", "PGx Guidelines", "therapeutics",
+     "CPIC-aligned pharmacogenomic decision support with provenance-preserved guideline translation."),
+    ("evidence_mining", "Evidence Mining", "core-intelligence",
+     "Live, cached evidence mining from PubMed and ClinicalTrials.gov feeding downstream modules."),
+    ("neuro_hub_dashboard", "Neuro-Hub Dashboard (spec slug)", "core-intelligence",
+     "Spec-named dashboard surface: platform health, compute-flux series, unified search and diagnostics over the Neuro-Hub core."),
+    ("qsar_bench", "QSAR Bench", "fabrication-evolution",
+     "Reproducible, dependency-light QSAR benchmarking against ChEMBL reference data."),
+    ("molecule_eval", "Molecule Eval", "fabrication-evolution",
+     "Auditable evaluation of generated molecular libraries: validity, novelty and Pareto fronts vs ChEMBL reference."),
 ]
 
 _VERIFIED = {slug for slug, _, _, _ in _MODULES}

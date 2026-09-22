@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Dark Genome
 
 Dark Genome: A decoder for non-coding DNA, identifying hidden enhancers and functional RNA elements within the "dark matter" of the genome. It correlates variations in these regions with disease risk and generates novel hypotheses. Dark Genome maps the regulatory landscape, helping researchers understand how non-protein-coding sequences influence biological phenotypes.
