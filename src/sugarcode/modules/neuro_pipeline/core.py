@@ -115,3 +115,59 @@ def rsa(model: MLP, n_in: int = 6, n_stimuli: int = 40, seed: int = 7) -> dict:
         "interpretation": ("high" if corr > 0.5 else "moderate" if corr > 0.25 else "low")
         + " geometry preservation between input and hidden manifolds",
     }
+
+# Explicit multimodal, continual-learning and causal-debugging extensions.
+def align_modalities(modalities,latent_dim=4):
+    if len(modalities)<2: raise ValueError('at least two modalities required')
+    embeddings={}; reconstruction={}
+    for name,X in modalities.items():
+        X=np.asarray(X,float); centered=X-X.mean(0); u,s,vt=np.linalg.svd(centered,full_matrices=False); k=min(latent_dim,vt.shape[0]); z=centered@vt[:k].T; embeddings[name]=z; reconstruction[name]=float(np.mean((centered-z@vt[:k])**2))
+    n=min(map(len,embeddings.values())); names=list(embeddings); similarities={}
+    for i,a in enumerate(names):
+        for b in names[i+1:]:
+            za=embeddings[a][:n]; zb=embeddings[b][:n]; k=min(za.shape[1],zb.shape[1]); similarities[f'{a}:{b}']=float(np.mean(np.sum(za[:,:k]*zb[:,:k],1)/(np.linalg.norm(za[:,:k],axis=1)*np.linalg.norm(zb[:,:k],axis=1)+1e-9)))
+    return {'embeddings':{k:v.tolist() for k,v in embeddings.items()},'cross_modal_cosine':similarities,'reconstruction_mse':reconstruction,'latent_dim':latent_dim}
+
+def spiking_dynamics(inputs,threshold=1,decay=.9,refractory_steps=1):
+    X=np.asarray(inputs,float); v=np.zeros(X.shape[1]); ref=np.zeros(X.shape[1],int); spikes=[]; voltage=[]
+    for x in X:
+        v=decay*v+x; v[ref>0]=0; fire=v>=threshold; spikes.append(fire.astype(int).tolist()); v[fire]=0; ref=np.maximum(0,ref-1); ref[fire]=refractory_steps; voltage.append(v.copy().tolist())
+    return {'spikes':spikes,'voltage':voltage,'firing_rate':np.asarray(spikes).mean(0).tolist()}
+
+def predictive_coding(observations,steps=20,learning_rate=.1):
+    y=np.asarray(observations,float); state=np.zeros_like(y[0]); errors=[]; trajectory=[]
+    target=y.mean(0)
+    for _ in range(steps):
+        err=target-state; errors.append(float(np.mean(err**2))); state+=learning_rate*err; trajectory.append(state.copy().tolist())
+    return {'latent_state':state.tolist(),'prediction_error':errors,'trajectory':trajectory}
+
+def continual_update(model,X,y,previous=None,lr=.1,epochs=20,ewc_lambda=1):
+    old=[model.W1.copy(),model.W2.copy()] if previous is None else previous
+    losses=[]
+    for _ in range(epochs):
+        loss=model.backward(np.asarray(X,float),np.asarray(y,float),lr); model.W1-=lr*ewc_lambda*(model.W1-old[0])/len(X); model.W2-=lr*ewc_lambda*(model.W2-old[1])/len(X); losses.append(loss)
+    drift=float(np.linalg.norm(model.W1-old[0])+np.linalg.norm(model.W2-old[1])); return {'model':model,'loss_curve':losses,'parameter_drift':drift,'ewc_lambda':ewc_lambda}
+
+def functional_connectivity(model,threshold=.15):
+    strength=np.abs(model.W1[:,:,None]*model.W2[None,:,:]).sum(2); edges=[]
+    for i in range(strength.shape[0]):
+        for h in range(strength.shape[1]):
+            if strength[i,h]>=threshold: edges.append({'source':f'input:{i}','target':f'hidden:{h}','strength':float(strength[i,h])})
+    return {'nodes':strength.shape[0]+strength.shape[1]+model.W2.shape[1],'edges':edges,'density':len(edges)/max(1,strength.size)}
+
+def causal_intervention(model,X,feature,value=0):
+    X=np.asarray(X,float); baseline=model.forward(X); do=X.copy(); do[:,feature]=value; changed=model.forward(do); delta=changed-baseline; return {'feature':feature,'value':value,'baseline_mean':baseline.mean(0).tolist(),'intervened_mean':changed.mean(0).tolist(),'average_causal_effect':delta.mean(0).tolist(),'individual_effects':delta.tolist()}
+
+def physics_cotraining(model,X,y,simulator_targets,lr=.1,physics_weight=.5,epochs=20):
+    X=np.asarray(X,float); y=np.asarray(y,float); sim=np.asarray(simulator_targets,float); target=(1-physics_weight)*y+physics_weight*sim; losses=[]
+    for _ in range(epochs): losses.append(model.backward(X,target,lr))
+    pred=model.forward(X); return {'model':model,'loss_curve':losses,'data_mse':float(np.mean((pred-y)**2)),'physics_mse':float(np.mean((pred-sim)**2)),'physics_weight':physics_weight}
+
+def feedback_reward_update(prior_alpha,prior_beta,outcomes):
+    o=np.asarray(outcomes,float); a=prior_alpha+o.sum(); b=prior_beta+len(o)-o.sum(); return {'alpha':float(a),'beta':float(b),'reward_mean':float(a/(a+b)),'uncertainty':float(np.sqrt(a*b/((a+b)**2*(a+b+1))))}
+
+def pipeline_report(seed=42):
+    run=train(epochs=80,seed=seed); model=run['model']; lesion=lesion_study(model); connectivity=functional_connectivity(model); x=np.eye(6); causal=causal_intervention(model,x,0); return {'training':{k:v for k,v in run.items() if k!='model'},'connectivity':connectivity,'lesion':lesion,'causal':causal,'rsa':rsa(model),'feedback':feedback_reward_update(1,1,[1,0,1]),'model_status':'A real small NumPy MLP and explicit algorithms; no biological foundation model or autonomous lab agent is bundled.'}
+
+def neuro_diagnostics(seed=42):
+    r=pipeline_report(seed); t=r['training']; l=r['lesion']; c=r['connectivity']; ca=r['causal']; return {'final_loss':t['final_loss'],'train_accuracy':t['train_accuracy'],'stdp_modulation':t['stdp_modulation'],'connectivity_edges':float(len(c['edges'])),'connectivity_density':c['density'],'lesion_baseline_accuracy':l['baseline_accuracy'],'critical_unit_count':float(len(l['critical_units'])),'max_lesion_drop':max((x['accuracy_drop'] for x in l['lesions']),default=0),'rsa_correlation':r['rsa']['rsa_correlation'],'causal_effect_abs':float(np.mean(np.abs(ca['average_causal_effect']))),'reward_mean':r['feedback']['reward_mean'],'reward_uncertainty':r['feedback']['uncertainty']}
