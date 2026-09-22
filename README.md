@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 448 tests
+python -m pytest -q                 # 452 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
