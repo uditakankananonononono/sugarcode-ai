@@ -270,3 +270,60 @@ def structure_resistance_scan(identifier: str, drugs: dict[str, str],
         "note": "hotspot positions use real structure residue numbering",
     })
     return scan
+
+# Explicit structural/ensemble/epistasis extensions; no learned GNN potential.
+import math
+import numpy as np
+
+def local_repack(coords,mutation_index,size_delta=0,steps=25):
+    x=np.asarray(coords,float).copy(); center=x[mutation_index].copy(); trace=[]
+    for _ in range(steps):
+        e=0; grad=np.zeros_like(x)
+        for i in range(len(x)):
+            if i==mutation_index: continue
+            d=x[i]-center; r=max(.5,np.linalg.norm(d)); target=3.8+.4*size_delta; diff=r-target; e+=.5*diff*diff; grad[i]+=diff*d/r
+        x-=.02*np.clip(grad,-2,2); trace.append(float(e))
+    return {'coordinates':x.tolist(),'energy_trace':trace,'converged':trace[-1]<=trace[0]}
+
+def interaction_graph(pocket,smiles):
+    d=dock(pocket,smiles); nodes=[{'id':i,'residue':a,'type':'residue'} for i,a in enumerate(pocket)]+[{'id':'ligand','type':'ligand'}]; edges=[]
+    polar=d['ligand']['hbond_capacity']>0
+    for i,a in enumerate(pocket):
+        if a in 'HDESTNQCY' and polar: edges.append({'source':i,'target':'ligand','interaction':'hbond','strength':1})
+        if a in 'AILMFWVY' and d['ligand']['heavy_atoms']>1: edges.append({'source':i,'target':'ligand','interaction':'hydrophobic','strength':.7})
+    return {'nodes':nodes,'edges':edges,'fingerprint':{k:sum(e['interaction']==k for e in edges) for k in ('hbond','hydrophobic')}}
+
+def graph_perturbation(pocket,smiles,position,mutant):
+    wt=interaction_graph(pocket,smiles); mp=pocket[:position]+mutant+pocket[position+1:]; mt=interaction_graph(mp,smiles); return {'wild_type':wt,'mutant':mt,'lost_contacts':max(0,len(wt['edges'])-len(mt['edges'])),'gained_contacts':max(0,len(mt['edges'])-len(wt['edges']))}
+
+def ensemble_mutation_effect(pocket_ensemble,smiles,position,mutant):
+    effects=[mutation_effect(p,smiles,position,mutant) for p in pocket_ensemble]; ddg=np.array([x['ddg_kcal_mol'] for x in effects]); w=np.exp(-np.array([dock(p,smiles)['binding_dg_kcal_mol'] for p in pocket_ensemble])/.593); w/=w.sum(); mean=float(w@ddg); var=float(w@((ddg-mean)**2)); return {'conformations':effects,'weights':w.tolist(),'ddg_mean':mean,'ddg_std':math.sqrt(var),'resistance_probability':float(sum(w*(ddg>.5)))}
+
+def epistasis_effect(pocket,smiles,mutations):
+    single=[]
+    for pos,aa in mutations: single.append(mutation_effect(pocket,smiles,pos,aa)['ddg_kcal_mol'])
+    mutant=list(pocket)
+    for pos,aa in mutations: mutant[pos]=aa
+    combined=dock(''.join(mutant),smiles)['binding_dg_kcal_mol']-dock(pocket,smiles)['binding_dg_kcal_mol']; additive=sum(single); return {'single_ddg':single,'combined_ddg':combined,'additive_expectation':additive,'epistasis':combined-additive,'classification':'synergistic' if combined-additive>.25 else 'compensatory' if combined-additive<-.25 else 'additive'}
+
+def mutational_fitness_landscape(pocket,smiles,positions=None):
+    positions=positions or range(len(pocket)); variants=[]
+    for p in positions:
+        for aa in 'ACDEFGHIKLMNPQRSTVWY':
+            if aa!=pocket[p]:
+                r=mutation_effect(pocket,smiles,p,aa); fitness=math.exp(-max(0,r['ddg_kcal_mol'])) ; variants.append({**r,'position':p,'fitness_proxy':fitness})
+    return {'variants':variants,'resistance_hotspots':sorted(variants,key=lambda x:-x['ddg_kcal_mol'])[:10]}
+
+def cross_drug_matrix(pocket,drugs,mutations):
+    matrix=[]
+    for pos,aa in mutations: matrix.append({'mutation':f'{pocket[pos]}{pos+1}{aa}','ddg':{name:mutation_effect(pocket,smi,pos,aa,drug_name=name)['ddg_kcal_mol'] for name,smi in drugs.items()}})
+    return {'drugs':list(drugs),'rows':matrix,'broad_resistance':[r['mutation'] for r in matrix if sum(v>.5 for v in r['ddg'].values())>1]}
+
+def evolutionary_forecast(pocket,smiles,generations=20,mutation_rate=.05,population=1000):
+    landscape=mutational_fitness_landscape(pocket,smiles); beneficial=[v for v in landscape['variants'] if v['ddg_kcal_mol']>.5]; rate=mutation_rate*len(beneficial)/max(1,len(landscape['variants'])); probability=[1-math.exp(-population*rate*(g+1)/population) for g in range(generations)]; return {'generations':list(range(1,generations+1)),'resistance_emergence_probability':probability,'accessible_resistance_variants':len(beneficial),'status':'population-genetic proxy, not patient prognosis'}
+
+def mutdock_report(pocket,drugs,mutations):
+    matrix=cross_drug_matrix(pocket,drugs,mutations); epi=epistasis_effect(pocket,next(iter(drugs.values())),mutations[:2]) if len(mutations)>=2 else None; return {'cross_drug':matrix,'epistasis':epi,'fitness':mutational_fitness_landscape(pocket,next(iter(drugs.values()))),'forecast':evolutionary_forecast(pocket,next(iter(drugs.values()))),'model_status':'Transparent docking-feature, ensemble and epistasis models; no trained GNN and not clinical treatment guidance.'}
+
+def mutdock_diagnostics(pocket,smiles,position,mutant):
+    r=mutation_effect(pocket,smiles,position,mutant); g=graph_perturbation(pocket,smiles,position,mutant); f=mutational_fitness_landscape(pocket,smiles,[position]); vals=np.array([x['ddg_kcal_mol'] for x in f['variants']]); return {'pocket_length':float(len(pocket)),'position':float(position),'wt_dg':r['wt_dg'],'mutant_dg':r['mutant_dg'],'ddg':r['ddg_kcal_mol'],'affinity_fold':r['affinity_change_fold'],'hotspot':float(r['hotspot']),'wt_contacts':float(len(g['wild_type']['edges'])),'mutant_contacts':float(len(g['mutant']['edges'])),'lost_contacts':float(g['lost_contacts']),'gained_contacts':float(g['gained_contacts']),'scan_ddg_mean':float(vals.mean()),'scan_ddg_std':float(vals.std()),'scan_ddg_max':float(vals.max())}
