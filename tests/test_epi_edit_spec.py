@@ -6,6 +6,13 @@ SEQ=('ATGC'*120)+'AGG'+('TGACTCA'*50)+'AGG'+('GC'*200)
 def test_legacy_landscape_and_nonpermanent_design():
  l=chromatin_landscape(SEQ); r=design_epigenome_edit(SEQ,(400,500),'CRISPRi'); assert l['track'] and r['non_permanent'] and r['mode']=='CRISPRi'
 
+def test_all_declared_histone_marks_have_assignment_paths():
+ seq=('CG'*120)+('A'*240)+('TGACTCA'*40)+('GC'*120)
+ landscape=chromatin_landscape(seq,(700,900))
+ observed={mark for tile in landscape['track'] for mark in tile['marks']}
+ assert {'H3K4me3','H3K27ac','H3K27me3','H3K9me3','H3K36me3'} <= observed
+
+
 def test_effector_activation_and_repression():
  krab=effector_response('KRAB',.8); p300=effector_response('p300',.8); assert krab['relative_expression']<p300['relative_expression'] and krab['state']['methylation']>p300['state']['methylation']
 

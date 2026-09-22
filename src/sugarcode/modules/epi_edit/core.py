@@ -33,6 +33,12 @@ def chromatin_landscape(seq: str, promoter_span: tuple[int, int] | None = None) 
             marks.append("H3K27ac")
         if gc < 0.35 and tf_hits == 0:
             marks.append("H3K9me3")
+        # Polycomb-like closed CpG domains without active TF occupancy.
+        if cpg >= 3 and tf_hits == 0 and accessibility < 0.45:
+            marks.append("H3K27me3")
+        # Gene-body proxy: tiles overlapping the supplied transcribed span.
+        if promoter_span and i < promoter_span[1] and i + window > promoter_span[0] and gc >= 0.35:
+            marks.append("H3K36me3")
         track.append({"start": i, "end": i + window, "gc": round(gc, 3),
                       "tf_motifs": tf_hits, "accessibility": round(accessibility, 3),
                       "marks": marks})
