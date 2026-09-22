@@ -1,3 +1,4 @@
-"""MutDock: mutation effects on drug affinity + cross-resistance forecast."""
-from .core import mutation_effect, resistance_scan, live_mutation_context, structure_resistance_scan
-__all__ = ["mutation_effect", "resistance_scan", "live_mutation_context", "structure_resistance_scan"]
+"""Mutation-aware docking, resistance and epistasis."""
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
