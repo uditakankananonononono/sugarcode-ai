@@ -20,3 +20,7 @@ def test_workspace_preserves_pair_representation():
  msa=[SEQ,SEQ[:-1]+'A',SEQ[:-1]+'V']; r=folding_workspace(SEQ,msa); assert r['msa']['depth']==3 and r['pair_representation'] and 'no AlphaFold neural weights' in r['model_status']
 def test_diagnostics_honest_finite_and_sequence_sensitive():
  a=structure_diagnostics(SEQ); b=structure_diagnostics('GGGGGGGGGGGG'); assert len(a)==14 and all(math.isfinite(x) for x in a.values()) and sum(a[k]!=b[k] for k in a)>=8
+
+def test_mutation_hydrophobic_term_is_live():
+ hyd=mutation_stability('AAAA',0,'V'); polar=mutation_stability('AAAA',0,'D')
+ assert hyd['terms']['hydrophobicity'] != polar['terms']['hydrophobicity'] and hyd['ddg_relative'] != polar['ddg_relative']
