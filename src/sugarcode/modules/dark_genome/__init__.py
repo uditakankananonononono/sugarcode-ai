@@ -1,3 +1,3 @@
-"""Dark Genome: non-coding element decoder (enhancers, lncRNA, motifs, CpG)."""
-from .core import decode
-__all__ = ["decode"]
+"""Multi-scale non-coding regulatory inference and perturbation design."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]
