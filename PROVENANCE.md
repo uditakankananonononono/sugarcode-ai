@@ -14,3 +14,10 @@
   effect n=82, 1 = splicing defect n=38), `data/variantBP.txt` from the same repo. Variants sit
   at c.-44..-18 (median -25) relative to the 3' splice site; cNomen is cDNA-based and therefore
   build-independent.
+
+## U12 acceptor PWM column 14 (drop 55, 2026-09-22)
+The intronIC export carried no downstream flank, so both U12 acceptor matrices shipped with a
+uniform 0.25 placeholder at column 14 (+1 exonic). Replaced with the U2 acceptor +1 column
+(1,170-junction harvest) as a documented approximation: the exonic +1 base preference is
+spliceosome-independent. Verified no U12-golden fixture case sits at acceptor +1 exonic, so no
+existing delta changes; U2 matrix untouched.

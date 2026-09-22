@@ -656,10 +656,11 @@
    "index": 13,
    "ref_score": 0.9265,
    "alt_score": 0.7215,
-   "delta": -0.205,
+   "delta": -0.195,
    "sig": "pathogenic",
    "review": "criteria provided, single submitter",
-   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk",
+   "delta_note": "drop 55 re-lock: U12 AT-AC acceptor column-14 de-placeholder shifted the matrix normalization"
   },
   {
    "notation": "c.4477-3T>C",
@@ -668,10 +669,11 @@
    "index": 11,
    "ref_score": 0.9372,
    "alt_score": 0.949,
-   "delta": 0.0118,
+   "delta": 0.0111,
    "sig": "pathogenic",
    "review": "criteria provided, multiple submitters, no conflicts",
-   "consequence": "minimal predicted effect on splicing"
+   "consequence": "minimal predicted effect on splicing",
+   "delta_note": "drop 55 re-lock: U12 AT-AC acceptor column-14 de-placeholder shifted the matrix normalization"
   },
   {
    "notation": "c.3429+1G>T",
@@ -824,10 +826,11 @@
    "index": 13,
    "ref_score": 0.9372,
    "alt_score": 0.7323,
-   "delta": -0.2049,
+   "delta": -0.195,
    "sig": "pathogenic",
    "review": "criteria provided, multiple submitters, no conflicts",
-   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk",
+   "delta_note": "drop 55 re-lock: U12 AT-AC acceptor column-14 de-placeholder shifted the matrix normalization; same strong-loss call"
   },
   {
    "notation": "c.4853-1G>C",
@@ -992,10 +995,11 @@
    "index": 12,
    "ref_score": 0.9372,
    "alt_score": 0.7323,
-   "delta": -0.2049,
+   "delta": -0.195,
    "sig": "pathogenic",
    "review": "criteria provided, multiple submitters, no conflicts",
-   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk",
+   "delta_note": "drop 55 re-lock: U12 AT-AC acceptor column-14 de-placeholder shifted the matrix normalization; same strong-loss call"
   },
   {
    "notation": "c.264+5G>A",

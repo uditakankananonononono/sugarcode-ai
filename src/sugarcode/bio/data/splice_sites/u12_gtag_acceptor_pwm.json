@@ -85,11 +85,12 @@
    "T": 0.0013774104683195593
   },
   {
-   "A": 0.25,
-   "C": 0.25,
-   "G": 0.25,
-   "T": 0.25
+   "A": 0.25070224719101125,
+   "C": 0.136938202247191,
+   "G": 0.4922752808988764,
+   "T": 0.12008426966292135
   }
  ],
- "n_sites": 361
+ "n_sites": 361,
+ "column14_note": "drop 55: uniform 0.25 placeholder replaced with the U2 acceptor +1 exonic column (A 0.2507 C 0.1369 G 0.4923 T 0.1201, 1,170-junction harvest) as a documented approximation - the exonic +1 preference is spliceosome-independent; no U12-golden fixture case sits at acceptor +1 exonic, so no existing delta changes"
 }
