@@ -5,6 +5,7 @@ exponential-backoff retries, on-disk JSON/XML cache, and an explicit
 offline mode for tests and air-gapped runs.
 """
 from __future__ import annotations
+import http.client
 import json
 import time
 import urllib.error
@@ -48,7 +49,8 @@ def _get(path: str, params: dict, offline: bool = False, retries: int = 3) -> by
                 data = r.read()
             cache_file.write_bytes(data)
             return data
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError,
+                http.client.IncompleteRead, ConnectionError) as e:
             if attempt == retries - 1:
                 raise EntrezError(f"E-utilities request failed after {retries} tries: {e}") from e
             time.sleep(delay)

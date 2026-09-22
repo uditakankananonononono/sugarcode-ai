@@ -1,0 +1,3477 @@
+{
+ "source": "ClinVar live unfiltered sweep 2026-09-22: coding substitutions at +1..+3 of acceptor exons (28 genes), scored with acceptor_exon_pwm (harvest-learned offline; no golden fit); per-variant ref-base verified",
+ "genes": {
+  "PKD1": {
+   "cases": [
+    {
+     "notation": "c.288G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.7866C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "TAC",
+     "delta": -0.0197,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.10619G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "MSH2": {
+   "cases": [
+    {
+     "notation": "c.212G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2211G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.367G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2460T>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GTG",
+     "delta": -0.9219,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.943G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.943G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1077A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": 1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2459G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2211G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.646A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATA",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1511G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2008C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GCC",
+     "delta": -0.0197,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2637A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CAA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2006G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCC",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.1077A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": -0.931,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.944G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.9219,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "TSC1": {
+   "cases": [
+    {
+     "notation": "c.914G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.6898,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.1264G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.1142C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1031C>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GCT",
+     "delta": -0.2308,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1334A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "AAG",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2977C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCT",
+     "delta": 0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1030G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1030G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2626G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2815G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "AGG",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.915G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1335A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "AAG",
+     "delta": -0.2805,
+     "sig": "benign",
+     "clinvar_sig": "Benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "APC": {
+   "cases": [
+    {
+     "notation": "c.935T>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GTG",
+     "delta": -0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.936G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GTG",
+     "delta": -0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.646C>A",
+     "exonic_offset": 1,
+     "ref_triplet": "CGA",
+     "delta": 0.4296,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.731G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "AGG",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.423G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.532T>A",
+     "exonic_offset": 1,
+     "ref_triplet": "TTT",
+     "delta": 0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.423G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.836G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1959G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -1.2602,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.646C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CGA",
+     "delta": -0.5014,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "MUTYH": {
+   "cases": [
+    {
+     "notation": "c.577G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.160T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "CCT",
+     "delta": 0.0197,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "VHL": {
+   "cases": [
+    {
+     "notation": "c.341G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.6898,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.341G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "criteria provided, single submitter"
+    }
+   ]
+  },
+  "PALB2": {
+   "cases": [
+    {
+     "notation": "c.3114G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "no assertion criteria provided"
+    },
+    {
+     "notation": "c.2749G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1685G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3351G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2835G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGC",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.3114G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.2602,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2750T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "GTT",
+     "delta": -0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.110G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "CGT",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "MYH7": {
+   "cases": [
+    {
+     "notation": "c.2163G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.5561C>A",
+     "exonic_offset": 2,
+     "ref_triplet": "ACG",
+     "delta": 0.0497,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.531C>A",
+     "exonic_offset": 1,
+     "ref_triplet": "CGG",
+     "delta": 0.4296,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.5657A>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GAG",
+     "delta": 0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4170G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5286C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GCC",
+     "delta": -0.0197,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.532G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "CGG",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2287G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5562G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "ACG",
+     "delta": -0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "F8": {
+   "cases": [
+    {
+     "notation": "c.603G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.9219,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.671G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.788G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.2114G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.6117G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "AGT",
+     "delta": 0.9219,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.6190C>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GAC",
+     "delta": -0.3212,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.6430G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.6901G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5999G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6118T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AGT",
+     "delta": -0.0933,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.5999G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.6276G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GTG",
+     "delta": -0.2082,
+     "sig": "benign",
+     "clinvar_sig": "Benign",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "PMS2": {
+   "cases": [
+    {
+     "notation": "c.1145G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2446G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.538G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.538G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1146T>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GTA",
+     "delta": -0.9219,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2175A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ACC",
+     "delta": 1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2176C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "ACC",
+     "delta": 0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1146T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "GTA",
+     "delta": -0.6912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.24T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TAC",
+     "delta": 0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.991T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AAT",
+     "delta": -0.0933,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.355G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "CGA",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2447T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GTG",
+     "delta": -0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1145G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.538G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2446G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.354C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CGA",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.164A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.166C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.113,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.708G>T",
+     "exonic_offset": 3,
+     "ref_triplet": "TTG",
+     "delta": 0.0933,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "CHEK2": {
+   "cases": [
+    {
+     "notation": "c.1009T>G",
+     "exonic_offset": 1,
+     "ref_triplet": "TAC",
+     "delta": 2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.593T>A",
+     "exonic_offset": 1,
+     "ref_triplet": "TTT",
+     "delta": 0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1260C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CCT",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1462G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.793G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.445G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1462G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.847C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CCT",
+     "delta": -0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.909G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.685G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGG",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.793G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "MECP2": {
+   "cases": [
+    {
+     "notation": "c.63G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    }
+   ]
+  },
+  "BRCA2": {
+   "cases": [
+    {
+     "notation": "c.477G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGG",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8635A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AAA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.9649A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATG",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.7977A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATA",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.7618C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CTG",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.682A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "AAT",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.8955T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "TTA",
+     "delta": -0.6912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.6842G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.70T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "ATT",
+     "delta": -0.0933,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.517G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.9650T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8634A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "AAA",
+     "delta": -0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.7620G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "CTG",
+     "delta": -0.2082,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.9118G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.517G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.6898,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1911T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "GTT",
+     "delta": -0.6912,
+     "sig": "benign",
+     "clinvar_sig": "Benign",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.9118G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8489G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGG",
+     "delta": 0.2805,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.6842G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.518G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.9219,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.517G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "PAH": {
+   "cases": [
+    {
+     "notation": "c.1068C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "TAC",
+     "delta": -0.0197,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.843T>A",
+     "exonic_offset": 1,
+     "ref_triplet": "TGA",
+     "delta": 0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.510T>G",
+     "exonic_offset": 1,
+     "ref_triplet": "TGG",
+     "delta": 2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.511G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGG",
+     "delta": 0.2805,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.442G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.2602,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.1068C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "TAC",
+     "delta": -0.113,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "MSH6": {
+   "cases": [
+    {
+     "notation": "c.3439G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3802G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4002G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.458G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3804A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GCA",
+     "delta": 0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.263G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "TTG",
+     "delta": -0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.3557G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "DMD": {
+   "cases": [
+    {
+     "notation": "c.2623G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.3605G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "AGA",
+     "delta": 0.9219,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5740G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.8938G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.8939C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCA",
+     "delta": 0.6912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.9164C>A",
+     "exonic_offset": 1,
+     "ref_triplet": "CGT",
+     "delta": 0.4296,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.9808G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.10263G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCC",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.10924G>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GTG",
+     "delta": 0.0933,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.11015G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.1151G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGG",
+     "delta": 0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.7544C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCA",
+     "delta": 0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.9975G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4345A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "AAA",
+     "delta": -0.931,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.3433G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.10554G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3789A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GAA",
+     "delta": 0.2082,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6292C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCG",
+     "delta": 0.6912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "TP53": {
+   "cases": [
+    {
+     "notation": "c.673G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.560G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1101C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CCA",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.560G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.378C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "TAC",
+     "delta": -0.113,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.783T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TGG",
+     "delta": 0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    }
+   ]
+  },
+  "PTEN": {
+   "cases": [
+    {
+     "notation": "c.165G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.165G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.494G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.255T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "TTG",
+     "delta": -0.6912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.635A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "NF1": {
+   "cases": [
+    {
+     "notation": "c.8114G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.2252G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2412T>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GCT",
+     "delta": -0.3016,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.6922G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1642G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5269G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.7741A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AAA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.6148G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6706T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATT",
+     "delta": -0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2851G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1722C>G",
+     "exonic_offset": 1,
+     "ref_triplet": "CTC",
+     "delta": 1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.4578G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.7458G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2002G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3200A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AGA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4431G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5271T>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GTT",
+     "delta": -0.3016,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.889A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "AAG",
+     "delta": -0.931,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2326G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4578G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6644C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCA",
+     "delta": 0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6148G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.655G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1263C>A",
+     "exonic_offset": 3,
+     "ref_triplet": "TCC",
+     "delta": -0.3212,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.3975G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.7458G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1642G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.7616G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8378G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8379A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GAA",
+     "delta": -0.2805,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4431G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2851G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1846C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1846C>G",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": 1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6820G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.3114G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2993A>C",
+     "exonic_offset": 3,
+     "ref_triplet": "GTA",
+     "delta": 0.3212,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4432T>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GTT",
+     "delta": -0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4333A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATA",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    }
+   ]
+  },
+  "BRCA1": {
+   "cases": [
+    {
+     "notation": "c.594T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TGT",
+     "delta": 0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.548G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.548G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4358C>G",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": 1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.5409T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GGT",
+     "delta": -0.0933,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5409T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "GGT",
+     "delta": 0.0197,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5409T>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GGT",
+     "delta": -0.3016,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5408G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4988T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.136T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATT",
+     "delta": -0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.135A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": 1.2602,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.213G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5076T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6912,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5076T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6415,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5469A>T",
+     "exonic_offset": 2,
+     "ref_triplet": "CAA",
+     "delta": 0.6415,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.5469A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "CAA",
+     "delta": -0.2805,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.82C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "TCT",
+     "delta": 0.6912,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5469A>C",
+     "exonic_offset": 2,
+     "ref_triplet": "CAA",
+     "delta": -0.0497,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5335C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.113,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5196T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "CAT",
+     "delta": 0.0197,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5280C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.0197,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.4358C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.595G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGT",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.548G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.4360G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "CAG",
+     "delta": -0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.303T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6912,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.4485G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4099G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GTG",
+     "delta": -0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4097G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.442C>A",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": 0.4296,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.442C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5407G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5280C>A",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.3212,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.5334T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATC",
+     "delta": -0.6912,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5470A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CAA",
+     "delta": 0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.81T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TCT",
+     "delta": 0.5014,
+     "sig": "benign",
+     "clinvar_sig": "Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5154G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GGG",
+     "delta": 0.2805,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.4988T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "ATG",
+     "delta": -0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4186C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.135A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": -0.931,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5408G>C",
+     "exonic_offset": 2,
+     "ref_triplet": "GGT",
+     "delta": 0.2308,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "ATM": {
+   "cases": [
+    {
+     "notation": "c.5675A>C",
+     "exonic_offset": 1,
+     "ref_triplet": "AGT",
+     "delta": -0.4296,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.8586T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TTG",
+     "delta": -0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.8013G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "GTG",
+     "delta": -0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.3285A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1608T>A",
+     "exonic_offset": 1,
+     "ref_triplet": "TCC",
+     "delta": 0.931,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.8988T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TGA",
+     "delta": 0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.3994A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATT",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8672G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2639G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4110G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.3154G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.902G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6097C>G",
+     "exonic_offset": 2,
+     "ref_triplet": "ACT",
+     "delta": -0.2308,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.903T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "GTG",
+     "delta": -0.6912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.7789G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.3155C>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GCT",
+     "delta": -0.2308,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1608T>C",
+     "exonic_offset": 1,
+     "ref_triplet": "TCC",
+     "delta": 0.5014,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3078G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCA",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.8269G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.8420A>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GAG",
+     "delta": 0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4238A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GAT",
+     "delta": -0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4110G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.4439C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GCC",
+     "delta": -0.0197,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.74A>G",
+     "exonic_offset": 2,
+     "ref_triplet": "AAA",
+     "delta": -0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.7092A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GCA",
+     "delta": 0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.75A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AAA",
+     "delta": 0.2082,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.4239T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "GAT",
+     "delta": 0.0197,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4612G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.6573A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": 1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.7789G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAT",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8419G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.4612G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.8269G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8851G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3748T>A",
+     "exonic_offset": 2,
+     "ref_triplet": "ATC",
+     "delta": -0.6415,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.8419G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.7091C>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GCA",
+     "delta": 0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.7517G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "AGA",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    }
+   ]
+  },
+  "RB1": {
+   "cases": [
+    {
+     "notation": "c.138G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.940G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1218C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "AAC",
+     "delta": -0.113,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.610G>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GGG",
+     "delta": 0.0933,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1424A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CAA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.266G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.2805,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1499G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1815G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.940G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1129A>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GAC",
+     "delta": 0.6415,
+     "sig": "benign",
+     "clinvar_sig": "Benign/Likely benign",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "MLH1": {
+   "cases": [
+    {
+     "notation": "c.791A>C",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": -0.4296,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1990G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1990G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2106T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "AGT",
+     "delta": 0.0197,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.119T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "TTT",
+     "delta": -0.0933,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.546G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.793C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.113,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.454G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.117T>G",
+     "exonic_offset": 1,
+     "ref_triplet": "TTT",
+     "delta": 2.1912,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1669G>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TGA",
+     "delta": 0.2805,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.591A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CAA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1991T>G",
+     "exonic_offset": 2,
+     "ref_triplet": "GTG",
+     "delta": -0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.454G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.791A>T",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": -0.931,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.793C>A",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.3212,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.307G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.793C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "ATC",
+     "delta": -0.0197,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "TSC2": {
+   "cases": [
+    {
+     "notation": "c.4007C>A",
+     "exonic_offset": 2,
+     "ref_triplet": "TCG",
+     "delta": 0.0497,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2223T>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CTT",
+     "delta": -0.0933,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5261T>C",
+     "exonic_offset": 2,
+     "ref_triplet": "ATC",
+     "delta": -0.6912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2098G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.3132G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTC",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1362G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1258G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5163G>A",
+     "exonic_offset": 3,
+     "ref_triplet": "ATG",
+     "delta": -0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1444G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.2967C>T",
+     "exonic_offset": 1,
+     "ref_triplet": "CAG",
+     "delta": -0.5014,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.5260A>G",
+     "exonic_offset": 1,
+     "ref_triplet": "ATC",
+     "delta": 1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.5069A>C",
+     "exonic_offset": 1,
+     "ref_triplet": "ACA",
+     "delta": -0.4296,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1948G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.9219,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1444G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.6898,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1842C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GCC",
+     "delta": -0.113,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.4992C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GGC",
+     "delta": -0.0197,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1258G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1362G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1258G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.339C>T",
+     "exonic_offset": 3,
+     "ref_triplet": "GGC",
+     "delta": -0.0197,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    }
+   ]
+  },
+  "LDLR": {
+   "cases": [
+    {
+     "notation": "c.1361C>G",
+     "exonic_offset": 3,
+     "ref_triplet": "CAC",
+     "delta": -0.113,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.1187G>C",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -1.6898,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.1189T>C",
+     "exonic_offset": 3,
+     "ref_triplet": "GCT",
+     "delta": 0.0197,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "HBB": {
+   "cases": [
+    {
+     "notation": "c.93G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GCT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  },
+  "CFTR": {
+   "cases": [
+    {
+     "notation": "c.3142A>G",
+     "exonic_offset": 3,
+     "ref_triplet": "GCA",
+     "delta": 0.2082,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.275A>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GAA",
+     "delta": 0.6415,
+     "sig": "other",
+     "clinvar_sig": "",
+     "review": ""
+    },
+    {
+     "notation": "c.3964G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GTT",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.580G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic/Likely pathogenic",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.1211G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.9219,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    },
+    {
+     "notation": "c.581G>T",
+     "exonic_offset": 2,
+     "ref_triplet": "GGA",
+     "delta": 0.9219,
+     "sig": "conflicting",
+     "clinvar_sig": "Conflicting classifications of pathogenicity",
+     "review": "criteria provided, conflicting classifications"
+    },
+    {
+     "notation": "c.2491G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAG",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.2909G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTG",
+     "delta": -1.2602,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    },
+    {
+     "notation": "c.274G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GAA",
+     "delta": -2.1912,
+     "sig": "pathogenic",
+     "clinvar_sig": "Pathogenic",
+     "review": "reviewed by expert panel"
+    }
+   ]
+  },
+  "SCN1A": {
+   "cases": [
+    {
+     "notation": "c.603G>A",
+     "exonic_offset": 1,
+     "ref_triplet": "GTA",
+     "delta": -1.2602,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, single submitter"
+    },
+    {
+     "notation": "c.2011G>T",
+     "exonic_offset": 1,
+     "ref_triplet": "GGA",
+     "delta": -2.1912,
+     "sig": "vus",
+     "clinvar_sig": "Uncertain significance",
+     "review": "criteria provided, multiple submitters, no conflicts"
+    }
+   ]
+  }
+ },
+ "summary": {
+  "PKD1": {
+   "n": 3,
+   "buckets": {
+    "vus": 1,
+    "benign": 1,
+    "conflicting": 1
+   }
+  },
+  "MSH2": {
+   "n": 16,
+   "buckets": {
+    "vus": 10,
+    "conflicting": 3,
+    "pathogenic": 2,
+    "benign": 1
+   }
+  },
+  "TSC1": {
+   "n": 12,
+   "buckets": {
+    "other": 2,
+    "vus": 7,
+    "pathogenic": 1,
+    "conflicting": 1,
+    "benign": 1
+   }
+  },
+  "APC": {
+   "n": 10,
+   "buckets": {
+    "vus": 5,
+    "conflicting": 2,
+    "pathogenic": 2,
+    "benign": 1
+   }
+  },
+  "MUTYH": {
+   "n": 2,
+   "buckets": {
+    "vus": 1,
+    "conflicting": 1
+   }
+  },
+  "VHL": {
+   "n": 2,
+   "buckets": {
+    "other": 1,
+    "pathogenic": 1
+   }
+  },
+  "PALB2": {
+   "n": 8,
+   "buckets": {
+    "vus": 4,
+    "conflicting": 3,
+    "pathogenic": 1
+   }
+  },
+  "MYH7": {
+   "n": 9,
+   "buckets": {
+    "vus": 4,
+    "conflicting": 4,
+    "benign": 1
+   }
+  },
+  "F8": {
+   "n": 12,
+   "buckets": {
+    "other": 8,
+    "pathogenic": 3,
+    "benign": 1
+   }
+  },
+  "PMS2": {
+   "n": 19,
+   "buckets": {
+    "vus": 11,
+    "pathogenic": 1,
+    "conflicting": 6,
+    "benign": 1
+   }
+  },
+  "CHEK2": {
+   "n": 11,
+   "buckets": {
+    "vus": 9,
+    "conflicting": 2
+   }
+  },
+  "MECP2": {
+   "n": 1,
+   "buckets": {
+    "other": 1
+   }
+  },
+  "BRCA2": {
+   "n": 21,
+   "buckets": {
+    "vus": 11,
+    "conflicting": 6,
+    "benign": 2,
+    "pathogenic": 2
+   }
+  },
+  "PAH": {
+   "n": 6,
+   "buckets": {
+    "vus": 2,
+    "pathogenic": 4
+   }
+  },
+  "MSH6": {
+   "n": 7,
+   "buckets": {
+    "vus": 4,
+    "conflicting": 3
+   }
+  },
+  "DMD": {
+   "n": 18,
+   "buckets": {
+    "other": 10,
+    "vus": 5,
+    "pathogenic": 2,
+    "benign": 1
+   }
+  },
+  "TP53": {
+   "n": 6,
+   "buckets": {
+    "vus": 4,
+    "conflicting": 1,
+    "pathogenic": 1
+   }
+  },
+  "PTEN": {
+   "n": 5,
+   "buckets": {
+    "vus": 3,
+    "conflicting": 2
+   }
+  },
+  "NF1": {
+   "n": 39,
+   "buckets": {
+    "other": 1,
+    "pathogenic": 5,
+    "vus": 27,
+    "conflicting": 5,
+    "benign": 1
+   }
+  },
+  "BRCA1": {
+   "n": 41,
+   "buckets": {
+    "vus": 16,
+    "other": 6,
+    "benign": 9,
+    "conflicting": 7,
+    "pathogenic": 3
+   }
+  },
+  "ATM": {
+   "n": 38,
+   "buckets": {
+    "other": 1,
+    "vus": 24,
+    "pathogenic": 3,
+    "conflicting": 9,
+    "benign": 1
+   }
+  },
+  "RB1": {
+   "n": 10,
+   "buckets": {
+    "vus": 7,
+    "pathogenic": 1,
+    "conflicting": 1,
+    "benign": 1
+   }
+  },
+  "MLH1": {
+   "n": 17,
+   "buckets": {
+    "vus": 9,
+    "pathogenic": 4,
+    "conflicting": 4
+   }
+  },
+  "TSC2": {
+   "n": 20,
+   "buckets": {
+    "pathogenic": 4,
+    "conflicting": 7,
+    "vus": 9
+   }
+  },
+  "LDLR": {
+   "n": 3,
+   "buckets": {
+    "vus": 2,
+    "conflicting": 1
+   }
+  },
+  "HBB": {
+   "n": 1,
+   "buckets": {
+    "vus": 1
+   }
+  },
+  "CFTR": {
+   "n": 9,
+   "buckets": {
+    "vus": 3,
+    "other": 1,
+    "pathogenic": 4,
+    "conflicting": 1
+   }
+  },
+  "SCN1A": {
+   "n": 2,
+   "buckets": {
+    "vus": 2
+   }
+  }
+ }
+}
