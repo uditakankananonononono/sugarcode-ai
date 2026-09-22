@@ -62,3 +62,23 @@ def compare_profiles(profiles: list[dict]) -> dict:
         "novel_mechanism_hint": (sims[-1]["pair"] if sims and sims[-1]["cosine_similarity"] < 0.97
                                  else "all profiles similar"),
     }
+
+import numpy as np
+
+def plate_normalize(features,controls):
+ f=np.asarray(features,float); c=np.asarray(controls,float); med=np.median(c,axis=0); mad=np.median(abs(c-med),axis=0); z=(f-med)/(1.4826*mad+1e-9); return {'normalized':z.tolist(),'control_median':med.tolist(),'control_mad':mad.tolist()}
+def quality_control(cell_counts,focus_scores,intensities):
+ return {'cell_count_cv':float(np.std(cell_counts)/np.mean(cell_counts)),'focus_pass_fraction':float(np.mean(np.asarray(focus_scores)>.7)),'saturation_fraction':float(np.mean(np.asarray(intensities)>=.99)),'pass':np.std(cell_counts)/np.mean(cell_counts)<.3 and np.mean(np.asarray(focus_scores)>.7)>.8}
+def batch_correct(batches):
+ corrected=[]
+ for b in batches:
+  x=np.asarray(b,float); corrected.append((x-x.mean(0)).tolist())
+ return {'batches':corrected,'method':'within-batch mean centering'}
+def nearest_mechanism(query,references):
+ q=np.array(list(query['signature_vector'].values())); rows=[]
+ for r in references:
+  v=np.array(list(r['signature_vector'].values())); sim=float(q@v/(np.linalg.norm(q)*np.linalg.norm(v))); rows.append({'mechanism':r['mechanism'],'similarity':sim})
+ return sorted(rows,key=lambda x:-x['similarity'])
+def concentration_trajectory(mechanism,doses,hours): return {'profiles':[profile_perturbation(mechanism,d,h) for d in doses for h in hours]}
+def cellpainting_report(profiles,controls):
+ matrix=[list(x['signature_vector'].values()) for x in profiles]; return {'comparison':compare_profiles(profiles),'normalized':plate_normalize(matrix,controls),'mechanism_matches':[nearest_mechanism(x,profiles)[:3] for x in profiles],'model_status':'Hand-specified morphology signatures and transparent statistics; no image segmentation or trained morphology model.'}
