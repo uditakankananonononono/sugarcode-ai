@@ -58,3 +58,35 @@ def engineer_capsid(capsid: str = "AAV9", target_receptor: str = "generic",
         "next_steps": ["synthesize lead + 2 alternates", "transduction assay in target cells",
                        "NAb neutralization assay", "in vivo biodistribution"],
     }
+
+
+def directed_evolution(capsid: str = "AAV9", target_receptor: str = "generic",
+                       n_rounds: int = 3, n_variants: int = 6,
+                       nab_escape: bool = True, seed: int = 1) -> dict:
+    """Run multi-round seeded capsid directed evolution - each round engineers
+    a population from the previous round's lead variant."""
+    rng = random.Random(seed)
+    rounds = []
+    lineage = [capsid]
+    current = capsid
+    for round_idx in range(n_rounds):
+        result = engineer_capsid(capsid=current, target_receptor=target_receptor,
+                                 nab_escape=nab_escape, n_variants=n_variants,
+                                 seed=seed + round_idx)
+        lead = result["lead"]
+        rounds.append(result)
+        current = lead["variant_id"]
+        lineage.append(current)
+    return {
+        "parent_capsid": capsid,
+        "target_receptor": target_receptor,
+        "n_rounds": n_rounds,
+        "rounds": rounds,
+        "lineage": lineage,
+        "lead": rounds[-1]["lead"] if rounds else None,
+        "directed_evolution_summary": (
+            f"{n_rounds} rounds of seeded capsid engineering from {capsid}; "
+            f"final lead {lineage[-1]} with predicted transduction "
+            f"{rounds[-1]['lead']['predicted_transduction']:.3f}" if rounds else "no rounds run"
+        ),
+    }
