@@ -34,13 +34,13 @@ def test_power_decreases_with_effect_size():
  assert power_estimate(.2)['replicates_per_group']>power_estimate(.8)['replicates_per_group']
 
 def test_experimental_plan_is_nonprocedural():
- r=experimental_plan('TP53'); assert r['controls'] and r['readouts'] and 'not an executable' in r['status']
+ r=experimental_plan('TP53'); assert r['controls'] and r['readouts'] and 'Non-procedural study-design guidance only' in r['status']
 
 def test_feedback_updates_and_reduces_uncertainty():
  r=feedback_update(.5,8,10); assert r['mean']>.5 and r['std']>0
 
 def test_diagnostics_honest_finite():
- d=gene_diagnostics('DEMO1',SEQ); assert len(d)==14 and all(math.isfinite(v) for v in d.values()) and not any(k.startswith('position_') for k in d)
+ d=gene_diagnostics('DEMO1',SEQ); assert len(d)==15 and all(math.isfinite(v) for v in d.values()) and not any(k.startswith('position_') for k in d)
 
 def test_digital_twin_complete_and_honest():
  r=digital_twin('DEMO1',SEQ,condition={'drug_inhibition':.2}); assert r['profile'] and r['causal_graph'] and r['counterfactual'] and r['crispr'] and r['experimental_plan'] and r['diagnostics']
