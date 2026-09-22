@@ -1,3 +1,6 @@
-"""Organoid AI: organoid design, media recipes, growth + drug-response simulation."""
-from .core import design_organoid, simulate_growth, drug_response
-__all__ = ["design_organoid", "simulate_growth", "drug_response"]
+"""Organoid AI: patient-derived organoid design and mechanistic digital twins."""
+from .core import (ORGANOID_RECIPES, analyze_organoid, design_organoid, drug_response,
+ enhancement_features, optimize_growth_conditions, simulate_digital_twin, simulate_growth,
+ spatial_gene_expression)
+__all__=["ORGANOID_RECIPES","analyze_organoid","design_organoid","drug_response","enhancement_features",
+ "optimize_growth_conditions","simulate_digital_twin","simulate_growth","spatial_gene_expression"]
