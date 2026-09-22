@@ -48,3 +48,31 @@ def test_digital_twin_complete_and_honest():
 
 def test_invalid_power_rejected():
  with pytest.raises(ValueError): power_estimate(0)
+
+def test_digital_twin_variant_input_drives_mechanistic_cascade():
+ synonymous=digital_twin('DEMO1',SEQ,[{'variant':'c.5A>G','consequence':'synonymous'}])
+ severe=digital_twin('DEMO1',SEQ,[{'variant':'c.5A>T','consequence':'splice donor nonsense','conservation':.95,'active_site':True}])
+ assert severe['counterfactual']['posterior']['pathogenic_probability']>synonymous['counterfactual']['posterior']['pathogenic_probability']
+ assert severe['counterfactual']['structural']['ddg_kcal_mol']>synonymous['counterfactual']['structural']['ddg_kcal_mol']
+ assert severe['counterfactual']['phenotype_delta']<synonymous['counterfactual']['phenotype_delta']
+ assert severe['diagnostics']['variant_splice_disruption']>synonymous['diagnostics']['variant_splice_disruption']
+
+
+def test_digital_twin_condition_interacts_with_variant_pathway():
+ variant=[{'variant':'c.5A>T','consequence':'missense','conservation':.8}]
+ untreated=digital_twin('EGFR',SEQ,variant,{'drug_inhibition':0})
+ treated=digital_twin('EGFR',SEQ,variant,{'drug_inhibition':.8})
+ assert untreated['counterfactual']['pathway']['biomarker_name']=='p_ERK'
+ assert treated['counterfactual']['pathway']['biomarker'][-1] < untreated['counterfactual']['pathway']['biomarker'][-1]
+
+
+def test_crispr_design_includes_advanced_modalities_and_validation():
+ designs=outcome_aware_crispr(SEQ)
+ assert designs and designs[0]['base_edit'] and designs[0]['prime_edit'] and designs[0]['silent_pam_disruption']
+ assert designs[0]['validation_assays'] and 'nucleosome_score' in designs[0]
+
+
+def test_diagnostics_no_literal_baseline_padding():
+ d=gene_diagnostics('DEMO1',SEQ,[{'variant':'c.5A>G','consequence':'synonymous'}])
+ assert len(d)==15 and not any(key.startswith('baseline.') or key=='pathway_count' for key in d)
+ assert all(math.isfinite(v) for v in d.values())
