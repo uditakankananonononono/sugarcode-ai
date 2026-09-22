@@ -1,3 +1,3 @@
-"""Promoter Lib: synthetic promoter generation with predictable strengths."""
-from .core import design_promoter, generate_library, score_promoter
-__all__ = ["design_promoter", "generate_library", "score_promoter"]
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
