@@ -72,3 +72,24 @@ def _interpret(f0, fixed_at, fit):
                 f"{fit[0]:.3f} holds it against drift")
     return (f"engineered allele lost by gen {fixed_at} - fitness cost of the construct "
             "exceeds what drift can tolerate; consider burden reduction or selection marker")
+
+import math
+
+def environment_sweep(environments,**kwargs):
+ rows=[]
+ for i,e in enumerate(environments): rows.append({'environment':e,'result':run_sandbox(fitness=e['fitness'],seed=kwargs.get('seed',42)+i,**{k:v for k,v in kwargs.items() if k!='seed'})})
+ return {'runs':rows,'most_stable':max(rows,key=lambda x:x['result']['final_construct_freq'])}
+def diversity_metrics(freq):
+ h=1-sum(x*x for x in freq); entropy=-sum(x*math.log(max(x,1e-12)) for x in freq); return {'heterozygosity':h,'shannon_entropy':entropy,'effective_alleles':math.exp(entropy)}
+def directed_evolution(rounds,variants,selection_strength=.1,seed=0):
+ rng=random.Random(seed); pop=[dict(v) for v in variants]; history=[]
+ for r in range(rounds):
+  weights=[math.exp(selection_strength*v['score']) for v in pop]; total=sum(weights); chosen=rng.choices(pop,weights=weights,k=len(pop)); pop=[{**v,'score':v['score']+rng.gauss(0,.05)} for v in chosen]; history.append({'round':r,'mean_score':sum(v['score'] for v in pop)/len(pop),'max_score':max(v['score'] for v in pop)})
+ return {'history':history,'population':pop,'best':max(pop,key=lambda x:x['score'])}
+def ecological_competition(initial,growth,competition,steps=100,dt=.05):
+ x=list(map(float,initial)); trace=[list(x)]
+ for _ in range(steps):
+  x=[max(0,x[i]+dt*growth[i]*x[i]*(1-sum(competition[i][j]*x[j] for j in range(len(x))))) for i in range(len(x))]; trace.append(list(x))
+ return {'trajectory':trace,'final':x,'coexistence':sum(v>.01 for v in x)>1}
+def playground_report(environments):
+ sweep=environment_sweep(environments,pop_size=100,generations=50,n_alleles=len(environments[0]['fitness']),bottleneck_size=10); return {'environment_sweep':sweep,'diversity':diversity_metrics(sweep['most_stable']['result']['trajectory_every_10gen'][-1]),'model_status':'Seeded Wright-Fisher and Lotka-Volterra equations; no learned evolutionary model and not a production forecast.'}
