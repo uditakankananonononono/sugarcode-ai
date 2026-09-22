@@ -1,0 +1,65 @@
+{
+ "source": "ClinVar live query 2026-09-22 (PTEN NM_000314, c.79+/c.80- splice variants) + RefSeqGene NG_007466.2 windows; PTEN intron 1 confirmed U12 GT-AG by the intronIC gold set (HomSap-gene-PTEN@rna-NM_001304717.5_2(9))",
+ "cases": [
+  {
+   "notation": "c.80-1G>A",
+   "site_type": "acceptor",
+   "window": "ACTAAAGTACTCAGA",
+   "index": 13,
+   "delta": -0.1837,
+   "donor_subtype": null,
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.79+1G>A",
+   "site_type": "donor",
+   "window": "CCTGTATCC",
+   "index": 3,
+   "delta": -0.152,
+   "donor_subtype": "U12 GT-AG",
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.79+1G>C",
+   "site_type": "donor",
+   "window": "CCTGTATCC",
+   "index": 3,
+   "delta": -0.152,
+   "donor_subtype": "U12 GT-AG",
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.80-2A>C",
+   "site_type": "acceptor",
+   "window": "ACTAAAGTACTCAGA",
+   "index": 12,
+   "delta": -0.1837,
+   "donor_subtype": null,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.80-1G>C",
+   "site_type": "acceptor",
+   "window": "ACTAAAGTACTCAGA",
+   "index": 13,
+   "delta": -0.1837,
+   "donor_subtype": null,
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic",
+   "review": "reviewed by expert panel",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  }
+ ]
+}
