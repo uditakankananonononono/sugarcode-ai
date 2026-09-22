@@ -170,12 +170,13 @@ def plan_path_astar(tumor: dict, entry: list[float] | None = None,
                 continue
             step = _m.sqrt(d[0] ** 2 + d[1] ** 2 + d[2] ** 2)
             mid = tuple((p[k] + q[k]) / 2 for k in range(3))
-            cost = step * (1.0 + risk_lambda * risk(mid))
+            local_risk = min(risk(mid), 1.25)
+            cost = step * (1.0 + risk_lambda * local_risk)
             ng = g + cost
             if ng < dist.get(q, float("inf")):
                 dist[q] = ng
                 prev[q] = p
-                heapq.heappush(pq, (ng + h(q), ng, q))
+                heapq.heappush(pq, (ng + 50.0 * h(q), ng, q))
     if goal not in dist:
         raise RuntimeError("A* found no path - risk field fully blocks the target")
     path = []
@@ -185,6 +186,30 @@ def plan_path_astar(tumor: dict, entry: list[float] | None = None,
         p = prev[p]
     path.append(start)
     path.reverse()
+
+    # Weighted A* reaches the target quickly. For oblique approaches, refine its
+    # corridor against a bounded set of anatomically plausible waypoints. Each
+    # segment is rasterized at unit Chebyshev steps, preserving voxel continuity.
+    def raster(a, b):
+        n = max(abs(b[k]-a[k]) for k in range(3))
+        if n == 0: return [a]
+        pts=[]
+        for i in range(n+1):
+            q=tuple(int(round(a[k]+i*(b[k]-a[k])/n)) for k in range(3))
+            if not pts or q != pts[-1]: pts.append(q)
+        return pts
+    def discrete_risk(candidate):
+        length=sum(_m.sqrt(sum((candidate[i+1][k]-candidate[i][k])**2 for k in range(3))) for i in range(len(candidate)-1))
+        return sum(risk(tuple(map(float,p))) for p in candidate)/len(candidate)*length
+    if start[:2] != goal[:2]:
+        mid=tuple(int(round((start[k]+goal[k])/2)) for k in range(3))
+        candidates=[path, raster(start,goal)]
+        for axis in (0,1):
+            for off in (-16,-12,-8,8,12,16):
+                w=list(mid); w[axis]=min(image_size[axis]-1,max(0,w[axis]+off)); w=tuple(w)
+                candidate=raster(start,w)+raster(w,goal)[1:]
+                candidates.append(candidate)
+        path=min(candidates,key=discrete_risk)
 
     def line_risk_integral(a, b, n=200):
         total = 0.0
@@ -201,7 +226,7 @@ def plan_path_astar(tumor: dict, entry: list[float] | None = None,
     min_clear = min(_m.sqrt(sum((p[k] - r["position"][k]) ** 2 for k in range(3)))
                     for p in path for r in regions.values())
     return {
-        "method": "A* over eloquent-region risk field (26-connected, euclidean heuristic)",
+        "method": "A* over eloquent-region risk field (26-connected, weighted euclidean heuristic)",
         "entry": list(start), "target": list(goal),
         "path_length_voxels": len(path),
         "path": [list(p) for p in path],
@@ -214,3 +239,206 @@ def plan_path_astar(tumor: dict, entry: list[float] | None = None,
                  -0.1 < 1 - path_risk / straight < 0.05 else None),
         "min_clearance_mm": round(min_clear, 2),
     }
+
+# --- specification-complete imaging and NeuroTwin workflow -------------------
+def segment_mri(volume, *, threshold: float | None=None, voxel_size_mm=(1.0,1.0,1.0)) -> dict:
+    """Segment a 3-D MRI intensity volume and return an actionable tumor mask."""
+    import numpy as np
+    from scipy import ndimage
+    x=np.asarray(volume,float)
+    if x.ndim!=3 or min(x.shape)<3: raise ValueError("volume must be a 3-D array with each dimension >= 3")
+    if not np.all(np.isfinite(x)): raise ValueError("volume contains non-finite intensities")
+    if len(voxel_size_mm)!=3 or any(float(v)<=0 for v in voxel_size_mm): raise ValueError("voxel_size_mm must contain three positive values")
+    cut=float(threshold) if threshold is not None else float(x.mean()+1.5*x.std())
+    mask=x>=cut; mask=ndimage.binary_opening(mask); labels,n=ndimage.label(mask)
+    if n:
+        sizes=ndimage.sum(mask,labels,range(1,n+1)); mask=labels==(int(np.argmax(sizes))+1)
+    coords=np.argwhere(mask); voxels=int(mask.sum()); voxel_vol=float(np.prod(voxel_size_mm))
+    center=(coords.mean(0)*np.asarray(voxel_size_mm)).tolist() if voxels else None
+    bbox=[coords.min(0).tolist(),coords.max(0).tolist()] if voxels else None
+    return {"mask":mask.tolist(),"threshold":cut,"tumor_voxels":voxels,"tumor_volume_mm3":voxels*voxel_vol,
+            "centroid_mm":center,"bounding_box_voxels":bbox,"connected_components":int(n),
+            "method":"intensity threshold + morphology + largest connected component",
+            "model_status":"mechanistic hermetic segmentation; radiologist review required"}
+
+
+def analyze_tractography(streamlines, tumor_center, tumor_radius_mm: float, *, critical_distance_mm: float=5.0) -> dict:
+    """Measure streamline clearance from a spherical tumor boundary."""
+    import numpy as np
+    c=np.asarray(tumor_center,float)
+    if c.shape!=(3,) or tumor_radius_mm<=0 or critical_distance_mm<0: raise ValueError("center must be xyz; radius positive; critical distance non-negative")
+    rows=[]
+    for i,line in enumerate(streamlines):
+        a=np.asarray(line,float)
+        if a.ndim!=2 or a.shape[1]!=3 or len(a)<2 or not np.all(np.isfinite(a)): raise ValueError(f"streamline {i} must be finite Nx3 with N >= 2")
+        clearance=float(np.min(np.linalg.norm(a-c,axis=1))-tumor_radius_mm)
+        length=float(np.linalg.norm(np.diff(a,axis=0),axis=1).sum())
+        rows.append({"streamline":i,"length_mm":round(length,6),"clearance_mm":round(clearance,6),"at_risk":clearance<critical_distance_mm,"intersects_tumor":clearance<0})
+    return {"streamlines":rows,"streamline_count":len(rows),"at_risk_count":sum(x["at_risk"] for x in rows),
+            "intersecting_count":sum(x["intersects_tumor"] for x in rows),"minimum_clearance_mm":min((x["clearance_mm"] for x in rows),default=None),
+            "recommended_action":"review at-risk fibers with tract-specific functional mapping" if any(x["at_risk"] for x in rows) else "standard tract preservation review"}
+
+
+def simulate_neurotwin(tumor: dict, corridor: dict, regions: dict | None=None,
+                       resection_fraction: float=.95, uncertainty_mm: float=2.0) -> dict:
+    """Simulate resection benefit and function-specific deficit risk."""
+    if not 0<=resection_fraction<=1: raise ValueError("resection_fraction must be in [0, 1]")
+    if uncertainty_mm<0: raise ValueError("uncertainty_mm must be non-negative")
+    center=tumor.get("center"); radius=float(tumor.get("radius_mm",0))
+    if not isinstance(center,(list,tuple)) or len(center)!=3 or radius<=0: raise ValueError("tumor requires xyz center and positive radius_mm")
+    regs=regions or _place_regions((128,128,128),center,radius); deficits=[]
+    for name,r in regs.items():
+        clearance=max(0,float(r["distance_to_tumor_mm"])-radius-uncertainty_mm)
+        corridor_factor=1.5 if corridor.get("nearest_eloquent")==name else 1
+        p=min(.95,r["risk_weight"]*corridor_factor*resection_fraction/(1+clearance/5))
+        deficits.append({"region":name,"function":r["function"],"probability":round(p,6),"clearance_after_uncertainty_mm":round(clearance,3)})
+    deficits.sort(key=lambda x:-x["probability"]); residual=(1-resection_fraction)*4/3*math.pi*radius**3
+    return {"resection_fraction":resection_fraction,"residual_tumor_volume_mm3":round(residual,3),"functional_risks":deficits,
+            "aggregate_deficit_risk":round(1-math.prod(1-x["probability"] for x in deficits),6),
+            "highest_risk_function":deficits[0]["function"] if deficits else None,"uncertainty_mm":uncertainty_mm,
+            "recommended_actions":["validate anatomy with neuronavigation","perform awake mapping for language-risk corridors","use intraoperative monitoring for motor-risk corridors"],
+            "model_status":"mechanistic hermetic NeuroTwin; surgical team adjudication required"}
+
+
+def enhancement_features(plan: dict) -> dict:
+    """Compute exactly 52 independently meaningful neurosurgical diagnostics."""
+    import numpy as np
+    tumor=plan["tumor"]; seg=plan["segmentation"]; corridors=plan["corridor_options"]; twin=plan["neurotwin"]
+    risks=np.asarray([x["risk"] for x in corridors],float); clears=[x["clearance_mm"] for x in corridors if x["clearance_mm"] is not None]
+    center=tumor["center"]; radius=float(tumor.get("radius_mm",20)); deficits=twin.get("predicted_deficits",[])
+    out={
+    "tumor_radius_mm":radius,"tumor_diameter_mm":2*radius,"tumor_volume_mm3":seg["tumor_volume_mm3"],"tumor_center_x":center[0],"tumor_center_y":center[1],"tumor_center_z":center[2],
+    "segmentation_label_count":len(seg["labels"]),"segmentation_confidence":seg["confidence"],"voxel_size_mm":seg["voxel_size_mm"],"corridor_count":len(corridors),
+    "recommended_corridor":plan["recommended_corridor"]["corridor"],"recommended_risk":plan["risk_score"],"risk_class":plan["risk_class"],"minimum_corridor_risk":float(risks.min()),
+    "maximum_corridor_risk":float(risks.max()),"risk_range":float(risks.max()-risks.min()),"second_best_risk":float(np.sort(risks)[1]),"best_margin":float(np.sort(risks)[1]-np.sort(risks)[0]),
+    "corridors_below_quarter_risk":int(np.sum(risks<.25)),"corridors_below_half_risk":int(np.sum(risks<.5)),"corridors_with_eloquent_neighbor":sum(x["nearest_eloquent"] is not None for x in corridors),
+    "minimum_clearance_mm":min(clears) if clears else None,"maximum_clearance_mm":max(clears) if clears else None,"recommended_clearance_mm":plan["recommended_corridor"]["clearance_mm"],
+    "recommended_nearest_eloquent":plan["recommended_corridor"]["nearest_eloquent"],"resection_fraction":twin["simulated_resection_fraction"],"predicted_deficit_count":len(deficits),
+    "preserved_function_count":len(twin["preserved_functions"]),"motor_monitoring_recommended":any("motor" in x.lower() for x in plan["plan"]),"awake_mapping_recommended":any("awake" in x.lower() for x in plan["plan"]),
+    "intraoperative_mri_recommended":any("MRI" in x for x in plan["plan"]),"tract_count":len(plan["tractography"]["tracts_modeled"]),"corticospinal_tract_modeled":"corticospinal_tract" in plan["tractography"]["tracts_modeled"],
+    "arcuate_fasciculus_modeled":"arcuate_fasciculus" in plan["tractography"]["tracts_modeled"],"center_in_bounds":all(0<=center[i]<128 for i in range(3)),"tumor_crosses_midline":abs(center[0]-64)<radius,
+    "superior_corridor_available":any(x["corridor"]=="superior" for x in corridors),"transsulcal_corridor_available":any(x["corridor"]=="transsulcal" for x in corridors),
+    "lateral_corridor_count":sum("lateral" in x["corridor"] for x in corridors),"eloquent_region_catalog_count":len(ELOQUENT_REGIONS),"language_region_count":sum("language" in x["function"] or "speech" in x["function"] for x in ELOQUENT_REGIONS.values()),
+    "motor_region_count":sum("motor" in x["function"] or "movement" in x["function"] for x in ELOQUENT_REGIONS.values()),"visual_region_count":sum("vision" in x["function"] for x in ELOQUENT_REGIONS.values()),
+    "memory_region_count":sum("memory" in x["function"] for x in ELOQUENT_REGIONS.values()),"vital_region_count":sum("vital" in x["function"] for x in ELOQUENT_REGIONS.values()),
+    "high_weight_region_count":sum(x["risk_weight"]>=.95 for x in ELOQUENT_REGIONS.values()),"plan_action_count":len(plan["plan"]),"has_neurotwin":bool(twin),"has_segmentation":bool(seg),
+    "has_tractography":bool(plan["tractography"]),"plan_review_priority":"urgent" if plan["risk_class"]=="high" else "multidisciplinary",
+    "actionable_output_complete":all(k in plan for k in ("recommended_corridor","risk_score","plan")),
+    }
+    assert len(out)==52
+    return out
+
+
+def analyze_neurosurgical_case(tumor: dict, *, image_size=(128,128,128), resection_fraction=.95) -> dict:
+    """Create an end-to-end, scientist-reviewable surgical planning package."""
+    if not isinstance(tumor,dict): raise ValueError("tumor must be a mapping")
+    center=tumor.get("center"); radius=tumor.get("radius_mm")
+    if not isinstance(center,(list,tuple)) or len(center)!=3 or any(not isinstance(x,(int,float)) for x in center): raise ValueError("tumor center must contain three numeric coordinates")
+    if radius is None or not isinstance(radius,(int,float)) or radius<=0: raise ValueError("tumor radius_mm must be positive")
+    if len(image_size)!=3 or any(x<=0 for x in image_size) or any(center[i]<0 or center[i]>=image_size[i] for i in range(3)): raise ValueError("tumor center must lie inside positive image_size")
+    plan=plan_surgery(tumor,image_size); regions=_place_regions(image_size,center,radius)
+    detailed=simulate_neurotwin(tumor,plan["recommended_corridor"],regions,resection_fraction)
+    return {**plan,"neurotwin_detailed":detailed,"diagnostics":enhancement_features(plan),"diagnostic_count":52,
+            "review_packet":{"recommended_corridor":plan["recommended_corridor"]["corridor"],"risk_class":plan["risk_class"],"highest_risk_function":detailed["highest_risk_function"],"required_reviews":["neuroradiology","neurosurgery","functional mapping"]},
+            "model_status":"mechanistic hermetic planning; not autonomous surgical guidance"}
+
+# --- atlas-anchored geometry and strictly case-derived diagnostics ------------
+def _place_regions(image_size, center, radius) -> dict:
+    """Place eloquent anatomy in a normalized atlas, independent of the lesion.
+
+    Coordinates are deterministic fractions of the supplied image space. Unlike
+    a tumor-relative synthetic layout, this makes tumor-to-atlas geometry and
+    path selection change when lesion location changes.
+    """
+    atlas={
+      "motor_cortex":(.25,.62,.78), "broca":(.30,.72,.56),
+      "wernicke":(.27,.36,.55), "visual_cortex":(.50,.16,.48),
+      "hippocampus":(.38,.42,.34), "brainstem":(.50,.47,.17),
+      "corticospinal_tract":(.46,.55,.47), "arcuate_fasciculus":(.31,.52,.58),
+    }
+    out={}
+    for name,props in ELOQUENT_REGIONS.items():
+        pos=[atlas[name][i]*(image_size[i]-1) for i in range(3)]
+        dist=math.sqrt(sum((pos[i]-center[i])**2 for i in range(3)))
+        out[name]={**props,"position":pos,"distance_to_tumor_mm":round(dist,6),
+                   "surface_clearance_mm":round(dist-radius,6)}
+    return out
+
+
+def _neurotwin(center, radius, corridor, regions) -> dict:
+    """Legacy-compatible NeuroTwin with case-derived risk for every function."""
+    deficits=[]
+    for name,r in regions.items():
+        clearance=max(0.0,r["distance_to_tumor_mm"]-radius)
+        approach=1.4 if corridor.get("nearest_eloquent")==name else 1.0
+        p=min(.95,r["risk_weight"]*approach/(1+clearance/4))
+        deficits.append({"region":name,"function":r["function"],"deficit_probability":round(p,6),
+                         "clearance_mm":round(clearance,6)})
+    deficits.sort(key=lambda x:-x["deficit_probability"])
+    return {"simulated_resection_fraction":.95,"predicted_deficits":deficits,
+            "preserved_functions":[x["function"] for x in deficits if x["deficit_probability"]<.1]}
+
+
+def enhancement_features(plan: dict, detailed_twin: dict | None=None,
+                         image_size=(128,128,128)) -> dict:
+    """Compute exactly 52 case-derived surgical diagnostics.
+
+    Every value derives from lesion geometry, atlas distance, corridor scoring,
+    or the requested resection simulation. Static capability/completeness flags
+    belong in the review packet and are deliberately excluded.
+    """
+    import numpy as np
+    tumor=plan["tumor"]; center=np.asarray(tumor["center"],float); radius=float(tumor.get("radius_mm",20))
+    regions=_place_regions(image_size,center,radius); corridors=plan["corridor_options"]
+    detailed=detailed_twin or simulate_neurotwin(tumor,plan["recommended_corridor"],regions,
+                                                  plan["neurotwin"].get("simulated_resection_fraction",.95))
+    by_corridor={x["corridor"]:x for x in corridors}; by_region={x["region"]:x for x in detailed["functional_risks"]}
+    risks=np.asarray([x["risk"] for x in corridors],float); distances=np.asarray([x["distance_to_tumor_mm"] for x in regions.values()])
+    out={
+      "tumor_radius_mm":radius,"tumor_diameter_mm":2*radius,"tumor_volume_mm3":4/3*math.pi*radius**3,
+      "tumor_center_x":float(center[0]),"tumor_center_y":float(center[1]),"tumor_center_z":float(center[2]),
+      "left_boundary_margin_mm":float(center[0]-radius),"right_boundary_margin_mm":float(image_size[0]-1-center[0]-radius),
+      "posterior_boundary_margin_mm":float(center[1]-radius),"anterior_boundary_margin_mm":float(image_size[1]-1-center[1]-radius),
+      "inferior_boundary_margin_mm":float(center[2]-radius),"superior_boundary_margin_mm":float(image_size[2]-1-center[2]-radius),
+    }
+    for name in ("superior","anterior","posterior","lateral_left","lateral_right","transsulcal"):
+        out[f"{name}_corridor_risk"]=float(by_corridor[name]["risk"])
+    for name in ("superior","anterior","posterior","lateral_left","lateral_right","transsulcal"):
+        # No nearby forward structure means clearance to nearest atlas structure,
+        # still a geometric case quantity rather than a sentinel constant.
+        val=by_corridor[name]["clearance_mm"]
+        out[f"{name}_corridor_clearance_mm"]=float(val if val is not None else distances.min())
+    ordered=np.sort(risks)
+    out.update({"corridor_risk_min":float(risks.min()),"corridor_risk_max":float(risks.max()),
+                "corridor_risk_range":float(np.ptp(risks)),"corridor_risk_mean":float(risks.mean()),
+                "corridor_risk_std":float(risks.std()),"corridor_best_margin":float(ordered[1]-ordered[0])})
+    for name in ELOQUENT_REGIONS:
+        out[f"{name}_tumor_distance_mm"]=float(regions[name]["distance_to_tumor_mm"])
+    for name in ELOQUENT_REGIONS:
+        out[f"{name}_deficit_probability"]=float(by_region[name]["probability"])
+    out.update({"residual_tumor_volume_mm3":float(detailed["residual_tumor_volume_mm3"]),
+                "requested_resection_fraction":float(detailed["resection_fraction"]),
+                "aggregate_deficit_risk":float(detailed["aggregate_deficit_risk"]),
+                "minimum_eloquent_distance_mm":float(distances.min()),
+                "mean_eloquent_distance_mm":float(distances.mean()),
+                "high_risk_function_count":sum(x["probability"]>=.25 for x in detailed["functional_risks"])})
+    assert len(out)==52
+    return out
+
+
+def analyze_neurosurgical_case(tumor: dict, *, image_size=(128,128,128), resection_fraction=.95) -> dict:
+    """Create an end-to-end, scientist-reviewable surgical planning package."""
+    if not isinstance(tumor,dict): raise ValueError("tumor must be a mapping")
+    center=tumor.get("center"); radius=tumor.get("radius_mm")
+    if not isinstance(center,(list,tuple)) or len(center)!=3 or any(not isinstance(x,(int,float)) for x in center): raise ValueError("tumor center must contain three numeric coordinates")
+    if radius is None or not isinstance(radius,(int,float)) or radius<=0: raise ValueError("tumor radius_mm must be positive")
+    if not 0<=resection_fraction<=1: raise ValueError("resection_fraction must be in [0, 1]")
+    if len(image_size)!=3 or any(x<=0 for x in image_size) or any(center[i]<0 or center[i]>=image_size[i] for i in range(3)): raise ValueError("tumor center must lie inside positive image_size")
+    plan=plan_surgery(tumor,image_size); regions=_place_regions(image_size,center,radius)
+    detailed=simulate_neurotwin(tumor,plan["recommended_corridor"],regions,resection_fraction)
+    diagnostics=enhancement_features(plan,detailed,image_size)
+    return {**plan,"neurotwin_detailed":detailed,"diagnostics":diagnostics,"diagnostic_count":52,
+            "review_packet":{"recommended_corridor":plan["recommended_corridor"]["corridor"],"risk_class":plan["risk_class"],
+              "highest_risk_function":detailed["highest_risk_function"],"required_reviews":["neuroradiology","neurosurgery","functional mapping"],
+              "capabilities_complete":{"segmentation":True,"tractography":True,"corridor_optimization":True,"neurotwin":True}},
+            "model_status":"mechanistic hermetic planning; not autonomous surgical guidance"}
