@@ -1,3 +1,3 @@
-"""BioGPT Lit: temporal evidence-weighted knowledge graph + contradiction detection."""
-from .core import KnowledgeGraph, extract_claims, ingest_pubmed
-__all__ = ["KnowledgeGraph", "extract_claims", "ingest_pubmed"]
+"""Evidence-weighted, temporal literature knowledge graph and reasoning."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]
