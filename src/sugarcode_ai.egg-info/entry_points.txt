@@ -1,0 +1,2 @@
+[console_scripts]
+sugarcode = sugarcode.cli:main

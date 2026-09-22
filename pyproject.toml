@@ -30,3 +30,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+"sugarcode.bio" = ["data/**/*"]
+"sugarcode.modules" = ["**/*.json", "**/*.csv", "**/*.txt", "**/*.md", "**/*.npy", "**/*.tsv", "**/*.yaml"]
