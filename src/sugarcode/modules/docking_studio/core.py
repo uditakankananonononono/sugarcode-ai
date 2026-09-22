@@ -199,3 +199,48 @@ def dock_into_structure(identifier: str, smiles: str, pocket_index: int = 0,
                          "no force-field minimization - a screening proxy, not a free energy"),
     })
     return base
+
+# Explicit configurational search and thermodynamic extensions; no learned scorer.
+import random
+import numpy as np
+
+def pose_energy(receptor_xyz,ligand_xyz,receptor_charges=None,ligand_charges=None,hbond_pairs=(),solvation=.0):
+    r=np.asarray(receptor_xyz,float); l=np.asarray(ligand_xyz,float); rq=np.asarray(receptor_charges if receptor_charges is not None else np.zeros(len(r))); lq=np.asarray(ligand_charges if ligand_charges is not None else np.zeros(len(l))); vdw=elec=0
+    for i,a in enumerate(r):
+        for j,b in enumerate(l):
+            d=max(.8,float(np.linalg.norm(a-b))); sr=(3.5/d)**6; vdw+=.08*(sr*sr-2*sr); elec+=.2*rq[i]*lq[j]/d
+    hb=-sum(max(0,1-abs(float(np.linalg.norm(r[i]-l[j]))-2.8)/1.2) for i,j in hbond_pairs); return {'vdw':vdw,'electrostatic':elec,'hbond':hb,'solvation':float(solvation),'total':vdw+elec+hb+solvation}
+
+def transform_pose(coords,translation=(0,0,0),axis=(0,0,1),angle=0):
+    c=np.asarray(coords,float); a=np.asarray(axis,float); a=a/(np.linalg.norm(a)+1e-12); K=np.array([[0,-a[2],a[1]],[a[2],0,-a[0]],[-a[1],a[0],0]]); R=np.eye(3)+math.sin(angle)*K+(1-math.cos(angle))*(K@K); return (c@R.T+np.asarray(translation)).tolist()
+
+def monte_carlo_dock(receptor_xyz,ligand_xyz,steps=100,temperature=.6,seed=0):
+    rng=random.Random(seed); current=np.asarray(ligand_xyz,float); e=pose_energy(receptor_xyz,current)['total']; best=(e,current.copy()); trace=[]
+    for step in range(steps):
+        proposal=np.asarray(transform_pose(current,[rng.gauss(0,.3) for _ in range(3)],[rng.random() for _ in range(3)],rng.gauss(0,.15))); pe=pose_energy(receptor_xyz,proposal)['total']; accepted=pe<e or rng.random()<math.exp(min(0,(e-pe)/temperature));
+        if accepted: current,e=proposal,pe
+        if e<best[0]: best=(e,current.copy())
+        trace.append({'step':step,'energy':e,'accepted':accepted})
+    return {'best_energy':best[0],'best_pose':best[1].tolist(),'trajectory':trace,'acceptance_rate':sum(x['accepted'] for x in trace)/max(1,steps)}
+
+def ensemble_docking(pocket_ensembles,smiles):
+    poses=[{**dock(p,smiles),'conformation':i} for i,p in enumerate(pocket_ensembles)]; poses.sort(key=lambda x:x['binding_dg_kcal_mol']); dg=np.array([p['binding_dg_kcal_mol'] for p in poses]); w=np.exp(-(dg-dg.min())/.593); w=w/w.sum(); return {'poses':poses,'conformational_weights':w.tolist(),'ensemble_dg':float(-.593*math.log(np.exp(-dg/.593).mean())),'best':poses[0]}
+
+def binding_thermodynamics(dg,rotatable_bonds,displaced_waters=0,temperature_k=298):
+    entropy_penalty=.003*temperature_k*rotatable_bonds; solvent_gain=.35*displaced_waters; enthalpy=dg-entropy_penalty+solvent_gain; return {'delta_h_kcal_mol':enthalpy,'minus_t_delta_s_kcal_mol':entropy_penalty-solvent_gain,'delta_g_kcal_mol':dg,'temperature_k':temperature_k}
+
+def competitive_binding(ligands,concentrations_uM):
+    if len(ligands)!=len(concentrations_uM): raise ValueError('length mismatch')
+    terms=[c/max(1e-12,l['estimated_kd_uM']) for l,c in zip(ligands,concentrations_uM)]; z=1+sum(terms); return {'unbound_fraction':1/z,'occupancies':[x/z for x in terms]}
+
+def interaction_fingerprint(pocket,smiles):
+    d=dock(pocket,smiles); terms=d['energy_terms']; return {'hydrogen_bond':int(terms['hbond']<0),'hydrophobic':int(terms['vdw']<0),'electrostatic':int(terms['electrostatic']<-.1),'aromatic':int(terms['aromatic']<0),'key_residues':d['key_residues']}
+
+def relative_free_energy(pocket,reference_smiles,analogs):
+    ref=dock(pocket,reference_smiles)['binding_dg_kcal_mol']; return {'reference':reference_smiles,'analogs':[{'smiles':s,'delta_delta_g':dock(pocket,s)['binding_dg_kcal_mol']-ref} for s in analogs]}
+
+def docking_report(pocket,library,ensembles=None):
+    screen=virtual_screen(pocket,library); detailed=[{**dock(pocket,s),'fingerprint':interaction_fingerprint(pocket,s)} for s in library]; return {'screen':screen,'detailed':detailed,'ensemble':ensemble_docking(ensembles,library[0]) if ensembles and library else None,'model_status':'Transparent composition/physics scoring and stochastic search; no trained GNN and values are screening proxies, not experimental free energies.'}
+
+def docking_diagnostics(pocket,smiles):
+    d=dock(pocket,smiles); f=d['ligand']; e=d['energy_terms']; return {'pocket_length':float(len(pocket)),'heavy_atoms':float(f['heavy_atoms']),'rings':float(f['rings']),'logp':f['logp_estimate'],'molecular_weight':f['mol_weight'],'hbond_capacity':float(f['hbond_capacity']),'vdw':e['vdw'],'hbond':e['hbond'],'electrostatic':e['electrostatic'],'desolvation':e['desolvation'],'aromatic':e['aromatic'],'binding_dg':d['binding_dg_kcal_mol'],'estimated_kd_uM':d['estimated_kd_uM'],'key_residue_count':float(len(d['key_residues']))}

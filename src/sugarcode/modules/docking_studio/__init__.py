@@ -1,3 +1,4 @@
-"""Docking Studio: pocket-ligand scoring, key residues, mutation suggestions."""
-from .core import dock, virtual_screen, parse_smiles_features, dock_into_structure
-__all__ = ["dock", "virtual_screen", "parse_smiles_features", "dock_into_structure"]
+"""Docking, configurational search and thermodynamic analysis."""
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
