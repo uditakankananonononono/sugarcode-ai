@@ -6,14 +6,24 @@ A multi-omic bio-design platform organized as a network of specialized modules o
 **Omega OS v7.0** framework. Built line-by-line from the SugarCode AI spec doc
 (`spec/` holds the full per-module spec corpus extracted from the source document).
 
-## Install + CLI (drop 57)
+## Install + CLI (drops 57-60)
+
+Requires Python 3.10+ and a modern pip (23+; older pips can mis-handle PEP 517
+builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 
 ```
 pip install .
 sugarcode version
 sugarcode modules                       # the 77 modules
-sugarcode splice assess RB1 'c.2490-28T>G'   # deepsplice live assessment, JSON out
+sugarcode splice assess RB1 'c.2499-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
+
+# offline bio tools (drop 60), all JSON on stdout:
+sugarcode codon cai ATGGCGGCGAAA                 # CAI vs a published usage table
+sugarcode codon optimize MAAKRF --gc-min 0.4 --gc-max 0.6
+sugarcode fasta stats sequences.fa               # records, lengths, GC
+sugarcode genbank features plasmid.gb            # feature counts + spans
+sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
 ```
 
 ## Architecture
@@ -464,7 +474,7 @@ similarity_check("CC(=O)Oc1ccccc1C(=O)O")    # -> ASPIRIN, 100%, phase 4
 OpenClinVar now adds live ClinVar evidence to its ACMG-style weighing: a
 targeted phrase query, title-verified against the requested notation (ClinVar's
 phrase search returns near-misses - caught live when c.5266dup initially
-matched c.5490dup), with honest sign handling (conflicting/uncertain = weight
+matched c.5499dup), with honest sign handling (conflicting/uncertain = weight
 0, not positive). EvoFold 4D runs ANM normal modes on real RCSB coordinates
 and validates fluctuations against experimental B-factors (1TUP chain B:
 Pearson r = 0.05, honestly reported as weak agreement). ChemGPT designs are
@@ -500,7 +510,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 490 tests
+python -m pytest -q                 # 499 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
