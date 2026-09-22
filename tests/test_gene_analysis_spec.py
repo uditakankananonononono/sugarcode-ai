@@ -76,3 +76,19 @@ def test_diagnostics_no_literal_baseline_padding():
  d=gene_diagnostics('DEMO1',SEQ,[{'variant':'c.5A>G','consequence':'synonymous'}])
  assert len(d)==15 and not any(key.startswith('baseline.') or key=='pathway_count' for key in d)
  assert all(math.isfinite(v) for v in d.values())
+
+def test_unrelated_locus_context_changes_variant_mechanism():
+ variant=[{'variant':'c.25A>G','consequence':'missense'}]
+ gc=digital_twin('GENE_GC','ATG'+('GCG'*40)+'TAA',variant)
+ at=digital_twin('GENE_AT','ATG'+('ATA'*40)+'TAA',variant)
+ assert gc['variant_features']['local_gc'] != at['variant_features']['local_gc']
+ assert gc['variant_features']['local_context'] != at['variant_features']['local_context']
+ assert gc['counterfactual']['structural']['ddg_kcal_mol'] != at['counterfactual']['structural']['ddg_kcal_mol']
+ assert gc['counterfactual']['posterior']['attributions'] != at['counterfactual']['posterior']['attributions']
+
+
+def test_variant_position_changes_codon_and_domain_overlap():
+ seq='ATG'+('GCC'*20)+('ATA'*20)+'TAA'
+ a=_variant_features({'variant':'c.10A>G','consequence':'missense'},seq)
+ b=_variant_features({'variant':'c.120A>G','consequence':'missense'},seq)
+ assert a['position_fraction'] < b['position_fraction'] and a['local_context'] != b['local_context'] and a['domain_overlap'] != b['domain_overlap']
