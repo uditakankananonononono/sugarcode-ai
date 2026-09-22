@@ -32,6 +32,14 @@ except _splice.SpliceDataMissing:
     ACCEPTOR_LOD = SEED_ACCEPTOR_LOD
     GC_DONOR_LOD = SEED_DONOR_LOD
     PWM_SOURCE = "consensus-seed fallback (vendored splice data missing)"
+try:
+    U12_ATAC_DONOR_LOD = _splice.u12_atac_donor_lod()
+    U12_ATAC_ACCEPTOR_LOD = _splice.u12_atac_acceptor_lod()
+    U12_SOURCE = ("U12 AT-AC matrices learned from 139 human gold minor introns "
+                  "(Larue & Roy 2023 intronIC index, see PROVENANCE)")
+except _splice.SpliceDataMissing:
+    U12_ATAC_DONOR_LOD = U12_ATAC_ACCEPTOR_LOD = None
+    U12_SOURCE = "U12 matrices missing - AT-AC sites named not-applicable"
 
 
 def score_donor(seq9: str, matrix: str = "real") -> float:
@@ -41,24 +49,42 @@ def score_donor(seq9: str, matrix: str = "real") -> float:
     if matrix == "real":
         # GC-AG donors route to the swapped matrix (bio/splice.gc_donor_lod) -
         # the BRCA2 c.7976+2C>G/A golden miss traced to this scope gap.
-        lod = GC_DONOR_LOD if s[3:5] == "GC" else DONOR_LOD
+        # AT-AC (U12) donors route to the learned U12 matrix (drop 27).
+        if s[3:5] == "AT" and U12_ATAC_DONOR_LOD is not None:
+            lod = U12_ATAC_DONOR_LOD
+        else:
+            lod = GC_DONOR_LOD if s[3:5] == "GC" else DONOR_LOD
     else:
         lod = SEED_DONOR_LOD
     return round(normalized_score(s, lod), 4)
 
 
-def _donor_lod_for(ref_window: str) -> list[dict[str, float]]:
+def _donor_lod_for(ref_window: str):
     """Matrix for a ref/alt PAIR: the REF window's class decides. Scoring the
     alt against its own class made GT->GC conversions look tolerated
-    (multi-gene golden caught it: +2T>C pathogenic variants scored ~0)."""
-    return GC_DONOR_LOD if clean_dna(ref_window)[3:5] == "GC" else DONOR_LOD
+    (multi-gene golden caught it: +2T>C pathogenic variants scored ~0).
+    AT-AC (U12) donors use the learned U12 matrix when vendored; without it
+    they are not scored at all (pwm_applicable False)."""
+    cls = clean_dna(ref_window)[3:5]
+    if cls == "AT":
+        return U12_ATAC_DONOR_LOD
+    return GC_DONOR_LOD if cls == "GC" else DONOR_LOD
+
+
+def _acceptor_lod_for(ref_window: str):
+    cls = clean_dna(ref_window)[12:14]
+    return U12_ATAC_ACCEPTOR_LOD if cls == "AC" else ACCEPTOR_LOD
 
 
 def score_acceptor(seq15: str, matrix: str = "real") -> float:
     s = clean_dna(seq15)
     if len(s) != 15:
         raise ValueError("acceptor window must be 15 nt")
-    lod = ACCEPTOR_LOD if matrix == "real" else SEED_ACCEPTOR_LOD
+    if matrix == "real":
+        lod = (U12_ATAC_ACCEPTOR_LOD if s[12:14] == "AC"
+               and U12_ATAC_ACCEPTOR_LOD is not None else ACCEPTOR_LOD)
+    else:
+        lod = SEED_ACCEPTOR_LOD
     return round(normalized_score(s, lod), 4)
 
 
@@ -88,9 +114,13 @@ def site_class(window: str, site_type: str = "donor") -> str:
 
 
 def pwm_applicable(window: str, site_type: str = "donor") -> bool:
-    """Whether the learned GT-AG PWMs may score this window's site class."""
+    """Whether a learned PWM may score this window's site class: GT/GC
+    donors and AG acceptors via the U2 matrices; AT-AC (U12) sites via the
+    U12 matrices when vendored (drop 27), otherwise named not-applicable."""
     cls = site_class(window, site_type)
-    return cls in ("GT", "GC") if site_type == "donor" else cls == "AG"
+    if site_type == "donor":
+        return cls in ("GT", "GC") or (cls == "AT" and U12_ATAC_DONOR_LOD is not None)
+    return cls == "AG" or (cls == "AC" and U12_ATAC_ACCEPTOR_LOD is not None)
 
 
 def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
@@ -103,6 +133,9 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
     if site_type == "donor" and matrix == "real":
         rs = round(normalized_score(clean_dna(ref_window), _donor_lod_for(ref_window)), 4)
         as_ = round(normalized_score(clean_dna(alt_window), _donor_lod_for(ref_window)), 4)
+    elif site_type == "acceptor" and matrix == "real":
+        rs = round(normalized_score(clean_dna(ref_window), _acceptor_lod_for(ref_window)), 4)
+        as_ = round(normalized_score(clean_dna(alt_window), _acceptor_lod_for(ref_window)), 4)
     else:
         scorer = score_donor if site_type == "donor" else score_acceptor
         rs, as_ = scorer(ref_window, matrix), scorer(alt_window, matrix)
@@ -126,7 +159,7 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
     else:
         consequence = "minimal predicted effect on splicing"
     cls = site_class(ref_window, site_type)
-    applicable = cls in ("GT", "GC") if site_type == "donor" else cls == "AG"
+    applicable = pwm_applicable(ref_window, site_type)
     if not applicable:
         consequence = (f"atypical site class ({cls} terminal dinucleotide"
                        f"{' - U12/minor spliceosome intron' if cls in ('AT', 'AC') else ''})"
@@ -143,6 +176,10 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
         **({"gc_donor": True,
             "gc_note": "GC-AG site scored with the swapped +2 matrix (approximation, "
                        "see bio/splice.gc_donor_lod)"} if gc_donor else {}),
+        **({"u12_atac": True,
+            "u12_note": f"AT-AC (U12 minor spliceosome) site scored with the learned "
+                        f"U12 matrix ({U12_SOURCE})"}
+           if applicable and cls in ("AT", "AC") else {}),
     }
 
 
@@ -220,13 +257,21 @@ def cryptic_scan(ref_seq: str, alt_seq: str, site_threshold: float = 0.75,
             "pwm_source": PWM_SOURCE}
 
 
-def live_splice_assessment(gene: str, notation: str, offline: bool = False) -> dict:
+def live_splice_assessment(gene: str, notation: str, offline: bool = False,
+                           transcript: str | None = None) -> dict:
     """Splice assessment of one ClinVar-style notation (c.N+k / c.N-k SNV)
     against the gene's REAL RefSeqGene junction map.
 
     Natural-site variants (donor +1..+6, acceptor -1..-14): window delta via
     the learned PWM. Deeper variants: cryptic_scan on +/-60 nt of real intronic
     context. Everything else: named out-of-scope, never guessed.
+
+    transcript: optional NM_ accession - builds the junction map for THAT
+    transcript by aligning its cDNA record's CDS to the RefSeqGene genomic
+    sequence (bio.splice.cdna_junction_map, drop 27). Use when ClinVar cites
+    a transcript the record does not annotate (SCN1A/NM_001165963: its
+    alternative 3'-donor exon-11 extension shifts all downstream c.
+    numbering by +33 vs the annotated NM_006920).
     """
     import re as _re
     from ...bio import splice as _sp
@@ -235,7 +280,10 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False) -> d
         return {"gene": gene, "notation": notation, "status": "unparseable",
                 "detail": "expected form c.135-1G>A or c.212+1G>A"}
     n, sign, k, refb, altb = int(m.group(1)), m.group(2), int(m.group(3)), m.group(4), m.group(5)
-    jm = _sp.junction_map(gene, offline=offline)
+    if transcript:
+        jm = _sp.cdna_junction_map(gene, transcript, offline=offline)
+    else:
+        jm = _sp.junction_map(gene, offline=offline)
     if jm["status"] != "ok":
         return {"gene": gene, "notation": notation, "status": jm["status"]}
     seq = jm["sequence"]

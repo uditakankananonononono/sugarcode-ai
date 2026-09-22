@@ -231,6 +231,60 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
                                       "detail": "absent from gnomAD - consistent with rare (weak support)"})
         except Exception as e:
             r["gnomad_frequency"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
+    # splice evidence (drop 27, mirrors the rarenet panel): natural-site
+    # delta on the gene's real RefSeqGene junction map; deep-intronic ->
+    # cryptic_scan; AT-AC sites named out-of-scope; weak perturbations add
+    # ZERO (BRCA1-validated non-discriminating). Weights are calibrated
+    # against the 17-gene golden: 1,802/1,802 canonical U2 sites called
+    # loss, benign specificity 62/63.
+    import re as _re
+    clean = variant.split(":")[-1].replace(" ", "")
+    if _re.fullmatch(r"c\.\d+[+-]\d+[ACGT]>[ACGT]", clean):
+        try:
+            from ..deepsplice import live_splice_assessment
+            sa = live_splice_assessment(gene, clean, offline=offline)
+            r["splice_assessment"] = {k: v for k, v in sa.items()
+                                      if k in ("status", "site_type", "site_class", "delta",
+                                               "consequence", "verdict", "source",
+                                               "strong_findings", "exon_context")}
+            st = sa.get("status")
+            if st == "natural_site":
+                d = sa["delta"]
+                if d <= -0.15:
+                    w = 0.4
+                    r["evidence"].append({
+                        "rule": "SPLICE_PWM_LOSS", "weight": w,
+                        "detail": (f"predicted loss of natural {sa['site_type']} site "
+                                   f"(delta {d:+.2f} on the RefSeqGene map; 17-gene golden: "
+                                   "100% of 1,802 canonical U2 sites called loss)")})
+                elif d <= -0.05:
+                    r["evidence"].append({
+                        "rule": "SPLICE_PWM_WEAKENED", "weight": 0.1,
+                        "detail": f"weakened {sa['site_type']} site (delta {d:+.2f}) - leaky/cryptic risk"})
+                else:
+                    r["evidence"].append({
+                        "rule": "SPLICE_PWM", "weight": 0.0,
+                        "detail": (f"weak {sa['site_type']}-site perturbation (delta {d:+.2f}) - "
+                                   "validated non-discriminating on the golden set; adds no evidence")})
+            elif st == "cryptic_scan":
+                if sa.get("strong_findings"):
+                    r["evidence"].append({
+                        "rule": "SPLICE_CRYPTIC_NEW", "weight": 0.3,
+                        "detail": sa["verdict"] + " (high-precision signal: 0 FP in 55 on the BRCA1 k>=3 golden)"})
+                else:
+                    r["evidence"].append({
+                        "rule": "SPLICE_CRYPTIC", "weight": 0.0,
+                        "detail": sa.get("verdict", "no cryptic activation") +
+                                  " - weak perturbations are non-discriminating; adds no evidence"})
+            elif st == "atypical_site_class":
+                r["evidence"].append({
+                    "rule": "SPLICE_SITE_CLASS", "weight": 0.0,
+                    "detail": (f"{sa.get('site_class')} terminal dinucleotide - U12/minor "
+                               "spliceosome or non-canonical site; GT-AG PWM not applicable "
+                               "(named, never mis-scored)")})
+            # ref mismatch / outside scope / no map: attached above, no evidence
+        except Exception as e:
+            r["splice_assessment"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
     try:
         matched = entrez.clinvar_exact(gene, variant, offline=offline)
     except Exception as e:

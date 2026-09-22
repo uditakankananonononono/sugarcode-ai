@@ -50,3 +50,16 @@ PKD1 NG_008617.1, TSC1 NG_012386.1, TSC2 NG_005895.1, VHL NG_008212.3.
 - RefSeqGene records annotate specific transcript versions (e.g. BRCA1
   NM_007294.3); cDNA numbering for variant mapping uses the CDS annotated
   on the same record (NP_009225.1, 5,592 bp CDS = 1,863 aa + stop).
+
+## U12 (minor spliceosome) matrices (drop 27)
+Source: Larue & Roy (2023, NAR gkad797) intronIC v3 training index,
+`training_index/training_data_index.tsv.gz` (github.com/glarue/intronIC,
+mirroring FigShare DOI 10.6084/m9.figshare.20483655; license GPL-3.0+ -
+only the splice-site sequence facts are vendored here). Human
+(species_full=homo_sapiens, label=u12) gold U12 introns: 361 GT-AG + 139
+AT-AC (2 GC-AG excluded). Donor window = last 3 nt of `up_flank` + first
+6 nt of the intron; acceptor = last 14 INTRONIC nt. The export carries no
+downstream exon flank, so acceptor column index 14 (first exonic base) is
+a uniform 0.25 column - labeled, not guessed. Learned consensuses match
+the literature: U12 donor RTATCCTTT (both subtypes), AT-AC acceptor
+(T)nCCTTRCAC. Harvest: scripts/harvest_u12.py (2026-09-22).

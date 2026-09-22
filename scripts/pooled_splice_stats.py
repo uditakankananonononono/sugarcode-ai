@@ -45,7 +45,8 @@ def main():
                           "canon_u2": cu, "canon_u2_loss": cl, "canon_atac": ca}
     print(f"genes: {len(FIX)}  pathogenic: {tot['path']}  benign: {tot['ben']}")
     print(f"canonical U2 (GT/GC donor, AG acceptor): {canon_u2_loss}/{canon_u2} called loss")
-    print(f"canonical AT-AC (U2 PWM not applicable, detected+labeled): {canon_atac}")
+    atac_loss = sum(1 for _, _, _, dl in atac_cases if dl <= -0.15)
+    print(f"canonical AT-AC (U12 matrices, drop 27): {atac_loss}/{canon_atac} called loss")
     for g, n, cls, dl in atac_cases:
         print(f"   {g} {n} class={cls} delta={dl:+.3f}")
     print(f"benign specificity: {ben_tp}/{ben_n}")
