@@ -1,3 +1,3 @@
-"""MetaboDesigner: pathway synthesis over reaction graphs + FBA bottleneck analysis."""
-from .core import design_pathway, bottleneck_analysis
-__all__ = ["design_pathway", "bottleneck_analysis"]
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and (callable(v) or k=='REACTION_DB')]

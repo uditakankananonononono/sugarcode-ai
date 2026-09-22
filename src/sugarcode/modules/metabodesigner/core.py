@@ -115,3 +115,41 @@ def bottleneck_analysis(path: list[dict], enzyme_kcat: dict[str, float] | None =
             "top_bottleneck": scored[0] if scored else None,
             "mitigation": f"overexpress {scored[0]['enzyme']} or find a faster ortholog"
             if scored else "empty pathway"}
+
+import math
+import numpy as np
+from scipy.optimize import linprog
+from scipy.integrate import solve_ivp
+
+def stoichiometric_matrix(route):
+ mets=sorted({m for r in route for m in r['substrates']+r['products']}); S=np.zeros((len(mets),len(route)))
+ for j,r in enumerate(route):
+  for m in r['substrates']:S[mets.index(m),j]-=1
+  for m in r['products']:S[mets.index(m),j]+=1
+ return {'metabolites':mets,'reactions':[r.get('reaction',r.get('id')) for r in route],'matrix':S.tolist()}
+def pathway_flux(route,target,source,upper=10):
+ sm=stoichiometric_matrix(route); S=np.asarray(sm['matrix']); internal=[i for i,m in enumerate(sm['metabolites']) if m not in (source,target)]; c=np.zeros(len(route)); c[-1]=-1; res=linprog(c,A_eq=S[internal] if internal else None,b_eq=np.zeros(len(internal)) if internal else None,bounds=[(0,upper)]*len(route),method='highs'); return {'success':bool(res.success),'fluxes':res.x.tolist() if res.success else [],'objective_flux':float(-res.fun) if res.success else 0,'stoichiometry':sm}
+def thermodynamics(route,dg_by_reaction=None):
+ dg_by_reaction=dg_by_reaction or {}; vals=[float(dg_by_reaction.get(r.get('reaction',r.get('id')),-5+len(r.get('cofactors',[])))) for r in route]; return {'step_dg':vals,'total_dg':sum(vals),'uphill_steps':[i+1 for i,v in enumerate(vals) if v>0],'feasible':sum(vals)<0}
+def carbon_redox(route):
+ cof=[c for r in route for c in r.get('cofactors',[])]; return {'atp_demand':cof.count('ATP'),'nadh_demand':cof.count('NADH'),'nadph_demand':cof.count('NADPH'),'carbon_efficiency_proxy':1/(1+.1*len(route))}
+def intermediate_risk(route,concentrations=None):
+ concentrations=concentrations or {}; out=[]
+ for r in route:
+  for p in r['products']: out.append({'metabolite':p,'concentration':concentrations.get(p,1),'reactivity_risk':min(1,.1*concentrations.get(p,1)+.2*('aldehyde' in p))})
+ return sorted(out,key=lambda x:-x['reactivity_risk'])
+def dynamic_pathway(kcats,initial_substrate=10,hours=20):
+ k=np.asarray(kcats,float); n=len(k)
+ def rhs(t,y):
+  rates=k*y[:-1]/(1+y[:-1]); dy=np.zeros(n+1); dy[0]=-rates[0]
+  for i in range(1,n):dy[i]=rates[i-1]-rates[i]
+  dy[-1]=rates[-1]; return dy
+ t=np.linspace(0,hours,201); s=solve_ivp(rhs,(0,hours),[initial_substrate]+[0]*n,t_eval=t,rtol=1e-8,atol=1e-9); return {'time_h':t.tolist(),'concentrations':s.y.tolist(),'product_final':float(s.y[-1,-1])}
+def chassis_rank(requirements):
+ chassis={'e_coli':{'oxygen':.5,'secretion':.2,'glycosylation':0,'scale':1},'yeast':{'oxygen':.7,'secretion':.7,'glycosylation':1,'scale':.8},'mammalian':{'oxygen':.8,'secretion':1,'glycosylation':1,'scale':.2}}; rows=[]
+ for name,p in chassis.items(): rows.append({'chassis':name,'score':sum(1-abs(p[k]-v) for k,v in requirements.items())/len(requirements)})
+ return sorted(rows,key=lambda x:-x['score'])
+def pathway_report(target,source='glucose'):
+ d=design_pathway(target,source); route=d.get('route',[]); return {**d,'flux':pathway_flux(route,target,source) if route else None,'thermodynamics':thermodynamics(route),'balances':carbon_redox(route),'intermediate_risks':intermediate_risk(route),'bottlenecks':bottleneck_analysis(route),'model_status':'Curated reaction graph, LP and explicit kinetics; not live KEGG/MetaCyc and no learned enzyme model.'}
+def metabolic_diagnostics(r):
+ return {'step_count':float(r['steps']),'feasibility_score':r['feasibility']['score'],'objective_flux':r['flux']['objective_flux'],'total_dg':r['thermodynamics']['total_dg'],'uphill_steps':float(len(r['thermodynamics']['uphill_steps'])),'atp_demand':float(r['balances']['atp_demand']),'nadh_demand':float(r['balances']['nadh_demand']),'nadph_demand':float(r['balances']['nadph_demand']),'carbon_efficiency':r['balances']['carbon_efficiency_proxy'],'intermediate_count':float(len(r['intermediate_risks'])),'max_intermediate_risk':max((x['reactivity_risk'] for x in r['intermediate_risks']),default=0),'bottleneck_risk':r['bottlenecks']['top_bottleneck']['risk'] if r['bottlenecks']['top_bottleneck'] else 0}
