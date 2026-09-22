@@ -12,6 +12,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+import hashlib
 from pathlib import Path
 
 BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
@@ -35,7 +36,10 @@ def _throttle():
 def _get(path: str, params: dict, offline: bool = False, retries: int = 3) -> bytes:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     key = urllib.parse.urlencode(sorted(params.items()))
-    cache_file = CACHE_DIR / f"{abs(hash((path, key)))}.raw"
+    # stable digest: builtin hash() is salted per process, which made cache
+    # files unreachable from any other run and broke --offline reuse
+    digest = hashlib.sha256(f"{path}?{key}".encode()).hexdigest()[:32]
+    cache_file = CACHE_DIR / f"{digest}.raw"
     if cache_file.exists():
         return cache_file.read_bytes()
     if offline:
