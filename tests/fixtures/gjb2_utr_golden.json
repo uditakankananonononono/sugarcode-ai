@@ -1,0 +1,38 @@
+{
+ "source": "ClinVar live query 2026-09-22 (GJB2 NM_004004, 5'-UTR intron splice variants) + NG_008358.1 mRNA-exon windows; CDS is a single exon so the CDS harness cannot see this intron",
+ "cases": [
+  {
+   "notation": "c.-22-1G>A",
+   "site_type": "acceptor",
+   "window": "TTCGTCTTTTCCAGA",
+   "index": 13,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.-22-2A>C",
+   "site_type": "acceptor",
+   "window": "TTCGTCTTTTCCAGA",
+   "index": 12,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "reviewed by expert panel",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.-23+1G>A",
+   "site_type": "donor",
+   "window": "CAGGTGAGC",
+   "index": 3,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  }
+ ]
+}
