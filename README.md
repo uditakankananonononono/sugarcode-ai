@@ -72,7 +72,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_opt | PAM enumeration both strands, GC 40-60% filter, position-weighted on-target score, seed-weighted off-target scan, hairpin check, browser-track payload |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, GC-window repair, motif avoidance, CHI tRNA-strain index, TASEP ribosome-flow KMC simulation, FBA constraint export |
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
-| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls calibrated on a 28-gene ClinVar golden set + U12 family goldens, 2,720 unique pathogenic + 86 benign cases after full (gene, notation) dedupe (100% of ALL 2,430 canonical sites called loss: 2,414 U2 GT/GC-AG and 16 AT-AC across five sodium-channel genes), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A, canonical and explicit-transcript maps), exon-skip in-frame/frameshift context + alternative outcomes (intron retention with real intron lengths, cryptic-site-use candidates), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
+| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls + a polypyrimidine-tract term for AG acceptors (learned from the harvest, additive with unscaled matrix contribution) calibrated on a 28-gene ClinVar golden set + U12 family goldens, 2,720 unique pathogenic + 86 benign cases after full (gene, notation) dedupe (100% of ALL 2,430 canonical sites called loss: 2,414 U2 GT/GC-AG and 16 AT-AC across five sodium-channel genes), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A, canonical and explicit-transcript maps), exon-skip in-frame/frameshift context + alternative outcomes (intron retention with real intron lengths, cryptic-site-use candidates), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 434 tests
+python -m pytest -q                 # 439 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

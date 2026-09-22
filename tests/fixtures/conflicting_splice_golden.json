@@ -8,7 +8,7 @@
      "site_type": "acceptor",
      "window": "TGATTTTATTTCAGG",
      "index": 8,
-     "delta": -0.0169,
+     "delta": -0.0242,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -17,7 +17,7 @@
      "site_type": "acceptor",
      "window": "ATTTGTGGTTTTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -26,7 +26,7 @@
      "site_type": "acceptor",
      "window": "CTGTTTCTTACTAGG",
      "index": 9,
-     "delta": 0.0437,
+     "delta": 0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -44,7 +44,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTTAAATTAGG",
      "index": 9,
-     "delta": 0.0192,
+     "delta": 0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -53,7 +53,7 @@
      "site_type": "acceptor",
      "window": "TGATTAATTTGCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -98,7 +98,7 @@
      "site_type": "acceptor",
      "window": "TGCTTAATTTTTAGG",
      "index": 3,
-     "delta": -0.0443,
+     "delta": -0.0693,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -125,7 +125,7 @@
      "site_type": "acceptor",
      "window": "GTTCTTTTTAACAGG",
      "index": 9,
-     "delta": -0.0154,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -143,7 +143,7 @@
      "site_type": "acceptor",
      "window": "TGATTAATTTGCAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -188,7 +188,7 @@
      "site_type": "acceptor",
      "window": "AAAAAAAAAAATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -197,7 +197,7 @@
      "site_type": "acceptor",
      "window": "ATTTGTGGTTTTAGT",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -206,7 +206,7 @@
      "site_type": "acceptor",
      "window": "TCTATTTTATTTAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -215,7 +215,7 @@
      "site_type": "acceptor",
      "window": "TGATTAATTTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -224,7 +224,7 @@
      "site_type": "acceptor",
      "window": "GTTCTTTTTAACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -260,7 +260,7 @@
      "site_type": "acceptor",
      "window": "CTCCATCTTAACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -269,7 +269,7 @@
      "site_type": "acceptor",
      "window": "TGCTTAATTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -292,7 +292,7 @@
      "site_type": "acceptor",
      "window": "CTTGTGACAAACAGA",
      "index": 2,
-     "delta": -0.0187,
+     "delta": -0.026,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -319,7 +319,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTTCCCGTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -355,7 +355,7 @@
      "site_type": "acceptor",
      "window": "ATTTCTATATGTAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -364,7 +364,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 6,
-     "delta": -0.0166,
+     "delta": -0.0239,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -373,7 +373,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -382,7 +382,7 @@
      "site_type": "acceptor",
      "window": "TGTCTTAATTGCAGA",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -400,7 +400,7 @@
      "site_type": "acceptor",
      "window": "TCTATTCACAATAGT",
      "index": 9,
-     "delta": 0.0438,
+     "delta": 0.0668,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -409,7 +409,7 @@
      "site_type": "acceptor",
      "window": "TCCTACCATCTTAGT",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -418,7 +418,7 @@
      "site_type": "acceptor",
      "window": "ATTTCTATATGTAGA",
      "index": 10,
-     "delta": 0.0142,
+     "delta": 0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -427,7 +427,7 @@
      "site_type": "acceptor",
      "window": "GTCGTGGCATTCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -436,7 +436,7 @@
      "site_type": "acceptor",
      "window": "TGTCTTAATTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -454,7 +454,7 @@
      "site_type": "acceptor",
      "window": "TAAATTATATTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -463,7 +463,7 @@
      "site_type": "acceptor",
      "window": "CTTAACTCTGTTAGG",
      "index": 9,
-     "delta": 0.0347,
+     "delta": 0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -490,7 +490,7 @@
      "site_type": "acceptor",
      "window": "GACTTATCTCACAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -499,7 +499,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 3,
-     "delta": -0.023,
+     "delta": -0.0407,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -526,7 +526,7 @@
      "site_type": "acceptor",
      "window": "CCTTTCTTATACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -553,7 +553,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTCTGTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -562,7 +562,7 @@
      "site_type": "acceptor",
      "window": "TGGTTTACTTTAAGA",
      "index": 6,
-     "delta": -0.005,
+     "delta": -0.007,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -571,7 +571,7 @@
      "site_type": "acceptor",
      "window": "AATTTCTTTTTAAGT",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -589,7 +589,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTGTCAGA",
      "index": 9,
-     "delta": 0.0347,
+     "delta": 0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -598,7 +598,7 @@
      "site_type": "acceptor",
      "window": "GACTTATCTCACAGC",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -643,7 +643,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTGACTCTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -670,7 +670,7 @@
      "site_type": "acceptor",
      "window": "TGGTTTACTTTAAGA",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0713,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -688,7 +688,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTAATGGTAGA",
      "index": 5,
-     "delta": -0.0376,
+     "delta": -0.0607,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -715,7 +715,7 @@
      "site_type": "acceptor",
      "window": "CCCTTTCTTTCTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -733,7 +733,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -751,7 +751,7 @@
      "site_type": "acceptor",
      "window": "TTACTTGATTTCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -769,7 +769,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0097,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -778,7 +778,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTAAATACAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -787,7 +787,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTCTTCACAGA",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -796,7 +796,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTCTTCACAGA",
      "index": 9,
-     "delta": -0.0193,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -805,7 +805,7 @@
      "site_type": "acceptor",
      "window": "GACTTATCTCACAGC",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -832,7 +832,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -859,7 +859,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTTACTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -895,7 +895,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -940,7 +940,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTGTCCTTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -976,7 +976,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTAAATACAGA",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -985,7 +985,7 @@
      "site_type": "acceptor",
      "window": "ATCTGTAACTCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -994,7 +994,7 @@
      "site_type": "acceptor",
      "window": "TCTCCCTATATTAGG",
      "index": 11,
-     "delta": 0.0139,
+     "delta": 0.0066,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1003,7 +1003,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1021,7 +1021,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTTCAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1030,7 +1030,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTTACTTTAGG",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1066,7 +1066,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGA",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1093,7 +1093,7 @@
      "site_type": "acceptor",
      "window": "TCTATTCACAATAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1120,7 +1120,7 @@
      "site_type": "acceptor",
      "window": "TCCTACCATCTTAGT",
      "index": 6,
-     "delta": -0.0191,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1129,7 +1129,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTCTTATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1138,7 +1138,7 @@
      "site_type": "acceptor",
      "window": "TCATTTTTCTTTAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1156,7 +1156,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTATTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1165,7 +1165,7 @@
      "site_type": "acceptor",
      "window": "TTTGGTTCGTGCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1174,7 +1174,7 @@
      "site_type": "acceptor",
      "window": "ATCTGTAACTCCAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1201,7 +1201,7 @@
      "site_type": "acceptor",
      "window": "ATTTTCTCTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1210,7 +1210,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTAAATACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1219,7 +1219,7 @@
      "site_type": "acceptor",
      "window": "TAACTCCTGTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1228,7 +1228,7 @@
      "site_type": "acceptor",
      "window": "TGTCTTAATTGCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1237,7 +1237,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTACCACAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1246,7 +1246,7 @@
      "site_type": "acceptor",
      "window": "TAACTCCTGTTTAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1255,7 +1255,7 @@
      "site_type": "acceptor",
      "window": "AATTTCTTTTTAAGT",
      "index": 11,
-     "delta": 0.0564,
+     "delta": 0.0721,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1273,7 +1273,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTGTCCTTAGT",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1282,7 +1282,7 @@
      "site_type": "acceptor",
      "window": "GACTTATCTCACAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1300,7 +1300,7 @@
      "site_type": "acceptor",
      "window": "CTTAACTCTGTTAGG",
      "index": 10,
-     "delta": -0.0109,
+     "delta": -0.0182,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1309,7 +1309,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTATTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1368,7 +1368,7 @@
      "site_type": "acceptor",
      "window": "CTTGTATTTTACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1386,7 +1386,7 @@
      "site_type": "acceptor",
      "window": "CCCATTCCTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1395,7 +1395,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTGTCTCCAGC",
      "index": 10,
-     "delta": 0.0108,
+     "delta": 0.0181,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1404,7 +1404,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1413,7 +1413,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1422,7 +1422,7 @@
      "site_type": "acceptor",
      "window": "AATGTCCATTTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1449,7 +1449,7 @@
      "site_type": "acceptor",
      "window": "CAATTTAATTTCAGG",
      "index": 7,
-     "delta": -0.0079,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1458,7 +1458,7 @@
      "site_type": "acceptor",
      "window": "TTTATAATTTATAGA",
      "index": 10,
-     "delta": -0.0079,
+     "delta": -0.0099,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1512,7 +1512,7 @@
      "site_type": "acceptor",
      "window": "TCCTGGGGATCCAGG",
      "index": 5,
-     "delta": 0.0009,
+     "delta": 0.0029,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1521,7 +1521,7 @@
      "site_type": "acceptor",
      "window": "ATTTATCTTTCTAGG",
      "index": 6,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1557,7 +1557,7 @@
      "site_type": "acceptor",
      "window": "CCCTACCCTGCTAGT",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1566,7 +1566,7 @@
      "site_type": "acceptor",
      "window": "AATGTCCATTTTAGA",
      "index": 7,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1602,7 +1602,7 @@
      "site_type": "acceptor",
      "window": "CATTCCATTTAAAGC",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1611,7 +1611,7 @@
      "site_type": "acceptor",
      "window": "TATGATCTCTTTAGG",
      "index": 6,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1620,7 +1620,7 @@
      "site_type": "acceptor",
      "window": "TTTATAATTTATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1638,7 +1638,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATTCTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1656,7 +1656,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1710,7 +1710,7 @@
      "site_type": "acceptor",
      "window": "TCCTGGGGATCCAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1728,7 +1728,7 @@
      "site_type": "acceptor",
      "window": "ATTTATCTTTCTAGG",
      "index": 4,
-     "delta": 0.004,
+     "delta": 0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1737,7 +1737,7 @@
      "site_type": "acceptor",
      "window": "CTCTCTTCTTCCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1755,7 +1755,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTGTCTCCAGC",
      "index": 9,
-     "delta": -0.0593,
+     "delta": -0.0843,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1782,7 +1782,7 @@
      "site_type": "acceptor",
      "window": "TTTATAATTTATAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1800,7 +1800,7 @@
      "site_type": "acceptor",
      "window": "GGGAAATTTTTTAGG",
      "index": 2,
-     "delta": -0.0007,
+     "delta": 0.0013,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1809,7 +1809,7 @@
      "site_type": "acceptor",
      "window": "AATGTCCATTTTAGA",
      "index": 6,
-     "delta": 0.0166,
+     "delta": 0.0239,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1827,7 +1827,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 3,
-     "delta": -0.0215,
+     "delta": -0.0288,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1872,7 +1872,7 @@
      "site_type": "acceptor",
      "window": "TATGATCTCTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1908,7 +1908,7 @@
      "site_type": "acceptor",
      "window": "AATGTCCATTTTAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1917,7 +1917,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATTCTGCAGA",
      "index": 6,
-     "delta": -0.0407,
+     "delta": -0.0657,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1926,7 +1926,7 @@
      "site_type": "acceptor",
      "window": "TATCGTTTTTGAAGC",
      "index": 4,
-     "delta": -0.004,
+     "delta": -0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1935,7 +1935,7 @@
      "site_type": "acceptor",
      "window": "CCCTACCCTGCTAGT",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1944,7 +1944,7 @@
      "site_type": "acceptor",
      "window": "GGGAAATTTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1953,7 +1953,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATTCTGCAGA",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1962,7 +1962,7 @@
      "site_type": "acceptor",
      "window": "ATTTATCTTTCTAGG",
      "index": 6,
-     "delta": 0.0165,
+     "delta": 0.0238,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -1994,7 +1994,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTCTGTAGG",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2012,7 +2012,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATCTTACAGT",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2039,7 +2039,7 @@
      "site_type": "acceptor",
      "window": "TATAATTTTTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2066,7 +2066,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTGATAGA",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0174,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2084,7 +2084,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2102,7 +2102,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATCTTACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2120,7 +2120,7 @@
      "site_type": "acceptor",
      "window": "CTTTCTCCAAACAGT",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2138,7 +2138,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 3,
-     "delta": 0.0039,
+     "delta": 0.0019,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2147,7 +2147,7 @@
      "site_type": "acceptor",
      "window": "ACACATTATTACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2174,7 +2174,7 @@
      "site_type": "acceptor",
      "window": "TTTATTTTGTGTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2201,7 +2201,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCTTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2228,7 +2228,7 @@
      "site_type": "acceptor",
      "window": "TTTATTTTGTGTAGC",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2237,7 +2237,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTAAATAGA",
      "index": 9,
-     "delta": -0.0154,
+     "delta": -0.0173,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2273,7 +2273,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTCTGTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2291,7 +2291,7 @@
      "site_type": "acceptor",
      "window": "CATTTTTTTATCAGA",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2336,7 +2336,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATCTTACAGT",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2345,7 +2345,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTAAATAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2372,7 +2372,7 @@
      "site_type": "acceptor",
      "window": "TAATTGTTTCCTAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2381,7 +2381,7 @@
      "site_type": "acceptor",
      "window": "ATTAATTTGTCCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2390,7 +2390,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCCATTCTAGG",
      "index": 6,
-     "delta": 0.0165,
+     "delta": 0.0238,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2399,7 +2399,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTGATAGA",
      "index": 4,
-     "delta": -0.0252,
+     "delta": -0.0325,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2471,7 +2471,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCCTCCCAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2489,7 +2489,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTCTGTAGG",
      "index": 8,
-     "delta": 0.0169,
+     "delta": 0.0242,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2498,7 +2498,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 5,
-     "delta": -0.0184,
+     "delta": -0.0257,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2507,7 +2507,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCTTAGA",
      "index": 10,
-     "delta": -0.0064,
+     "delta": -0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2516,7 +2516,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTGATAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2543,7 +2543,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTACCCCCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2552,7 +2552,7 @@
      "site_type": "acceptor",
      "window": "TTGTACTGTTTCAGG",
      "index": 4,
-     "delta": 0.004,
+     "delta": 0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -2566,7 +2566,7 @@
      "site_type": "acceptor",
      "window": "GAAATATTTCACAGG",
      "index": 3,
-     "delta": 0.0038,
+     "delta": 0.0018,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2575,7 +2575,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTGGTAATAGG",
      "index": 7,
-     "delta": 0.0078,
+     "delta": 0.0097,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2584,7 +2584,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTATAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2602,7 +2602,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTTAACAGG",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2638,7 +2638,7 @@
      "site_type": "acceptor",
      "window": "TGATTGATTTACAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2647,7 +2647,7 @@
      "site_type": "acceptor",
      "window": "TTCCCCTTTTGTAGG",
      "index": 8,
-     "delta": -0.0169,
+     "delta": -0.0242,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2674,7 +2674,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTTGCTATAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2683,7 +2683,7 @@
      "site_type": "acceptor",
      "window": "TTGTTCCATTCCAGG",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -2697,7 +2697,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2715,7 +2715,7 @@
      "site_type": "acceptor",
      "window": "GCCTTTCTGTGTAGT",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2724,7 +2724,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATATTACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2733,7 +2733,7 @@
      "site_type": "acceptor",
      "window": "GCCTTTCTGTGTAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2760,7 +2760,7 @@
      "site_type": "acceptor",
      "window": "GTTCTCTATTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2796,7 +2796,7 @@
      "site_type": "acceptor",
      "window": "AATTGTTGCTTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2805,7 +2805,7 @@
      "site_type": "acceptor",
      "window": "TAATTCCCTCACAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2823,7 +2823,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTCCCTCTAGT",
      "index": 7,
-     "delta": 0.0094,
+     "delta": 0.0167,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2832,7 +2832,7 @@
      "site_type": "acceptor",
      "window": "GCCTTTCTGTGTAGT",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2868,7 +2868,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTCCCTCTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2895,7 +2895,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATATTACAGA",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2904,7 +2904,7 @@
      "site_type": "acceptor",
      "window": "GTTCTCTATTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2940,7 +2940,7 @@
      "site_type": "acceptor",
      "window": "GTTCTCTATTTTAGG",
      "index": 5,
-     "delta": -0.0202,
+     "delta": -0.0379,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -2994,7 +2994,7 @@
      "site_type": "acceptor",
      "window": "TAATTCCCTCACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3012,7 +3012,7 @@
      "site_type": "acceptor",
      "window": "CTACCAATATTAAGC",
      "index": 6,
-     "delta": -0.0051,
+     "delta": -0.0071,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3030,7 +3030,7 @@
      "site_type": "acceptor",
      "window": "CTACCAATATTAAGC",
      "index": 4,
-     "delta": -0.0185,
+     "delta": -0.0362,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3048,7 +3048,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATATTACAGA",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3057,7 +3057,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTCCCTCTAGT",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -3080,7 +3080,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTCTCAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3098,7 +3098,7 @@
      "site_type": "acceptor",
      "window": "TCCCTTCTTTTCAGC",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3116,7 +3116,7 @@
      "site_type": "acceptor",
      "window": "TAATGTGCTTACAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3134,7 +3134,7 @@
      "site_type": "acceptor",
      "window": "TATCCTCCCAACAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3143,7 +3143,7 @@
      "site_type": "acceptor",
      "window": "ACTATTGCACACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3152,7 +3152,7 @@
      "site_type": "acceptor",
      "window": "TCCCTTCTTTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3161,7 +3161,7 @@
      "site_type": "acceptor",
      "window": "CTCTATTATTAAAGG",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3170,7 +3170,7 @@
      "site_type": "acceptor",
      "window": "CCAAAATATTTTAGC",
      "index": 9,
-     "delta": -0.0593,
+     "delta": -0.0843,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3197,7 +3197,7 @@
      "site_type": "acceptor",
      "window": "TTGGTCCTTTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3215,7 +3215,7 @@
      "site_type": "acceptor",
      "window": "TGTATGTGTTTTAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3224,7 +3224,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTCATAATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3233,7 +3233,7 @@
      "site_type": "acceptor",
      "window": "GTTTTGCTCAATAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3242,7 +3242,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTGTTAAAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3260,7 +3260,7 @@
      "site_type": "acceptor",
      "window": "TCTTTATTTTTCAGA",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.0629,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3296,7 +3296,7 @@
      "site_type": "acceptor",
      "window": "TGTCTCTTCTCCAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3323,7 +3323,7 @@
      "site_type": "acceptor",
      "window": "AAATTGTTTTTTAGG",
      "index": 5,
-     "delta": 0.0386,
+     "delta": 0.0636,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3332,7 +3332,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTAATTTCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3341,7 +3341,7 @@
      "site_type": "acceptor",
      "window": "TCCTTCTTTGTCAGG",
      "index": 10,
-     "delta": -0.0064,
+     "delta": -0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3350,7 +3350,7 @@
      "site_type": "acceptor",
      "window": "CACTGTCCTTACAGA",
      "index": 2,
-     "delta": -0.0206,
+     "delta": -0.0383,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3391,7 +3391,7 @@
      "site_type": "acceptor",
      "window": "TTGGTTTTTATAAGG",
      "index": 3,
-     "delta": -0.0039,
+     "delta": -0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -3405,7 +3405,7 @@
      "site_type": "acceptor",
      "window": "TCTTCCTCCCACAGC",
      "index": 2,
-     "delta": -0.0187,
+     "delta": -0.026,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3414,7 +3414,7 @@
      "site_type": "acceptor",
      "window": "TCTTCCTCCCACAGC",
      "index": 7,
-     "delta": -0.0248,
+     "delta": -0.0405,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3423,7 +3423,7 @@
      "site_type": "acceptor",
      "window": "TCTTCCTCCCACAGC",
      "index": 7,
-     "delta": -0.0326,
+     "delta": -0.0503,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -3437,7 +3437,7 @@
      "site_type": "acceptor",
      "window": "TGTCCTCCCACCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3446,7 +3446,7 @@
      "site_type": "acceptor",
      "window": "ATTTATTCTTTCAGA",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3455,7 +3455,7 @@
      "site_type": "acceptor",
      "window": "CTGGCCCTGCGCAGG",
      "index": 6,
-     "delta": -0.0242,
+     "delta": -0.0419,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3473,7 +3473,7 @@
      "site_type": "acceptor",
      "window": "TTCTTCTGCCCCAGG",
      "index": 9,
-     "delta": 0.0246,
+     "delta": 0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3536,7 +3536,7 @@
      "site_type": "acceptor",
      "window": "TCCTCCTGCCTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3582,7 +3582,7 @@
      "site_type": "acceptor",
      "window": "AATGTGTTTTCCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3591,7 +3591,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTTCCTTAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3600,7 +3600,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCTCATTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3609,7 +3609,7 @@
      "site_type": "acceptor",
      "window": "GTTTGATTTGCCAGT",
      "index": 9,
-     "delta": 0.0347,
+     "delta": 0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3636,7 +3636,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTGTTTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3645,7 +3645,7 @@
      "site_type": "acceptor",
      "window": "TGTTTGTTTATCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3654,7 +3654,7 @@
      "site_type": "acceptor",
      "window": "TTGGTATCTAACAGA",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3663,7 +3663,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTATTTTCAGT",
      "index": 2,
-     "delta": -0.04,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3672,7 +3672,7 @@
      "site_type": "acceptor",
      "window": "AATGTGTTTTCCAGA",
      "index": 8,
-     "delta": -0.0169,
+     "delta": -0.0242,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3681,7 +3681,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTATTTTCAGT",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3690,7 +3690,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCTCATTAGA",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3699,7 +3699,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTTGCAGT",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3708,7 +3708,7 @@
      "site_type": "acceptor",
      "window": "TTGCTTCTTCCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3717,7 +3717,7 @@
      "site_type": "acceptor",
      "window": "GTTTGATTTGCCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3744,7 +3744,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCTTTTCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3771,7 +3771,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTCATTGCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3780,7 +3780,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTAATACAGA",
      "index": 7,
-     "delta": 0.0341,
+     "delta": 0.0572,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3807,7 +3807,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTATTTTCAGT",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3825,7 +3825,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTCTAATAGA",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3843,7 +3843,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCCTGACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3861,7 +3861,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTCTAATAGA",
      "index": 10,
-     "delta": 0.0064,
+     "delta": 0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3879,7 +3879,7 @@
      "site_type": "acceptor",
      "window": "AATCTTCTGTTCAGG",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3888,7 +3888,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTGCAAGCAGG",
      "index": 7,
-     "delta": 0.0094,
+     "delta": 0.0167,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3915,7 +3915,7 @@
      "site_type": "acceptor",
      "window": "TGTTTGTTTATCAGC",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3951,7 +3951,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTGCAAGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3960,7 +3960,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTAATACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3969,7 +3969,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTTGCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -3996,7 +3996,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTAATACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4014,7 +4014,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTTGGACCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -4037,7 +4037,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4055,7 +4055,7 @@
      "site_type": "acceptor",
      "window": "CAAATTTCTTATAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4064,7 +4064,7 @@
      "site_type": "acceptor",
      "window": "CTACTTTCTTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4073,7 +4073,7 @@
      "site_type": "acceptor",
      "window": "CACATGTGTTTCAGC",
      "index": 2,
-     "delta": -0.0206,
+     "delta": -0.0383,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4082,7 +4082,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4109,7 +4109,7 @@
      "site_type": "acceptor",
      "window": "CACATGTGTTTCAGC",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4127,7 +4127,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4163,7 +4163,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTAATTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4190,7 +4190,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4208,7 +4208,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTATACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4226,7 +4226,7 @@
      "site_type": "acceptor",
      "window": "TGTTCTGTTTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4253,7 +4253,7 @@
      "site_type": "acceptor",
      "window": "CACATGTGTTTCAGC",
      "index": 3,
-     "delta": 0.0039,
+     "delta": 0.0019,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4262,7 +4262,7 @@
      "site_type": "acceptor",
      "window": "CAAATTTCTTATAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4307,7 +4307,7 @@
      "site_type": "acceptor",
      "window": "AATTTGTTTTGTAGG",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4361,7 +4361,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 9,
-     "delta": 0.0437,
+     "delta": 0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4370,7 +4370,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCAAAATAGA",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4397,7 +4397,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4406,7 +4406,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4415,7 +4415,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTATACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4424,7 +4424,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCAAAATAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4456,7 +4456,7 @@
      "site_type": "acceptor",
      "window": "ACATTTCTTTCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4465,7 +4465,7 @@
      "site_type": "acceptor",
      "window": "TCCCTCATTCACAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4474,7 +4474,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4492,7 +4492,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4501,7 +4501,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4537,7 +4537,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 11,
-     "delta": 0.0564,
+     "delta": 0.0722,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4546,7 +4546,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4591,7 +4591,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4600,7 +4600,7 @@
      "site_type": "acceptor",
      "window": "ACATTTCTTTCTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4618,7 +4618,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 10,
-     "delta": -0.0045,
+     "delta": 0.0113,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4627,7 +4627,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGG",
      "index": 10,
-     "delta": -0.0063,
+     "delta": -0.0293,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4654,7 +4654,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4663,7 +4663,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 7,
-     "delta": -0.042,
+     "delta": -0.067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4699,7 +4699,7 @@
      "site_type": "acceptor",
      "window": "TCCTTGCCTGGCAGG",
      "index": 6,
-     "delta": 0.0165,
+     "delta": 0.0238,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4726,7 +4726,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 6,
-     "delta": 0.0191,
+     "delta": 0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4735,7 +4735,7 @@
      "site_type": "acceptor",
      "window": "TCCCTCATTCACAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4762,7 +4762,7 @@
      "site_type": "acceptor",
      "window": "TCCCTCATTCACAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0709,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4771,7 +4771,7 @@
      "site_type": "acceptor",
      "window": "TCCTTGCCTGGCAGG",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4780,7 +4780,7 @@
      "site_type": "acceptor",
      "window": "CTCTCTTTTAACAGA",
      "index": 4,
-     "delta": 0.0253,
+     "delta": 0.0326,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4789,7 +4789,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4798,7 +4798,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -4816,7 +4816,7 @@
      "site_type": "acceptor",
      "window": "CCACCTGTTCACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4825,7 +4825,7 @@
      "site_type": "acceptor",
      "window": "CCTTCTTGCCACAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4834,7 +4834,7 @@
      "site_type": "acceptor",
      "window": "CCACCTGTTCACAGA",
      "index": 6,
-     "delta": 0.0242,
+     "delta": 0.0419,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4843,7 +4843,7 @@
      "site_type": "acceptor",
      "window": "ATGGGCCCCTGCAGA",
      "index": 6,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4861,7 +4861,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTATCCCCAGA",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4870,7 +4870,7 @@
      "site_type": "acceptor",
      "window": "TTGTCCCCGGGCAGA",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4879,7 +4879,7 @@
      "site_type": "acceptor",
      "window": "CTTCTCTCTACCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4888,7 +4888,7 @@
      "site_type": "acceptor",
      "window": "CTCCTGATCCTCAGG",
      "index": 9,
-     "delta": 0.0246,
+     "delta": 0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4906,7 +4906,7 @@
      "site_type": "acceptor",
      "window": "CTTCTCTCTACCAGC",
      "index": 9,
-     "delta": -0.0154,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4915,7 +4915,7 @@
      "site_type": "acceptor",
      "window": "CTCCCCCAACCCAGA",
      "index": 2,
-     "delta": -0.0213,
+     "delta": -0.0371,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -4942,7 +4942,7 @@
      "site_type": "acceptor",
      "window": "CCTCCCCTGGGCAGG",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5005,7 +5005,7 @@
      "site_type": "acceptor",
      "window": "CCCTCTCCCCACAGA",
      "index": 6,
-     "delta": -0.0191,
+     "delta": -0.0348,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5014,7 +5014,7 @@
      "site_type": "acceptor",
      "window": "CCTCTGGCCCCCAGA",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5041,7 +5041,7 @@
      "site_type": "acceptor",
      "window": "TGTTCCCCACACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5077,7 +5077,7 @@
      "site_type": "acceptor",
      "window": "TTCCATCTCTCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5104,7 +5104,7 @@
      "site_type": "acceptor",
      "window": "CCCTCTCCCCACAGA",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5131,7 +5131,7 @@
      "site_type": "acceptor",
      "window": "TTGTGTCTGACCAGG",
      "index": 4,
-     "delta": -0.004,
+     "delta": -0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5163,7 +5163,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTCTCAGG",
      "index": 5,
-     "delta": -0.0376,
+     "delta": -0.0606,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5172,7 +5172,7 @@
      "site_type": "acceptor",
      "window": "TTTGAATTCTGTAGA",
      "index": 2,
-     "delta": -0.04,
+     "delta": -0.0631,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5199,7 +5199,7 @@
      "site_type": "acceptor",
      "window": "CCACCACTTTCCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5226,7 +5226,7 @@
      "site_type": "acceptor",
      "window": "TGCCTTCATTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5262,7 +5262,7 @@
      "site_type": "acceptor",
      "window": "TTTAAAAAATTCAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5271,7 +5271,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATCTTTCAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5307,7 +5307,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTCCTAAAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0753,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5325,7 +5325,7 @@
      "site_type": "acceptor",
      "window": "ACTTTTGTTTATAGG",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5343,7 +5343,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTCCTAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5352,7 +5352,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTCTTACAGA",
      "index": 10,
-     "delta": 0.0064,
+     "delta": 0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5361,7 +5361,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTATTTATAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5370,7 +5370,7 @@
      "site_type": "acceptor",
      "window": "GTTTTATTGTGTAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5397,7 +5397,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCCACATTAGG",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5406,7 +5406,7 @@
      "site_type": "acceptor",
      "window": "TTTAAAAAATTCAGG",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.0629,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5415,7 +5415,7 @@
      "site_type": "acceptor",
      "window": "CCACCATTCTATAGG",
      "index": 3,
-     "delta": -0.0229,
+     "delta": -0.0406,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5424,7 +5424,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTATTTATAGG",
      "index": 5,
-     "delta": -0.0184,
+     "delta": -0.0257,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5433,7 +5433,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTCTTACAGA",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5442,7 +5442,7 @@
      "site_type": "acceptor",
      "window": "CCCTTGACTCTCAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5451,7 +5451,7 @@
      "site_type": "acceptor",
      "window": "TTTTTACTTTTTAGG",
      "index": 7,
-     "delta": -0.0094,
+     "delta": -0.0167,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5460,7 +5460,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTCCTAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5478,7 +5478,7 @@
      "site_type": "acceptor",
      "window": "GTTTTATTGTGTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5523,7 +5523,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5595,7 +5595,7 @@
      "site_type": "acceptor",
      "window": "TTGCATCTTGGCAGG",
      "index": 9,
-     "delta": 0.0592,
+     "delta": 0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5604,7 +5604,7 @@
      "site_type": "acceptor",
      "window": "TATTTTTCATGCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5613,7 +5613,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTCTTACAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5631,7 +5631,7 @@
      "site_type": "acceptor",
      "window": "ATTTTCCATTACAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5640,7 +5640,7 @@
      "site_type": "acceptor",
      "window": "ATTATCTTTAATAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5649,7 +5649,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTTCTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5658,7 +5658,7 @@
      "site_type": "acceptor",
      "window": "AATTTTGTGTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5667,7 +5667,7 @@
      "site_type": "acceptor",
      "window": "CCACCATTCTATAGG",
      "index": 6,
-     "delta": -0.0407,
+     "delta": -0.0657,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5676,7 +5676,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTAATTGCAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5721,7 +5721,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTTCTCTAGT",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5730,7 +5730,7 @@
      "site_type": "acceptor",
      "window": "ATCCCCTTTTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5739,7 +5739,7 @@
      "site_type": "acceptor",
      "window": "TTTAAAAAATTCAGG",
      "index": 5,
-     "delta": -0.0009,
+     "delta": -0.0029,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5757,7 +5757,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTCTAGC",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5775,7 +5775,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTCCTAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5793,7 +5793,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATCTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5820,7 +5820,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5847,7 +5847,7 @@
      "site_type": "acceptor",
      "window": "ATCTTCTTTGCCAGG",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5865,7 +5865,7 @@
      "site_type": "acceptor",
      "window": "ATCCCCTTTTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5892,7 +5892,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTCTTACAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5901,7 +5901,7 @@
      "site_type": "acceptor",
      "window": "CCCTTGACTCTCAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5910,7 +5910,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTCTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5928,7 +5928,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTTTGTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5937,7 +5937,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTGTAGG",
      "index": 10,
-     "delta": 0.0078,
+     "delta": 0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5964,7 +5964,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTCTTTTAGG",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5973,7 +5973,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTCCTAAAAGG",
      "index": 9,
-     "delta": -0.0154,
+     "delta": -0.0173,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -5991,7 +5991,7 @@
      "site_type": "acceptor",
      "window": "TTTTTACTTTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6000,7 +6000,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6009,7 +6009,7 @@
      "site_type": "acceptor",
      "window": "CTATGTCTATATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0097,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6032,7 +6032,7 @@
      "site_type": "acceptor",
      "window": "TGCCTGTATTCTAGT",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -6046,7 +6046,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCTTCTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6091,7 +6091,7 @@
      "site_type": "acceptor",
      "window": "TTCTCCGAAATTAGG",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6127,7 +6127,7 @@
      "site_type": "acceptor",
      "window": "TGCCATTGTGTCAGA",
      "index": 6,
-     "delta": -0.0408,
+     "delta": -0.0658,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6136,7 +6136,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTATTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6172,7 +6172,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCCTCCTCAGA",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6235,7 +6235,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCACAGA",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6244,7 +6244,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCTTCTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6262,7 +6262,7 @@
      "site_type": "acceptor",
      "window": "TGCCATTGTGTCAGA",
      "index": 7,
-     "delta": 0.0078,
+     "delta": 0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6271,7 +6271,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCACAGA",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6280,7 +6280,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCTCCTCTAGC",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.0629,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6289,7 +6289,7 @@
      "site_type": "acceptor",
      "window": "TATATTTGGCTTAGG",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6298,7 +6298,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6343,7 +6343,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCCTCCTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6361,7 +6361,7 @@
      "site_type": "acceptor",
      "window": "TTCTCCGAAATTAGG",
      "index": 5,
-     "delta": 0.0184,
+     "delta": 0.0257,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6370,7 +6370,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTATCTAAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6465,7 +6465,7 @@
      "site_type": "acceptor",
      "window": "CCACCGGTCTCCAGC",
      "index": 5,
-     "delta": 0.0009,
+     "delta": 0.0029,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6474,7 +6474,7 @@
      "site_type": "acceptor",
      "window": "CCCCCGTCCACCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6497,7 +6497,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6515,7 +6515,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 3,
-     "delta": 0.0038,
+     "delta": 0.0018,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6524,7 +6524,7 @@
      "site_type": "acceptor",
      "window": "TTTAAACTTTCTAGA",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0022,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6542,7 +6542,7 @@
      "site_type": "acceptor",
      "window": "TGTCTCACACTCAGG",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6560,7 +6560,7 @@
      "site_type": "acceptor",
      "window": "ACTGATTTCTCTAGT",
      "index": 10,
-     "delta": 0.0109,
+     "delta": 0.0182,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6569,7 +6569,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTACCTGCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6587,7 +6587,7 @@
      "site_type": "acceptor",
      "window": "CCACGTTTGCTTAGG",
      "index": 9,
-     "delta": -0.0193,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6605,7 +6605,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6632,7 +6632,7 @@
      "site_type": "acceptor",
      "window": "TTGTATTCTTTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6641,7 +6641,7 @@
      "site_type": "acceptor",
      "window": "TTTGTGTTTTTCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6659,7 +6659,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 10,
-     "delta": -0.0045,
+     "delta": 0.0112,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6668,7 +6668,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 6,
-     "delta": -0.0166,
+     "delta": -0.0239,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6686,7 +6686,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6695,7 +6695,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTTGCCTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6704,7 +6704,7 @@
      "site_type": "acceptor",
      "window": "TTTAAACTTTCTAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6713,7 +6713,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6722,7 +6722,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGT",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6731,7 +6731,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTAAACAGG",
      "index": 6,
-     "delta": -0.0166,
+     "delta": -0.0239,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6749,7 +6749,7 @@
      "site_type": "acceptor",
      "window": "TTTGTGTTTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6767,7 +6767,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTTGCCTTAGA",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6785,7 +6785,7 @@
      "site_type": "acceptor",
      "window": "ACACTCTCTTTCAGC",
      "index": 5,
-     "delta": -0.0201,
+     "delta": -0.0378,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6848,7 +6848,7 @@
      "site_type": "acceptor",
      "window": "ACTGATTTCTCTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6857,7 +6857,7 @@
      "site_type": "acceptor",
      "window": "CCACGTTTGCTTAGG",
      "index": 4,
-     "delta": -0.0041,
+     "delta": -0.0021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6875,7 +6875,7 @@
      "site_type": "acceptor",
      "window": "TTTAAACTTTCTAGA",
      "index": 10,
-     "delta": 0.0045,
+     "delta": -0.0112,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6893,7 +6893,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTACCTGCAGT",
      "index": 8,
-     "delta": -0.038,
+     "delta": -0.0557,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6902,7 +6902,7 @@
      "site_type": "acceptor",
      "window": "TTGTATTCTTTTAGC",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6911,7 +6911,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6929,7 +6929,7 @@
      "site_type": "acceptor",
      "window": "CCACGTTTGCTTAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -6943,7 +6943,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTTACCACAGT",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6952,7 +6952,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTTTAAGG",
      "index": 9,
-     "delta": -0.0593,
+     "delta": -0.0843,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6970,7 +6970,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTTACCACAGT",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -6997,7 +6997,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTTACCACAGT",
      "index": 8,
-     "delta": 0.017,
+     "delta": 0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -7020,7 +7020,7 @@
      "site_type": "acceptor",
      "window": "TACCACTTTTACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7092,7 +7092,7 @@
      "site_type": "acceptor",
      "window": "TCTTATTCCCACAGT",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7101,7 +7101,7 @@
      "site_type": "acceptor",
      "window": "TTATTGTTATTTAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7128,7 +7128,7 @@
      "site_type": "acceptor",
      "window": "TCTTAACTTGACAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0097,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7137,7 +7137,7 @@
      "site_type": "acceptor",
      "window": "TTTATCCCCTCTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7173,7 +7173,7 @@
      "site_type": "acceptor",
      "window": "TCTTAACTTGACAGA",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7218,7 +7218,7 @@
      "site_type": "acceptor",
      "window": "TCTGTAATTTGTAGA",
      "index": 10,
-     "delta": 0.0142,
+     "delta": 0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7227,7 +7227,7 @@
      "site_type": "acceptor",
      "window": "ATTATCTGTTTCAGG",
      "index": 3,
-     "delta": 0.0039,
+     "delta": 0.0019,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7250,7 +7250,7 @@
      "site_type": "acceptor",
      "window": "TCTCTTCAATATAGC",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7268,7 +7268,7 @@
      "site_type": "acceptor",
      "window": "TACCCCACTTGCAGC",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7286,7 +7286,7 @@
      "site_type": "acceptor",
      "window": "TTTCAAACTTCTAGT",
      "index": 7,
-     "delta": 0.0094,
+     "delta": 0.0167,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7322,7 +7322,7 @@
      "site_type": "acceptor",
      "window": "TTCCCCTTTGGTAGG",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7331,7 +7331,7 @@
      "site_type": "acceptor",
      "window": "TTTCAAACTTCTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7349,7 +7349,7 @@
      "site_type": "acceptor",
      "window": "GTCCTTCTTAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7381,7 +7381,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTTCCTACAGT",
      "index": 9,
-     "delta": -0.0593,
+     "delta": -0.0843,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7408,7 +7408,7 @@
      "site_type": "acceptor",
      "window": "CTGATTGCTCTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7462,7 +7462,7 @@
      "site_type": "acceptor",
      "window": "GTGTTATCTCCTAGG",
      "index": 11,
-     "delta": 0.0139,
+     "delta": 0.0066,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7471,7 +7471,7 @@
      "site_type": "acceptor",
      "window": "TGCCTCTTTCCTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7480,7 +7480,7 @@
      "site_type": "acceptor",
      "window": "GTGTTATCTCCTAGG",
      "index": 10,
-     "delta": -0.0034,
+     "delta": -0.0211,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7489,7 +7489,7 @@
      "site_type": "acceptor",
      "window": "TGCCTCTTTCCTAGC",
      "index": 9,
-     "delta": -0.0193,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7498,7 +7498,7 @@
      "site_type": "acceptor",
      "window": "TCTGTCTCCTACAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7534,7 +7534,7 @@
      "site_type": "acceptor",
      "window": "TGCCTCTTTCCTAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -7548,7 +7548,7 @@
      "site_type": "acceptor",
      "window": "CCCAACTCTTCTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7602,7 +7602,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTGGTTAGC",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7611,7 +7611,7 @@
      "site_type": "acceptor",
      "window": "GGTTCCTTTTCTAGG",
      "index": 10,
-     "delta": -0.0034,
+     "delta": -0.0211,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7620,7 +7620,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7629,7 +7629,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTCCTGCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7638,7 +7638,7 @@
      "site_type": "acceptor",
      "window": "AACTTTCTTCCTAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7647,7 +7647,7 @@
      "site_type": "acceptor",
      "window": "TGCTTTACAATCAGG",
      "index": 9,
-     "delta": 0.0438,
+     "delta": 0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7656,7 +7656,7 @@
      "site_type": "acceptor",
      "window": "GGTTCCTTTTCTAGG",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7665,7 +7665,7 @@
      "site_type": "acceptor",
      "window": "CTCTTCCATTTTAGG",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7674,7 +7674,7 @@
      "site_type": "acceptor",
      "window": "AACTTTCTTCCTAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7683,7 +7683,7 @@
      "site_type": "acceptor",
      "window": "CCCAACTCTTCTAGC",
      "index": 4,
-     "delta": 0.004,
+     "delta": 0.002,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7710,7 +7710,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTGGTTAGC",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7719,7 +7719,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7728,7 +7728,7 @@
      "site_type": "acceptor",
      "window": "GTCTCTTTGGGCAGA",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7764,7 +7764,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTGGTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7800,7 +7800,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7809,7 +7809,7 @@
      "site_type": "acceptor",
      "window": "CTGGTCTCTGCTAGA",
      "index": 5,
-     "delta": -0.0201,
+     "delta": -0.0378,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     }
@@ -7850,7 +7850,7 @@
      "site_type": "acceptor",
      "window": "TCTTCTTTTGACAGG",
      "index": 10,
-     "delta": 0.0064,
+     "delta": 0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7877,7 +7877,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 3,
-     "delta": 0.0269,
+     "delta": 0.0426,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7886,7 +7886,7 @@
      "site_type": "acceptor",
      "window": "GCTCACTCTGCCAGG",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7904,7 +7904,7 @@
      "site_type": "acceptor",
      "window": "TCTGCTGGTGACAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7913,7 +7913,7 @@
      "site_type": "acceptor",
      "window": "ATTGTGTCTCGCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7922,7 +7922,7 @@
      "site_type": "acceptor",
      "window": "CTGCTCACCCTCAGC",
      "index": 3,
-     "delta": 0.0214,
+     "delta": 0.0287,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7931,7 +7931,7 @@
      "site_type": "acceptor",
      "window": "CTGCTCACCCTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7949,7 +7949,7 @@
      "site_type": "acceptor",
      "window": "GCCTGGTACTGCAGA",
      "index": 10,
-     "delta": 0.0078,
+     "delta": 0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7958,7 +7958,7 @@
      "site_type": "acceptor",
      "window": "GCCTCTGCCTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7967,7 +7967,7 @@
      "site_type": "acceptor",
      "window": "TCTGTGTGCCACAGT",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -7976,7 +7976,7 @@
      "site_type": "acceptor",
      "window": "GCTTTTGTCTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8003,7 +8003,7 @@
      "site_type": "acceptor",
      "window": "CCTGTCTCCTGCAGC",
      "index": 2,
-     "delta": -0.0186,
+     "delta": -0.0259,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8012,7 +8012,7 @@
      "site_type": "acceptor",
      "window": "CCTCTTCCTGACAGG",
      "index": 9,
-     "delta": 0.0347,
+     "delta": 0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8039,7 +8039,7 @@
      "site_type": "acceptor",
      "window": "TGCCGCCTCCGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8048,7 +8048,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 3,
-     "delta": 0.0039,
+     "delta": 0.0019,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8066,7 +8066,7 @@
      "site_type": "acceptor",
      "window": "TGCCGCCTCCGCAGG",
      "index": 3,
-     "delta": -0.023,
+     "delta": -0.0407,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8084,7 +8084,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8129,7 +8129,7 @@
      "site_type": "acceptor",
      "window": "TCTTGTCCGGGCAGG",
      "index": 9,
-     "delta": 0.0347,
+     "delta": 0.0524,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8156,7 +8156,7 @@
      "site_type": "acceptor",
      "window": "CTGTGTCCTCCCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8165,7 +8165,7 @@
      "site_type": "acceptor",
      "window": "TCCCTGTCTTCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8174,7 +8174,7 @@
      "site_type": "acceptor",
      "window": "CCTCTTCCTGACAGG",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8192,7 +8192,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8201,7 +8201,7 @@
      "site_type": "acceptor",
      "window": "GCCTACGTCCCCAGA",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8210,7 +8210,7 @@
      "site_type": "acceptor",
      "window": "CTGCTCACCCTCAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8219,7 +8219,7 @@
      "site_type": "acceptor",
      "window": "ATGGTCCTTTCTAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8228,7 +8228,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8246,7 +8246,7 @@
      "site_type": "acceptor",
      "window": "GGTGCTCCCTGCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8327,7 +8327,7 @@
      "site_type": "acceptor",
      "window": "GCCTACGTCCCCAGA",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8354,7 +8354,7 @@
      "site_type": "acceptor",
      "window": "TCCTCACCCGATAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8363,7 +8363,7 @@
      "site_type": "acceptor",
      "window": "GATTTGGTCATCAGC",
      "index": 8,
-     "delta": 0.017,
+     "delta": 0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8372,7 +8372,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8381,7 +8381,7 @@
      "site_type": "acceptor",
      "window": "GGGAACACTTTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8408,7 +8408,7 @@
      "site_type": "acceptor",
      "window": "TCTGTGTGCCACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8417,7 +8417,7 @@
      "site_type": "acceptor",
      "window": "GCCTACGTCCCCAGA",
      "index": 2,
-     "delta": -0.0206,
+     "delta": -0.0383,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8453,7 +8453,7 @@
      "site_type": "acceptor",
      "window": "GATTTGGTCATCAGC",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8462,7 +8462,7 @@
      "site_type": "acceptor",
      "window": "GCCTGGTACTGCAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8471,7 +8471,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 4,
-     "delta": 0.0253,
+     "delta": 0.0326,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8489,7 +8489,7 @@
      "site_type": "acceptor",
      "window": "GCCTTCCCTTGCAGT",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8507,7 +8507,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 10,
-     "delta": 0.0142,
+     "delta": 0.0392,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8543,7 +8543,7 @@
      "site_type": "acceptor",
      "window": "TCTTCTTTTGACAGG",
      "index": 9,
-     "delta": 0.0592,
+     "delta": 0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8579,7 +8579,7 @@
      "site_type": "acceptor",
      "window": "CCTCTTCCTGACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8597,7 +8597,7 @@
      "site_type": "acceptor",
      "window": "ATGGTCCTTTCTAGT",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8624,7 +8624,7 @@
      "site_type": "acceptor",
      "window": "ATGGTCCTTTCTAGT",
      "index": 2,
-     "delta": -0.0007,
+     "delta": 0.0013,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8633,7 +8633,7 @@
      "site_type": "acceptor",
      "window": "CCTCTTCCTGACAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8696,7 +8696,7 @@
      "site_type": "acceptor",
      "window": "TCTGCTGGTGACAGC",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8705,7 +8705,7 @@
      "site_type": "acceptor",
      "window": "GGGAACACTTTTAGA",
      "index": 8,
-     "delta": -0.0548,
+     "delta": -0.0798,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8723,7 +8723,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8732,7 +8732,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8741,7 +8741,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 9,
-     "delta": -0.0348,
+     "delta": -0.0525,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8750,7 +8750,7 @@
      "site_type": "acceptor",
      "window": "CCTGTCTCCTGCAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8804,7 +8804,7 @@
      "site_type": "acceptor",
      "window": "CTGCCGTCCCGCAGG",
      "index": 4,
-     "delta": -0.0225,
+     "delta": -0.0382,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8822,7 +8822,7 @@
      "site_type": "acceptor",
      "window": "CCTTCTCTTCAAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8854,7 +8854,7 @@
      "site_type": "acceptor",
      "window": "GCTTGTCCCGATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8908,7 +8908,7 @@
      "site_type": "acceptor",
      "window": "GCTTGTCCCGATAGG",
      "index": 10,
-     "delta": 0.0064,
+     "delta": 0.0294,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },
@@ -8917,7 +8917,7 @@
      "site_type": "acceptor",
      "window": "GCTTGTCCCGATAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, conflicting classifications"
     },

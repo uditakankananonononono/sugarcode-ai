@@ -1,0 +1,14 @@
+{
+ "source": "pooled tract-zone (window indices 2..11 = c.-12..-3) base frequencies over the harvest AG acceptors (junctions.tsv, 1,170 GT-AG junctions; pseudocount 0.5). Learned 2026-09-22 by scripts/learn_tract_pwm.py",
+ "zone": [
+  2,
+  12
+ ],
+ "n_acceptors": 1176,
+ "pwm": {
+  "A": 0.113138,
+  "C": 0.304634,
+  "G": 0.099872,
+  "T": 0.482526
+ }
+}

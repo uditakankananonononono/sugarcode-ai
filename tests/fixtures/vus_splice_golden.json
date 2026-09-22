@@ -53,7 +53,7 @@
      "site_type": "acceptor",
      "window": "TCTATTTTATTTAGA",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -116,7 +116,7 @@
      "site_type": "acceptor",
      "window": "CATTTGGCCCACAGG",
      "index": 5,
-     "delta": 0.001,
+     "delta": 0.003,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -125,7 +125,7 @@
      "site_type": "acceptor",
      "window": "TATTTAATTTACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -134,7 +134,7 @@
      "site_type": "acceptor",
      "window": "TGCTTAATTTTTAGG",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -143,7 +143,7 @@
      "site_type": "acceptor",
      "window": "AAAAAAAAAAATAGG",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -233,7 +233,7 @@
      "site_type": "acceptor",
      "window": "AAAAAAAAAAATAGG",
      "index": 8,
-     "delta": -0.0092,
+     "delta": -0.0112,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -278,7 +278,7 @@
      "site_type": "acceptor",
      "window": "GTTCTTTTTAACAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -296,7 +296,7 @@
      "site_type": "acceptor",
      "window": "GTTCTTTTTAACAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -305,7 +305,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTTAAATTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -350,7 +350,7 @@
      "site_type": "acceptor",
      "window": "AAAAAAAAAAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -368,7 +368,7 @@
      "site_type": "acceptor",
      "window": "CTCCATCTTAACAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -463,7 +463,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTGCTACTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -472,7 +472,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTATTTTCAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -490,7 +490,7 @@
      "site_type": "acceptor",
      "window": "CATTTTCATTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -499,7 +499,7 @@
      "site_type": "acceptor",
      "window": "TCTCTTCCTTGAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -508,7 +508,7 @@
      "site_type": "acceptor",
      "window": "TGTCTTAATTGCAGA",
      "index": 10,
-     "delta": 0.0078,
+     "delta": 0.0097,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -526,7 +526,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTGCTACTAGA",
      "index": 2,
-     "delta": -0.0187,
+     "delta": -0.026,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -571,7 +571,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTTCCCGTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -598,7 +598,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -643,7 +643,7 @@
      "site_type": "acceptor",
      "window": "ATTTTCTCTTTTAGG",
      "index": 2,
-     "delta": -0.04,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -706,7 +706,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTACCACAGC",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -724,7 +724,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTTCAGT",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -733,7 +733,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTGTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -769,7 +769,7 @@
      "site_type": "acceptor",
      "window": "CTTAACTCTGTTAGG",
      "index": 9,
-     "delta": 0.0592,
+     "delta": 0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -778,7 +778,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTTCCCGTAGG",
      "index": 9,
-     "delta": -0.0193,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -787,7 +787,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTAAATACAGA",
      "index": 8,
-     "delta": -0.0092,
+     "delta": -0.0112,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -805,7 +805,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTGAAATAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -814,7 +814,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCCTTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -832,7 +832,7 @@
      "site_type": "acceptor",
      "window": "TATACTTTTATTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -877,7 +877,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTTGAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -895,7 +895,7 @@
      "site_type": "acceptor",
      "window": "TAATTATTCTGAAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -904,7 +904,7 @@
      "site_type": "acceptor",
      "window": "AAAATTATTTCTAGA",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -913,7 +913,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -931,7 +931,7 @@
      "site_type": "acceptor",
      "window": "TTCCATGTTTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -940,7 +940,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTGTTATAGT",
      "index": 5,
-     "delta": -0.0386,
+     "delta": -0.0636,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -958,7 +958,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTGTTATAGT",
      "index": 5,
-     "delta": -0.0377,
+     "delta": -0.0607,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -985,7 +985,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTCTTATAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1003,7 +1003,7 @@
      "site_type": "acceptor",
      "window": "CCTTTCTTATACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1012,7 +1012,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCCTTGCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1048,7 +1048,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTATTTAAAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1075,7 +1075,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTATGCAAGA",
      "index": 11,
-     "delta": 0.0424,
+     "delta": 0.0655,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1147,7 +1147,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGGATTACAGG",
      "index": 5,
-     "delta": 0.0009,
+     "delta": 0.0028,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1183,7 +1183,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1201,7 +1201,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTATTTAAAGG",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1273,7 +1273,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGGATTACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1282,7 +1282,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0588,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1291,7 +1291,7 @@
      "site_type": "acceptor",
      "window": "TTGCTTGTTTTAAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1318,7 +1318,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTTCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1336,7 +1336,7 @@
      "site_type": "acceptor",
      "window": "TAATTATTCTGAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0753,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1354,7 +1354,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGA",
      "index": 11,
-     "delta": 0.0563,
+     "delta": 0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1363,7 +1363,7 @@
      "site_type": "acceptor",
      "window": "AAAATTATTTCTAGA",
      "index": 3,
-     "delta": 0.0482,
+     "delta": 0.0713,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1381,7 +1381,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGA",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1399,7 +1399,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTGTTATAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1417,7 +1417,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1426,7 +1426,7 @@
      "site_type": "acceptor",
      "window": "CTTAACTCTGTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1435,7 +1435,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTTTCTCCAGT",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1462,7 +1462,7 @@
      "site_type": "acceptor",
      "window": "CCTTTCTTATACAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1480,7 +1480,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTATTTTTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1507,7 +1507,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTATTTAAAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1516,7 +1516,7 @@
      "site_type": "acceptor",
      "window": "TCTATTCACAATAGT",
      "index": 3,
-     "delta": 0.0268,
+     "delta": 0.0425,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1534,7 +1534,7 @@
      "site_type": "acceptor",
      "window": "ATTTCTATATGTAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1561,7 +1561,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTGTTATAGT",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1570,7 +1570,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGGATTACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1606,7 +1606,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTTTCTCCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1624,7 +1624,7 @@
      "site_type": "acceptor",
      "window": "TATACTTTTATTAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0175,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1642,7 +1642,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTATTAATAGG",
      "index": 10,
-     "delta": -0.0045,
+     "delta": 0.0113,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1651,7 +1651,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTAATGGTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1669,7 +1669,7 @@
      "site_type": "acceptor",
      "window": "CCTTTCTTATACAGA",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1678,7 +1678,7 @@
      "site_type": "acceptor",
      "window": "GTCGTGGCATTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1687,7 +1687,7 @@
      "site_type": "acceptor",
      "window": "TAACTCCTGTTTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1705,7 +1705,7 @@
      "site_type": "acceptor",
      "window": "TTTGTATATTCTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1723,7 +1723,7 @@
      "site_type": "acceptor",
      "window": "ATTTTCTCTTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1741,7 +1741,7 @@
      "site_type": "acceptor",
      "window": "AATTTCTTTTTAAGT",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1750,7 +1750,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTGAAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -1777,7 +1777,7 @@
      "site_type": "acceptor",
      "window": "TCATTTTTCTTTAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1786,7 +1786,7 @@
      "site_type": "acceptor",
      "window": "TGTTTATTTTCTAGG",
      "index": 6,
-     "delta": -0.0407,
+     "delta": -0.0657,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1831,7 +1831,7 @@
      "site_type": "acceptor",
      "window": "TTTGGTTCGTGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1903,7 +1903,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTCTTATAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -1930,7 +1930,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTGTCAGA",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2020,7 +2020,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTATTTTTAGA",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2029,7 +2029,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTGCTACTAGA",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2038,7 +2038,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTGAAATAGG",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2056,7 +2056,7 @@
      "site_type": "acceptor",
      "window": "AATTTCTTTTTAAGT",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2092,7 +2092,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTCTTCACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2128,7 +2128,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTATTTTTAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2137,7 +2137,7 @@
      "site_type": "acceptor",
      "window": "CTTAACTCTGTTAGG",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2146,7 +2146,7 @@
      "site_type": "acceptor",
      "window": "ATCTGTAACTCCAGG",
      "index": 7,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2155,7 +2155,7 @@
      "site_type": "acceptor",
      "window": "TTCCATGTTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2209,7 +2209,7 @@
      "site_type": "acceptor",
      "window": "TATACTTTTATTAGG",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2218,7 +2218,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2245,7 +2245,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTGCTACTAGA",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2398,7 +2398,7 @@
      "site_type": "acceptor",
      "window": "CATTTTCATTTCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2425,7 +2425,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTCTTCACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2434,7 +2434,7 @@
      "site_type": "acceptor",
      "window": "TGGTTTACTTTAAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2443,7 +2443,7 @@
      "site_type": "acceptor",
      "window": "TGTCTTAATTGCAGA",
      "index": 7,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2452,7 +2452,7 @@
      "site_type": "acceptor",
      "window": "TTTGTATATTCTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2497,7 +2497,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTCTTATAGA",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2506,7 +2506,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTGTCAGA",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2533,7 +2533,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTTTACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2542,7 +2542,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTTCAGT",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2578,7 +2578,7 @@
      "site_type": "acceptor",
      "window": "TTTGTATATTCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2623,7 +2623,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTACCACAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2695,7 +2695,7 @@
      "site_type": "acceptor",
      "window": "TTACTTGATTTCAGG",
      "index": 3,
-     "delta": -0.0268,
+     "delta": -0.0426,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2704,7 +2704,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTTTACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2758,7 +2758,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTTCAGT",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2776,7 +2776,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTTACTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2821,7 +2821,7 @@
      "site_type": "acceptor",
      "window": "TTACTTGATTTCAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -2848,7 +2848,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2875,7 +2875,7 @@
      "site_type": "acceptor",
      "window": "TAATTATTCTGAAGG",
      "index": 6,
-     "delta": -0.0407,
+     "delta": -0.0657,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -2965,7 +2965,7 @@
      "site_type": "acceptor",
      "window": "TTACTTTCTTGAAGT",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3010,7 +3010,7 @@
      "site_type": "acceptor",
      "window": "ATTTCTATATGTAGA",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3019,7 +3019,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGA",
      "index": 11,
-     "delta": 0.0423,
+     "delta": 0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3028,7 +3028,7 @@
      "site_type": "acceptor",
      "window": "TATACTTTTATTAGG",
      "index": 4,
-     "delta": -0.0185,
+     "delta": -0.0362,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3150,7 +3150,7 @@
      "site_type": "acceptor",
      "window": "TTGTATATTTTCAGC",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3186,7 +3186,7 @@
      "site_type": "acceptor",
      "window": "TATCGTTTTTGAAGC",
      "index": 3,
-     "delta": -0.0268,
+     "delta": -0.0425,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3195,7 +3195,7 @@
      "site_type": "acceptor",
      "window": "GGGAAATTTTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3249,7 +3249,7 @@
      "site_type": "acceptor",
      "window": "ACCATACTGTTTAGC",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3312,7 +3312,7 @@
      "site_type": "acceptor",
      "window": "CCCATTCCTTTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3321,7 +3321,7 @@
      "site_type": "acceptor",
      "window": "GGGAAATTTTTTAGG",
      "index": 4,
-     "delta": 0.004,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3366,7 +3366,7 @@
      "site_type": "acceptor",
      "window": "AATGTCCATTTTAGA",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3375,7 +3375,7 @@
      "site_type": "acceptor",
      "window": "TTTATAATTTATAGA",
      "index": 6,
-     "delta": -0.0051,
+     "delta": -0.0071,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3393,7 +3393,7 @@
      "site_type": "acceptor",
      "window": "TCCTGGGGATCCAGG",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0712,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3420,7 +3420,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTGTCTCCAGC",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3447,7 +3447,7 @@
      "site_type": "acceptor",
      "window": "CAATTTAATTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3474,7 +3474,7 @@
      "site_type": "acceptor",
      "window": "TTGGTTTCTTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3483,7 +3483,7 @@
      "site_type": "acceptor",
      "window": "TTGGTTTCTTTCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3501,7 +3501,7 @@
      "site_type": "acceptor",
      "window": "CCCTACCCTGCTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3609,7 +3609,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTATTTAAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3627,7 +3627,7 @@
      "site_type": "acceptor",
      "window": "TATGATCTCTTTAGG",
      "index": 2,
-     "delta": -0.04,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3636,7 +3636,7 @@
      "site_type": "acceptor",
      "window": "CATTCCATTTAAAGC",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3672,7 +3672,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3681,7 +3681,7 @@
      "site_type": "acceptor",
      "window": "ACCATACTGTTTAGC",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3699,7 +3699,7 @@
      "site_type": "acceptor",
      "window": "ACCATACTGTTTAGC",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0655,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3780,7 +3780,7 @@
      "site_type": "acceptor",
      "window": "TGATTTAATTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3816,7 +3816,7 @@
      "site_type": "acceptor",
      "window": "CTCTCTTCTTCCAGA",
      "index": 8,
-     "delta": -0.0169,
+     "delta": -0.0242,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -3843,7 +3843,7 @@
      "site_type": "acceptor",
      "window": "ACCATACTGTTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3879,7 +3879,7 @@
      "site_type": "acceptor",
      "window": "TTGTATATTTTCAGC",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3888,7 +3888,7 @@
      "site_type": "acceptor",
      "window": "CTTGTATTTTACAGA",
      "index": 6,
-     "delta": -0.0408,
+     "delta": -0.0658,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3906,7 +3906,7 @@
      "site_type": "acceptor",
      "window": "GGGAAATTTTTTAGG",
      "index": 5,
-     "delta": -0.001,
+     "delta": -0.0029,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -3924,7 +3924,7 @@
      "site_type": "acceptor",
      "window": "CAATTTAATTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3951,7 +3951,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATTCTGCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3960,7 +3960,7 @@
      "site_type": "acceptor",
      "window": "TATCGTTTTTGAAGC",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -3978,7 +3978,7 @@
      "site_type": "acceptor",
      "window": "TTTATAATTTATAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4010,7 +4010,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCCTCCCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4046,7 +4046,7 @@
      "site_type": "acceptor",
      "window": "ATATTTCTTTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4055,7 +4055,7 @@
      "site_type": "acceptor",
      "window": "TTGTACTGTTTCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4082,7 +4082,7 @@
      "site_type": "acceptor",
      "window": "TTTTATTTGTTCAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4091,7 +4091,7 @@
      "site_type": "acceptor",
      "window": "CATTTTTTTATCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4118,7 +4118,7 @@
      "site_type": "acceptor",
      "window": "GTTTTCACTTTTAGA",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4172,7 +4172,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4190,7 +4190,7 @@
      "site_type": "acceptor",
      "window": "TTGTACTGTTTCAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4199,7 +4199,7 @@
      "site_type": "acceptor",
      "window": "ATTAATTTGTCCAGA",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0572,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4217,7 +4217,7 @@
      "site_type": "acceptor",
      "window": "TTGTACTGTTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4226,7 +4226,7 @@
      "site_type": "acceptor",
      "window": "ATTAATTTGTCCAGA",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4244,7 +4244,7 @@
      "site_type": "acceptor",
      "window": "TTGTACTGTTTCAGG",
      "index": 5,
-     "delta": -0.0202,
+     "delta": -0.0379,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4253,7 +4253,7 @@
      "site_type": "acceptor",
      "window": "TTTTATTTGTTCAGG",
      "index": 3,
-     "delta": -0.0443,
+     "delta": -0.0693,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4262,7 +4262,7 @@
      "site_type": "acceptor",
      "window": "TCTCCCCATTGCAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4271,7 +4271,7 @@
      "site_type": "acceptor",
      "window": "TAATTGTTTCCTAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4280,7 +4280,7 @@
      "site_type": "acceptor",
      "window": "TTATACTTTAACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4379,7 +4379,7 @@
      "site_type": "acceptor",
      "window": "TAATTGTTTCCTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4397,7 +4397,7 @@
      "site_type": "acceptor",
      "window": "CTTTCTCCAAACAGT",
      "index": 9,
-     "delta": 0.0193,
+     "delta": 0.0351,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4406,7 +4406,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 9,
-     "delta": 0.0245,
+     "delta": 0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4415,7 +4415,7 @@
      "site_type": "acceptor",
      "window": "TTATACTTTAACAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4496,7 +4496,7 @@
      "site_type": "acceptor",
      "window": "TATAATTTTTGCAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4514,7 +4514,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTAAATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4541,7 +4541,7 @@
      "site_type": "acceptor",
      "window": "ACACATTATTACAGT",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4550,7 +4550,7 @@
      "site_type": "acceptor",
      "window": "CTTTCTCCAAACAGT",
      "index": 6,
-     "delta": -0.0191,
+     "delta": -0.0348,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4595,7 +4595,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCTTAGA",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4613,7 +4613,7 @@
      "site_type": "acceptor",
      "window": "ATATTTCTTTTTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4622,7 +4622,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTACCCCCAGT",
      "index": 7,
-     "delta": -0.0326,
+     "delta": -0.0503,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4631,7 +4631,7 @@
      "site_type": "acceptor",
      "window": "ATATTTCTTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4640,7 +4640,7 @@
      "site_type": "acceptor",
      "window": "ATATTTCTTTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4658,7 +4658,7 @@
      "site_type": "acceptor",
      "window": "TTATACTTTAACAGG",
      "index": 5,
-     "delta": -0.0201,
+     "delta": -0.0378,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4685,7 +4685,7 @@
      "site_type": "acceptor",
      "window": "TTATACTTTAACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4694,7 +4694,7 @@
      "site_type": "acceptor",
      "window": "ACACATTATTACAGT",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4703,7 +4703,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTCTGTAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4712,7 +4712,7 @@
      "site_type": "acceptor",
      "window": "GTTTTCACTTTTAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4730,7 +4730,7 @@
      "site_type": "acceptor",
      "window": "TATAATTTTTGCAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4748,7 +4748,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCCTCCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4766,7 +4766,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTATGTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4784,7 +4784,7 @@
      "site_type": "acceptor",
      "window": "TTAAATGGTCACAGG",
      "index": 4,
-     "delta": 0.004,
+     "delta": 0.002,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4793,7 +4793,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTGATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -4910,7 +4910,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCCATTCTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -4982,7 +4982,7 @@
      "site_type": "acceptor",
      "window": "ATTAATTTGTCCAGA",
      "index": 5,
-     "delta": -0.0385,
+     "delta": -0.0635,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5072,7 +5072,7 @@
      "site_type": "acceptor",
      "window": "TCTCCCCATTGCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5081,7 +5081,7 @@
      "site_type": "acceptor",
      "window": "ATTAATTTGTCCAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5099,7 +5099,7 @@
      "site_type": "acceptor",
      "window": "TTTTATTTGTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5189,7 +5189,7 @@
      "site_type": "acceptor",
      "window": "TATAATTTTTGCAGA",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5198,7 +5198,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTACCCCCAGT",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     }
@@ -5239,7 +5239,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTTGCAGA",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5248,7 +5248,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTGGTAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5284,7 +5284,7 @@
      "site_type": "acceptor",
      "window": "TATTTGCTTTACAGC",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -5338,7 +5338,7 @@
      "site_type": "acceptor",
      "window": "TGATTGATTTACAGA",
      "index": 7,
-     "delta": -0.0094,
+     "delta": -0.0167,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5356,7 +5356,7 @@
      "site_type": "acceptor",
      "window": "GAAATATTTCACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5374,7 +5374,7 @@
      "site_type": "acceptor",
      "window": "CTTTGATCTTACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5401,7 +5401,7 @@
      "site_type": "acceptor",
      "window": "TATTTGCTTTACAGC",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5455,7 +5455,7 @@
      "site_type": "acceptor",
      "window": "GGTTTTATTTCCAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5464,7 +5464,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTTAACAGG",
      "index": 9,
-     "delta": -0.0154,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5482,7 +5482,7 @@
      "site_type": "acceptor",
      "window": "AGCCATTTCCCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5509,7 +5509,7 @@
      "site_type": "acceptor",
      "window": "CTTTTACCTTATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5518,7 +5518,7 @@
      "site_type": "acceptor",
      "window": "TATTTTTATTTCAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5527,7 +5527,7 @@
      "site_type": "acceptor",
      "window": "TTCTCTAACTGCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5545,7 +5545,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATTTTCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5554,7 +5554,7 @@
      "site_type": "acceptor",
      "window": "TTCCCCTTTTGTAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5563,7 +5563,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCATCTATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5635,7 +5635,7 @@
      "site_type": "acceptor",
      "window": "TCTTTCTTTTCTAGA",
      "index": 5,
-     "delta": 0.0184,
+     "delta": 0.0257,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5644,7 +5644,7 @@
      "site_type": "acceptor",
      "window": "CATTTTCTTTTTAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5680,7 +5680,7 @@
      "site_type": "acceptor",
      "window": "TTCCCCTTTTGTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5725,7 +5725,7 @@
      "site_type": "acceptor",
      "window": "TGATTGATTTACAGA",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5743,7 +5743,7 @@
      "site_type": "acceptor",
      "window": "ATTGTTTTTTATAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5752,7 +5752,7 @@
      "site_type": "acceptor",
      "window": "GAAATATTTCACAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5770,7 +5770,7 @@
      "site_type": "acceptor",
      "window": "TTATTCTTTTGCAGA",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -5793,7 +5793,7 @@
      "site_type": "acceptor",
      "window": "CTACCAATATTAAGC",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5811,7 +5811,7 @@
      "site_type": "acceptor",
      "window": "CCCCCTCTTCTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5829,7 +5829,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5874,7 +5874,7 @@
      "site_type": "acceptor",
      "window": "GTTCTCTATTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -5883,7 +5883,7 @@
      "site_type": "acceptor",
      "window": "CCCCCTCTTCTTAGC",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -5982,7 +5982,7 @@
      "site_type": "acceptor",
      "window": "CCTTTGTGTTTCAGG",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6036,7 +6036,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6099,7 +6099,7 @@
      "site_type": "acceptor",
      "window": "CCTTTGTGTTTCAGG",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6117,7 +6117,7 @@
      "site_type": "acceptor",
      "window": "GCCTTTCTGTGTAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6126,7 +6126,7 @@
      "site_type": "acceptor",
      "window": "CTACCAATATTAAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6153,7 +6153,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATATTACAGA",
      "index": 11,
-     "delta": -0.1299,
+     "delta": -0.1476,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6180,7 +6180,7 @@
      "site_type": "acceptor",
      "window": "TCTGTTTATCAAAGG",
      "index": 2,
-     "delta": -0.04,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6198,7 +6198,7 @@
      "site_type": "acceptor",
      "window": "GTTCTCTATTTTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6243,7 +6243,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTTCCTTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6252,7 +6252,7 @@
      "site_type": "acceptor",
      "window": "CCTTTGTGTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6324,7 +6324,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 7,
-     "delta": -0.0078,
+     "delta": -0.0097,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6342,7 +6342,7 @@
      "site_type": "acceptor",
      "window": "TAATTCCCTCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6369,7 +6369,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6387,7 +6387,7 @@
      "site_type": "acceptor",
      "window": "TCCTTTATTTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6396,7 +6396,7 @@
      "site_type": "acceptor",
      "window": "TCCTTTATTTTCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6414,7 +6414,7 @@
      "site_type": "acceptor",
      "window": "CCTTTGTGTTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6423,7 +6423,7 @@
      "site_type": "acceptor",
      "window": "CCCCCTCTTCTTAGC",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6441,7 +6441,7 @@
      "site_type": "acceptor",
      "window": "GCCTTTCTGTGTAGT",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6459,7 +6459,7 @@
      "site_type": "acceptor",
      "window": "TAATTCCCTCACAGG",
      "index": 2,
-     "delta": 0.0007,
+     "delta": -0.0013,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6486,7 +6486,7 @@
      "site_type": "acceptor",
      "window": "GTACTGAATTTTAGA",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6522,7 +6522,7 @@
      "site_type": "acceptor",
      "window": "TCTGTTTATCAAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6549,7 +6549,7 @@
      "site_type": "acceptor",
      "window": "CTTTTATATTACAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6608,7 +6608,7 @@
      "site_type": "acceptor",
      "window": "GTTTTGTGTTTTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6626,7 +6626,7 @@
      "site_type": "acceptor",
      "window": "CACTGTCCTTACAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6635,7 +6635,7 @@
      "site_type": "acceptor",
      "window": "TGTATGTGTTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6725,7 +6725,7 @@
      "site_type": "acceptor",
      "window": "CCAAAATATTTTAGC",
      "index": 3,
-     "delta": 0.0038,
+     "delta": 0.0018,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6743,7 +6743,7 @@
      "site_type": "acceptor",
      "window": "ACTATTGCACACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6761,7 +6761,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTCCTCCCAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6788,7 +6788,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTCTCAGC",
      "index": 5,
-     "delta": -0.0376,
+     "delta": -0.0606,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6824,7 +6824,7 @@
      "site_type": "acceptor",
      "window": "ATTTTATCTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -6851,7 +6851,7 @@
      "site_type": "acceptor",
      "window": "CTCTATTATTAAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6869,7 +6869,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCTGTTTCAGT",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6878,7 +6878,7 @@
      "site_type": "acceptor",
      "window": "TCTTTGTTTTCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6887,7 +6887,7 @@
      "site_type": "acceptor",
      "window": "TATCCTCCCAACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6923,7 +6923,7 @@
      "site_type": "acceptor",
      "window": "TCTGTACAATTAAGG",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6941,7 +6941,7 @@
      "site_type": "acceptor",
      "window": "ATTTTATTGTGCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6959,7 +6959,7 @@
      "site_type": "acceptor",
      "window": "TCTCCTTTTCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -6977,7 +6977,7 @@
      "site_type": "acceptor",
      "window": "ATTCTTCATAATAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7058,7 +7058,7 @@
      "site_type": "acceptor",
      "window": "CTGTTCTTTTTCAGG",
      "index": 4,
-     "delta": -0.0477,
+     "delta": -0.0707,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7067,7 +7067,7 @@
      "site_type": "acceptor",
      "window": "ATCTCATTTCACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7076,7 +7076,7 @@
      "site_type": "acceptor",
      "window": "CTCATGGAATATAGC",
      "index": 5,
-     "delta": 0.001,
+     "delta": 0.003,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7085,7 +7085,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTCTTGCAGT",
      "index": 3,
-     "delta": 0.0039,
+     "delta": 0.0019,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7130,7 +7130,7 @@
      "site_type": "acceptor",
      "window": "AAATTGTTTTTTAGG",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7139,7 +7139,7 @@
      "site_type": "acceptor",
      "window": "CTCATGGAATATAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7184,7 +7184,7 @@
      "site_type": "acceptor",
      "window": "ACTCTATGGCACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7202,7 +7202,7 @@
      "site_type": "acceptor",
      "window": "TTTGGATGACTTAGC",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0655,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7265,7 +7265,7 @@
      "site_type": "acceptor",
      "window": "GTTCTTTTCCCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7292,7 +7292,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTTGCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7301,7 +7301,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCCTTTCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7346,7 +7346,7 @@
      "site_type": "acceptor",
      "window": "TTTGGATGACTTAGC",
      "index": 3,
-     "delta": -0.0039,
+     "delta": -0.002,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7355,7 +7355,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTTTTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7436,7 +7436,7 @@
      "site_type": "acceptor",
      "window": "ACCCTTCTCTGCAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7463,7 +7463,7 @@
      "site_type": "acceptor",
      "window": "GTTTTGCTCAATAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0709,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7472,7 +7472,7 @@
      "site_type": "acceptor",
      "window": "TTTCTGCCTTATAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7481,7 +7481,7 @@
      "site_type": "acceptor",
      "window": "ACTATTGCACACAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7508,7 +7508,7 @@
      "site_type": "acceptor",
      "window": "ATGTTTAAACTTAGA",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7553,7 +7553,7 @@
      "site_type": "acceptor",
      "window": "CTGTTCTTTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7688,7 +7688,7 @@
      "site_type": "acceptor",
      "window": "TATATCTATACCAGC",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7706,7 +7706,7 @@
      "site_type": "acceptor",
      "window": "ATAAAAATCTATAGC",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7724,7 +7724,7 @@
      "site_type": "acceptor",
      "window": "TCTTGTTTTAACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7733,7 +7733,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTTTGCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7742,7 +7742,7 @@
      "site_type": "acceptor",
      "window": "CAAATGTGTTTCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7760,7 +7760,7 @@
      "site_type": "acceptor",
      "window": "TTTGATGCCAATAGG",
      "index": 10,
-     "delta": -0.0079,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     }
@@ -7792,7 +7792,7 @@
      "site_type": "acceptor",
      "window": "TTGTCTGACTCCAGA",
      "index": 5,
-     "delta": -0.0377,
+     "delta": -0.0607,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     }
@@ -7806,7 +7806,7 @@
      "site_type": "acceptor",
      "window": "TTTCCCACCCTTAGG",
      "index": 11,
-     "delta": 0.0139,
+     "delta": 0.0066,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7824,7 +7824,7 @@
      "site_type": "acceptor",
      "window": "TCTTCCTCCCACAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -7847,7 +7847,7 @@
      "site_type": "acceptor",
      "window": "CCCCGGACCCCCAGG",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7892,7 +7892,7 @@
      "site_type": "acceptor",
      "window": "TGTCCTCCCACCAGC",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7928,7 +7928,7 @@
      "site_type": "acceptor",
      "window": "ATCCATCCCTGCAGC",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7946,7 +7946,7 @@
      "site_type": "acceptor",
      "window": "CTGGCCCTGCGCAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7973,7 +7973,7 @@
      "site_type": "acceptor",
      "window": "TGCTGCCTGTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -7991,7 +7991,7 @@
      "site_type": "acceptor",
      "window": "ATCCATCCCTGCAGC",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8000,7 +8000,7 @@
      "site_type": "acceptor",
      "window": "TGCTGCCTGTTTAGG",
      "index": 6,
-     "delta": -0.0242,
+     "delta": -0.0419,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8018,7 +8018,7 @@
      "site_type": "acceptor",
      "window": "TGTCTCTTCTGTAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8054,7 +8054,7 @@
      "site_type": "acceptor",
      "window": "CCCCGGACCCCCAGG",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8126,7 +8126,7 @@
      "site_type": "acceptor",
      "window": "TTCTTCTGCCCCAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -8158,7 +8158,7 @@
      "site_type": "acceptor",
      "window": "GTTTAACACTTCAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8167,7 +8167,7 @@
      "site_type": "acceptor",
      "window": "GTTTAACACTTCAGG",
      "index": 8,
-     "delta": 0.017,
+     "delta": 0.0243,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8176,7 +8176,7 @@
      "site_type": "acceptor",
      "window": "GTTTGTCCCCACAGT",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0712,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8217,7 +8217,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTTGCAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8226,7 +8226,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTGTTTAGA",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.0629,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8289,7 +8289,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTTGGACCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8307,7 +8307,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTTCCTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8316,7 +8316,7 @@
      "site_type": "acceptor",
      "window": "AATGTGTTTTCCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8325,7 +8325,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTTGGACCAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8352,7 +8352,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTCTAATAGA",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0405,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8388,7 +8388,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCCTGACAGT",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8424,7 +8424,7 @@
      "site_type": "acceptor",
      "window": "TTGGTATCTAACAGA",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8451,7 +8451,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTTGGACCAGG",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8469,7 +8469,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTATTTTCAGT",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8487,7 +8487,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTAATACAGA",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8496,7 +8496,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTAATACAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8514,7 +8514,7 @@
      "site_type": "acceptor",
      "window": "TATTTTCCTGACAGT",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8523,7 +8523,7 @@
      "site_type": "acceptor",
      "window": "TGTTTGTTTATCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8541,7 +8541,7 @@
      "site_type": "acceptor",
      "window": "AATCTTCTGTTCAGG",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8550,7 +8550,7 @@
      "site_type": "acceptor",
      "window": "AATCTTCTGTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8559,7 +8559,7 @@
      "site_type": "acceptor",
      "window": "TTGCTTCTTCCTAGG",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8568,7 +8568,7 @@
      "site_type": "acceptor",
      "window": "AATGTGTTTTCCAGA",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8586,7 +8586,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTGTTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8631,7 +8631,7 @@
      "site_type": "acceptor",
      "window": "TTGGTATCTAACAGA",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8658,7 +8658,7 @@
      "site_type": "acceptor",
      "window": "AATCTTCTGTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8721,7 +8721,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTCATTGCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8739,7 +8739,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTGCAAGCAGG",
      "index": 5,
-     "delta": -0.0377,
+     "delta": -0.0608,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8766,7 +8766,7 @@
      "site_type": "acceptor",
      "window": "TTGCTTCTTCCTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8784,7 +8784,7 @@
      "site_type": "acceptor",
      "window": "TTGGTATCTAACAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0097,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8793,7 +8793,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTGCAAGCAGG",
      "index": 10,
-     "delta": 0.0033,
+     "delta": 0.021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8802,7 +8802,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTCATTGCAGA",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8829,7 +8829,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTCTAATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8856,7 +8856,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTGCAAGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8874,7 +8874,7 @@
      "site_type": "acceptor",
      "window": "AATCTTCTGTTCAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8883,7 +8883,7 @@
      "site_type": "acceptor",
      "window": "TTTCTTTGGACCAGG",
      "index": 7,
-     "delta": 0.0078,
+     "delta": 0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8910,7 +8910,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTCTAATAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -8969,7 +8969,7 @@
      "site_type": "acceptor",
      "window": "AATTTGTTTTGTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -8987,7 +8987,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9005,7 +9005,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9032,7 +9032,7 @@
      "site_type": "acceptor",
      "window": "TTAATTTATTTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9050,7 +9050,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTATACAGG",
      "index": 3,
-     "delta": -0.0443,
+     "delta": -0.0693,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9059,7 +9059,7 @@
      "site_type": "acceptor",
      "window": "TCTTGATTATCAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9104,7 +9104,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9113,7 +9113,7 @@
      "site_type": "acceptor",
      "window": "CACATGTGTTTCAGC",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9149,7 +9149,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9185,7 +9185,7 @@
      "site_type": "acceptor",
      "window": "CTACTTTCTTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9194,7 +9194,7 @@
      "site_type": "acceptor",
      "window": "CTACTTTCTTTTAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9203,7 +9203,7 @@
      "site_type": "acceptor",
      "window": "CTACTTTCTTTTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9230,7 +9230,7 @@
      "site_type": "acceptor",
      "window": "TGTTCTGTTTGCAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9284,7 +9284,7 @@
      "site_type": "acceptor",
      "window": "TGTTCTGTTTGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9338,7 +9338,7 @@
      "site_type": "acceptor",
      "window": "ATTATGTGCTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9410,7 +9410,7 @@
      "site_type": "acceptor",
      "window": "AATTTGTTTTGTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9437,7 +9437,7 @@
      "site_type": "acceptor",
      "window": "CACATGTGTTTCAGC",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9455,7 +9455,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGG",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9464,7 +9464,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTACTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9482,7 +9482,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTACTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9500,7 +9500,7 @@
      "site_type": "acceptor",
      "window": "CAAATTTCTTATAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9509,7 +9509,7 @@
      "site_type": "acceptor",
      "window": "TTTTTGTTTACTAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9518,7 +9518,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTCAAAATAGA",
      "index": 8,
-     "delta": -0.0092,
+     "delta": -0.0112,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9545,7 +9545,7 @@
      "site_type": "acceptor",
      "window": "TTAATTTATTTCAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9590,7 +9590,7 @@
      "site_type": "acceptor",
      "window": "ATTTCGATTTGCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9617,7 +9617,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTACTTAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9649,7 +9649,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 9,
-     "delta": 0.0437,
+     "delta": 0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9685,7 +9685,7 @@
      "site_type": "acceptor",
      "window": "TTTTACTTTAACAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9721,7 +9721,7 @@
      "site_type": "acceptor",
      "window": "CTCTCTTTTAACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9730,7 +9730,7 @@
      "site_type": "acceptor",
      "window": "TCCCTCATTCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9784,7 +9784,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9802,7 +9802,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9811,7 +9811,7 @@
      "site_type": "acceptor",
      "window": "TCCTTGCCTGGCAGG",
      "index": 9,
-     "delta": 0.0154,
+     "delta": 0.0174,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9883,7 +9883,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9910,7 +9910,7 @@
      "site_type": "acceptor",
      "window": "CCTTTTGGCAACAGT",
      "index": 7,
-     "delta": 0.0078,
+     "delta": 0.0097,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9919,7 +9919,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0712,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -9937,7 +9937,7 @@
      "site_type": "acceptor",
      "window": "ACATTTCTTTCTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9946,7 +9946,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -9964,7 +9964,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 6,
-     "delta": -0.005,
+     "delta": -0.0069,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10009,7 +10009,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTTTCTTAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10027,7 +10027,7 @@
      "site_type": "acceptor",
      "window": "ACATTTCTTTCTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10063,7 +10063,7 @@
      "site_type": "acceptor",
      "window": "TCCTTGCCTGGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10072,7 +10072,7 @@
      "site_type": "acceptor",
      "window": "TCCCTCATTCACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10090,7 +10090,7 @@
      "site_type": "acceptor",
      "window": "TTTTTAATTTTAAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10126,7 +10126,7 @@
      "site_type": "acceptor",
      "window": "CATGCCCCCTGCAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10162,7 +10162,7 @@
      "site_type": "acceptor",
      "window": "CAACCCCTTCCCAGG",
      "index": 2,
-     "delta": 0.0006,
+     "delta": -0.0014,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10225,7 +10225,7 @@
      "site_type": "acceptor",
      "window": "CCACCTGTTCACAGA",
      "index": 5,
-     "delta": -0.0377,
+     "delta": -0.0608,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10261,7 +10261,7 @@
      "site_type": "acceptor",
      "window": "CTCCTTCCCCACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10279,7 +10279,7 @@
      "site_type": "acceptor",
      "window": "CCTCCACCTTGCAGG",
      "index": 9,
-     "delta": -0.0246,
+     "delta": -0.0319,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10288,7 +10288,7 @@
      "site_type": "acceptor",
      "window": "TTGTGTCTGACCAGG",
      "index": 8,
-     "delta": 0.0092,
+     "delta": 0.0112,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10369,7 +10369,7 @@
      "site_type": "acceptor",
      "window": "TTTCCTTTCAAAAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10396,7 +10396,7 @@
      "site_type": "acceptor",
      "window": "GGGCCTCCCTACAGA",
      "index": 9,
-     "delta": -0.0438,
+     "delta": -0.0668,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10414,7 +10414,7 @@
      "site_type": "acceptor",
      "window": "CATGCCCCCTGCAGT",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10504,7 +10504,7 @@
      "site_type": "acceptor",
      "window": "CCTTCTTGCCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10549,7 +10549,7 @@
      "site_type": "acceptor",
      "window": "CTTGGCCTCTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10567,7 +10567,7 @@
      "site_type": "acceptor",
      "window": "GGGCCTCCCTACAGA",
      "index": 3,
-     "delta": -0.0268,
+     "delta": -0.0425,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10603,7 +10603,7 @@
      "site_type": "acceptor",
      "window": "CATGCCCCCTGCAGT",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.0629,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10630,7 +10630,7 @@
      "site_type": "acceptor",
      "window": "CCTCCCCTGGGCAGG",
      "index": 9,
-     "delta": 0.0592,
+     "delta": 0.0842,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10639,7 +10639,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTTCCCCTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10891,7 +10891,7 @@
      "site_type": "acceptor",
      "window": "CCCTCTCCCCACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -10909,7 +10909,7 @@
      "site_type": "acceptor",
      "window": "TGGTGCTTCCCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10918,7 +10918,7 @@
      "site_type": "acceptor",
      "window": "CCTCTGGCCCCCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -10945,7 +10945,7 @@
      "site_type": "acceptor",
      "window": "CACCTTGCCTGCAGG",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11026,7 +11026,7 @@
      "site_type": "acceptor",
      "window": "TTCTTGGTCGGCAGG",
      "index": 10,
-     "delta": 0.0033,
+     "delta": 0.021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11125,7 +11125,7 @@
      "site_type": "acceptor",
      "window": "TTCTTGGTCGGCAGG",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11161,7 +11161,7 @@
      "site_type": "acceptor",
      "window": "CTCCTTCCCCACAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11224,7 +11224,7 @@
      "site_type": "acceptor",
      "window": "TCTCCTGCACACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11233,7 +11233,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTTCCCCTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11269,7 +11269,7 @@
      "site_type": "acceptor",
      "window": "CTTGGCCTCTGCAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11278,7 +11278,7 @@
      "site_type": "acceptor",
      "window": "CCCTCTCCCCACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11314,7 +11314,7 @@
      "site_type": "acceptor",
      "window": "TTCTTGGTCGGCAGG",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11341,7 +11341,7 @@
      "site_type": "acceptor",
      "window": "TTCTTGGTCGGCAGG",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -11422,7 +11422,7 @@
      "site_type": "acceptor",
      "window": "ATGGGCCCCTGCAGA",
      "index": 2,
-     "delta": 0.0393,
+     "delta": 0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11431,7 +11431,7 @@
      "site_type": "acceptor",
      "window": "TTGTCCCCGGGCAGA",
      "index": 7,
-     "delta": 0.0094,
+     "delta": 0.0167,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -11499,7 +11499,7 @@
      "site_type": "acceptor",
      "window": "CTGCTTCTTTACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11508,7 +11508,7 @@
      "site_type": "acceptor",
      "window": "GTGCATTTCTGTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11535,7 +11535,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTGTAGG",
      "index": 11,
-     "delta": -0.1159,
+     "delta": -0.1409,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11544,7 +11544,7 @@
      "site_type": "acceptor",
      "window": "GTTTTATTGTGTAGA",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11553,7 +11553,7 @@
      "site_type": "acceptor",
      "window": "TGGGGTTTTTATAGA",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11562,7 +11562,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCCACATTAGG",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11589,7 +11589,7 @@
      "site_type": "acceptor",
      "window": "TATTTTTCTTTTAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11598,7 +11598,7 @@
      "site_type": "acceptor",
      "window": "CTATGTCTATATAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11652,7 +11652,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTTTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11697,7 +11697,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTTTCTATAGA",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11715,7 +11715,7 @@
      "site_type": "acceptor",
      "window": "TTTAAAAAATTCAGG",
      "index": 7,
-     "delta": 0.0341,
+     "delta": 0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11724,7 +11724,7 @@
      "site_type": "acceptor",
      "window": "ATCCCCTTTTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11742,7 +11742,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTCCTAGG",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11751,7 +11751,7 @@
      "site_type": "acceptor",
      "window": "ATCTTTTCTGTTAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11769,7 +11769,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTATTTATAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11778,7 +11778,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTATTTATAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11805,7 +11805,7 @@
      "site_type": "acceptor",
      "window": "GTTTTATTGTGTAGA",
      "index": 6,
-     "delta": -0.0408,
+     "delta": -0.0658,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11823,7 +11823,7 @@
      "site_type": "acceptor",
      "window": "CTATCTTGCTGCAGA",
      "index": 3,
-     "delta": -0.0214,
+     "delta": -0.0287,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11841,7 +11841,7 @@
      "site_type": "acceptor",
      "window": "CCACCATTCTATAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11886,7 +11886,7 @@
      "site_type": "acceptor",
      "window": "TGGGGTTTTTATAGA",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11904,7 +11904,7 @@
      "site_type": "acceptor",
      "window": "TTTGAATTCTGTAGA",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11931,7 +11931,7 @@
      "site_type": "acceptor",
      "window": "GTTTTATTGTGTAGA",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11958,7 +11958,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCCACATTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -11967,7 +11967,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTTCTCAGA",
      "index": 9,
-     "delta": -0.0348,
+     "delta": -0.0525,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12003,7 +12003,7 @@
      "site_type": "acceptor",
      "window": "TTTGAATTCTGTAGA",
      "index": 5,
-     "delta": -0.001,
+     "delta": -0.003,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12012,7 +12012,7 @@
      "site_type": "acceptor",
      "window": "TTGATTTGTTGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12039,7 +12039,7 @@
      "site_type": "acceptor",
      "window": "GTCATTTTCCTTAGG",
      "index": 11,
-     "delta": -0.0423,
+     "delta": -0.0653,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12093,7 +12093,7 @@
      "site_type": "acceptor",
      "window": "ATTATCTTTAATAGA",
      "index": 7,
-     "delta": -0.034,
+     "delta": -0.057,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12165,7 +12165,7 @@
      "site_type": "acceptor",
      "window": "AATTTTGTGTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12228,7 +12228,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTAATTGCAGA",
      "index": 5,
-     "delta": -0.0386,
+     "delta": -0.0636,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12246,7 +12246,7 @@
      "site_type": "acceptor",
      "window": "CTCTTTTTCTCCAGG",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12291,7 +12291,7 @@
      "site_type": "acceptor",
      "window": "TTTTTACTTTTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12327,7 +12327,7 @@
      "site_type": "acceptor",
      "window": "TTTTTATTTCTCAGA",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12345,7 +12345,7 @@
      "site_type": "acceptor",
      "window": "TTTTTACTTTTTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12354,7 +12354,7 @@
      "site_type": "acceptor",
      "window": "TCTTTTAATTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12372,7 +12372,7 @@
      "site_type": "acceptor",
      "window": "TTATGTTACTGCAGC",
      "index": 6,
-     "delta": -0.0408,
+     "delta": -0.0658,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12399,7 +12399,7 @@
      "site_type": "acceptor",
      "window": "CTATCTTGCTGCAGA",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12408,7 +12408,7 @@
      "site_type": "acceptor",
      "window": "TTTGAATTCTGTAGA",
      "index": 8,
-     "delta": -0.038,
+     "delta": -0.0557,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12417,7 +12417,7 @@
      "site_type": "acceptor",
      "window": "TTATGTTACTGCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12462,7 +12462,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTTTCTCTAGT",
      "index": 11,
-     "delta": 0.0139,
+     "delta": 0.0066,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12498,7 +12498,7 @@
      "site_type": "acceptor",
      "window": "TATTTTTCATGCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -12660,7 +12660,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTTTCTATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12669,7 +12669,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTCTTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12678,7 +12678,7 @@
      "site_type": "acceptor",
      "window": "GTATTTTTTTCCAGG",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -12696,7 +12696,7 @@
      "site_type": "acceptor",
      "window": "TTGCATCTTGGCAGG",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0686,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12714,7 +12714,7 @@
      "site_type": "acceptor",
      "window": "TTTGAATTCTGTAGA",
      "index": 6,
-     "delta": -0.0408,
+     "delta": -0.0658,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12741,7 +12741,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTGTAGG",
      "index": 7,
-     "delta": -0.0094,
+     "delta": -0.0167,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12813,7 +12813,7 @@
      "site_type": "acceptor",
      "window": "TTCTTTATTTATAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12840,7 +12840,7 @@
      "site_type": "acceptor",
      "window": "TTTAAAAAATTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -12858,7 +12858,7 @@
      "site_type": "acceptor",
      "window": "ATCCCCTTTTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12876,7 +12876,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTCTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -12948,7 +12948,7 @@
      "site_type": "acceptor",
      "window": "TTTGCTGTATCTAGG",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13011,7 +13011,7 @@
      "site_type": "acceptor",
      "window": "ATTATCTTTAATAGA",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13020,7 +13020,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTTTGTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13029,7 +13029,7 @@
      "site_type": "acceptor",
      "window": "CTATCTTGCTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13047,7 +13047,7 @@
      "site_type": "acceptor",
      "window": "TTTTCATCTTTCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13056,7 +13056,7 @@
      "site_type": "acceptor",
      "window": "TTTGTCCACATTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13065,7 +13065,7 @@
      "site_type": "acceptor",
      "window": "GTGTTTTCTCCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13137,7 +13137,7 @@
      "site_type": "acceptor",
      "window": "TTGCATCTTGGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13182,7 +13182,7 @@
      "site_type": "acceptor",
      "window": "CTGCTTCTTTACAGG",
      "index": 10,
-     "delta": 0.0064,
+     "delta": 0.0294,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13227,7 +13227,7 @@
      "site_type": "acceptor",
      "window": "GTGCATTTCTGTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13281,7 +13281,7 @@
      "site_type": "acceptor",
      "window": "TTATTTTTTTCTAGC",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13335,7 +13335,7 @@
      "site_type": "acceptor",
      "window": "TTATGTTACTGCAGC",
      "index": 5,
-     "delta": -0.0386,
+     "delta": -0.0636,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13371,7 +13371,7 @@
      "site_type": "acceptor",
      "window": "TTGTATTTGCTTAGG",
      "index": 5,
-     "delta": -0.0385,
+     "delta": -0.0635,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13443,7 +13443,7 @@
      "site_type": "acceptor",
      "window": "TGCCTTCATTTTAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13497,7 +13497,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTCTCAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13547,7 +13547,7 @@
      "site_type": "acceptor",
      "window": "TCCCCCAATTACAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13556,7 +13556,7 @@
      "site_type": "acceptor",
      "window": "ACTTTCCATTCCAGA",
      "index": 7,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -13565,7 +13565,7 @@
      "site_type": "acceptor",
      "window": "ATTCTCTCTTCTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13592,7 +13592,7 @@
      "site_type": "acceptor",
      "window": "TCCCCCAATTACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     },
@@ -13750,7 +13750,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCTTCTTTAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13768,7 +13768,7 @@
      "site_type": "acceptor",
      "window": "TTCTCCGAAATTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13786,7 +13786,7 @@
      "site_type": "acceptor",
      "window": "TGCCATTGTGTCAGA",
      "index": 2,
-     "delta": -0.0213,
+     "delta": -0.037,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13840,7 +13840,7 @@
      "site_type": "acceptor",
      "window": "TTCTCCGAAATTAGG",
      "index": 4,
-     "delta": -0.0185,
+     "delta": -0.0362,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13849,7 +13849,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTATTTAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13858,7 +13858,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTATCTAAGG",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13867,7 +13867,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTATCTAAGG",
      "index": 2,
-     "delta": -0.0399,
+     "delta": -0.063,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13876,7 +13876,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTATTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13885,7 +13885,7 @@
      "site_type": "acceptor",
      "window": "TGCCATTGTGTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13903,7 +13903,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTTCTTCCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -13930,7 +13930,7 @@
      "site_type": "acceptor",
      "window": "TTTGTTTTATTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13984,7 +13984,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTAATTACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -13993,7 +13993,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCACAGA",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14011,7 +14011,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTTTCACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14038,7 +14038,7 @@
      "site_type": "acceptor",
      "window": "TTTTTCTTCTTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14047,7 +14047,7 @@
      "site_type": "acceptor",
      "window": "TGCCATTGTGTCAGA",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14065,7 +14065,7 @@
      "site_type": "acceptor",
      "window": "TATATTTGGCTTAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14119,7 +14119,7 @@
      "site_type": "acceptor",
      "window": "TATATTTGGCTTAGG",
      "index": 7,
-     "delta": 0.0078,
+     "delta": 0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14128,7 +14128,7 @@
      "site_type": "acceptor",
      "window": "TTTTGTTATCTAAGG",
      "index": 11,
-     "delta": -0.0734,
+     "delta": -0.0754,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14137,7 +14137,7 @@
      "site_type": "acceptor",
      "window": "TTCTCCGAAATTAGG",
      "index": 9,
-     "delta": -0.0155,
+     "delta": -0.0174,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14178,7 +14178,7 @@
      "site_type": "acceptor",
      "window": "CCTTCCCTGCCCAGG",
      "index": 8,
-     "delta": 0.0549,
+     "delta": 0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14205,7 +14205,7 @@
      "site_type": "acceptor",
      "window": "CCCTCGTCCTGCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14214,7 +14214,7 @@
      "site_type": "acceptor",
      "window": "ACGCATGTCTGCAGG",
      "index": 5,
-     "delta": -0.0386,
+     "delta": -0.0636,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14241,7 +14241,7 @@
      "site_type": "acceptor",
      "window": "CTGTGTCCTCACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14250,7 +14250,7 @@
      "site_type": "acceptor",
      "window": "CCCCCGTCCACCAGA",
      "index": 8,
-     "delta": -0.038,
+     "delta": -0.0557,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14277,7 +14277,7 @@
      "site_type": "acceptor",
      "window": "CGCGCCCCCCACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14304,7 +14304,7 @@
      "site_type": "acceptor",
      "window": "CATTCCCCCCGCAGA",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14322,7 +14322,7 @@
      "site_type": "acceptor",
      "window": "CTCTTGCCTCCCAGG",
      "index": 6,
-     "delta": 0.0165,
+     "delta": 0.0238,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14331,7 +14331,7 @@
      "site_type": "acceptor",
      "window": "CACCCTCTGCGCAGG",
      "index": 4,
-     "delta": -0.0225,
+     "delta": -0.0382,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14340,7 +14340,7 @@
      "site_type": "acceptor",
      "window": "CACTCCCACGCCAGG",
      "index": 4,
-     "delta": -0.0185,
+     "delta": -0.0362,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14349,7 +14349,7 @@
      "site_type": "acceptor",
      "window": "CTGGCTCCACACAGG",
      "index": 3,
-     "delta": -0.0038,
+     "delta": -0.0019,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14358,7 +14358,7 @@
      "site_type": "acceptor",
      "window": "CCCCTCTCCGGCAGG",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "no assertion criteria provided"
     },
@@ -14462,7 +14462,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTAAACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14480,7 +14480,7 @@
      "site_type": "acceptor",
      "window": "CCACGTTTGCTTAGG",
      "index": 10,
-     "delta": -0.0142,
+     "delta": -0.0392,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14489,7 +14489,7 @@
      "site_type": "acceptor",
      "window": "TGTATTTTGTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14498,7 +14498,7 @@
      "site_type": "acceptor",
      "window": "ACACTCTCTTTCAGC",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14516,7 +14516,7 @@
      "site_type": "acceptor",
      "window": "ACTGATTTCTCTAGT",
      "index": 3,
-     "delta": 0.0229,
+     "delta": 0.0406,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14525,7 +14525,7 @@
      "site_type": "acceptor",
      "window": "CCACGTTTGCTTAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14534,7 +14534,7 @@
      "site_type": "acceptor",
      "window": "ACACTCTCTTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14606,7 +14606,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14633,7 +14633,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTAAACAGG",
      "index": 9,
-     "delta": 0.0192,
+     "delta": 0.035,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14642,7 +14642,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14678,7 +14678,7 @@
      "site_type": "acceptor",
      "window": "ACACTCTCTTTCAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14687,7 +14687,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14759,7 +14759,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14786,7 +14786,7 @@
      "site_type": "acceptor",
      "window": "TGTCTCACACTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14840,7 +14840,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14912,7 +14912,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTTGCCTTAGA",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14921,7 +14921,7 @@
      "site_type": "acceptor",
      "window": "TTGTATTCTTTTAGC",
      "index": 10,
-     "delta": -0.0109,
+     "delta": -0.0182,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14930,7 +14930,7 @@
      "site_type": "acceptor",
      "window": "TGTCTCACACTCAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14939,7 +14939,7 @@
      "site_type": "acceptor",
      "window": "TTAATGTTGAATAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -14957,7 +14957,7 @@
      "site_type": "acceptor",
      "window": "ACACTCTCTTTCAGC",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -14993,7 +14993,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTTTAAACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15011,7 +15011,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTTTTTCAGT",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15020,7 +15020,7 @@
      "site_type": "acceptor",
      "window": "GTATTCTCTCACAGC",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0405,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15106,7 +15106,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTTTAAGG",
      "index": 10,
-     "delta": -0.0064,
+     "delta": -0.0294,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15133,7 +15133,7 @@
      "site_type": "acceptor",
      "window": "TTTCTGTCCACCAGG",
      "index": 9,
-     "delta": 0.0192,
+     "delta": 0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15142,7 +15142,7 @@
      "site_type": "acceptor",
      "window": "ACTAAAGTACTCAGA",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15151,7 +15151,7 @@
      "site_type": "acceptor",
      "window": "TTTCTGTCCACCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15169,7 +15169,7 @@
      "site_type": "acceptor",
      "window": "AACTTTTCTTTTAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15187,7 +15187,7 @@
      "site_type": "acceptor",
      "window": "ACTAAAGTACTCAGA",
      "index": 8,
-     "delta": 0.0457,
+     "delta": 0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15205,7 +15205,7 @@
      "site_type": "acceptor",
      "window": "ACTAAAGTACTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15277,7 +15277,7 @@
      "site_type": "acceptor",
      "window": "ATTTAACCATGCAGA",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15304,7 +15304,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGTTTTAAGG",
      "index": 11,
-     "delta": -0.0735,
+     "delta": -0.0755,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15367,7 +15367,7 @@
      "site_type": "acceptor",
      "window": "TTTCTGTCCACCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15421,7 +15421,7 @@
      "site_type": "acceptor",
      "window": "ACTAAAGTACTCAGA",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15430,7 +15430,7 @@
      "site_type": "acceptor",
      "window": "ACTAAAGTACTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15439,7 +15439,7 @@
      "site_type": "acceptor",
      "window": "ATTTAACCATGCAGA",
      "index": 5,
-     "delta": -0.001,
+     "delta": -0.0029,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15466,7 +15466,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTTTCTCTAGG",
      "index": 10,
-     "delta": -0.0033,
+     "delta": -0.021,
      "site_class": "AG",
      "review": "reviewed by expert panel"
     }
@@ -15489,7 +15489,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTGTTTGTAGC",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15498,7 +15498,7 @@
      "site_type": "acceptor",
      "window": "ATTATCTGTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15534,7 +15534,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTTCCTTTAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15579,7 +15579,7 @@
      "site_type": "acceptor",
      "window": "GTTTTTCTTTTCAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15588,7 +15588,7 @@
      "site_type": "acceptor",
      "window": "TTTTTTGTTCCCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15606,7 +15606,7 @@
      "site_type": "acceptor",
      "window": "TCTTTCCTTTGTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15624,7 +15624,7 @@
      "site_type": "acceptor",
      "window": "TTATTGTTATTTAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15633,7 +15633,7 @@
      "site_type": "acceptor",
      "window": "TTAAATATATCTAGG",
      "index": 4,
-     "delta": 0.0041,
+     "delta": 0.0021,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15660,7 +15660,7 @@
      "site_type": "acceptor",
      "window": "CATGTTTCATATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15696,7 +15696,7 @@
      "site_type": "acceptor",
      "window": "TTATTGTTATTTAGT",
      "index": 3,
-     "delta": -0.0443,
+     "delta": -0.0693,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15759,7 +15759,7 @@
      "site_type": "acceptor",
      "window": "CTGTTCTTCCTCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15804,7 +15804,7 @@
      "site_type": "acceptor",
      "window": "TACCACTTTTACAGA",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15849,7 +15849,7 @@
      "site_type": "acceptor",
      "window": "TACCACTTTTACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15876,7 +15876,7 @@
      "site_type": "acceptor",
      "window": "TTAAATATATCTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -15903,7 +15903,7 @@
      "site_type": "acceptor",
      "window": "TTTATCCCCTCTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15912,7 +15912,7 @@
      "site_type": "acceptor",
      "window": "TATTTGTTTAATAGG",
      "index": 10,
-     "delta": -0.0078,
+     "delta": -0.0098,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15957,7 +15957,7 @@
      "site_type": "acceptor",
      "window": "AATTTATTTACTAGA",
      "index": 11,
-     "delta": -0.1159,
+     "delta": -0.1409,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -15975,7 +15975,7 @@
      "site_type": "acceptor",
      "window": "CATTTTTTTTTCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16029,7 +16029,7 @@
      "site_type": "acceptor",
      "window": "CATGTTTCATATAGG",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16115,7 +16115,7 @@
      "site_type": "acceptor",
      "window": "TACCCCACTTGCAGC",
      "index": 4,
-     "delta": -0.0225,
+     "delta": -0.0382,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16124,7 +16124,7 @@
      "site_type": "acceptor",
      "window": "TTCCTGTCTTACAGA",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16151,7 +16151,7 @@
      "site_type": "acceptor",
      "window": "ACTCCCTATTACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16187,7 +16187,7 @@
      "site_type": "acceptor",
      "window": "TACCCCACTTGCAGC",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16205,7 +16205,7 @@
      "site_type": "acceptor",
      "window": "AACACTTTCTGCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16214,7 +16214,7 @@
      "site_type": "acceptor",
      "window": "GTCCTTCTTAATAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16223,7 +16223,7 @@
      "site_type": "acceptor",
      "window": "ACTCCCTATTACAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16250,7 +16250,7 @@
      "site_type": "acceptor",
      "window": "ATTTTTGTTTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16268,7 +16268,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTTAATCTAGA",
      "index": 10,
-     "delta": 0.0045,
+     "delta": -0.0113,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16295,7 +16295,7 @@
      "site_type": "acceptor",
      "window": "TACCCCACTTGCAGC",
      "index": 9,
-     "delta": -0.0592,
+     "delta": -0.0842,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16304,7 +16304,7 @@
      "site_type": "acceptor",
      "window": "TGTTTTGATCTTAGG",
      "index": 8,
-     "delta": -0.0548,
+     "delta": -0.0798,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16322,7 +16322,7 @@
      "site_type": "acceptor",
      "window": "CATTTTCTTTATAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16331,7 +16331,7 @@
      "site_type": "acceptor",
      "window": "TTCCCCTTTGGTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16340,7 +16340,7 @@
      "site_type": "acceptor",
      "window": "TTCCTGTCTTACAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16349,7 +16349,7 @@
      "site_type": "acceptor",
      "window": "CTTTTTTCAAACAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16358,7 +16358,7 @@
      "site_type": "acceptor",
      "window": "CATCTCACTTACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16385,7 +16385,7 @@
      "site_type": "acceptor",
      "window": "TTGTTGTTTTTAAGG",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16430,7 +16430,7 @@
      "site_type": "acceptor",
      "window": "CTATTTCTCTACAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     }
@@ -16489,7 +16489,7 @@
      "site_type": "acceptor",
      "window": "CTCTGTTGCTGCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16498,7 +16498,7 @@
      "site_type": "acceptor",
      "window": "GTGTTATCTCCTAGG",
      "index": 11,
-     "delta": -0.1159,
+     "delta": -0.1409,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16516,7 +16516,7 @@
      "site_type": "acceptor",
      "window": "CTCTGTTGCTGCAGA",
      "index": 6,
-     "delta": -0.0357,
+     "delta": -0.0587,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16525,7 +16525,7 @@
      "site_type": "acceptor",
      "window": "CTCTTGTCTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16570,7 +16570,7 @@
      "site_type": "acceptor",
      "window": "TCACCCATCTACAGT",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16588,7 +16588,7 @@
      "site_type": "acceptor",
      "window": "CCTATCCTGAGTAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16597,7 +16597,7 @@
      "site_type": "acceptor",
      "window": "CCTATCCTGAGTAGT",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16615,7 +16615,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTTCCTACAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16741,7 +16741,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTTCCTACAGT",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16759,7 +16759,7 @@
      "site_type": "acceptor",
      "window": "CCTATCCTGAGTAGT",
      "index": 8,
-     "delta": 0.0093,
+     "delta": 0.0112,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -16813,7 +16813,7 @@
      "site_type": "acceptor",
      "window": "CTGATTGCTCTTAGG",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16908,7 +16908,7 @@
      "site_type": "acceptor",
      "window": "TCTGTATCTTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16926,7 +16926,7 @@
      "site_type": "acceptor",
      "window": "GGTTCCTTTTCTAGG",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16935,7 +16935,7 @@
      "site_type": "acceptor",
      "window": "CTGGTCTCTGCTAGA",
      "index": 2,
-     "delta": -0.0006,
+     "delta": 0.0014,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -16962,7 +16962,7 @@
      "site_type": "acceptor",
      "window": "GGTTCCTTTTCTAGG",
      "index": 8,
-     "delta": -0.0549,
+     "delta": -0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17016,7 +17016,7 @@
      "site_type": "acceptor",
      "window": "TTTTCTTGATTTAGA",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17052,7 +17052,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTCCTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17070,7 +17070,7 @@
      "site_type": "acceptor",
      "window": "ACTTATCTTTTCAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17079,7 +17079,7 @@
      "site_type": "acceptor",
      "window": "AACTTTCTTCCTAGG",
      "index": 6,
-     "delta": -0.0242,
+     "delta": -0.0419,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17088,7 +17088,7 @@
      "site_type": "acceptor",
      "window": "CCCTTGTCTCTAAGC",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0712,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17106,7 +17106,7 @@
      "site_type": "acceptor",
      "window": "TCTGTATCTTTCAGA",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17178,7 +17178,7 @@
      "site_type": "acceptor",
      "window": "GTCTCTTTGGGCAGA",
      "index": 8,
-     "delta": 0.0093,
+     "delta": 0.0113,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17187,7 +17187,7 @@
      "site_type": "acceptor",
      "window": "TTTTACATTTTCAGC",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0722,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17196,7 +17196,7 @@
      "site_type": "acceptor",
      "window": "TCTGTATCTTTCAGA",
      "index": 10,
-     "delta": -0.0109,
+     "delta": -0.0182,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17223,7 +17223,7 @@
      "site_type": "acceptor",
      "window": "TCTGTATCTTTCAGA",
      "index": 2,
-     "delta": -0.0187,
+     "delta": -0.026,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17241,7 +17241,7 @@
      "site_type": "acceptor",
      "window": "CCCTTGTCTCTAAGC",
      "index": 4,
-     "delta": -0.0252,
+     "delta": -0.0325,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17268,7 +17268,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 7,
-     "delta": -0.0094,
+     "delta": -0.0167,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17277,7 +17277,7 @@
      "site_type": "acceptor",
      "window": "CTTTTCTCCTGCAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17304,7 +17304,7 @@
      "site_type": "acceptor",
      "window": "TCTCTTCCTCTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17313,7 +17313,7 @@
      "site_type": "acceptor",
      "window": "ACTTATCTTTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17340,7 +17340,7 @@
      "site_type": "acceptor",
      "window": "GTCTCTTTGGGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17358,7 +17358,7 @@
      "site_type": "acceptor",
      "window": "CTGGTCTCTGCTAGA",
      "index": 4,
-     "delta": -0.0437,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17457,7 +17457,7 @@
      "site_type": "acceptor",
      "window": "ACTTATCTTTTCAGG",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17475,7 +17475,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17484,7 +17484,7 @@
      "site_type": "acceptor",
      "window": "GGTTCCTTTTCTAGG",
      "index": 9,
-     "delta": -0.0593,
+     "delta": -0.0843,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17502,7 +17502,7 @@
      "site_type": "acceptor",
      "window": "CTCTTCCATTTTAGG",
      "index": 11,
-     "delta": 0.014,
+     "delta": 0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17529,7 +17529,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17538,7 +17538,7 @@
      "site_type": "acceptor",
      "window": "TTGTTTCTCTTCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17592,7 +17592,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17601,7 +17601,7 @@
      "site_type": "acceptor",
      "window": "TTTTACATTTTCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -17655,7 +17655,7 @@
      "site_type": "acceptor",
      "window": "TATTAACTTCCCAGG",
      "index": 5,
-     "delta": -0.0009,
+     "delta": -0.0029,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     }
@@ -17714,7 +17714,7 @@
      "site_type": "acceptor",
      "window": "TCTTCTTTTGACAGG",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17723,7 +17723,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 5,
-     "delta": -0.0377,
+     "delta": -0.0607,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17732,7 +17732,7 @@
      "site_type": "acceptor",
      "window": "GCCTGGTACTGCAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17741,7 +17741,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 7,
-     "delta": -0.034,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17813,7 +17813,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 4,
-     "delta": -0.0253,
+     "delta": -0.0326,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17822,7 +17822,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17831,7 +17831,7 @@
      "site_type": "acceptor",
      "window": "GCTTTTGTCTTTAGG",
      "index": 11,
-     "delta": -0.0424,
+     "delta": -0.0654,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17840,7 +17840,7 @@
      "site_type": "acceptor",
      "window": "GCTCACTCTGCCAGG",
      "index": 9,
-     "delta": 0.0155,
+     "delta": 0.0175,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17885,7 +17885,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.035,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17939,7 +17939,7 @@
      "site_type": "acceptor",
      "window": "TCTTGTCCGGGCAGG",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -17948,7 +17948,7 @@
      "site_type": "acceptor",
      "window": "GCCTCTGCCTTCAGA",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18029,7 +18029,7 @@
      "site_type": "acceptor",
      "window": "TCCCTGTCTTCTAGG",
      "index": 6,
-     "delta": -0.0356,
+     "delta": -0.0586,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18038,7 +18038,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 10,
-     "delta": 0.0033,
+     "delta": 0.021,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18056,7 +18056,7 @@
      "site_type": "acceptor",
      "window": "CTGCCGTCCCGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18074,7 +18074,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 7,
-     "delta": -0.0419,
+     "delta": -0.0669,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18083,7 +18083,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 7,
-     "delta": -0.0341,
+     "delta": -0.0571,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18191,7 +18191,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18236,7 +18236,7 @@
      "site_type": "acceptor",
      "window": "GCTCACTCTGCCAGG",
      "index": 9,
-     "delta": 0.0348,
+     "delta": 0.0525,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18245,7 +18245,7 @@
      "site_type": "acceptor",
      "window": "GATTTGGTCATCAGC",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18254,7 +18254,7 @@
      "site_type": "acceptor",
      "window": "CTGCTCACCCTCAGC",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18263,7 +18263,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18290,7 +18290,7 @@
      "site_type": "acceptor",
      "window": "ATTGTGTCTCGCAGC",
      "index": 4,
-     "delta": -0.0478,
+     "delta": -0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18326,7 +18326,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCCTCGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18353,7 +18353,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18398,7 +18398,7 @@
      "site_type": "acceptor",
      "window": "CTCCATTACCGCAGC",
      "index": 3,
-     "delta": 0.0214,
+     "delta": 0.0287,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18407,7 +18407,7 @@
      "site_type": "acceptor",
      "window": "GCTTTTGTCTTTAGG",
      "index": 7,
-     "delta": -0.0094,
+     "delta": -0.0167,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18416,7 +18416,7 @@
      "site_type": "acceptor",
      "window": "GCCTTCCCTTGCAGT",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18443,7 +18443,7 @@
      "site_type": "acceptor",
      "window": "TCTGCTGGTGACAGC",
      "index": 8,
-     "delta": -0.0457,
+     "delta": -0.0687,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18452,7 +18452,7 @@
      "site_type": "acceptor",
      "window": "CCTCTTCCTGACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18488,7 +18488,7 @@
      "site_type": "acceptor",
      "window": "CTGCCGTCCCGCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18533,7 +18533,7 @@
      "site_type": "acceptor",
      "window": "CCCTCCCTGTGCAGT",
      "index": 11,
-     "delta": -0.0563,
+     "delta": -0.072,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18542,7 +18542,7 @@
      "site_type": "acceptor",
      "window": "CTGTGTCCTCCCAGA",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18560,7 +18560,7 @@
      "site_type": "acceptor",
      "window": "CCCTCTCCCCACAGA",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18578,7 +18578,7 @@
      "site_type": "acceptor",
      "window": "TCTTCTTTTGACAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18587,7 +18587,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18623,7 +18623,7 @@
      "site_type": "acceptor",
      "window": "CTCCATTACCGCAGC",
      "index": 4,
-     "delta": 0.0478,
+     "delta": 0.0708,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18632,7 +18632,7 @@
      "site_type": "acceptor",
      "window": "GCCTCTGCCTTCAGA",
      "index": 3,
-     "delta": -0.0482,
+     "delta": -0.0712,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18641,7 +18641,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 8,
-     "delta": 0.0549,
+     "delta": 0.0799,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18659,7 +18659,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -18668,7 +18668,7 @@
      "site_type": "acceptor",
      "window": "GATTTGGTCATCAGC",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18695,7 +18695,7 @@
      "site_type": "acceptor",
      "window": "GGTGCTCCCTGCAGG",
      "index": 3,
-     "delta": 0.0444,
+     "delta": 0.0694,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18713,7 +18713,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 8,
-     "delta": -0.0287,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18731,7 +18731,7 @@
      "site_type": "acceptor",
      "window": "CCTGTCTCCTGCAGC",
      "index": 2,
-     "delta": -0.0393,
+     "delta": -0.0643,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18758,7 +18758,7 @@
      "site_type": "acceptor",
      "window": "GGTGCTCCCTGCAGG",
      "index": 6,
-     "delta": -0.0242,
+     "delta": -0.0419,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18812,7 +18812,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18839,7 +18839,7 @@
      "site_type": "acceptor",
      "window": "TCCTCACCCGATAGT",
      "index": 8,
-     "delta": -0.0286,
+     "delta": -0.0444,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18857,7 +18857,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18920,7 +18920,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 10,
-     "delta": 0.0045,
+     "delta": -0.0112,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18956,7 +18956,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 4,
-     "delta": -0.0185,
+     "delta": -0.0362,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -18983,7 +18983,7 @@
      "site_type": "acceptor",
      "window": "CCCTCCCTGTGCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19082,7 +19082,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19091,7 +19091,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 9,
-     "delta": -0.0245,
+     "delta": -0.0318,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19127,7 +19127,7 @@
      "site_type": "acceptor",
      "window": "GATTCTCTTCTCAGC",
      "index": 7,
-     "delta": -0.042,
+     "delta": -0.067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19136,7 +19136,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCTCTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19181,7 +19181,7 @@
      "site_type": "acceptor",
      "window": "CCTTCTCTTCAAAGG",
      "index": 3,
-     "delta": -0.0444,
+     "delta": -0.0694,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19190,7 +19190,7 @@
      "site_type": "acceptor",
      "window": "TGCCGCCTCCGCAGG",
      "index": 3,
-     "delta": -0.0268,
+     "delta": -0.0425,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19199,7 +19199,7 @@
      "site_type": "acceptor",
      "window": "TCTGTGTGCCACAGT",
      "index": 4,
-     "delta": -0.0438,
+     "delta": -0.0688,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19235,7 +19235,7 @@
      "site_type": "acceptor",
      "window": "GCCTACGTCCCCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19244,7 +19244,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19262,7 +19262,7 @@
      "site_type": "acceptor",
      "window": "TCTGCTGGTGACAGC",
      "index": 6,
-     "delta": 0.005,
+     "delta": 0.007,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19280,7 +19280,7 @@
      "site_type": "acceptor",
      "window": "TCCTCTCTCTGCAGA",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19307,7 +19307,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19316,7 +19316,7 @@
      "site_type": "acceptor",
      "window": "TTGTGCCTGTGCAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19334,7 +19334,7 @@
      "site_type": "acceptor",
      "window": "CGCTTCTCCCCCAGC",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19415,7 +19415,7 @@
      "site_type": "acceptor",
      "window": "CCAAGTCTCCCCAGA",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19433,7 +19433,7 @@
      "site_type": "acceptor",
      "window": "GCCTGGTACTGCAGA",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19451,7 +19451,7 @@
      "site_type": "acceptor",
      "window": "ATTGTGTCTCGCAGC",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19460,7 +19460,7 @@
      "site_type": "acceptor",
      "window": "GCCCTCTTCTTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19469,7 +19469,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 8,
-     "delta": -0.0456,
+     "delta": -0.0686,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19478,7 +19478,7 @@
      "site_type": "acceptor",
      "window": "CCTTCTCATCTCAGG",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19496,7 +19496,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 9,
-     "delta": -0.0437,
+     "delta": -0.0667,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19577,7 +19577,7 @@
      "site_type": "acceptor",
      "window": "CCTGTCTCCTGCAGC",
      "index": 11,
-     "delta": -0.0139,
+     "delta": -0.0066,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19613,7 +19613,7 @@
      "site_type": "acceptor",
      "window": "TGCCGCCTCCGCAGG",
      "index": 9,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19622,7 +19622,7 @@
      "site_type": "acceptor",
      "window": "GCCTCTGCCTTCAGA",
      "index": 7,
-     "delta": -0.0247,
+     "delta": -0.0404,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19640,7 +19640,7 @@
      "site_type": "acceptor",
      "window": "TCTGCTGGTGACAGC",
      "index": 8,
-     "delta": -0.017,
+     "delta": -0.0243,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19676,7 +19676,7 @@
      "site_type": "acceptor",
      "window": "TCTTCTTTTGACAGG",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19694,7 +19694,7 @@
      "site_type": "acceptor",
      "window": "CTGCCGTCCCGCAGG",
      "index": 9,
-     "delta": -0.0347,
+     "delta": -0.0524,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19721,7 +19721,7 @@
      "site_type": "acceptor",
      "window": "GATTTGGTCATCAGC",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19739,7 +19739,7 @@
      "site_type": "acceptor",
      "window": "TCCTCACCCGATAGT",
      "index": 11,
-     "delta": -0.1158,
+     "delta": -0.1408,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19784,7 +19784,7 @@
      "site_type": "acceptor",
      "window": "GGCTCGTGTTCCAGG",
      "index": 11,
-     "delta": -0.1298,
+     "delta": -0.1475,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19811,7 +19811,7 @@
      "site_type": "acceptor",
      "window": "GCCTACGTCCCCAGA",
      "index": 5,
-     "delta": -0.0192,
+     "delta": -0.0349,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     }
@@ -19834,7 +19834,7 @@
      "site_type": "acceptor",
      "window": "GCTTGTCCCGATAGG",
      "index": 7,
-     "delta": -0.0325,
+     "delta": -0.0502,
      "site_class": "AG",
      "review": "criteria provided, single submitter"
     },
@@ -19861,7 +19861,7 @@
      "site_type": "acceptor",
      "window": "TTTTGCCCTTCCAGT",
      "index": 11,
-     "delta": -0.0564,
+     "delta": -0.0721,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19879,7 +19879,7 @@
      "site_type": "acceptor",
      "window": "GCTTGTCCCGATAGG",
      "index": 8,
-     "delta": -0.0379,
+     "delta": -0.0556,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },
@@ -19888,7 +19888,7 @@
      "site_type": "acceptor",
      "window": "TTTTGCCCTTCCAGT",
      "index": 11,
-     "delta": -0.014,
+     "delta": -0.0067,
      "site_class": "AG",
      "review": "criteria provided, multiple submitters, no conflicts"
     },

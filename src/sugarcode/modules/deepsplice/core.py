@@ -42,6 +42,43 @@ except _splice.SpliceDataMissing:
     U12_ATAC_DONOR_LOD = U12_ATAC_ACCEPTOR_LOD = U12_GTAG_DONOR_LOD = None
     U12_SOURCE = "U12 matrices missing - AT-AC sites named not-applicable"
 
+# Drop 44: polypyrimidine-tract term for AG acceptors. The position-specific
+# PWM cannot express 'a purine ANYWHERE in the tract disrupts it'; the pooled
+# tract-zone model (bio.splice.acceptor_tract_lod, learned from the same
+# 1,170-junction harvest) can. Blend weight 0.25: a principled split (matrix
+# dominant), NOT golden-fit - the golden VALIDATES it (canonical capture
+# unchanged by construction: +/-1/-2 variants sit outside the tract zone;
+# benign specificity re-measured, reported in STATUS).
+TRACT_WEIGHT = 0.25
+try:
+    TRACT_LOD = _splice.acceptor_tract_lod()
+except _splice.SpliceDataMissing:
+    TRACT_LOD = None
+
+
+def tract_score(seq15: str) -> float | None:
+    """0..1 tract-zone score of a 15-nt acceptor window, or None when the
+    vendored tract model is missing. Position-independent."""
+    if TRACT_LOD is None:
+        return None
+    s = clean_dna(seq15)
+    if len(s) != 15:
+        raise ValueError("acceptor window must be 15 nt")
+    return normalized_score(s[2:12], TRACT_LOD)
+
+
+def _additive_acceptor(seq15: str, matrix_score: float, ref_class: str) -> float:
+    """Matrix score PLUS the weighted tract term (AG acceptors only). The
+    matrix contribution is deliberately UNSCALED: the calibrated delta bands
+    (-0.15) were fit on the matrix delta, so acceptor delta =
+    matrix_delta + TRACT_WEIGHT * (tract_alt - tract_ref). Variants outside
+    the tract zone (+/-1, -2) get exactly the matrix delta - canonical
+    capture is preserved by construction, not by tuning."""
+    if ref_class != "AG" or TRACT_LOD is None:
+        return matrix_score
+    return round(matrix_score + TRACT_WEIGHT * tract_score(seq15), 4)
+
+
 # U12 GT-AG donors are told apart from U2 GT-AG donors by matrix score
 # difference. Calibrated 2026-09-22 on the vendored sets: margin 0.15 gives
 # 99.2% recall on the 361 gold U12 GT-AG donors at 0.09% FPR on the 1,170
@@ -113,10 +150,10 @@ def score_acceptor(seq15: str, matrix: str = "real") -> float:
     if len(s) != 15:
         raise ValueError("acceptor window must be 15 nt")
     if matrix == "real":
-        lod = (U12_ATAC_ACCEPTOR_LOD if s[12:14] == "AC"
-               and U12_ATAC_ACCEPTOR_LOD is not None else ACCEPTOR_LOD)
-    else:
-        lod = SEED_ACCEPTOR_LOD
+        if s[12:14] == "AC" and U12_ATAC_ACCEPTOR_LOD is not None:
+            return round(normalized_score(s, U12_ATAC_ACCEPTOR_LOD), 4)
+        return _additive_acceptor(s, normalized_score(s, ACCEPTOR_LOD), "AG")
+    lod = SEED_ACCEPTOR_LOD
     return round(normalized_score(s, lod), 4)
 
 
@@ -166,8 +203,12 @@ def variant_effect(ref_window: str, alt_window: str, site_type: str = "donor",
         rs = round(normalized_score(clean_dna(ref_window), _donor_lod_for(ref_window)), 4)
         as_ = round(normalized_score(clean_dna(alt_window), _donor_lod_for(ref_window)), 4)
     elif site_type == "acceptor" and matrix == "real":
-        rs = round(normalized_score(clean_dna(ref_window), _acceptor_lod_for(ref_window)), 4)
-        as_ = round(normalized_score(clean_dna(alt_window), _acceptor_lod_for(ref_window)), 4)
+        cls_a = clean_dna(ref_window)[12:14]
+        lod_a = _acceptor_lod_for(ref_window)
+        rs = _additive_acceptor(clean_dna(ref_window),
+                                round(normalized_score(clean_dna(ref_window), lod_a), 4), cls_a)
+        as_ = _additive_acceptor(clean_dna(alt_window),
+                                 round(normalized_score(clean_dna(alt_window), lod_a), 4), cls_a)
     else:
         scorer = score_donor if site_type == "donor" else score_acceptor
         rs, as_ = scorer(ref_window, matrix), scorer(alt_window, matrix)

@@ -10,6 +10,10 @@ sys.path.insert(0, "src")
 from sugarcode.modules.deepsplice import site_class
 
 FIX = sorted(Path("tests/fixtures").glob("*_splice_golden.json"))
+# drop 44: the sweep fixtures (drops 42/43) are classification-bucket sweeps,
+# not per-gene goldens - exclude from the pooled golden headline
+FIX = [f for f in FIX if f.name not in ("vus_splice_golden.json",
+                                        "conflicting_splice_golden.json")]
 # drop 35: the SCN-family AT-AC golden rides along (SCN1A's 8 AT-AC cases
 # are already in the main fixtures; these are the 8 NEW family cases)
 FIX += sorted(Path("tests/fixtures").glob("*_u12_golden.json"))

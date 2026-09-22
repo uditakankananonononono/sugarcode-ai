@@ -37,6 +37,24 @@ def acceptor_pwm() -> list[dict[str, float]]:
     return _load("acceptor_pwm.json")
 
 
+@lru_cache(maxsize=1)
+def acceptor_tract_lod() -> list[dict[str, float]]:
+    """Position-independent polypyrimidine-tract log-odds (drop 44): the
+    pooled tract-zone (window indices 2..11 = c.-12..-3) base frequencies
+    over the harvest AG acceptors, repeated as 10 identical columns so the
+    standard normalized_score applies. Complements the position-specific
+    acceptor PWM, which cannot express 'a purine ANYWHERE in the tract
+    disrupts it'. Learned by scripts/learn_tract_pwm.py; AG acceptors only
+    (U12/AT-AC tracts differ - the term is not applied there)."""
+    import json as _json
+    p = DATA / "acceptor_tract_pwm.json"
+    if not p.exists():
+        raise SpliceDataMissing(f"missing vendored splice data: {p}")
+    freqs = _json.loads(p.read_text())["pwm"]
+    col = {b: __import__("math").log2(max(freqs[b], 1e-9) / 0.25) for b in "ACGT"}
+    return [dict(col) for _ in range(10)]
+
+
 def donor_lod() -> list[dict[str, float]]:
     return log_odds_matrix(donor_pwm())
 

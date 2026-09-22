@@ -63,3 +63,10 @@ downstream exon flank, so acceptor column index 14 (first exonic base) is
 a uniform 0.25 column - labeled, not guessed. Learned consensuses match
 the literature: U12 donor RTATCCTTT (both subtypes), AT-AC acceptor
 (T)nCCTTRCAC. Harvest: scripts/harvest_u12.py (2026-09-22).
+
+## acceptor_tract_pwm.json (drop 44)
+Position-independent polypyrimidine-tract model: pooled base frequencies over
+the tract zone (acceptor window indices 2..11 = c.-12..-3) of the same 1,170
+harvest AG acceptors in junctions.tsv (pseudocount 0.5). Learned 2026-09-22
+by scripts/learn_tract_pwm.py. Pyrimidine fraction 0.787. AG acceptors only;
+U12/AT-AC tracts differ and the term is not applied there.
