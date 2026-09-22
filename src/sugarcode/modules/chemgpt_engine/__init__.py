@@ -1,2 +1,3 @@
-from .core import generate, score_molecule, pareto_front, similarity_check
-__all__ = ["generate", "score_molecule", "pareto_front", "similarity_check"]
+"""Physics-informed molecular generation, ADMET and synthesis planning."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]
