@@ -526,8 +526,21 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
                 "detail": "context base does not match ClinVar ref"}
     alt_ctx = ref_ctx[:CTX] + altb + ref_ctx[CTX+1:]
     r = cryptic_scan(ref_ctx, alt_ctx)
-    return {"gene": gene, "notation": notation, "status": "cryptic_scan", **r,
-            "source": jm["source"]}
+    out = {"gene": gene, "notation": notation, "status": "cryptic_scan", **r,
+           "source": jm["source"]}
+    # Drop 56: acceptor-side deep variants inside the branch zone
+    # (-18..-45) additionally get the wired branch-point assessment. The
+    # -60..-1 window of the SAME acceptor is a slice of the cryptic context
+    # (variant at index CTX = position -k, so acceptor -1 sits at index
+    # CTX+k-1 and the window is ref_ctx[k:k+60]); AG acceptors only - the BP
+    # model is learned on GT-AG introns. Reported as a SEPARATE evidence
+    # block; the cryptic_scan verdict is unchanged.
+    if sign == "-" and BP_ZONE[0] <= -k <= BP_ZONE[1] and n in jm.get("acceptors", {}):
+        w = jm["acceptors"][n]
+        if w[12:14] == "AG" and len(ref_ctx) == 2 * CTX + 1:
+            out["branchpoint"] = branchpoint_variant_effect(
+                ref_ctx[k:k + 60], 60 - k, altb)
+    return out
 
 
 def _outcome_context(jm: dict, site_type: str, n: int, natural_ref: float) -> dict | None:
