@@ -81,7 +81,7 @@ def test_atac_scored_with_u12_matrix():
     from sugarcode.modules.deepsplice import variant_at
     r = variant_at("TTCATATCC", 3, "G", "donor")   # SCN1A c.383+1A>G (AT-AC)
     assert r["site_class"] == "AT" and r["pwm_applicable"] is True
-    assert r["u12_atac"] is True and "139 human" in r["u12_note"]
+    assert r["u12_atac"] is True and "139 AT-AC human" in r["u12_note"]
     assert r["delta"] <= -0.15
     r2 = variant_at("AAGGTAAGT", 3, "A", "donor")  # normal GT site unaffected
     assert r2["site_class"] == "GT" and r2["pwm_applicable"] is True

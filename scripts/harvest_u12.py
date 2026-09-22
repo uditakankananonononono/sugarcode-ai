@@ -51,6 +51,11 @@ def main():
             continue
         donors[key].append(five)
         acceptors[key].append(three)
+    with open(OUT / "u12_sites.tsv", "w") as fh:
+        fh.write("subtype\tdonor9\tacceptor14\n")
+        for key in ("ATAC", "GTAG"):
+            for d, a in zip(donors[key], acceptors[key]):
+                fh.write(f"{key}\t{d}\t{a}\n")
     for key, stem in (("ATAC", "u12_atac"), ("GTAG", "u12_gtag")):
         json.dump(pwm_payload(donors[key], 9),
                   open(OUT / f"{stem}_donor_pwm.json", "w"), indent=1)

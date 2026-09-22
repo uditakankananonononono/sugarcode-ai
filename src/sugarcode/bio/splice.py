@@ -58,6 +58,19 @@ def u12_atac_acceptor_lod() -> list[dict[str, float]]:
     return log_odds_matrix(_load("u12_atac_acceptor_pwm.json"))
 
 
+def u12_gtag_donor_lod() -> list[dict[str, float]]:
+    """GT-AG U12 (minor spliceosome) donor log-odds: 361 human gold U12
+    GT-AG introns (intronIC training index, PROVENANCE). Consensus
+    RTATCCTTT - distinct from the U2 GT-AG consensus."""
+    return log_odds_matrix(_load("u12_gtag_donor_pwm.json"))
+
+
+def u12_gtag_acceptor_lod() -> list[dict[str, float]]:
+    """GT-AG U12 acceptor log-odds: 361 human gold introns. U12 acceptors
+    lack the U2 polypyrimidine tract. Column 14 is a uniform placeholder."""
+    return log_odds_matrix(_load("u12_gtag_acceptor_pwm.json"))
+
+
 def n_sites() -> dict[str, int]:
     return {"donor": json.loads((DATA / "donor_pwm.json").read_text())["n_sites"],
             "acceptor": json.loads((DATA / "acceptor_pwm.json").read_text())["n_sites"]}
