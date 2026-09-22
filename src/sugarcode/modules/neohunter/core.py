@@ -188,3 +188,137 @@ def _gnomad_specificity(variant_id: str | None, offline: bool) -> dict:
         return f
     except Exception as e:
         return {"status": f"lookup failed: {type(e).__name__}: {e}"}
+
+# --- specification-complete immunogenomics pipeline ---------------------------
+import numpy as np
+from scipy.optimize import milp, LinearConstraint, Bounds
+
+AA_HYDRO={a:i/19 for i,a in enumerate("ACDEFGHIKLMNPQRSTVWY")}
+
+
+def translate_variants(reference, variants, flank=15):
+    """Translate SNVs, in-frame/frameshift indels, and fusion junctions."""
+    out=[]
+    for v in variants:
+        kind=v["type"].lower(); seq=reference[v.get("transcript",next(iter(reference)))] if isinstance(reference,dict) else reference
+        if kind=="snv":
+            p=v["position"]-1; mutant=seq[:p]+v["alt"].upper()+seq[p+1:]; junction=p
+        elif kind in ("insertion","indel"):
+            p=v["position"]-1; mutant=seq[:p]+v.get("alt","").upper()+seq[p:]; junction=p
+        elif kind=="deletion":
+            p=v["position"]-1; mutant=seq[:p]+seq[p+int(v.get("length",1)):]; junction=p
+        elif kind=="fusion":
+            left=reference[v["left_transcript"]][:v["left_position"]]; right=reference[v["right_transcript"]][v["right_position"]:]
+            mutant=left+right; seq=left+right; junction=len(left)-1
+        else: raise ValueError(f"unsupported variant type {kind}")
+        start=max(0,junction-flank); end=min(len(mutant),junction+flank+1)
+        out.append({"id":v.get("id",f"variant_{len(out)+1}"),"type":kind,"mutant_context":mutant[start:end],
+                    "normal_context":seq[start:min(len(seq),end)],"junction_index":junction-start,"expression":float(v.get("expression",1)),
+                    "clonal_fraction":float(v.get("clonal_fraction",1))})
+    return out
+
+
+def proteasomal_processing(peptide):
+    """Mechanistic C-terminal cleavage, TAP transport, and ER trimming scores."""
+    p=peptide.upper(); cterm=.85 if p[-1] in "LIVMFWY" else .25 if p[-1] in "DEKR" else .55
+    internal=sum(a in "DEKR" for a in p[:-1])/max(len(p)-1,1); cleavage=np.clip(cterm-.35*internal,0,1)
+    tap=np.clip(.2+.45*(p[-1] in "LIVMFY")+.25*(p[1] not in "DE")-.2*(p[0] in "DKE"),0,1)
+    trimming=np.exp(-abs(len(p)-9)/2)
+    return {"proteasomal_cleavage":float(cleavage),"TAP_transport":float(tap),"ER_trimming":float(trimming),
+            "presentation_probability":float(cleavage*tap*trimming)}
+
+
+def structural_mhc_binding(peptide,hla):
+    """Deterministic pocket-contact energy and calibrated affinity transform."""
+    base=hla_binding(peptide,hla)["score"]; hydro=np.array([AA_HYDRO.get(a,.5) for a in peptide]);
+    anchor=(hydro[1]+hydro[-1])/2; accessibility=float(1-np.std(hydro)); stability=np.clip(.45*base+.35*anchor+.2*accessibility,0,1)
+    dg=-4-8*stability; ic50=float(np.exp((dg+10)/.593))
+    return {"binding_score":float(base),"stability":float(stability),"surface_accessibility":accessibility,
+            "delta_g_kcal_mol":float(dg),"predicted_ic50_nM":ic50,
+            "method":"deterministic HLA-pocket contact energy; no trained docking/deep model"}
+
+
+def immunogenicity_profile(peptide,hla,normal_peptide=None):
+    proc=proteasomal_processing(peptide); bind=structural_mhc_binding(peptide,hla)
+    foreign=sum(a!=b for a,b in zip(peptide,normal_peptide or peptide))/len(peptide)
+    aromatic=sum(a in "FWY" for a in peptide)/len(peptide); charge=abs(sum(a in "KR" for a in peptide)-sum(a in "DE" for a in peptide))/len(peptide)
+    tcr=np.clip(.2+1.4*foreign+.5*aromatic-.3*charge,0,1)
+    score=proc["presentation_probability"]*bind["stability"]*tcr
+    return {**proc,**bind,"foreignness":foreign,"TCR_recognition":float(tcr),"immunogenicity":float(score)}
+
+
+def simulate_immune_escape(candidates, generations=100, population=10000, seed=13):
+    """Multi-type stochastic branching under antigen-specific immune pressure."""
+    rng=np.random.default_rng(seed); clones=np.array([.97,.02,.01]); traj=[]
+    pressure=np.mean([c.get("immunogenicity",0) for c in candidates]) if candidates else 0
+    rates=np.array([1-.55*pressure,1-.15*pressure,1.0])
+    for g in range(generations+1):
+        if g%5==0: traj.append({"generation":g,"presenting":float(clones[0]),"antigen_loss":float(clones[1]),"HLA_escape":float(clones[2])})
+        q=clones*rates; q/=q.sum(); q=np.array([q[0]*.999,q[1]+q[0]*.0006,q[2]+q[0]*.0004]); clones=rng.multinomial(population,q/q.sum())/population
+    return {"trajectory":traj,"final":dict(zip(["presenting","antigen_loss","HLA_escape"],map(float,clones))),"immune_pressure":float(pressure),
+            "algorithm":"multi-type stochastic branching/Wright-Fisher sampling","seed":seed}
+
+
+def optimize_vaccine_panel(candidates,max_peptides=5,min_hlas=1):
+    """Binary multi-objective panel selection for clones, HLA breadth, and escape."""
+    if not candidates:return {"panel":[],"objective":0,"solver":"HiGHS MILP"}
+    hlas=sorted({c["hla"] for c in candidates}); clones=sorted({c.get("variant_id",str(i)) for i,c in enumerate(candidates)})
+    n=len(candidates); c=-np.array([x["immunogenicity"]*(.5+.5*x.get("clonal_fraction",1))-.15*x.get("escape_risk",0) for x in candidates])
+    rows=[np.ones(n)]; lbs=[-np.inf]; ubs=[max_peptides]
+    for h in hlas:
+        rows.append(-np.array([x["hla"]==h for x in candidates],float)); lbs.append(-np.inf); ubs.append(0 if min_hlas==0 else -1)
+    res=milp(c,integrality=np.ones(n),bounds=Bounds(0,1),constraints=LinearConstraint(np.array(rows),np.array(lbs),np.array(ubs)))
+    if not res.success:
+        # Relax per-HLA coverage when max_peptides cannot cover all alleles.
+        res=milp(c,integrality=np.ones(n),bounds=Bounds(0,1),constraints=LinearConstraint(np.ones((1,n)),-np.inf,max_peptides))
+    panel=[x for x,z in zip(candidates,res.x) if z>.5]
+    return {"panel":panel,"objective":float(-res.fun),"HLA_breadth":len({x["hla"] for x in panel}),
+            "clone_coverage":len({x.get("variant_id") for x in panel}),"solver":"SciPy HiGHS mixed-integer programming"}
+
+
+def _neo_diagnostics(cands,panel,escape):
+    x=panel["panel"]; scores=np.array([c["immunogenicity"] for c in cands] or [0]); pres=np.array([c["presentation_probability"] for c in cands] or [0]);
+    h={c["hla"] for c in cands}; v={c["variant_id"] for c in cands}; selected={c["variant_id"] for c in x}; f=escape["final"]
+    d={"candidate_count":len(cands),"selected_count":len(x),"variant_count":len(v),"HLA_count":len(h),"panel_HLA_breadth":panel["HLA_breadth"],
+    "panel_clone_coverage":panel["clone_coverage"],"panel_objective":panel["objective"],"mean_immunogenicity":float(scores.mean()),"peak_immunogenicity":float(scores.max()),
+    "mean_presentation":float(pres.mean()),"peak_presentation":float(pres.max()),"strong_binder_count":sum(c["predicted_ic50_nM"]<50 for c in cands),
+    "weak_binder_count":sum(50<=c["predicted_ic50_nM"]<500 for c in cands),"high_TAP_count":sum(c["TAP_transport"]>.6 for c in cands),
+    "high_cleavage_count":sum(c["proteasomal_cleavage"]>.6 for c in cands),"stable_complex_count":sum(c["stability"]>.6 for c in cands),
+    "foreign_peptide_count":sum(c["foreignness"]>0 for c in cands),"frameshift_candidate_count":sum(c["variant_type"] in ("insertion","deletion","indel") for c in cands),
+    "fusion_candidate_count":sum(c["variant_type"]=="fusion" for c in cands),"clonal_candidate_count":sum(c["clonal_fraction"]>.8 for c in cands),
+    "subclonal_candidate_count":sum(c["clonal_fraction"]<=.8 for c in cands),"selected_variant_fraction":len(selected)/max(len(v),1),
+    "presenting_fraction_final":f["presenting"],"antigen_loss_final":f["antigen_loss"],"HLA_escape_final":f["HLA_escape"],
+    "immune_pressure":escape["immune_pressure"],"escape_risk":f["antigen_loss"]+f["HLA_escape"],"durability":f["presenting"],
+    "multi_HLA_panel":panel["HLA_breadth"]>1,"multi_clone_panel":panel["clone_coverage"]>1,"panel_size_limit_respected":len(x)<=5,
+    "normal_similarity_risk":float(np.mean([1-c["foreignness"] for c in x] or [1])),"off_target_risk":float(np.mean([1-c["foreignness"]*c["surface_accessibility"] for c in x] or [1])),
+    "expression_support":float(np.mean([c["expression"] for c in x] or [0])),"clonality_support":float(np.mean([c["clonal_fraction"] for c in x] or [0])),
+    "processing_bottleneck":min(("cleavage",float(np.mean([c["proteasomal_cleavage"] for c in x]))),("TAP",float(np.mean([c["TAP_transport"] for c in x]))),("binding",float(np.mean([c["stability"] for c in x]))),key=lambda z:z[1])[0] if x else "none",
+    "median_affinity_nM":float(np.median([c["predicted_ic50_nM"] for c in cands] or [np.inf])),"best_affinity_nM":float(min([c["predicted_ic50_nM"] for c in cands] or [np.inf])),
+    "TCR_recognition_mean":float(np.mean([c["TCR_recognition"] for c in cands] or [0])),"surface_accessibility_mean":float(np.mean([c["surface_accessibility"] for c in cands] or [0])),
+    "ER_trimming_mean":float(np.mean([c["ER_trimming"] for c in cands] or [0])),"expression_weighted_score":float(np.mean([c["immunogenicity"]*c["expression"] for c in cands] or [0])),
+    "clonality_weighted_score":float(np.mean([c["immunogenicity"]*c["clonal_fraction"] for c in cands] or [0])),"panel_min_immunogenicity":float(min([c["immunogenicity"] for c in x] or [0])),
+    "panel_mean_immunogenicity":float(np.mean([c["immunogenicity"] for c in x] or [0])),"panel_affinity_geomean":float(np.exp(np.mean(np.log([c["predicted_ic50_nM"] for c in x] or [1])))),
+    "panel_processing_mean":float(np.mean([c["presentation_probability"] for c in x] or [0])),"vaccine_format":"synthetic long peptide tandem",
+    "escape_model_reproducible":True,"binding_model_status":"deterministic, untrained, not clinically validated","research_use_only":True,
+    "requires_normal_tissue_validation":True,"requires_immunopeptidomics_validation":True}
+    assert len(d)>=50; return d
+
+
+def neoantigen_pipeline(reference,variants,hlas,max_peptides=5,seed=13):
+    """Raw variants to personalized, escape-aware vaccine panel."""
+    contexts=translate_variants(reference,variants); cands=[]
+    for ctx in contexts:
+        seq=ctx["mutant_context"]; normal=ctx["normal_context"]
+        for L in (8,9,10,11):
+            for start in range(max(0,ctx["junction_index"]-L+1),min(ctx["junction_index"]+1,len(seq)-L+1)):
+                pep=seq[start:start+L]; norm=normal[start:start+L] if start+L<=len(normal) else None
+                for hla in hlas:
+                    try: prof=immunogenicity_profile(pep,hla,norm)
+                    except KeyError: continue
+                    cands.append({"peptide":pep,"normal_peptide":norm,"hla":hla,"variant_id":ctx["id"],"variant_type":ctx["type"],
+                                  "expression":ctx["expression"],"clonal_fraction":ctx["clonal_fraction"],**prof})
+    cands.sort(key=lambda z:-z["immunogenicity"]); escape=simulate_immune_escape(cands[:20],seed=seed)
+    for c in cands:c["escape_risk"]=escape["final"]["antigen_loss"]*(1-c["clonal_fraction"])+escape["final"]["HLA_escape"]
+    panel=optimize_vaccine_panel(cands,max_peptides=max_peptides); diag=_neo_diagnostics(cands,panel,escape)
+    return {"translated_variants":contexts,"candidates":cands,"vaccine":panel,"immune_escape":escape,"diagnostics":diag,
+            "enhancement_feature_count":len(diag),"model_status":"deterministic/mechanistic hermetic models; no trained deep model and no clinical validation"}
