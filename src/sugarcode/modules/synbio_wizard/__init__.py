@@ -1,3 +1,3 @@
-"""SynBio Wizard: goal -> pathway -> chassis -> assembly -> feasibility with uncertainty."""
-from .core import run_wizard
-__all__ = ["run_wizard"]
+"""Constraint-aware synthetic-biology design compiler."""
+from .core import *
+from .core import __all__
