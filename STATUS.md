@@ -1,12 +1,34 @@
-# SugarCode AI - honest status (as of drop 61 / this push)
+# SugarCode AI - honest status (as of the audit-fix drop, 2026-09-22)
 
 This document is the current truth ledger. It says what is verified against
 real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **500 passed, 0 failed** (hermetic fixtures; live calls verified
-outside pytest and recorded below).
+Test suite: **1355 passed, 0 failed, 1 skipped** (hermetic fixtures; live calls
+verified outside pytest and recorded below). The suite now runs in GitHub
+Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
+count is independently reproduced, not developer-reported.
+
+Audit-fix drop (third-party repo audit, 2026-09-22):
+- Registry reconciled: **88 modules registered** - the 77 spec modules plus 11
+  beyond-spec published-model implementations (cfd_offtarget, crisprater,
+  mit_offtarget, structural_biophysics, syn_bio_studio, dti_bench,
+  pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
+  molecule_eval). Every registry slug equals its package directory name; every
+  package under `src/sugarcode/modules/` is registered.
+- Stale duplicate tree removed: the unpackaged top-level `sugarcode/modules/`
+  (one outdated copy of structural_biophysics plus two orphaned packages,
+  crisprscan_score and clinical_evidence_fusion, that were never moved into
+  `src/`) and two stray root-level test files are deleted. The orphaned work
+  survives in git history (commits b78b943, 35e0995, 1d43dc8) if it is ever
+  promoted properly.
+- liquid_biopsy wording fixed: `transformer_denoise` is a real attention
+  computation with RANDOM, UNTRAINED weights drawn at inference (seeded for
+  reproducibility); docs and the function itself now say so explicitly.
+- Overclaim sweep: registry summaries and docstrings no longer use
+  deep-learning/RL/continual-learning wording for deterministic computations;
+  the spec corpus in `spec/` is labeled as aspirational source text.
 
 ## Tier 1 - verified against live external data
 

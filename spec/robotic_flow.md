@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Robotic Flow
 
 Robotic Flow: A control interface for lab automation hardware that coordinates high-throughput tasks like transformation and plating. It manages real-time monitoring and ensures that experimental protocols are executed with high precision. Robotic Flow integrates with robotic platforms, accelerating the transition from digital genetic designs to physical samples for manufacturing.

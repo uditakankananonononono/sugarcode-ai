@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Syn-Bio Studio
 
 Syn-Bio Studio: A visual design platform for building complex genetic logic circuits from modular biological parts. It provides ODE-based simulations of circuit behavior, allowing researchers to verify logical function and dynamics. Syn-Bio Studio enables the design of oscillators, switches, and sensors, ensuring that synthetic systems perform reliably before laboratory synthesis.

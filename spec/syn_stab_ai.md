@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Syn-Stab AI
 
 Syn-Stab AI: A predictive tool that evaluates the evolutionary stability of synthetic gene circuits and host organisms. It forecasts circuit failure risk due to metabolic burden or mutational drift over generations. Syn-Stab AI suggests genetic modifications to increase functional half-life, preventing the loss of synthetic functions during industrial processes.

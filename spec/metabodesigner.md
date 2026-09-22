@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # MetaboDesigner
 
 MetaboDesigner: An expert system for designing novel metabolic pathways using data from global reaction databases. It identifies required enzymes and reaction steps to produce target compounds in host organisms. MetaboDesigner performs flux balance analysis to visualize metabolic bottlenecks and optimizes precursor costs, ensuring that synthetic pathways are biologically viable

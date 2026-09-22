@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Gene Explorer
 
 Gene Explorer: An interactive visualization tool mapping the central dogma from DNA to protein for any gene. it provides sequence segments, mRNA transcripts, and translated amino acid sequences alongside summaries for 3D molecular animations. Gene Explorer aids in tracing biological information flow, providing a foundational view for research and education. 

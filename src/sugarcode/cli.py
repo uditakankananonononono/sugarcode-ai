@@ -2,7 +2,7 @@
 
 Subcommands (all offline except splice assess, all JSON on stdout):
   version                          print version
-  modules                          list the 77 modules
+  modules                          list the 88 registered modules
   splice assess GENE NOTATION      deepsplice live assessment [--transcript NM] [--offline]
   codon cai SEQ                    codon adaptation index vs a published table
   codon optimize PROTEIN           codon-optimized DNA (GC-window repair, motif avoidance)
@@ -55,8 +55,8 @@ def _cmd_version(_args) -> int:
 
 
 def _cmd_modules(_args) -> int:
-    # The product surface is defined by the canonical registry, not every
-    # importable package that happens to be present in the source tree.
+    # The product surface is the canonical registry; since the audit fix every
+    # package in src/sugarcode/modules/ is registered, so this lists all of them.
     from omega.registry import module_slugs
     names = sorted(module_slugs())
     print(f"{len(names)} modules")
@@ -184,7 +184,7 @@ def main(argv: list[str] | None = None) -> int:
 
     v = sub.add_parser("version", help="print version")
     v.set_defaults(func=_cmd_version)
-    m = sub.add_parser("modules", help="list the 77 modules")
+    m = sub.add_parser("modules", help="list the 88 registered modules")
     m.set_defaults(func=_cmd_modules)
     args = p.parse_args(argv)
     return args.func(args)

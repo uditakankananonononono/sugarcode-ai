@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Protein Painter
 
 Protein Painter: A de novo protein design tool that generates amino acid sequences from functional descriptions. It uses integrated structure prediction to verify folding and identifies active-site residues. Protein Painter predicts the stability of designed enzymes, allowing for the creation of custom biocatalysts for industrial applications and therapeutic interventions.

@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # CellFateNet
 
 CellFateNet: A visualization engine for the causal regulatory networks and lineage transitions that drive cellular differentiation and reprogramming. It identifies key regulatory nodes and provides a step-by-step genetic "recipe" for transformation. CellFateNet offers deep insights into molecular mechanisms governing identity, helping researchers manipulate cell states for therapeutic purposes.

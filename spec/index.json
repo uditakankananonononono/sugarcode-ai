@@ -1,5 +1,8 @@
 [
  {
+  "_note": "This index and the 77 spec/*.md files are the original aspirational spec corpus. Shipped modules are deterministic/statistical computation, not trained deep/foundation models. 11 beyond-spec modules exist in src/sugarcode/modules/ and the registry (88 total). See STATUS.md."
+ },
+ {
   "name": "Neuro-Hub (Dashboard)",
   "slug": "neuro_hub_dashboard",
   "start": 2,

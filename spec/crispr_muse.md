@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # CRISPR Muse
 
 CRISPR Muse: A reinforcement-learning-based gRNA generator that refines its designs through simulated lab feedback loops. It predicts compatibility with various PAM sites and adjusts its models to improve accuracy. CRISPR Muse enables an iterative design process, ensuring that genetic interventions are continuously optimized for the specific requirements of the biosystem.

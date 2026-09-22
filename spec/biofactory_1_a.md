@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # BioFactory 1-A
 
 BioFactory 1-A: A workflow engine that generates automated robotic protocols for high-throughput biological experimentation. It suggests necessary equipment and provides AI-driven optimization tips for laboratory pipelines. BioFactory 1-A bridges the gap between digital design and physical execution, ensuring that complex workflows are ready for standardized biofoundry integration and screening.

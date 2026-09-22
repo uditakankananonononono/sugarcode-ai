@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # DeepSplice
 
 DeepSplice: A deep learning model that predicts how genetic variants affect alternative splicing patterns and protein isoforms. It identifies changes in splice site strength and describes the resulting biological consequences. DeepSplice helps researchers understand how mutations in both coding and non-coding regions can lead to disease by altering splicing.

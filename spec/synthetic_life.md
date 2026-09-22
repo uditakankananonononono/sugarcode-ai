@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Synthetic Life
 
 Synthetic Life: A design tool for minimal genomes that identifies the essential gene set required for organismal survival. It simulates knockout lethality and models metabolic requirements of minimal life. Synthetic Life enables the creation of efficient "chassis" organisms, providing a platform for building systems without non-essential biological processes.

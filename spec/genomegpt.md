@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # GenomeGPT
 
 GenomeGPT: A specialized genomic transformer model designed to analyze raw sequence data at scale. It identifies regulatory motifs, predicts 3D chromatin loop interactions, and provides clinical interpretations of sequence variants. By modeling long-range dependencies in DNA, GenomeGPT offers functional insights into how non-coding regions influence gene regulation and disease phenotypes.

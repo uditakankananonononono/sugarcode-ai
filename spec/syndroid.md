@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # SynDroid
 
 SynDroid: A simulator for minimal synthetic cells containing only essential gene sets, predicting emergent behaviors and functional outcomes. It provides simulation logs and summaries of how simple genetic programs give rise to complex cellular actions. SynDroid helps researchers explore the fundamental principles of life and design biological machines.

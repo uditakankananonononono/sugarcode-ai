@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Neuro-Pipeline
 
 Neuro-Pipeline: Neuro-Pipeline can be reimagined as a closed-loop, neuro-symbolic MLOps system that not only trains biological deep learning models but actively interrogates and augments them using principles from cutting-edge computational neuroscience. At its core, the platform would orchestrate large-scale foundation models for biology—such as protein language models and structure predictors—while integrating brain-inspired architectures like spiking neural networks (SNNs), predictive coding frameworks, and hierarchical Bayesian models. Training pipelines would move beyond static supervised learning to incorporate continual learning and synaptic plasticity rules (e.g., STDP-inspired updates), enabling models to adapt dynamically to new biological datasets without catastrophic forgetting. The system could manage multi-modal inputs—genomic sequences, cryo-EM densities, single-cell RNA-seq, and electrophysiological traces—aligning them through shared latent representations learned via contrastive and self-supervised objectives.

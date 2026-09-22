@@ -1,3 +1,9 @@
+> **Spec vs implementation:** this file is the original aspirational product-spec
+> text. The shipped module is deterministic/statistical/mechanistic computation
+> (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
+> learning, foundation, GNN, or RL model, whatever the text below says. See
+> STATUS.md for what is actually verified.
+
 # Liquid Biopsy
 
 Liquid Biopsy: An AI-enhanced detection system for circulating tumor DNA, improving the sensitivity of early-stage cancer diagnosis through deep learning noise filters. It suggests optimal biomarkers and provides simulated raw vs. filtered signal visualizations. Liquid Biopsy offers a non-invasive method for monitoring disease progression and treatment response from blood.
