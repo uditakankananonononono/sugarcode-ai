@@ -193,9 +193,9 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
         # perturbations are NOT evidence (BRCA1-validated) and add nothing.
         hgvs = ev.get("hgvs") or ev.get("change") or ""
         import re as _re
-        if gene and _re.fullmatch(r"(?:[A-Z0-9_\.]+\()?c\.\d+[+-]\d+[ACGT]>[ACGT]\)?",
+        if gene and _re.fullmatch(r"(?:[A-Z0-9_\.]+\()?c\.-?\d+[+-]\d+[ACGT]>[ACGT]\)?",
                                   hgvs.replace(" ", "")) or _re.fullmatch(
-                                  r"c\.\d+[+-]\d+[ACGT]>[ACGT]", hgvs.replace(" ", "")):
+                                  r"c\.-?\d+[+-]\d+[ACGT]>[ACGT]", hgvs.replace(" ", "")):
             try:
                 from ..deepsplice import live_splice_assessment
                 sa = live_splice_assessment(gene, hgvs.split(":")[-1].split("(")[-1].rstrip(")"),

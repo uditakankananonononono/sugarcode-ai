@@ -239,7 +239,7 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
     # loss, benign specificity 85/86.
     import re as _re
     clean = variant.split(":")[-1].replace(" ", "")
-    if _re.fullmatch(r"c\.\d+[+-]\d+[ACGT]>[ACGT]", clean):
+    if _re.fullmatch(r"c\.-?\d+[+-]\d+[ACGT]>[ACGT]", clean):
         try:
             from ..deepsplice import live_splice_assessment
             sa = live_splice_assessment(gene, clean, offline=offline)

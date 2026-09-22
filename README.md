@@ -72,7 +72,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_opt | PAM enumeration both strands, GC 40-60% filter, position-weighted on-target score, seed-weighted off-target scan, hairpin check, browser-track payload |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, GC-window repair, motif avoidance, CHI tRNA-strain index, TASEP ribosome-flow KMC simulation, FBA constraint export |
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
-| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls calibrated on a 2,786-case, 28-gene ClinVar golden set (100% of ALL 2,413 canonical sites called loss: GT/GC-AG and AT-AC), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), exon-skip in-frame/frameshift context, cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
+| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls calibrated on a 2,786-case, 28-gene ClinVar golden set (100% of ALL 2,413 canonical sites called loss: GT/GC-AG and AT-AC), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A), exon-skip in-frame/frameshift context, cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 388 tests
+python -m pytest -q                 # 393 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

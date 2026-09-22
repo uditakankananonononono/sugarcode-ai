@@ -165,6 +165,104 @@ def gc_donor_lod() -> list[dict[str, float]]:
     return log_odds_matrix(swapped)
 
 
+def utr_junction_map(gene: str, offline: bool = False) -> dict:
+    """5'-UTR-aware junction map (drop 33): junction windows keyed by c.
+    number INCLUDING negative (5'-UTR) positions, built from the canonical
+    transcript's mRNA exons with c.1 anchored at the paired CDS start.
+
+    Motivation: the CDS-only map (junction_map) cannot see UTR introns -
+    GJB2's CDS is a single exon, but its 5' UTR carries one intron, the
+    site of c.-23+1G>A / c.-22-2A>C. Canonical CDS = most spans (as
+    junction_map); its mRNA is picked by maximal genomic overlap with the
+    CDS (span-tuple equality fails on UTR-trimmed terminal exons - the
+    drop-26 lesson). 3'-UTR introns (c.*N numbering) are NOT keyed yet:
+    boundaries landing past the CDS end are skipped and named in the
+    source note.
+    """
+    acc = refseqgene_accession(gene)
+    if not acc:
+        return {"status": "no RefSeqGene junction map for this gene", "gene": gene}
+    txt = _entrez._get("efetch.fcgi", {"db": "nuccore", "id": acc,
+                                       "rettype": "gb", "retmode": "text"},
+                       offline=offline).decode()
+    gb = _parse_gb(txt); seq = gb["sequence"]
+    cds = max((f for f in gb["features"] if f["key"] == "CDS"),
+              key=lambda c: sum(b - a for a, b in c["spans"]), default=None)
+    if not cds:
+        return {"status": "no CDS in record", "gene": gene, "accession": acc}
+    strand = cds["strand"]
+    cds_spans = _texons(cds)
+    cds_start = cds_spans[0][0] if strand == 1 else cds_spans[0][1]
+    cds_end = cds_spans[-1][1] if strand == 1 else cds_spans[-1][0]
+
+    def overlap(f):
+        return sum(max(0, min(b, cb) - max(a, ca) + 1)
+                   for a, b in f["spans"] for ca, cb in cds["spans"])
+
+    mrnas = [f for f in gb["features"] if f["key"] == "mRNA"]
+    mrna = max(mrnas, key=overlap, default=None)
+    if not mrna or overlap(mrna) == 0:
+        return {"status": "no mRNA overlapping the CDS", "gene": gene, "accession": acc}
+    tx = mrna["qualifiers"].get("transcript_id", "")
+    exons = _texons(mrna)
+
+    # c. numbering is EXONIC: walk exons in transcription order and number
+    # each base by its walked index relative to the CDS-start base (genomic
+    # distance would wrongly count introns - first pass here fixes that).
+    cds_len = sum(b - a + 1 for a, b in cds_spans)
+    utr_len = 0
+    walked = 0
+    for a, b in exons:
+        ln = b - a + 1
+        edge_start = a if strand == 1 else b   # first base, tx orientation
+        edge_end = b if strand == 1 else a     # last base, tx orientation
+        before = ((strand == 1 and edge_end < cds_start) or
+                  (strand == -1 and edge_end > cds_start))
+        if before:
+            utr_len += ln
+        elif ((strand == 1 and edge_start < cds_start <= edge_end) or
+              (strand == -1 and edge_end > cds_start >= edge_start)):
+            utr_len += abs(cds_start - edge_start)  # partial: UTR part only
+        walked += ln
+
+    def cnum(w):
+        """c. number of the base at walked exonic index w (0-based)."""
+        if w < utr_len:
+            return -(utr_len - w)
+        if w >= utr_len + cds_len:
+            return None                          # 3' UTR: c.*N unsupported
+        return w - utr_len + 1
+
+    donors, acceptors, exon_rows = {}, {}, []
+    walked = 0
+    for i, (a, b) in enumerate(exons):
+        ln = b - a + 1
+        exon_rows.append({"cdna_start": cnum(walked),
+                          "cdna_end": cnum(walked + ln - 1), "length": ln})
+        if i + 1 < len(exons):
+            na, nb = exons[i + 1]
+            d_key = cnum(walked + ln - 1)
+            a_key = cnum(walked + ln)
+            if d_key is not None:
+                donors[d_key] = (seq[b-3:b+6] if strand == 1
+                                 else _rc(seq[a-7:a+2]))
+            if a_key is not None:
+                acceptors[a_key] = (seq[na-15:na] if strand == 1
+                                    else _rc(seq[nb-1:nb+14]))
+        walked += ln
+    skipped_3utr = sum(1 for e in exon_rows
+                       if e["cdna_start"] is None or e["cdna_end"] is None)
+    src = (f"NCBI RefSeqGene {acc} ({'cache' if offline else 'live'}), "
+           f"mRNA {tx} exons with c.1 at the paired CDS start")
+    if skipped_3utr:
+        src += f"; {skipped_3utr} 3'-UTR exon(s) unnumbered (c.*N unsupported)"
+    return {"status": "ok", "gene": gene, "accession": acc, "transcript": tx,
+            "donors": {k: v for k, v in donors.items() if k is not None},
+            "acceptors": {k: v for k, v in acceptors.items() if k is not None},
+            "sequence": seq, "strand": strand, "exons": exon_rows,
+            "source": src}
+
+
 # --- transcript-isoform junction maps (drop 27): cDNA-record alignment ------
 
 def _segment_cdna(cdna: str, gseq: str, anchor: int = 30) -> list[list[int]] | None:
