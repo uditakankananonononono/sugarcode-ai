@@ -334,3 +334,49 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
         "note": "classification shown alongside model evidence - clinician adjudicates",
     }
     return r
+
+# Transparent Bayesian/graph evidence extensions; no clinical decision model.
+import math
+from collections import defaultdict
+
+def bayesian_acmg(evidence,prior=.1):
+    if not 0<prior<1: raise ValueError('prior must be within (0,1)')
+    odds=prior/(1-prior); trace=[]
+    for e in evidence:
+        strength=e.get('strength','supporting'); direction=e.get('direction','pathogenic'); base={'very_strong':350,'strong':18.7,'moderate':4.3,'supporting':2.08}.get(strength,1); lr=base if direction=='pathogenic' else 1/base; odds*=lr; trace.append({**e,'likelihood_ratio':lr,'cumulative_probability':odds/(1+odds)})
+    p=odds/(1+odds); cls='pathogenic' if p>.99 else 'likely_pathogenic' if p>.9 else 'benign' if p<.001 else 'likely_benign' if p<.1 else 'uncertain_significance'; return {'posterior_probability':p,'classification':cls,'reasoning_trace':trace,'prior':prior}
+
+def evidence_consensus(records):
+    if not records: return {'consensus':None,'conflicts':[],'effective_support':0}
+    weighted=defaultdict(float); provenance=[]
+    for r in records:
+        quality=float(r.get('quality',.5)); recency=1/(1+max(0,2026-int(r.get('year',2026)))/10); sample=math.log1p(float(r.get('sample_size',1)))/5; weight=quality*(.5+.3*recency+.2*min(1,sample)); weighted[r['classification']]+=weight; provenance.append({**r,'evidence_weight':weight})
+    consensus=max(weighted,key=weighted.get); conflicts=[r for r in provenance if r['classification']!=consensus]; return {'consensus':consensus,'weighted_votes':dict(weighted),'conflicts':conflicts,'effective_support':sum(weighted.values()),'records':provenance}
+
+def reasoning_graph(gene,variant,consequence,phenotypes=(),pathways=(),structure_effect=None):
+    nodes=[{'id':variant,'type':'variant'},{'id':gene,'type':'gene'},{'id':consequence,'type':'molecular_consequence'}]; edges=[{'source':variant,'target':gene,'relation':'occurs_in'},{'source':variant,'target':consequence,'relation':'causes'}]
+    for p in pathways: nodes.append({'id':p,'type':'pathway'}); edges.append({'source':consequence,'target':p,'relation':'disrupts'})
+    for h in phenotypes: nodes.append({'id':h,'type':'phenotype'}); edges.append({'source':pathways[0] if pathways else consequence,'target':h,'relation':'contributes_to'})
+    if structure_effect: nodes.append({'id':structure_effect,'type':'structural_effect'}); edges.append({'source':consequence,'target':structure_effect,'relation':'alters_structure'})
+    return {'nodes':nodes,'edges':edges,'causal_chain':[variant,consequence,*pathways,*phenotypes]}
+
+def phenotype_match(patient_hpo,disease_hpo,ancestor_map=None):
+    p=set(patient_hpo); d=set(disease_hpo); exact=len(p&d); ancestors=ancestor_map or {}; partial=sum(.5 for x in p for y in d if y in ancestors.get(x,()) or x in ancestors.get(y,())); return {'exact_matches':exact,'semantic_partial':partial,'score':(exact+partial)/max(1,len(p|d)),'patient_terms':list(patient_hpo),'disease_terms':list(disease_hpo)}
+
+def reverse_inference(patient_hpo,candidates):
+    ranked=[]
+    for c in candidates:
+        match=phenotype_match(patient_hpo,c.get('phenotypes',[]),c.get('ancestor_map')); prior=float(c.get('variant_probability',.5)); score=.65*match['score']+.35*prior; ranked.append({**c,'phenotype_match':match,'diagnostic_score':score})
+    return sorted(ranked,key=lambda x:-x['diagnostic_score'])
+
+def forward_trajectory(classification,penetrance=.5,ages=(20,40,60)):
+    pathogenic={'pathogenic':1,'likely_pathogenic':.75,'uncertain_significance':.35,'likely_benign':.1,'benign':.02}.get(classification,.35); return {'ages':list(ages),'cumulative_risk':[min(1,penetrance*pathogenic*(1-math.exp(-a/45))) for a in ages],'assumptions':{'penetrance':penetrance,'classification_factor':pathogenic},'status':'illustrative trajectory, not prognosis'}
+
+def federated_evidence(updates,prior_alpha=1,prior_beta=1):
+    successes=sum(float(x['supporting']) for x in updates); total=sum(float(x['total']) for x in updates); a=prior_alpha+successes; b=prior_beta+total-successes; return {'alpha':a,'beta':b,'posterior_mean':a/(a+b),'sites':len(updates),'shared_data':'aggregate counts only'}
+
+def variant_intelligence(gene,variant,consequence='missense',acmg_evidence=None,literature=None,phenotypes=(),pathways=(),patient_hpo=()):
+    local=interpret_variant(gene,variant,consequence=consequence); bayes=bayesian_acmg(acmg_evidence or []); lit=evidence_consensus(literature or []); graph=reasoning_graph(gene,variant,consequence,phenotypes,pathways); match=phenotype_match(patient_hpo,phenotypes); return {'local_interpretation':local,'bayesian_acmg':bayes,'literature_consensus':lit,'reasoning_graph':graph,'phenotype_match':match,'trajectory':forward_trajectory(bayes['classification']),'model_status':'Transparent evidence aggregation; no trained transformer/GNN and not a diagnosis or clinical recommendation.'}
+
+def clinvar_diagnostics(report):
+    b=report['bayesian_acmg']; l=report['literature_consensus']; g=report['reasoning_graph']; m=report['phenotype_match']; t=report['trajectory']; return {'posterior_probability':b['posterior_probability'],'acmg_evidence_count':float(len(b['reasoning_trace'])),'literature_record_count':float(len(l.get('records',[]))),'literature_conflict_count':float(len(l['conflicts'])),'effective_support':float(l['effective_support']),'graph_nodes':float(len(g['nodes'])),'graph_edges':float(len(g['edges'])),'causal_chain_length':float(len(g['causal_chain'])),'phenotype_exact_matches':float(m['exact_matches']),'phenotype_partial_matches':float(m['semantic_partial']),'phenotype_score':m['score'],'trajectory_final_risk':t['cumulative_risk'][-1]}
