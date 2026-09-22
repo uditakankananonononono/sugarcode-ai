@@ -219,6 +219,14 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
                         if esc:
                             frame = (f"; exon-skip context: {esc['skipped_exon']['length']} nt "
                                      f"{'in-frame' if esc['in_frame'] else 'out-of-frame'}")
+                        # drop 36: surface retention + cryptic-use outcomes
+                        alt = (esc.get("alternative_outcomes") or {}) if esc else {}
+                        if alt.get("intron_retention"):
+                            frame += f"; {alt['intron_retention'].split(':')[0]}"
+                        cu = (alt.get("cryptic_use") or {}).get("candidates") or []
+                        if cu:
+                            frame += (f"; cryptic {sa['site_type']} candidate at "
+                                      f"{cu[0]['offset_nt']:+d} nt ({cu[0]['score']:.2f})")
                         components.append(f"predicted loss of natural {sa['site_type']} "
                                           f"site{u12} (delta {d:+.2f}, RefSeqGene map{frame}) (+1.5)")
                     elif d <= -0.05:

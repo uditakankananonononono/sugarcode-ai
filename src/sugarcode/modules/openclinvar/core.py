@@ -252,10 +252,20 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
                 d = sa["delta"]
                 if d <= -0.15:
                     w = 0.4
+                    # drop 36: surface retention + cryptic-use outcomes
+                    esc = sa.get("exon_context") or {}
+                    alt = esc.get("alternative_outcomes") or {}
+                    extra = ""
+                    if alt.get("intron_retention"):
+                        extra += f"; {alt['intron_retention'].split(':')[0]}"
+                    cu = (alt.get("cryptic_use") or {}).get("candidates") or []
+                    if cu:
+                        extra += (f"; cryptic {sa['site_type']} candidate at "
+                                  f"{cu[0]['offset_nt']:+d} nt ({cu[0]['score']:.2f})")
                     r["evidence"].append({
                         "rule": "SPLICE_PWM_LOSS", "weight": w,
                         "detail": (f"predicted loss of natural {sa['site_type']} site "
-                                   f"(delta {d:+.2f} on the RefSeqGene map; 28-gene golden: "
+                                   f"(delta {d:+.2f} on the RefSeqGene map{extra}; 28-gene golden: "
                                    "100% of 2,405 canonical U2 sites called loss)")})
                 elif d <= -0.05:
                     r["evidence"].append({
