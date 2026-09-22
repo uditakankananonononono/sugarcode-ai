@@ -13,3 +13,8 @@ def test_fabrication_fidelity(): assert fabrication_resolution(100,5,10)['printa
 def test_report_honest(): assert 'no generative AI/MD/FBA' in material_report('PHA')['model_status']
 def test_diagnostics():
  d=material_diagnostics(material_report('PHA')); assert len(d)==12 and all(math.isfinite(x) for x in d.values())
+
+def test_report_threads_temperature_porosity_and_calibrates_network_modulus():
+ r=material_report('PHA','scaffold')
+ assert r['network_mechanics']['porosity']==r['predicted_properties']['recommended_porosity']
+ assert abs(r['network_mechanics']['youngs_modulus_mpa']-r['predicted_properties']['youngs_modulus_mpa'])<1e-6
