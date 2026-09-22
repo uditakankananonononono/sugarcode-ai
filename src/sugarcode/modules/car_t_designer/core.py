@@ -62,3 +62,30 @@ def _trial(costim: dict, tox: dict) -> dict:
     return {"months": months, "car_persistence_fraction": persistence,
             "predicted_overall_response": response,
             "readouts": ["MRD negativity", "CAR copy number", "cytokine panel"]}
+
+import math
+
+def antigen_selectivity(tumor_expression, normal_expression, detection_limit=1e-6):
+    t=max(float(tumor_expression),detection_limit); n=max(float(normal_expression),detection_limit)
+    return {'tumor_expression':t,'normal_expression':n,'tumor_normal_ratio':t/n,'selective':t/n>=10}
+
+def logic_gate_response(antigen_a, antigen_b, gate='AND', threshold=0.5):
+    a=antigen_a>=threshold; b=antigen_b>=threshold
+    if gate=='AND': active=a and b
+    elif gate=='OR': active=a or b
+    elif gate=='A_NOT_B': active=a and not b
+    else: raise ValueError('gate must be AND, OR, or A_NOT_B')
+    return {'active':active,'gate':gate,'inputs_above_threshold':[a,b]}
+
+def exhaustion_trajectory(days, stimulation, costim='4-1BB'):
+    if costim not in COSTIM: raise ValueError(f'unknown costim: {costim}')
+    rate=COSTIM[costim]['exhaustion']*float(stimulation)
+    vals=[1-math.exp(-rate*d/14) for d in days]
+    return {'days':list(days),'exhaustion_fraction':vals,'costim':costim}
+
+def killing_curve(effector_target_ratios, potency=0.6, antigen_positive_fraction=1.0):
+    vals=[antigen_positive_fraction*(1-math.exp(-potency*float(r))) for r in effector_target_ratios]
+    return {'effector_target_ratios':list(effector_target_ratios),'target_kill_fraction':vals,'antigen_positive_fraction':antigen_positive_fraction}
+
+def car_report(antigen, indication=None):
+    out=design_car(antigen,indication); out['validation_scope']='Transparent heuristic design; no trained patient-response model and not clinically validated.'; return out
