@@ -707,3 +707,40 @@ def _isoform_call(site_type: str, delta: float) -> str:
     if delta >= 0.15:
         return "novel splice isoform with extra/missing exonic sequence"
     return "canonical isoform remains dominant"
+
+# Transparent context/regulatory/isoform extensions; no transformer or GNN bundled.
+import math
+import numpy as np
+RBP_MOTIFS={'SRSF1':['GAAGAA','GGAGGA'],'HNRNPA1':['TAGGGA','UAGGGA'],'PTBP1':['TTCT','CTCT']}
+
+def regulatory_features(sequence,rbp_maps=None,chromatin=None,elongation_rate=1):
+    s=clean_dna(sequence); hits={name:sum(s.count(m.replace('U','T')) for m in motifs) for name,motifs in RBP_MOTIFS.items()}; ext=rbp_maps or {}; hits.update({k:hits.get(k,0)+float(v) for k,v in ext.items()}); gc=(s.count('G')+s.count('C'))/len(s); pairing=sum(a==b for a,b in zip(s,s[::-1]))/len(s); chrom={'H3K36me3':.5,'H3K4me3':.5,**(chromatin or {})}; return {'rbp_hits':hits,'gc_fraction':gc,'structure_pairing_proxy':pairing,'chromatin':chrom,'elongation_rate':elongation_rate,'exon_definition_support':min(1,.2*sum(hits.values())/max(1,len(s))+.35*chrom['H3K36me3']+.2/elongation_rate)}
+
+def exon_inclusion(ref_site,alt_site,regulatory,calibration_n=100):
+    delta=alt_site-ref_site; logit=-.5+5*alt_site+2*regulatory['exon_definition_support']; psi=1/(1+math.exp(-logit)); radius=1.96*math.sqrt(psi*(1-psi)/max(1,calibration_n)); return {'psi':psi,'delta_site_strength':delta,'interval95':[max(0,psi-radius),min(1,psi+radius)],'calibration_n':calibration_n}
+
+def isoform_distribution(psi,frame_preserved=True,cryptic_strength=0,intron_retention=.05):
+    crypt=max(0,min(1,cryptic_strength))*(1-psi); retained=min(1-psi-crypt,max(0,intron_retention)); skipped=max(0,1-psi-crypt-retained); vals={'canonical':psi,'exon_skipped':skipped,'cryptic_site':crypt,'intron_retained':retained}; z=sum(vals.values()); vals={k:v/z for k,v in vals.items()}; return {'isoforms':vals,'protein_outcomes':{'canonical':'full-length','exon_skipped':'in-frame deletion' if frame_preserved else 'frameshift/truncation','cryptic_site':'altered junction','intron_retained':'PTC/NMD risk'}}
+
+def splice_regulatory_graph(exons,introns,rbp_edges):
+    nodes=[{'id':x,'type':'exon'} for x in exons]+[{'id':x,'type':'intron'} for x in introns]; edges=[]
+    for rbp,target,effect in rbp_edges: nodes.append({'id':rbp,'type':'RBP'}); edges.append({'source':rbp,'target':target,'effect':effect})
+    return {'nodes':list({x['id']:(x) for x in nodes}.values()),'edges':edges,'activation_balance':sum(1 if e['effect']=='enhance' else -1 for e in edges)}
+
+def intervention_simulation(wild_psi,aberrant_psi,strategies):
+    out=[]
+    for s in strategies:
+        effect=float(s.get('psi_shift',0)); off=float(s.get('offtarget_risk',.1)); restored=max(0,min(1,aberrant_psi+effect)); out.append({**s,'restored_psi':restored,'restoration_error':abs(wild_psi-restored),'net_score':1-abs(wild_psi-restored)-off,'status':'non-procedural design concept'})
+    return sorted(out,key=lambda x:-x['net_score'])
+
+def active_learning(candidates):
+    out=[]
+    for c in candidates:
+        p=float(c['probability']); uncertainty=4*p*(1-p); impact=float(c.get('impact',.5)); out.append({**c,'priority':uncertainty*impact})
+    return sorted(out,key=lambda x:-x['priority'])
+
+def splicing_report(ref_window,alt_window,site_type='donor',context_sequence=None,frame_preserved=True):
+    score=score_donor if site_type=='donor' else score_acceptor; ref=score(ref_window); alt=score(alt_window); reg=regulatory_features(context_sequence or ref_window); inc=exon_inclusion(ref,alt,reg); iso=isoform_distribution(inc['psi'],frame_preserved,max(0,alt-ref)); return {'site_type':site_type,'ref_score':ref,'alt_score':alt,'regulatory':reg,'inclusion':inc,'isoforms':iso,'model_status':'PWM, motif and probabilistic context models; no transformer/GNN and not clinically validated.'}
+
+def splice_diagnostics(report):
+    r=report['regulatory']; i=report['inclusion']; iso=report['isoforms']['isoforms']; return {'ref_score':report['ref_score'],'alt_score':report['alt_score'],'delta':report['alt_score']-report['ref_score'],'psi':i['psi'],'interval_width':i['interval95'][1]-i['interval95'][0],'gc_fraction':r['gc_fraction'],'pairing_proxy':r['structure_pairing_proxy'],'exon_definition_support':r['exon_definition_support'],'rbp_hit_count':float(sum(r['rbp_hits'].values())),'canonical_isoform':iso['canonical'],'skipped_isoform':iso['exon_skipped'],'cryptic_isoform':iso['cryptic_site'],'retained_isoform':iso['intron_retained']}
