@@ -224,3 +224,63 @@ def _sbml_export(dna: str, strain: float) -> str:
     </listOfReactions>
   </model>
 </sbml>"""
+
+# --- laboratory-grade integrated construct design -----------------------------
+def _validate_design(protein,host,gc_min,gc_max,copies):
+    p=protein.upper().strip()
+    if not p: raise ValueError("protein must be a non-empty amino-acid sequence")
+    bad=sorted(set(p)-set("ACDEFGHIKLMNPQRSTVWY"))
+    if bad: raise ValueError(f"protein contains unsupported residues: {bad}")
+    if host not in codonlib.HOST_TABLES: raise ValueError(f"unknown host {host!r}; available hosts: {sorted(codonlib.HOST_TABLES)}")
+    if not 0<gc_min<gc_max<1: raise ValueError("GC bounds must satisfy 0 < gc_min < gc_max < 1")
+    if copies<1: raise ValueError("copies must be a positive integer")
+    return p
+
+
+def sequence_attention(dna:str,heads:int=4)->dict:
+    """Deterministic, untrained contextual codon self-attention diagnostic."""
+    s=clean_dna(dna); codons=[s[i:i+3] for i in range(0,len(s)-2,3)]
+    if not codons: raise ValueError("dna must contain at least one complete codon")
+    X=np.array([[c.count(b)/3 for b in "ATGC"] for c in codons]); pos=np.arange(len(codons))[:,None]
+    feats=np.concatenate([X,np.sin(pos/10),np.cos(pos/10)],1); mats=[]
+    for h in range(heads):
+        shift=np.roll(feats,h,axis=1); z=shift@shift.T/np.sqrt(feats.shape[1]); z-=z.max(1,keepdims=True); a=np.exp(z); a/=a.sum(1,keepdims=True); mats.append(a)
+    att=np.mean(mats,0)
+    return {"attention":att.tolist(),"context_score":att.max(1).tolist(),"heads":heads,"method":"deterministic untrained codon-context attention"}
+
+
+def folding_accessibility(dna:str,window:int=30)->dict:
+    """Nearest-neighbor-inspired local RNA pairing and initiation accessibility."""
+    s=clean_dna(dna).replace("T","U")
+    if len(s)<6: raise ValueError("dna must be at least 6 nt for folding analysis")
+    energies=[]
+    for i in range(len(s)):
+        seg=s[max(0,i-window//2):min(len(s),i+window//2)]; gc=seg.count("G")+seg.count("C"); pairs=sum(seg[j]+seg[-j-1] in ("GC","CG","AU","UA","GU","UG") for j in range(len(seg)//2)); energies.append(-2.1*gc/len(seg)-.5*pairs)
+    acc=1/(1+np.exp(-np.array(energies)))
+    return {"local_delta_g_kcal_mol":energies,"accessibility":acc.tolist(),"initiation_accessibility":float(np.mean(acc[:min(30,len(acc))])),"method":"deterministic nearest-neighbor-inspired screening"}
+
+
+def evolutionary_robustness(dna:str,trials:int=200,seed:int=7)->dict:
+    """Synonymous/nonsynonymous single-mutation landscape and motif risk."""
+    s=clean_dna(dna); rng=np.random.default_rng(seed); code=STANDARD_CODE; retained=0; stops=0; effects=[]
+    for _ in range(trials):
+        i=int(rng.integers(len(s))); alt=rng.choice([b for b in "ATGC" if b!=s[i]]); m=s[:i]+alt+s[i+1:]; c=i//3; a0=code.get(s[c*3:c*3+3],"X"); a1=code.get(m[c*3:c*3+3],"X"); retained+=a0==a1; stops+=a1=="*"; effects.append(0 if a0==a1 else -1 if a1=="*" else -.3)
+    repeats=max((s.count(k*4) for k in "ATGC"),default=0)
+    return {"synonymous_fraction":retained/trials,"stop_gain_fraction":stops/trials,"mean_mutation_effect":float(np.mean(effects)),"homopolymer_risk":repeats,"trials":trials,"seed":seed}
+
+
+def _design_diagnostics(dna,tasep,load,fold,evo,attention,table,copies):
+    codons=[dna[i:i+3] for i in range(0,len(dna),3)]; w=codonlib.relative_adaptiveness(table); dw=np.array(tasep["dwell_times_s"]); den=np.array(tasep["density_profile"]); gc=np.array([x[1] for x in gc_windows(dna,60)] or [gc_content(dna)]); acc=np.array(fold["accessibility"]); ctx=np.array(attention["context_score"])
+    d={"sequence_length_nt":len(dna),"protein_length_aa":len(codons),"GC_fraction":gc_content(dna),"GC_window_min":float(gc.min()),"GC_window_max":float(gc.max()),"GC_window_range":float(np.ptp(gc)),"CAI":codonlib.cai(dna,table),"CHI":_trna_strain(dna,table),"rare_codon_fraction":sum(w.get(c,0)<.2 for c in codons)/len(codons),"optimal_codon_fraction":sum(w.get(c,0)>.8 for c in codons)/len(codons),"codon_diversity":len(set(codons)),"codon_entropy":float(-(lambda p:p@np.log(p+1e-12))(np.unique(codons,return_counts=True)[1]/len(codons))),"mean_dwell_s":float(dw.mean()),"max_dwell_s":float(dw.max()),"dwell_CV":float(dw.std()/dw.mean()),"output_rate_per_s":tasep["output_rate_per_s"],"ribosome_mean_density":tasep["mean_density"],"ribosome_peak_density":float(den.max()),"jam_site_count":len(tasep["jam_sites"]),"queue_fraction":float((den>.6).mean()),"initiation_accessibility":fold["initiation_accessibility"],"mean_mRNA_accessibility":float(acc.mean()),"minimum_mRNA_accessibility":float(acc.min()),"structured_fraction":float((acc<.2).mean()),"attention_peak":float(ctx.max()),"attention_mean":float(ctx.mean()),"ATP_cost":load["atp_molecules_per_cell_per_cycle"],"host_flux_diversion":load["estimated_host_flux_diversion"],"gene_copies":copies,"synonymous_robustness":evo["synonymous_fraction"],"stop_gain_risk":evo["stop_gain_fraction"],"mean_mutation_effect":evo["mean_mutation_effect"],"homopolymer_risk":evo["homopolymer_risk"],"start_codon_valid":dna.startswith("ATG"),"internal_stop_count":sum(code=="*" for code in [STANDARD_CODE.get(c) for c in codons[:-1]]),"restriction_EcoRI_count":dna.count("GAATTC"),"restriction_BamHI_count":dna.count("GGATCC"),"restriction_BsaI_count":dna.count("GGTCTC")+dna.count("GAGACC"),"repeat_AT_count":dna.count("ATATAT"),"repeat_GC_count":dna.count("GCGCGC"),"CpG_fraction":dna.count("CG")/len(dna),"mRNA_length_nt":len(dna),"translation_time_s":float(dw.sum()),"proteins_per_hour":3600*tasep["output_rate_per_s"],"ATP_per_protein":4*len(codons),"resource_efficiency":tasep["output_rate_per_s"]/(1+load["estimated_host_flux_diversion"]),"folding_pause_balance":float(np.corrcoef(dw,np.array(acc)[::3][:len(dw)])[0,1]) if len(dw)>2 else 0,"bottleneck_codon_index":int(dw.argmax()),"bottleneck_codon":codons[int(dw.argmax())],"synthesis_complexity_score":float(np.ptp(gc)+evo["homopolymer_risk"]*.1+sum(dna.count(x) for x in ("GAATTC","GGATCC","GGTCTC"))),"design_score":float(codonlib.cai(dna,table)*fold["initiation_accessibility"]*evo["synonymous_fraction"]/(1+load["estimated_host_flux_diversion"]))}
+    assert len(d)>=50; return d
+
+
+def design_expression_construct(protein:str,host:str="ecoli_k12",*,gc_min:float=.40,gc_max:float=.60,copies:int=100,avoid_motifs:list[str]|None=None,tasep_steps:int=2000,seed:int=7)->dict:
+    """Design an actionable synthesis-ready coding sequence for a named host."""
+    p=_validate_design(protein,host,gc_min,gc_max,copies); base=optimize(p,host,gc_min,gc_max,avoid_motifs); dna=base["optimized_dna"]; table=codonlib.HOST_TABLES[host]
+    flow=tasep_simulate(dna,table,steps=tasep_steps); load=metabolic_load(dna,copies=copies); fold=folding_accessibility(dna); evo=evolutionary_robustness(dna,seed=seed); att=sequence_attention(dna); diag=_design_diagnostics(dna,flow,load,fold,evo,att,table,copies)
+    flags=[]
+    if diag["jam_site_count"]: flags.append("ribosome queue predicted: inspect bottleneck codon and local structure")
+    if diag["host_flux_diversion"]>.05: flags.append("high expression burden: reduce copy number or promoter strength")
+    if diag["initiation_accessibility"]<.2: flags.append("structured 5-prime coding region: redesign first 30 nt with RBS context")
+    return {"host":host,"optimized_dna":dna,"protein":p,"diagnostics":diag,"enhancement_feature_count":len(diag),"kinetics":flow,"folding":fold,"metabolic_load":load,"evolutionary_robustness":evo,"context_attention":att,"quality_flags":flags,"recommended_next_steps":["order synthesis with vendor sequence QC","validate expression by small-scale induction time course","measure growth-rate burden against empty-vector control","confirm product folding/activity"],"artifacts":{"sbml":base["sbml_export"],"fasta":f">codon_opt_{host}\n{dna}\n"},"model_status":"mechanistic and deterministic/untrained sequence models; not clinically validated"}
