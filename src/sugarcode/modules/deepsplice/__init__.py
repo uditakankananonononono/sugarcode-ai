@@ -1,3 +1,4 @@
-"""DeepSplice: variant effects on splice-site strength and isoform outcomes."""
-from .core import score_donor, score_acceptor, variant_effect, variant_at, cryptic_scan, live_splice_assessment, site_class, pwm_applicable, donor_subtype, PWM_SOURCE, tract_score, TRACT_LOD, TRACT_WEIGHT, branchpoint_score, branchpoint_variant_effect, BP_WEIGHT, BP_ZONE, BP_LOD
-__all__ = ["score_donor", "score_acceptor", "variant_effect", "site_class", "pwm_applicable"]
+"""Splice-site, regulatory and isoform intelligence."""
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and (callable(v) or k in ('PWM_SOURCE','BP_ZONE'))]
