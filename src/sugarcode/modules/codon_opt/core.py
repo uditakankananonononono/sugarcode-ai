@@ -42,7 +42,7 @@ def optimize(protein: str, host: str = "ecoli_k12", gc_min: float = 0.40,
         "gc_windows": [{"start": s, "gc": round(g, 3)} for s, g in gc_windows(opt, 60)],
         "chi_score": round(strain, 4),
         "tasep": flow,
-        "sbml_export": _sbml_stub(opt, strain),
+        "sbml_export": _sbml_export(opt, strain),
     }
 
 
@@ -155,7 +155,72 @@ def metabolic_load(dna: str, host_flux_mmol_gdw_h: float = 10.0,
     }
 
 
-def _sbml_stub(dna: str, strain: float) -> str:
-    return (f'<?xml version="1.0" encoding="UTF-8"?>\n'
-            f'<sbml level="3" version="2"><model id="codon_opt_construct" '
-            f'metaid="cai_strain_{strain:.3f}" notes="construct length {len(dna)} bp"/></sbml>')
+def _sbml_export(dna: str, strain: float) -> str:
+    """Real SBML Level 3 Version 2 export of the optimized construct: one
+    compartment, five species (gene, mRNA, protein, ATP, amino-acid pool)
+    and four reactions (transcription, translation, mRNA decay, protein
+    decay) with mass-action kinetic laws. The translation rate constant
+    carries the tRNA-pool strain index as k_translate = k0 / (1 + strain),
+    so the exported model responds to the optimization quality; ATP and
+    amino-acid consumption stoichiometry follows the translation reaction.
+    Generated directly as XML (no libsbml dependency); structure is
+    validated by the drop-54 tests."""
+    from xml.sax.saxutils import escape
+    n_nt = len(dna)
+    n_aa = n_nt // 3
+    k_tx, k_tl0, k_mdeg, k_pdeg = 0.05, 0.1, 0.01, 0.005
+    k_tl = k_tl0 / (1.0 + max(strain, 0.0))
+    notes = (f"Codon-optimized construct, {n_nt} nt ({n_aa} aa); "
+             f"tRNA-pool strain index {strain:.4f}; translation rate "
+             f"constant k_translate={k_tl:.6f} = k0/(1+strain)")
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version2/core" level="3" version="2">
+  <model id="codon_opt_construct" metaid="meta_codon_opt_construct" substanceUnits="item" timeUnits="second" extentUnits="item">
+    <notes><p xmlns="http://www.w3.org/1999/xhtml">{escape(notes)}</p></notes>
+    <listOfUnitDefinitions>
+      <unitDefinition id="per_second"><listOfUnits><unit kind="second" exponent="-1" scale="0" multiplier="1"/></listOfUnits></unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="cell" spatialDimensions="3" size="1" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="SYNTH_GENE" compartment="cell" initialAmount="1" hasOnlySubstanceUnits="true" boundaryCondition="true" constant="true"/>
+      <species id="SYNTH_mRNA" compartment="cell" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false"/>
+      <species id="SYNTH_protein" compartment="cell" initialAmount="0" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false"/>
+      <species id="ATP" compartment="cell" initialAmount="1000000" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false"/>
+      <species id="AA_POOL" compartment="cell" initialAmount="1000000" hasOnlySubstanceUnits="true" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="k_transcribe" value="{k_tx}" units="per_second" constant="true"/>
+      <parameter id="k_translate" value="{k_tl:.6f}" units="per_second" constant="true"/>
+      <parameter id="k_mrna_decay" value="{k_mdeg}" units="per_second" constant="true"/>
+      <parameter id="k_protein_decay" value="{k_pdeg}" units="per_second" constant="true"/>
+      <parameter id="trna_strain_index" value="{strain:.6f}" constant="true"/>
+      <parameter id="construct_nt" value="{n_nt}" constant="true"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="transcription" reversible="false">
+        <listOfReactants><speciesReference species="SYNTH_GENE" stoichiometry="1" constant="true"/></listOfReactants>
+        <listOfProducts><speciesReference species="SYNTH_mRNA" stoichiometry="1" constant="true"/></listOfProducts>
+        <kineticLaw><math xmlns="http://www.w3.org/1998/Math/MathML"><apply><times/><ci>k_transcribe</ci><ci>SYNTH_GENE</ci></apply></math></kineticLaw>
+      </reaction>
+      <reaction id="translation" reversible="false">
+        <listOfReactants>
+          <speciesReference species="SYNTH_mRNA" stoichiometry="1" constant="true"/>
+          <speciesReference species="ATP" stoichiometry="{4 * n_aa}" constant="true"/>
+          <speciesReference species="AA_POOL" stoichiometry="{n_aa}" constant="true"/>
+        </listOfReactants>
+        <listOfProducts><speciesReference species="SYNTH_protein" stoichiometry="1" constant="true"/></listOfProducts>
+        <kineticLaw><math xmlns="http://www.w3.org/1998/Math/MathML"><apply><times/><ci>k_translate</ci><ci>SYNTH_mRNA</ci></apply></math></kineticLaw>
+      </reaction>
+      <reaction id="mrna_decay" reversible="false">
+        <listOfReactants><speciesReference species="SYNTH_mRNA" stoichiometry="1" constant="true"/></listOfReactants>
+        <kineticLaw><math xmlns="http://www.w3.org/1998/Math/MathML"><apply><times/><ci>k_mrna_decay</ci><ci>SYNTH_mRNA</ci></apply></math></kineticLaw>
+      </reaction>
+      <reaction id="protein_decay" reversible="false">
+        <listOfReactants><speciesReference species="SYNTH_protein" stoichiometry="1" constant="true"/></listOfReactants>
+        <kineticLaw><math xmlns="http://www.w3.org/1998/Math/MathML"><apply><times/><ci>k_protein_decay</ci><ci>SYNTH_protein</ci></apply></math></kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>"""
