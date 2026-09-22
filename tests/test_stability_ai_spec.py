@@ -42,3 +42,16 @@ def test_canonical_end_to_end_v3_has_fifty_full_stack_environment_sensitive_diag
  assert {"sequence_risk_max","point_mutation_rate","insertion_rate","deletion_rate","terminal_copy_number_mean","aggregation_probability","metabolite_24h_survival"} <= set(mild["diagnostics"])
  assert sum(mild["diagnostics"][k]!=harsh["diagnostics"][k] for k in mild["diagnostics"])>=15
  assert mild["diagnostics"]["terminal_functional_mean"]>harsh["diagnostics"]["terminal_functional_mean"]
+
+def test_feedback_update_moves_and_tightens_failure_probability():
+ from sugarcode.modules.stability_ai.core import update_failure_rate
+ a=update_failure_rate(1,9,0,0); b=update_failure_rate(1,9,8,10)
+ assert b['failure_probability']>a['failure_probability'] and b['std']>0
+
+def test_environment_robustness_and_failure_attribution_are_live():
+ from sugarcode.modules.stability_ai.core import environment_robustness,failure_attribution
+ c={**construct(),'sequence':'ATGC'*30,'protein_sequence':'MKT'*30}
+ sweep=environment_robustness(c,[{'temperature_C':30,'pH':7,'oxidative_stress':0},{'temperature_C':50,'pH':5,'oxidative_stress':.9}],generations=5)
+ assert sweep['robustness_range']>0 and sweep['worst_case']['environment']['temperature_C']==50
+ attr=failure_attribution(analyze_stability(c,generations=5,population=500,replicates=8))
+ assert abs(sum(attr['contributions'].values())-1)<1e-12 and attr['dominant_failure_driver'] in attr['contributions']

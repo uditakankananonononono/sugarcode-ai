@@ -178,3 +178,15 @@ def analyze_stability(construct: dict, *, environment: dict | None=None, generat
     result["model_status"]="mechanistic hermetic full-stack stability model; no production-lot prediction"
     result["simulation"]["model_status"]="mechanistic hermetic Wright-Fisher/CNV/environment model; no production-lot prediction"
     return result
+
+# Validation feedback and scenario robustness extensions.
+def update_failure_rate(prior_alpha,prior_beta,failures,total):
+    if not 0<=failures<=total or min(prior_alpha,prior_beta)<=0: raise ValueError('invalid beta update')
+    a=prior_alpha+failures; b=prior_beta+total-failures; return {'alpha':a,'beta':b,'failure_probability':a/(a+b),'std':math.sqrt(a*b/((a+b)**2*(a+b+1)))}
+def environment_robustness(construct,scenarios,generations=30):
+    rows=[]
+    for i,env in enumerate(scenarios):
+        r=analyze_stability(construct,environment=env,generations=generations,population=1000,replicates=8,seed=100+i); rows.append({'environment':env,'terminal_functional':r['diagnostics']['terminal_functional_mean'],'adjusted_stability':r['diagnostics']['environment_adjusted_stability']})
+    vals=[x['adjusted_stability'] for x in rows]; return {'scenarios':rows,'worst_case':min(rows,key=lambda x:x['adjusted_stability']),'mean_adjusted_stability':sum(vals)/len(vals),'robustness_range':max(vals)-min(vals)}
+def failure_attribution(result):
+    d=result['diagnostics']; terms={'sequence_mutation':d['total_mutation_rate']*1e6,'copy_number':d['cnv_rate_per_generation']*100,'environment':d['environmental_stress_index'],'aggregation':d['aggregation_probability'],'biochemical_decay':1-d['metabolite_24h_survival']*d['cofactor_24h_survival']}; z=sum(terms.values()); return {'contributions':{k:v/z for k,v in terms.items()},'dominant_failure_driver':max(terms,key=terms.get),'raw_terms':terms}
