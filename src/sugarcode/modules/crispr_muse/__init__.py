@@ -1,3 +1,3 @@
-"""CRISPR Muse: RL-style gRNA generator refined by simulated lab feedback."""
-from .core import MuseAgent, train_round
-__all__ = ["MuseAgent", "train_round"]
+"""Adaptive, traceable CRISPR guide and editing-strategy design."""
+from .core import *
+from .core import __all__
