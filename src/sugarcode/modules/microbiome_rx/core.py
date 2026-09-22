@@ -148,13 +148,18 @@ def enhancement_features(sim: dict, opt: dict) -> dict:
         a=np.array([x["metabolites"][m] for x in rows]);out[f"{m}_final"]=float(a[-1]);out[f"{m}_change"]=float(a[-1]-a[0])
     # fill with meaningful aggregate diagnostics to exactly 50
     finals=np.array(list(sim["final_relative"].values())); out.update({"final_richness":int(np.sum(finals>1e-6)),"final_shannon":float(-np.sum(finals[finals>0]*np.log(finals[finals>0]))),"dominant_fraction":float(finals.max()),"optimization_objective":opt["objective"],"optimized_fiber":opt["diet"]["fiber"],"optimized_sugar":opt["diet"]["sugar"],"optimization_evaluations":opt["evaluations"]})
-    # species count varies; add trajectory aggregates until 50
+    # Preserve optimizer diagnostics as load-bearing decision outputs. Trim only
+    # redundant per-species AUC fields when the panel would exceed 50.
+    protected={"optimization_objective","optimized_fiber","optimized_sugar","optimization_evaluations"}
+    while len(out)>50:
+        removable=next((k for k in reversed(list(out)) if k not in protected and k.endswith("_auc")),None)
+        if removable is None: removable=next(k for k in reversed(list(out)) if k not in protected)
+        out.pop(removable)
     total=np.array([sum(x["species"].values()) for x in rows]); extras={"total_biomass_initial":float(total[0]),"total_biomass_final":float(total[-1]),"total_biomass_peak":float(total.max()),"total_biomass_auc":float(np.trapz(total,t)),"community_fold_change":float(total[-1]/total[0])}
     for k,v in extras.items():
         if len(out)<50: out[k]=v
-    # For common 6-species input this is exactly 50; reject underspecified panels honestly.
     if len(out)<50: raise ValueError("at least five species are required for 50-diagnostic community analysis")
-    if len(out)>50: out=dict(list(out.items())[:50])
+    assert len(out)==50 and protected <= set(out)
     return out
 
 def analyze_microbiome(initial: dict[str,float], target_metabolites: dict[str,float], *, days: float=7) -> dict:

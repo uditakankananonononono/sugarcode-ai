@@ -9,6 +9,7 @@ def test_real_intervention_optimizer():
  r=optimize_intervention(community(),{"butyrate":.1},days=2); assert r["evaluations"]>10 and 0<=r["diet"]["fiber"]<=3
 def test_exactly_fifty_case_derived_diagnostics():
  r=analyze_microbiome(community(),{"butyrate":.1},days=2); assert len(r["diagnostics"])==50 and len(set(r["diagnostics"]))==50
+ assert {"optimization_objective","optimized_fiber","optimized_sugar","optimization_evaluations"} <= set(r["diagnostics"])
 def test_actionable_and_honest():
  r=analyze_microbiome(community(),{"acetate":.2},days=1); assert r["diagnostic_count"]==50 and len(r["lab_plan"])==4 and "no clinical response claim" in r["optimization"]["simulation"]["model_status"]
 def test_legacy_api_remains(): assert simulate_community(community(),days=1)["trajectory"] and design_intervention(current_profile=community())["recommended"]
