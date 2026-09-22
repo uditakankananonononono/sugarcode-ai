@@ -1,0 +1,109 @@
+{
+ "source": "ClinVar live query 2026-09-22 on the ClinVar-cited transcripts (SCN2A NM_001040142.2, SCN8A NM_001330260.2, SCN9A NM_001365536.1, SCN5A NM_000335.4) via cdna_junction_map; AT-AC intron confirmed per gene by the intronIC gold set (donor-window match)",
+ "cases": [
+  {
+   "gene": "SCN2A",
+   "notation": "c.386+1A>C",
+   "site_type": "donor",
+   "window": "TTCATATCC",
+   "index": 3,
+   "delta": -0.1578,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN2A",
+   "notation": "c.386+2T>C",
+   "site_type": "donor",
+   "window": "TTCATATCC",
+   "index": 4,
+   "delta": -0.1578,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN2A",
+   "notation": "c.387-2A>G",
+   "site_type": "acceptor",
+   "window": "TGACGATATTCTACT",
+   "index": 12,
+   "delta": -0.205,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN8A",
+   "notation": "c.396-1C>T",
+   "site_type": "acceptor",
+   "window": "TGACTCTTCTCTACA",
+   "index": 13,
+   "delta": -0.205,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN9A",
+   "notation": "c.378-1C>T",
+   "site_type": "acceptor",
+   "window": "TGATTCTAAGCTACC",
+   "index": 13,
+   "delta": -0.2049,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.392+2T>C",
+   "site_type": "donor",
+   "window": "CTCATATCC",
+   "index": 4,
+   "delta": -0.1578,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.392+2T>G",
+   "site_type": "donor",
+   "window": "CTCATATCC",
+   "index": 4,
+   "delta": -0.1578,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "SCN5A",
+   "notation": "c.393-2A>G",
+   "site_type": "acceptor",
+   "window": "TTGACCCCACGCACG",
+   "index": 12,
+   "delta": -0.205,
+   "u12_atac": true,
+   "sig": "pathogenic",
+   "clinvar_sig": "Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  }
+ ]
+}

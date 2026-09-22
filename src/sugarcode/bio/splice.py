@@ -87,7 +87,14 @@ def refseqgene_accession(gene: str) -> str | None:
     meta = DATA / "harvest_meta.json"
     if not meta.exists():
         raise SpliceDataMissing(f"missing {meta}")
-    for g in json.loads(meta.read_text())["genes"]:
+    m = json.loads(meta.read_text())
+    for g in m["genes"]:
+        if g["gene"] == gene.upper():
+            return g["accession"]
+    # map-only extensions (drop 35): title-verified RefSeqGene records for
+    # junction MAPS only - deliberately NOT in the PWM training set, so the
+    # matrices and every golden calibrated on them are untouched
+    for g in m.get("map_only_genes", []):
         if g["gene"] == gene.upper():
             return g["accession"]
     return None
