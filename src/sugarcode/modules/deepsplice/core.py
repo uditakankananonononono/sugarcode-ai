@@ -353,6 +353,9 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
         if r["delta"] <= -0.15:
             esc = _exon_skip_context(jm, "donor", n)
             if esc:
+                alt = _outcome_context(jm, "donor", n, r["ref_score"])
+                if alt:
+                    esc["alternative_outcomes"] = alt
                 out["exon_context"] = esc
         return out
     if sign == "-" and k <= 14 and n in jm["acceptors"]:
@@ -372,6 +375,9 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
         if r["delta"] <= -0.15:
             esc = _exon_skip_context(jm, "acceptor", n)
             if esc:
+                alt = _outcome_context(jm, "acceptor", n, r["ref_score"])
+                if alt:
+                    esc["alternative_outcomes"] = alt
                 out["exon_context"] = esc
         return out
     # deeper intronic: cryptic scan on real context (strand-aware)
@@ -392,6 +398,94 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
     r = cryptic_scan(ref_ctx, alt_ctx)
     return {"gene": gene, "notation": notation, "status": "cryptic_scan", **r,
             "source": jm["source"]}
+
+
+def _outcome_context(jm: dict, site_type: str, n: int, natural_ref: float) -> dict | None:
+    """Alternative outcomes of natural-site loss (drop 34), alongside the
+    exon-skipping prediction: intron retention (real intron length from the
+    RefSeqGene CDS spans; frame + honest PTC/NMD note) and cryptic-site use
+    (strongest pre-existing same-type site in the +/-60 nt flank, in
+    transcript orientation, excluding the natural site itself; use of an
+    exonic cryptic truncates the exon, an intronic one extends it).
+    CDS-map only: the UTR map carries no genomic spans, so UTR losses get
+    no alternative_outcomes (named, not guessed).
+    """
+    spans = jm.get("cds_spans")
+    if not spans:
+        return None
+    seq, strand = jm["sequence"], jm["strand"]
+    exons = jm.get("exons") or []
+    if site_type == "donor":
+        i = next((k for k, e in enumerate(exons) if e["cdna_end"] == n), None)
+        if i is None or i + 1 >= len(spans):
+            return None
+        a, b = spans[i]; c, _ = spans[i + 1]
+        intron_len = c - b - 1
+        flank = (seq[max(0, b - 60):b] + seq[b:b + 60]) if strand == 1 \
+            else _rc2(seq[max(0, a - 61):a - 1] + seq[a - 1:a + 59])
+    else:
+        i = next((k for k, e in enumerate(exons) if e["cdna_start"] == n), None)
+        if i is None or i == 0:
+            return None
+        _, b = spans[i - 1]; c, d = spans[i]
+        intron_len = c - b - 1
+        flank = (seq[c - 61:c - 1] + seq[c - 1:c + 59]) if strand == 1 \
+            else _rc2(seq[max(0, d - 60):d] + seq[d:d + 60])
+    if len(flank) != 120:
+        return None
+    # intron retention
+    size_note = ("; note retention is rarely observed for long introns - "
+                 "exon skipping dominates there" if intron_len > 1000 else "")
+    if intron_len % 3 == 0:
+        ret = (f"intron retention ({intron_len} nt, in-frame): would insert "
+               f"{intron_len // 3} aa - but retained introns usually carry "
+               "premature stop codons and trigger NMD; clean in-frame "
+               f"insertion is the exception{size_note}")
+    else:
+        ret = (f"intron retention ({intron_len} nt, not a multiple of 3): "
+               f"frameshift -> premature termination codon / NMD{size_note}")
+    # cryptic-site candidates in the flank (same site type, natural excluded)
+    from ...bio.pwm import scan as _scan
+    lod = DONOR_LOD if site_type == "donor" else ACCEPTOR_LOD
+    wlen = len(lod)
+    natural_pos = 60 - (3 if site_type == "donor" else wlen - 1)
+    cands = []
+    for h in _scan(flank, lod, 0.0):
+        if h["position"] == natural_pos:
+            continue
+        w = flank[h["position"]:h["position"] + wlen]
+        # a site without its dinucleotide is not viable (donor GT/GC at
+        # +1/+2, acceptor AG at -2/-1) - score alone does not imply use
+        if site_type == "donor" and w[3:5] not in ("GT", "GC"):
+            continue
+        if site_type == "acceptor" and w[12:14] != "AG":
+            continue
+        # donor: window's +1 base (idx 3) is the first intronic base, so the
+        # exon/intron boundary sits at pos+3. Acceptor: the window's last
+        # base (idx 14) is the first EXONIC base (-14..+1 convention, checked
+        # against jm windows), so the boundary sits at pos+wlen-1.
+        off = (h["position"] + (3 if site_type == "donor" else wlen - 1)) - 60
+        cands.append({"offset_nt": off, "score": round(h["score"], 3),
+                      "sequence": flank[h["position"]:h["position"] + wlen]})
+    cands = [c for c in cands if c["score"] >= 0.5]
+    cands.sort(key=lambda c: -c["score"])
+    top = cands[:3]
+    crypt = None
+    if top:
+        t0 = top[0]
+        where = ("exonic (exon truncation if used)" if t0["offset_nt"] < 0
+                 else "intronic (exon extension if used)")
+        crypt = {"candidates": top,
+                 "note": (f"strongest pre-existing cryptic {site_type} at "
+                          f"{t0['offset_nt']:+d} nt ({where}), score "
+                          f"{t0['score']:.2f} vs natural {natural_ref:.2f}; "
+                          "cryptic use is a documented outcome of natural-site loss")}
+    return {"intron_retention": ret, "cryptic_use": crypt}
+
+
+def _rc2(s: str) -> str:
+    from ...bio.genbank import revcomp
+    return revcomp(s)
 
 
 def _exon_skip_context(jm: dict, site_type: str, n: int) -> dict | None:
