@@ -123,7 +123,7 @@ Status per module: **verified** = implemented with passing named tests;
 | neuroplan_ai | tumor segmentation volume, corridor optimization around eloquent regions, risk class + surgical plan |
 | neodti_engine | drug-target-pathway-disease graph walk, therapeutic resilience index, disease alias resolution, docking hook |
 | liquid_biopsy | error-rate-aware ctDNA calling (beta-binomial floor), denoise, serial-monitoring plan |
-| rarenet_ai | phenotype-driven rare-disease matching + unified variant evidence panel (star-tiered ClinVar, gnomAD, splice assessment, constraint), ranked differentials |
+| rarenet_ai | phenotype-driven rare-disease matching + unified variant evidence panel (star-tiered ClinVar, gnomAD, splice assessment with U12 GT-AG/AT-AC flags and exon-skip in-frame/out-of-frame context, constraint), ranked differentials |
 | oncocircuit | two-input AND-gate tumor sensing circuits, promoter logic, payload delivery design |
 | pdx_insight | PDX fidelity index (mutation retention, expression concordance, stroma, drift), verdict + CRISPR repair |
 | microbiome_exp | 16S alpha diversity (Shannon/Simpson), functional potential, dysbiosis-disease flags |
@@ -490,7 +490,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 378 tests
+python -m pytest -q                 # 381 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

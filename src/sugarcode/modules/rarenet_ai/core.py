@@ -200,16 +200,27 @@ def variant_evidence_panel(variants: list[dict], offline: bool = False) -> dict:
                 from ..deepsplice import live_splice_assessment
                 sa = live_splice_assessment(gene, hgvs.split(":")[-1].split("(")[-1].rstrip(")"),
                                             offline=offline)
+                # drop 30: carry the U12 flags and exon-skip context through
+                # to the panel, and surface them in the readable components.
                 ev["splice_assessment"] = {k: v for k, v in sa.items()
-                                           if k in ("status", "site_type", "delta",
-                                                    "consequence", "verdict", "source",
-                                                    "strong_findings")}
+                                           if k in ("status", "site_type", "site_class",
+                                                    "delta", "consequence", "verdict",
+                                                    "source", "strong_findings",
+                                                    "exon_context", "donor_subtype",
+                                                    "u12_atac", "u12_note")}
                 if sa.get("status") == "natural_site":
                     d = sa["delta"]
+                    u12 = (f" [{sa['donor_subtype']}]" if sa.get("donor_subtype")
+                           else " [AT-AC U12]" if sa.get("u12_atac") else "")
                     if d <= -0.15:
                         score += 1.5
+                        esc = sa.get("exon_context") or {}
+                        frame = ""
+                        if esc:
+                            frame = (f"; exon-skip context: {esc['skipped_exon']['length']} nt "
+                                     f"{'in-frame' if esc['in_frame'] else 'out-of-frame'}")
                         components.append(f"predicted loss of natural {sa['site_type']} "
-                                          f"site (delta {d:+.2f}, RefSeqGene map) (+1.5)")
+                                          f"site{u12} (delta {d:+.2f}, RefSeqGene map{frame}) (+1.5)")
                     elif d <= -0.05:
                         score += 0.5
                         components.append(f"weakened {sa['site_type']} site (delta {d:+.2f}) (+0.5)")
