@@ -187,8 +187,12 @@ def temporal_consensus(kg,subject,obj):
 def contradiction_context(kg,subject,obj):
     claims=[c for c in kg.claims if c['subject'].lower()==subject.lower() and c['object'].lower()==obj.lower()]; grouped=defaultdict(list)
     for c in claims: grouped[c['relation']].append(c)
-    conflicts=[]
+    conflicts=[]; seen_pairs=set()
     for a,b in OPPOSING:
+        pair=frozenset((a,b))
+        if pair in seen_pairs:
+            continue
+        seen_pairs.add(pair)
         if a in grouped and b in grouped:
             contexts={r:{"papers":[x['paper'] for x in grouped[r]],"years":[x['year'] for x in grouped[r]],"sample_sizes":[x.get('n') for x in grouped[r]],"conditions":[x.get('condition','unspecified') for x in grouped[r]]} for r in (a,b)}; conflicts.append({"relations":[a,b],"contexts":contexts,"resolution_experiment":"matched cell type, dose and time-course perturbation with blinded outcome assessment"})
     return {"conflicts":conflicts,"count":len(conflicts)}
