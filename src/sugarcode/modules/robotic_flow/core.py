@@ -91,3 +91,35 @@ def monitor(run: dict, checkpoints: list[dict] | None = None) -> dict:
         "precision_note": "all timing tracked to the minute; volume QC via liquid-class calibration",
         "status": "on_track" if not alerts else "review_required",
     }
+
+import math
+from collections import defaultdict
+
+def droplet_error(volume_ul,viscosity_cp,surface_tension=72,temp_c=22):
+ bias=.002*viscosity_cp+.001*abs(surface_tension-72)+.0005*abs(temp_c-22); return {'bias_ul':volume_ul*bias,'delivered_ul':volume_ul*(1-bias),'relative_error':bias}
+def environmental_control(setpoint,observations,kp=.5,ki=.05):
+ integ=0; control=[]
+ for x in observations: err=setpoint-x; integ+=err; control.append(kp*err+ki*integ)
+ return {'control':control,'final_error':setpoint-observations[-1],'integral_error':integ}
+def sensor_anomalies(observations,z_threshold=3):
+ vals=[float(x) for x in observations]; mean=sum(vals)/len(vals); sd=math.sqrt(sum((x-mean)**2 for x in vals)/max(1,len(vals)-1)); return {'mean':mean,'std':sd,'anomalies':[i for i,x in enumerate(vals) if abs(x-mean)>z_threshold*max(sd,1e-9)]}
+def sample_lineage(samples,operations):
+ lineage={s:{'parents':[],'operations':[]} for s in samples}
+ for op in operations:
+  out=op['output']; lineage[out]={'parents':list(op.get('inputs',[])),'operations':[op['op']]}
+ return {'samples':lineage,'traceable':all('parents' in x for x in lineage.values())}
+def reagent_status(age_days,half_life_days,temperature_excursion_h=0,incompatible=False):
+ activity=2**(-age_days/half_life_days)*math.exp(-.03*temperature_excursion_h); return {'activity_fraction':activity,'usable':activity>.7 and not incompatible,'incompatible':incompatible}
+def contamination_control(transfers):
+ last=None; actions=[]
+ for t in transfers:
+  group=t.get('contamination_group',t.get('liquid','water'))
+  if last is not None and group!=last: actions.append({'before_transfer':t['dest'],'action':'new_tip_and_wash'})
+  last=group
+ return {'actions':actions,'tip_changes':len(actions)}
+def corrective_action(alert):
+ severity=alert['severity']; return {'alert':alert,'action':'pause_and_isolate' if severity=='critical' else 'recalibrate_and_retry','requires_human_review':severity=='critical'}
+def robotic_report(transfers,tasks,checkpoints=()):
+ p=pipette_plan(transfers); run=schedule_run(tasks); mon=monitor(run,list(checkpoints)); return {'pipetting':p,'schedule':run,'monitoring':mon,'contamination':contamination_control(transfers),'corrective_actions':[corrective_action(a) for a in mon['alerts']],'model_status':'Deterministic fluid/timing/control models; no computer vision or live robot hardware connection is bundled.'}
+def robotic_diagnostics(r):
+ p=r['pipetting']; s=r['schedule']; m=r['monitoring']; return {'transfer_count':float(p['n_transfers']),'pipette_minutes':p['estimated_total_min'],'total_volume':sum(x['volume_ul'] for x in p['steps']),'evaporation_correction':sum(x['evaporation_correction_ul'] for x in p['steps']),'makespan':s['makespan_min'],'instrument_count':float(len(s['instrument_utilization'])),'mean_utilization':sum(s['instrument_utilization'].values())/max(1,len(s['instrument_utilization'])),'checkpoint_count':float(len(m['checkpoints'])),'alert_count':float(len(m['alerts'])),'critical_count':float(sum(a['severity']=='critical' for a in m['alerts'])),'tip_changes':float(r['contamination']['tip_changes']),'corrective_count':float(len(r['corrective_actions']))}
