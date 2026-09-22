@@ -27,6 +27,7 @@ GENES = {"BRCA1": "NG_005905.2", **G1, **ext.GENES, **r3.GENES}
 GENES.pop("GJB2", None)  # single-exon CDS; UTR harness owns its variants
 TX_OVERRIDE = {**T1, **ext.TX_OVERRIDE, **r3.TX_OVERRIDE}
 CDNA_TX = {**ext.CDNA_TX, **r3.CDNA_TX}
+WANT = "vus"
 
 PAT = lambda nm, sym: re.compile(
     rf'{nm}\.\d+\({sym}\):c\.(\d+)([+-])(\d+)([ACGT])>([ACGT])')
@@ -55,7 +56,13 @@ def main():
             if not m:
                 continue
             germ = doc.get("germline_classification", {})
-            if _class_bucket(germ.get("description", "")) != "vus":
+            desc = germ.get("description", "")
+            # "conflicting" is not a _class_bucket value (drop-41 buckets it
+            # with pathogenic by description text and labels it via
+            # clinvar_sig); here it is its own bucket.
+            b = ("conflicting" if desc.startswith("Conflicting")
+                 else _class_bucket(desc))
+            if b != WANT:
                 continue
             n, sign, k = int(m.group(1)), m.group(2), int(m.group(3))
             refb, altb = m.group(4), m.group(5)
@@ -78,17 +85,27 @@ def main():
         out[sym] = {"cases": cases, "unmappable": unmappable}
         summary[sym] = {"vus": len(cases), "strong_loss": len(strong),
                         "unmappable": unmappable}
-        print(f"{sym:7s} VUS={len(cases):4d} strong-loss={len(strong):3d} "
+        print(f"{sym:7s} {WANT}={len(cases):4d} strong-loss={len(strong):3d} "
               f"unmappable={unmappable}")
     tot = sum(s["vus"] for s in summary.values())
     tot_strong = sum(s["strong_loss"] for s in summary.values())
-    print(f"TOTAL: {tot} VUS scored, {tot_strong} with strong loss call "
+    print(f"TOTAL: {tot} {WANT} scored, {tot_strong} with strong loss call "
           f"(prioritization signal, NOT pathogenicity evidence)")
-    json.dump({"source": "ClinVar live unfiltered sweep 2026-09-22, VUS bucketed on "
-                         "germline description text; deltas are model prioritization "
-                         "signals, NOT pathogenicity evidence",
+    labels = {"vus": ("VUS", "vus_splice_golden.json",
+                        "deltas are model prioritization signals, NOT "
+                        "pathogenicity evidence"),
+              "conflicting": ("conflicting-classification",
+                              "conflicting_splice_golden.json",
+                              "ClinVar submitters disagree on these; the model "
+                              "delta is on record as ONE computational opinion, "
+                              "not a tiebreaker")}
+    label, fname, note = labels[WANT]
+    json.dump({"source": f"ClinVar live unfiltered sweep 2026-09-22, {label} bucketed on "
+                         f"germline description text; {note}",
                "genes": out, "summary": summary},
-              open("tests/fixtures/vus_splice_golden.json", "w"), indent=1)
+              open(f"tests/fixtures/{fname}", "w"), indent=1)
 
 if __name__ == "__main__":
+    if "--bucket" in sys.argv:
+        WANT = sys.argv[sys.argv.index("--bucket") + 1]
     main()
