@@ -55,6 +55,22 @@ def acceptor_tract_lod() -> list[dict[str, float]]:
     return [dict(col) for _ in range(10)]
 
 
+def branchpoint_lod() -> list[dict[str, float]]:
+    """Branch-point 7-mer log-odds (drop 50/53): YNYTRAY position
+    frequencies vs the pooled -45..-18 zone background, learned from the
+    646 longest-CDS harvest GT-AG acceptors by scripts/learn_bp_pwm.py.
+    Seven columns, branch A at offset 5; candidates are searched in the
+    -45..-18 zone (Mercer et al. 2015 empirical range)."""
+    import json as _json
+    p = DATA / "branchpoint_pwm.json"
+    if not p.exists():
+        raise SpliceDataMissing(f"missing vendored splice data: {p}")
+    d = _json.loads(p.read_text())
+    import math as _m
+    return [{b: _m.log2(max(d["pwm"][k][b], 1e-9) / d["background"][b])
+             for b in "ACGT"} for k in range(7)]
+
+
 def donor_lod() -> list[dict[str, float]]:
     return log_odds_matrix(donor_pwm())
 

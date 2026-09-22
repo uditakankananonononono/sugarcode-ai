@@ -79,6 +79,83 @@ def _additive_acceptor(seq15: str, matrix_score: float, ref_class: str) -> float
     return round(matrix_score + TRACT_WEIGHT * tract_score(seq15), 4)
 
 
+# Drop 53: branch-point term for AG acceptors. The 15-mer acceptor window
+# ends at -14; the branch zone (-45..-18, Mercer 2015 / Leman 2020) is
+# upstream of every existing term, so variants there scored exactly 0 - the
+# drop-50 gap measurement. This is a NEW scoring surface over the -60..-1
+# intronic window: it does not modify variant_effect/variant_at/score_acceptor,
+# so every existing calibrated delta is preserved literally (suite stays
+# regression-locked). Weight 0.25 matches the tract-term discipline
+# (conservative, NOT golden-fit); validation on the Leman functional set and
+# the branch-zone ClinVar sweep is in STATUS.md.
+BP_WEIGHT = 0.25
+BP_ZONE = (-45, -18)  # branch-A cDNA coordinate range, upstream of 3'SS
+try:
+    BP_LOD = _splice.branchpoint_lod()
+except _splice.SpliceDataMissing:
+    BP_LOD = None
+
+
+def _bp_raw(s: str) -> float:
+    best = None
+    for i in range(len(s) - 6):
+        a_pos = -(len(s) - (i + 5))
+        if not (BP_ZONE[0] <= a_pos <= BP_ZONE[1]):
+            continue
+        sc = sum(BP_LOD[k].get(s[i + k], -99.0) for k in range(7))
+        if best is None or sc > best:
+            best = sc
+    return best if best is not None else 0.0
+
+
+def branchpoint_score(win60: str) -> float | None:
+    """Best branch-point candidate score (summed 7-mer log-odds, bits) with
+    branch A in BP_ZONE, over a -60..-1 intronic window (60 nt, transcript
+    orientation, last base = -1). None when the model is missing."""
+    if BP_LOD is None:
+        return None
+    s = clean_dna(win60)
+    if len(s) != 60:
+        raise ValueError("branch-point window must be 60 nt (-60..-1)")
+    return round(_bp_raw(s), 4)
+
+
+def branchpoint_variant_effect(win60: str, index: int, alt_base: str) -> dict:
+    """Ref/alt branch-zone assessment: substitution at window index (0-based,
+    -60..-1 window) scored with the harvest-learned BP model. Delta is the
+    WEIGHTED candidate-score change (BP_WEIGHT x bits), aligned with the
+    acceptor delta scale; consequence bands mirror variant_effect."""
+    if BP_LOD is None:
+        return {"bp_applicable": False,
+                "consequence": "branch-point model missing - zone not scored"}
+    s = clean_dna(win60)
+    if len(s) != 60:
+        raise ValueError("branch-point window must be 60 nt (-60..-1)")
+    alt = s[:index] + clean_dna(alt_base) + s[index + 1:]
+    ref_sc = round(_bp_raw(s), 4)
+    alt_sc = round(_bp_raw(alt), 4)
+    drop = round(_bp_raw(s) - _bp_raw(alt), 4)  # round the difference once
+    delta = round(-BP_WEIGHT * drop, 4)  # negative = candidate disruption
+    if drop >= 0.6:
+        consequence = ("likely branch-point disruption (candidate drop "
+                       f"{drop} bits) - exon skipping risk")
+    elif drop >= 0.3:
+        consequence = (f"weakened branch-point candidate ({drop} bits) - "
+                       "leaky/cryptic 3' splice-site choice possible")
+    elif drop <= -0.6:
+        consequence = (f"strengthened branch-point candidate ({-drop} bits)"
+                       " - altered 3' splice-site choice possible")
+    else:
+        consequence = "minimal predicted effect on the branch-point candidate"
+    return {"bp_applicable": True, "zone": list(BP_ZONE),
+            "ref_bp_score": ref_sc, "alt_bp_score": alt_sc,
+            "bp_drop_bits": drop, "delta": delta, "weight": BP_WEIGHT,
+            "consequence": consequence,
+            "pwm_source": ("646 longest-CDS harvest GT-AG acceptors, "
+                           "YNYTRAY PWM (drop 50); validated on Leman 2020 "
+                           "functional set + branch-zone ClinVar sweep (drop 52)")}
+
+
 # U12 GT-AG donors are told apart from U2 GT-AG donors by matrix score
 # difference. Calibrated 2026-09-22 on the vendored sets: margin 0.15 gives
 # 99.2% recall on the 361 gold U12 GT-AG donors at 0.09% FPR on the 1,170
