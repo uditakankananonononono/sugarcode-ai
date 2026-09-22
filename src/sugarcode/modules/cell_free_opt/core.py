@@ -73,3 +73,33 @@ def cost_model(conditions: dict, reaction_ul: float = 15.0, n_reactions: int = 9
             "plate_usd": round(per_rxn * n_reactions, 2),
             "breakdown": {k: round(v, 4) for k, v in parts.items()},
             "note": "lysate dominates; PEP energy substrate second - consider glucose-based energy"}
+
+def batch_normalize(yields, controls):
+    import statistics
+    if len(yields)!=len(controls) or not yields: raise ValueError('paired non-empty yields and controls required')
+    norm=[float(y)/float(c) for y,c in zip(yields,controls)]
+    return {'normalized_yield':norm,'mean':statistics.mean(norm),'cv':statistics.pstdev(norm)/(statistics.mean(norm)+1e-12)}
+
+def resource_sensitivity(conditions, fraction=0.1):
+    base=_yield_model(conditions['mg_mm'],conditions['k_mm'],conditions['pep_mm'],conditions['template_ng_ul'],conditions['peg_pct']); out={}
+    keys=['mg_mm','k_mm','pep_mm','template_ng_ul','peg_pct']
+    for key in keys:
+        c=dict(conditions); c[key]*=1+fraction
+        y=_yield_model(c['mg_mm'],c['k_mm'],c['pep_mm'],c['template_ng_ul'],c['peg_pct'])
+        out[key]=(y-base)/(base*fraction) if base else 0
+    return {'baseline_g_l':base,'elasticity':out,'most_sensitive':max(out,key=lambda k:abs(out[k]))}
+
+def pareto_conditions(candidates):
+    keep=[]
+    for c in candidates:
+        dominated=any((o['yield_g_l']>=c['yield_g_l'] and o['cost_usd']<=c['cost_usd'] and (o['yield_g_l']>c['yield_g_l'] or o['cost_usd']<c['cost_usd'])) for o in candidates)
+        if not dominated: keep.append(c)
+    return sorted(keep,key=lambda x:x['cost_usd'])
+
+def replicate_qc(values, max_cv=.15):
+    import statistics
+    mean=statistics.mean(values); cv=statistics.pstdev(values)/(mean+1e-12)
+    return {'mean':mean,'cv':cv,'passes':cv<=max_cv,'n':len(values)}
+
+def optimization_report(grid_step=2):
+    out=optimize_cfps(grid_step); out['validation_scope']='Mechanistic response-surface heuristic; no trained production model and wet-lab validation is required.'; return out
