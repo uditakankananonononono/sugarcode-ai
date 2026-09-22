@@ -103,3 +103,49 @@ def _composition(veh: str, payload: str, dose_ug: float) -> dict:
         return {"capsid": veh, "genome": f"ssDNA {payload} expression cassette",
                 "vp_particles": "1e13 vg/kg typical", "dose_ug": dose_ug}
     return {"particle": veh, "payload": payload, "dose_ug": dose_ug}
+
+# Transparent mechanistic extensions; no trained toxicity or efficacy model.
+import numpy as np
+from scipy.integrate import solve_ivp
+
+RECEPTOR_TROPISM={"liver":{"ASGPR":.9,"LDLR":.8},"t_cell":{"CD3":.8,"CD7":.7},"cns":{"AAVR":.75},"muscle":{"AAVR":.65},"lung":{"ICAM1":.6}}
+
+def payload_architecture(payload, promoter='tissue_specific', nls_count=2):
+    if payload not in PAYLOADS or nls_count<0: raise ValueError('invalid payload architecture')
+    size=PAYLOADS[payload]; aav_fit=size<=4.7
+    return {"payload":payload,"size_kb":size,"aav_fit":aav_fit,"split_required":not aav_fit,"split_strategy":None if aav_fit else "dual-vector intein/reconstitution concept","promoter":promoter,"nls_count":nls_count,"status":"architecture-level, non-procedural"}
+
+def receptor_uptake(tissue, receptor_expression, vehicle='LNP', kd=0.3):
+    if kd<=0: raise ValueError('kd must be positive')
+    atlas=RECEPTOR_TROPISM.get(tissue,{})
+    scores={cell:{"uptake_probability":max(0,min(1,float(expr)/(float(expr)+kd)*max(atlas.values(),default=.2))),"receptor_expression":float(expr)} for cell,expr in receptor_expression.items()}
+    return {"tissue":tissue,"vehicle":vehicle,"cell_subtypes":scores,"atlas_receptors":atlas}
+
+def lnp_biophysics(size_nm=90,zeta_mv=5,pka=6.4,peg_mol_pct=1.5):
+    if size_nm<=0 or peg_mol_pct<0: raise ValueError('invalid particle properties')
+    size_score=math.exp(-((size_nm-90)/45)**2); ionization=1/(1+10**(7.2-pka)); fusion=size_score*(.4+.6*ionization); escape=fusion*math.exp(-peg_mol_pct/8); clearance=min(1,.15+abs(zeta_mv)/80+peg_mol_pct/12)
+    return {"size_nm":size_nm,"zeta_mv":zeta_mv,"pka":pka,"peg_mol_pct":peg_mol_pct,"fusion_probability":fusion,"endosomal_escape_probability":escape,"relative_clearance":clearance}
+
+def compartment_pk(vehicle,dose_ug=100,hours=96,tissue='liver'):
+    if vehicle not in VEHICLES or dose_ug<=0: raise ValueError('invalid vehicle/dose')
+    trop=VEHICLES[vehicle]['tissues'].get(tissue,.1); ke=math.log(2)/VEHICLES[vehicle]['half_life_h']; kup=.03+.12*trop; kout=.04
+    def rhs(t,y): return [-(ke+kup)*y[0]+kout*y[1],kup*y[0]-kout*y[1],ke*y[0]]
+    t=np.linspace(0,hours,97); sol=solve_ivp(rhs,(0,hours),[dose_ug/3,0,0],t_eval=t,rtol=1e-8,atol=1e-10)
+    return {"time_h":t.tolist(),"plasma_ug_l":sol.y[0].tolist(),"target_ug_l":sol.y[1].tolist(),"cleared_ug_l":sol.y[2].tolist(),"target_auc":float(np.trapz(sol.y[1],t)),"mass_balance_error":float(np.max(abs(sol.y.sum(0)-dose_ug/3)))}
+
+def immune_risk(vehicle,cpg_fraction=0,rna_uridine_fraction=.25,preexisting_antibody=.1):
+    if min(cpg_fraction,rna_uridine_fraction,preexisting_antibody)<0: raise ValueError('risk inputs must be nonnegative')
+    viral=1 if vehicle.startswith('AAV') else 0; innate=min(1,.5*cpg_fraction+.4*rna_uridine_fraction+.2*VEHICLES[vehicle]['immunogenicity']); adaptive=min(1,viral*(.55*preexisting_antibody+.45*VEHICLES[vehicle]['immunogenicity'])); return {"innate_activation":innate,"adaptive_risk":adaptive,"complement_risk":min(1,.15+VEHICLES[vehicle]['immunogenicity']*.5),"overall":max(innate,adaptive),"status":"relative mechanistic risk, not clinical prediction"}
+
+def expression_kinetics(payload,vehicle,hours=168):
+    arch=payload_architecture(payload); hl=24 if vehicle=='LNP' else 240; t=np.linspace(0,hours,85); active=(1-np.exp(-t/8))*np.exp(-math.log(2)*t/hl); off_target_burden=np.trapz(active,t)*(1+.08*arch['nls_count']); return {"time_h":t.tolist(),"relative_activity":active.tolist(),"active_auc":float(np.trapz(active,t)),"off_target_exposure_proxy":float(off_target_burden)}
+
+def optimize_delivery(payload,tissue,receptor_expression=None,repeat_dosing=False):
+    base=recommend_vehicle(payload,tissue,repeat_dosing); ranked=[]
+    for row in base['ranked']:
+        immune=immune_risk(row['vehicle']); uptake=receptor_uptake(tissue,receptor_expression or {'target':.7},row['vehicle']); cell=np.mean([x['uptake_probability'] for x in uptake['cell_subtypes'].values()]); benefit=row['score']*cell; ranked.append({**row,"cell_uptake":cell,"immune_risk":immune['overall'],"benefit_risk":benefit/(.1+immune['overall'])})
+    ranked.sort(key=lambda x:-x['benefit_risk']); return {"payload":payload,"tissue":tissue,"ranked":ranked,"recommendation":ranked[0],"payload_architecture":payload_architecture(payload),"validation":["biodistribution qPCR","cell-subtype uptake assay","cytokine and complement panel","editing and off-target time course"],"model_status":"Transparent PK/biophysical scoring; no trained toxicity model and not clinically validated."}
+
+def cargo_diagnostics(payload,tissue,vehicle='LNP'):
+    arch=payload_architecture(payload); bio=lnp_biophysics() if vehicle=='LNP' else {"fusion_probability":0,"endosomal_escape_probability":0,"relative_clearance":0}; imm=immune_risk(vehicle); pk=compartment_pk(vehicle,100,24,tissue); trop=VEHICLES[vehicle]['tissues'].get(tissue,.1)
+    return {"payload_kb":arch['size_kb'],"cargo_capacity_kb":VEHICLES[vehicle]['cargo_kb'],"cargo_margin_kb":VEHICLES[vehicle]['cargo_kb']-arch['size_kb'],"tropism":trop,"half_life_h":VEHICLES[vehicle]['half_life_h'],"immunogenicity":VEHICLES[vehicle]['immunogenicity'],"innate_risk":imm['innate_activation'],"adaptive_risk":imm['adaptive_risk'],"fusion_probability":bio['fusion_probability'],"escape_probability":bio['endosomal_escape_probability'],"relative_clearance":bio['relative_clearance'],"target_auc":pk['target_auc'],"mass_balance_error":pk['mass_balance_error'],"repeat_dose_compatible":float(VEHICLES[vehicle]['repeat_dose'])}
