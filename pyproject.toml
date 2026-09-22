@@ -4,10 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sugarcode-ai"
-version = "0.1.0"
+version = "0.2.0"
 description = "SugarCode AI - Omega OS v7.0 multi-omic bio-design platform"
+readme = "README.md"
+license = {text = "Proprietary"}
+authors = [{name = "Udita Phookan"}]
+keywords = ["genomics", "splice", "bio-design", "multi-omics", "clinical-variant-interpretation"]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "fastapi>=0.100", "pydantic>=2"]
+
+[project.scripts]
+sugarcode = "sugarcode.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]

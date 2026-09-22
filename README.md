@@ -6,6 +6,16 @@ A multi-omic bio-design platform organized as a network of specialized modules o
 **Omega OS v7.0** framework. Built line-by-line from the SugarCode AI spec doc
 (`spec/` holds the full per-module spec corpus extracted from the source document).
 
+## Install + CLI (drop 57)
+
+```
+pip install .
+sugarcode version
+sugarcode modules                       # the 77 modules
+sugarcode splice assess RB1 'c.2490-28T>G'   # deepsplice live assessment, JSON out
+sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
+```
+
 ## Architecture
 
 ```
@@ -490,7 +500,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 480 tests
+python -m pytest -q                 # 484 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
