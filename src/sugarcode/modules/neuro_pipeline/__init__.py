@@ -1,3 +1,4 @@
-"""Neuro-Pipeline: train small numpy models with plasticity rules; lesion + RSA analysis."""
-from .core import MLP, train, lesion_study, activation_trace, rsa
-__all__ = ["MLP", "train", "lesion_study", "activation_trace", "rsa"]
+"""Neuro-inspired biological model training and causal debugging."""
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
