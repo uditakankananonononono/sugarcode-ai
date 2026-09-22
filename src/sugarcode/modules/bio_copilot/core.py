@@ -137,3 +137,78 @@ def live_gene_context(gene: str, offline: bool = False) -> dict:
                 "local": GENES.get(gene)}
     return {"gene": gene, "source": "local knowledge slice",
             "warning": "no reviewed UniProt entry", "local": GENES.get(gene)}
+
+
+def design_crispr_guides(sequence, pam="NGG", max_guides=20):
+    """Enumerate and rank SpCas9 guides with explicit sequence-derived scores."""
+    seq=sequence.upper().replace(" ","")
+    if not seq or set(seq)-set("ACGT"):
+        raise ValueError("sequence must contain only A/C/G/T")
+    if pam != "NGG":
+        raise ValueError("only NGG PAM is currently supported")
+    rows=[]
+    for i in range(20,len(seq)-2):
+        if seq[i+1:i+3] != "GG": continue
+        guide=seq[i-20:i]; gc=(guide.count("G")+guide.count("C"))/20
+        seed=guide[-12:]
+        homopolymer=max(len(x) for base in "ACGT" for x in guide.split(base) if x) if guide else 0
+        efficiency=max(0,1-abs(gc-.5)*2-.05*guide.count("TTTT"))
+        risk=min(1,.08*max(seed.count("G"),seed.count("C"))+.2*guide.count("TTTT"))
+        rows.append({"guide":guide,"start":i-20,"pam":seq[i:i+3],"gc_fraction":round(gc,3),
+                     "on_target_score":round(efficiency,3),"off_target_risk":round(risk,3),
+                     "composite_score":round(.7*efficiency-.3*risk,3)})
+    rows.sort(key=lambda x:(-x["composite_score"],x["start"]))
+    return {"pam":pam,"candidates":rows[:max_guides],"candidate_count":len(rows),
+            "limitations":["off-target risk is a sequence proxy, not a genome-wide alignment","experimental validation required"]}
+
+
+def select_editing_strategy(ref, alt, distance_to_pam=5, bystander_count=0):
+    """Select HDR, base, or prime editing from edit constraints."""
+    ref,alt=ref.upper(),alt.upper()
+    if ref not in "ACGT" or alt not in "ACGT" or ref==alt:
+        raise ValueError("ref and alt must be distinct DNA bases")
+    transition=(ref,alt) in {("C","T"),("G","A"),("A","G"),("T","C")}
+    if transition and distance_to_pam<=15 and bystander_count==0: method="base editing"
+    elif distance_to_pam<=30: method="prime editing"
+    else: method="HDR"
+    return {"edit":f"{ref}>{alt}","method":method,"transition":transition,
+            "distance_to_pam":distance_to_pam,"bystander_count":bystander_count,
+            "pbs_length_nt":13 if method=="prime editing" else None,"rtt_length_nt":16 if method=="prime editing" else None,
+            "validation":["amplicon sequencing","predicted off-target sequencing"]}
+
+
+def propagate_uncertainty(node_estimates, samples=2000, seed=1):
+    """Monte Carlo propagation for independent mean/standard-deviation nodes."""
+    import random, math
+    if samples<100: raise ValueError("samples must be at least 100")
+    if not node_estimates: raise ValueError("node_estimates must be non-empty")
+    rng=random.Random(seed); values=[]
+    for _ in range(samples):
+        v=1.0
+        for node,p in node_estimates.items():
+            if p[1]<0: raise ValueError(f"standard deviation for {node} must be non-negative")
+            v*=rng.gauss(p[0],p[1])
+        values.append(v)
+    values.sort(); mean=sum(values)/samples
+    return {"samples":samples,"seed":seed,"mean":round(mean,6),"ci95":[round(values[int(.025*samples)],6),round(values[int(.975*samples)],6)],
+            "parameters":node_estimates,"model_status":"uncertainty propagation, not experimental confidence"}
+
+
+def update_from_experiment(prior_mean, prior_strength, successes, trials):
+    """Beta-binomial feedback update for measured success rates."""
+    if not 0<prior_mean<1 or prior_strength<=0 or trials<1 or not 0<=successes<=trials:
+        raise ValueError("invalid prior or experiment counts")
+    a=prior_mean*prior_strength+successes; b=(1-prior_mean)*prior_strength+trials-successes
+    return {"prior_mean":prior_mean,"posterior_mean":round(a/(a+b),6),"alpha":round(a,6),"beta":round(b,6),
+            "next_experiment":"collect more replicates" if a+b<100 else "validate on an independent cohort"}
+
+
+def compile_research_artifact(question, result):
+    """Serialize inputs, result, provenance, parameters, and replay steps."""
+    import json
+    if not question.strip(): raise ValueError("question must be non-empty")
+    payload={"schema_version":"1.0","question":question,"result":result,
+             "provenance":{"knowledge":"local curated slice unless source says live","generated_by":"Bio-Copilot deterministic pipeline"},
+             "replay":["install sugarcode","run the named function with recorded inputs"],
+             "limitations":["computational research aid only","not clinical or experimental evidence"]}
+    return {"json":json.dumps(payload,sort_keys=True),"payload":payload}
