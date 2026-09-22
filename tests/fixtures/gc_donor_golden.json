@@ -1,0 +1,96 @@
+{
+ "source": "ClinVar live query 2026-09-22 + RefSeqGene windows; GC-AG donors verified on the canonical maps (BRCA2 NG_012772.3 c.7976, ATM NG_009830.1 c.7515, PALB2 NG_007406.1 c.3350)",
+ "cases": [
+  {
+   "gene": "BRCA2",
+   "notation": "c.7976+1G>T",
+   "site_type": "donor",
+   "window": "CAGGCAAGT",
+   "index": 3,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "BRCA2",
+   "notation": "c.7976+2C>G",
+   "site_type": "donor",
+   "window": "CAGGCAAGT",
+   "index": 4,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "BRCA2",
+   "notation": "c.7976+2C>A",
+   "site_type": "donor",
+   "window": "CAGGCAAGT",
+   "index": 4,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "BRCA2",
+   "notation": "c.7976+1G>A",
+   "site_type": "donor",
+   "window": "CAGGCAAGT",
+   "index": 3,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic",
+   "review": "reviewed by expert panel",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "ATM",
+   "notation": "c.7515+1G>T",
+   "site_type": "donor",
+   "window": "AAGGCAAGT",
+   "index": 3,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "ATM",
+   "notation": "c.7515+1G>A",
+   "site_type": "donor",
+   "window": "AAGGCAAGT",
+   "index": 3,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "gene": "PALB2",
+   "notation": "c.3350+1G>A",
+   "site_type": "donor",
+   "window": "CAGGCAAGT",
+   "index": 3,
+   "delta": -0.2539,
+   "site_class": "GC",
+   "sig": "pathogenic",
+   "clinvar_sig": "Pathogenic/Likely pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  }
+ ]
+}
