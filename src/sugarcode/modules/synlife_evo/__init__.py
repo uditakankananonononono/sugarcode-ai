@@ -1,3 +1,3 @@
-"""SynLife Evo: long-term evolution of engineered pathways over thousands of generations."""
-from .core import evolve
-__all__ = ["evolve"]
+"""SynLife Evo laboratory-grade long-term synthetic-organism evolution."""
+from .core import evolve,simulate_evolution_experiment,optimize_stability
+__all__=["evolve","simulate_evolution_experiment","optimize_stability"]
