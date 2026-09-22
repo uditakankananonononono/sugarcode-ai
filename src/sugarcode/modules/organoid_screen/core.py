@@ -258,9 +258,10 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
 
 import math
 import numpy as np
+_trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 
 def dose_response(concentrations,viability):
- c=np.asarray(concentrations,float); v=np.asarray(viability,float); idx=int(np.argmin(abs(v-.5))); auc=float(np.trapz(v,np.log10(c))); return {'ic50_uM':float(c[idx]),'auc_log_concentration':auc,'max_kill':float(1-v.min())}
+ c=np.asarray(concentrations,float); v=np.asarray(viability,float); idx=int(np.argmin(abs(v-.5))); auc=float(_trapz(v,np.log10(c))); return {'ic50_uM':float(c[idx]),'auc_log_concentration':auc,'max_kill':float(1-v.min())}
 def bliss_synergy(single_a,single_b,combo):
  expected=single_a*single_b; return {'expected_viability':expected,'observed_viability':combo,'bliss_excess':expected-combo,'synergistic':combo<expected}
 def replicate_quality(replicates):

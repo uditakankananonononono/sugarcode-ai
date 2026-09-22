@@ -1,5 +1,6 @@
 from __future__ import annotations
 import numpy as np
+_trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 from scipy.integrate import solve_ivp
 
 # Minimal gene-program modules (JCVI-syn3.0 flavored categories)
@@ -199,7 +200,7 @@ def _diagnostics(program,evolution):
     "glucose_consumed":float(glc[0]-glc[-1]),"substrate_exhausted":bool(glc[-1]<.01),"division_events":program["division_events"],"viability":program["viable"],
     "mRNA_total":sum(program["stochastic_expression"]["mRNA"].values()),"protein_total":sum(program["stochastic_expression"]["protein"].values()),
     "expression_event_count":program["stochastic_expression"]["total_event_count"],"expression_noise_fano":float(np.var(list(program["stochastic_expression"]["protein"].values()))/(np.mean(list(program["stochastic_expression"]["protein"].values()))+1e-12)),
-    "circuit_output_final":float(out[-1]),"circuit_output_peak":float(out.max()),"circuit_activation_auc":float(np.trapz(out,program["time_hours"])),"circuit_burden":program["circuit"]["burden"],
+    "circuit_output_final":float(out[-1]),"circuit_output_peak":float(out.max()),"circuit_activation_auc":float(_trapz(out,program["time_hours"])),"circuit_burden":program["circuit"]["burden"],
     "feedback_strength":program["circuit"]["feedback"],"sensor_threshold":program["circuit"]["sensor_threshold"],"damage_final":float(damage[-1]),"damage_peak":float(damage.max()),
     "homeostasis_margin":float(5-damage.max()),"functional_fraction_final":final["functional"],"escape_fraction_final":final["escape"],"loss_fraction_final":final["loss"],
     "evolutionary_half_life":evolution["functional_half_life"],"mutation_resilience":float(final["functional"]),"replication_present":"replication" in processes,

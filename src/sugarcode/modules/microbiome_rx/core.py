@@ -1,5 +1,6 @@
 from __future__ import annotations
 import numpy as np
+_trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 from scipy.integrate import solve_ivp
 
 # generalized Lotka-Volterra community with metabolite exchange
@@ -143,7 +144,7 @@ def optimize_intervention(initial: dict[str,float], target_metabolites: dict[str
 def enhancement_features(sim: dict, opt: dict) -> dict:
     rows=sim["trajectory"]; t=np.array([x["day"] for x in rows]); species=sorted(rows[0]["species"]); mets=list(METABOLITES); out={"duration_days":float(t[-1]),"timepoint_count":len(t),"solver_evaluations":sim["solver"]["nfev"],"species_count":len(species),"metabolite_count":len(mets)}
     for s in species:
-        a=np.array([x["species"][s] for x in rows]);out[f"{s}_initial"]=float(a[0]);out[f"{s}_final"]=float(a[-1]);out[f"{s}_fold_change"]=float(a[-1]/max(a[0],1e-12));out[f"{s}_auc"]=float(np.trapz(a,t))
+        a=np.array([x["species"][s] for x in rows]);out[f"{s}_initial"]=float(a[0]);out[f"{s}_final"]=float(a[-1]);out[f"{s}_fold_change"]=float(a[-1]/max(a[0],1e-12));out[f"{s}_auc"]=float(_trapz(a,t))
     for m in mets:
         a=np.array([x["metabolites"][m] for x in rows]);out[f"{m}_final"]=float(a[-1]);out[f"{m}_change"]=float(a[-1]-a[0])
     # fill with meaningful aggregate diagnostics to exactly 50
@@ -155,7 +156,7 @@ def enhancement_features(sim: dict, opt: dict) -> dict:
         removable=next((k for k in reversed(list(out)) if k not in protected and k.endswith("_auc")),None)
         if removable is None: removable=next(k for k in reversed(list(out)) if k not in protected)
         out.pop(removable)
-    total=np.array([sum(x["species"].values()) for x in rows]); extras={"total_biomass_initial":float(total[0]),"total_biomass_final":float(total[-1]),"total_biomass_peak":float(total.max()),"total_biomass_auc":float(np.trapz(total,t)),"community_fold_change":float(total[-1]/total[0])}
+    total=np.array([sum(x["species"].values()) for x in rows]); extras={"total_biomass_initial":float(total[0]),"total_biomass_final":float(total[-1]),"total_biomass_peak":float(total.max()),"total_biomass_auc":float(_trapz(total,t)),"community_fold_change":float(total[-1]/total[0])}
     for k,v in extras.items():
         if len(out)<50: out[k]=v
     if len(out)<50: raise ValueError("at least five species are required for 50-diagnostic community analysis")
