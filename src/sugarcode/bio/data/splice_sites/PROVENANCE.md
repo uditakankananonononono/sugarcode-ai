@@ -70,3 +70,17 @@ the tract zone (acceptor window indices 2..11 = c.-12..-3) of the same 1,170
 harvest AG acceptors in junctions.tsv (pseudocount 0.5). Learned 2026-09-22
 by scripts/learn_tract_pwm.py. Pyrimidine fraction 0.787. AG acceptors only;
 U12/AT-AC tracts differ and the term is not applied there.
+
+## esrseq_ese.txt / esrseq_ess.txt (drop 48)
+Quantitative exonic splicing enhancer/silencer hexamer scores: 1,182 ESE
+hexamers (positive) + 1,090 ESS hexamers (negative) covering the significant
+subset of all 4,096 hexamers. Lineage: Ke et al. 2011, Genome Research
+21:1360-74 ("Quantitative evaluation of all hexamers as exonic splicing
+elements"; ESRseq scores) as packaged by Spliceogen (VCCRI, published tool)
+in data/ESE.txt and data/ESS.txt. Fetched verbatim 2026-09-22 from
+https://raw.githubusercontent.com/VCCRI/Spliceogen/master/data/ESE.txt and
+.../ESS.txt (SHA check at vendor time on file). Format: single line of
+tab-separated HEXAMER<TAB>score pairs. The original Burge-lab RESCUE-ESE
+server (genes.mit.edu/burgelab/rescue-ese) is dead (404, verified
+2026-09-22); the Ke et al. publisher supplement page also 404s - the
+Spliceogen packaging is the verifiable fetchable source, labeled as such.

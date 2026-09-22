@@ -175,6 +175,28 @@ def junction_map(gene: str, offline: bool = False) -> dict:
             "source": f"NCBI RefSeqGene {acc} ({'cache' if offline else 'live'})"}
 
 
+@lru_cache(maxsize=2)
+def esrseq(kind: str = "ese") -> dict[str, float]:
+    """Quantitative exonic splicing enhancer (ESE) / silencer (ESS) hexamer
+    scores (drop 48): Ke et al. 2011 ESRseq lineage, vendored verbatim from
+    the Spliceogen packaging (see PROVENANCE). Hexamers NOT in the dict are
+    neutral (score 0) - the files carry the significant subset only."""
+    name = "esrseq_ese.txt" if kind == "ese" else "esrseq_ess.txt"
+    p = DATA / name
+    if not p.exists():
+        raise SpliceDataMissing(f"missing vendored splice data: {p}")
+    toks = p.read_text().split()
+    return {toks[i]: float(toks[i + 1]) for i in range(0, len(toks), 2)}
+
+
+def esrseq_score(seq: str) -> float:
+    """Sum of ESE (positive) + ESS (negative) hexamer scores over a sequence."""
+    ese, ess = esrseq("ese"), esrseq("ess")
+    s = seq.upper()
+    return round(sum(ese.get(s[i:i + 6], 0.0) + ess.get(s[i:i + 6], 0.0)
+                     for i in range(len(s) - 5)), 4)
+
+
 def gc_donor_lod() -> list[dict[str, float]]:
     """GC-AG donor log-odds: the GT donor matrix with the +2 column T<->C
     swapped. GC donors are ~0.6% of junctions (7 observed in our harvest), too
