@@ -37,7 +37,7 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
     ddg_score = mt["binding_dg_kcal_mol"] - wt["binding_dg_kcal_mol"]
     class_pen = DDG_CLASS_CHANGE.get((_cls(wt_aa), _cls(mutant_aa)), 0.5)
     ddg = round(0.6 * ddg_score + 0.4 * class_pen, 3)
-    resistance = ("high" if ddg > 1.5 else "moderate" if ddg > 0.5 else "low")
+    resistance = ("high" if ddg > 0.6 else "moderate" if ddg > 0.35 else "low")
     true_num = resnums[position] if resnums else pocket_start + position + 1
     return {
         "mutation": f"{wt_aa}{true_num}{mutant_aa}",
@@ -46,7 +46,7 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
         "ddg_kcal_mol": ddg,
         "affinity_change_fold": round(2.718 ** (ddg / 0.593), 2),
         "resistance_risk": resistance,
-        "hotspot": ddg > 1.0,
+        "hotspot": ddg > 0.5,
     }
 
 
