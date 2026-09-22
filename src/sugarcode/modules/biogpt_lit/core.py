@@ -164,3 +164,66 @@ def ingest_pubmed(kg: "KnowledgeGraph", query: str, retmax: int = 10,
     return {"query": query, "papers_fetched": len(abstracts),
             "claims_ingested": total,
             "pmids": [a["pmid"] for a in abstracts]}
+
+# Structured evidence reasoning; no trained transformer/GNN is bundled and
+# outputs are not clinical guidance.
+import math,json
+import numpy as np
+
+def evidence_quality(paper,claim=None):
+    claim=claim or {}; n=float(claim.get('n',paper.get('sample_size',10))); replicated=bool(paper.get('replicated',False)); citations=float(paper.get('citations',0)); rigor=float(paper.get('rigor',.5)); prereg=float(paper.get('preregistered',False)); reproducibility=.35*replicated+.2*prereg+.25*min(1,math.log10(1+citations)/3)+.2*min(1,n/100); strength=.55*rigor+.45*reproducibility; return {"sample_size":n,"rigor":rigor,"reproducibility":reproducibility,"strength":strength,"preliminary":strength<.45}
+
+def parse_full_text(document):
+    text=' '.join(str(document.get(k,'')) for k in ('title','abstract','full_text','methods')); claims=extract_claims(text); entities=sorted({c[k] for c in claims for k in ('subject','object')}); methods={"has_randomization":"random" in text.lower(),"has_blinding":"blind" in text.lower(),"has_replication":"replicat" in text.lower(),"sample_size_mentions":text.lower().count('n=')}; return {"claims":claims,"entities":entities,"methods":methods,"supplement_count":len(document.get('supplements',[])),"figure_count":len(document.get('figures',[]))}
+
+def temporal_consensus(kg,subject,obj):
+    relevant=[c for c in kg.claims if c['subject'].lower()==subject.lower() and c['object'].lower()==obj.lower()]; years=sorted({c['year'] for c in relevant}); trajectory=[]
+    for year in years:
+        subset=[c for c in relevant if c['year']<=year]; weights=defaultdict(float)
+        for c in subset: weights[c['relation']]+=kg._weight(c)
+        total=sum(weights.values()); trajectory.append({"year":year,"relations":dict(weights),"consensus":max(weights,key=weights.get),"agreement":max(weights.values())/total if total else 0})
+    return {"subject":subject,"object":obj,"trajectory":trajectory,"status":"emerging" if trajectory and trajectory[-1]['agreement']<.7 else "consolidated" if trajectory else "unknown"}
+
+def contradiction_context(kg,subject,obj):
+    claims=[c for c in kg.claims if c['subject'].lower()==subject.lower() and c['object'].lower()==obj.lower()]; grouped=defaultdict(list)
+    for c in claims: grouped[c['relation']].append(c)
+    conflicts=[]
+    for a,b in OPPOSING:
+        if a in grouped and b in grouped:
+            contexts={r:{"papers":[x['paper'] for x in grouped[r]],"years":[x['year'] for x in grouped[r]],"sample_sizes":[x.get('n') for x in grouped[r]],"conditions":[x.get('condition','unspecified') for x in grouped[r]]} for r in (a,b)}; conflicts.append({"relations":[a,b],"contexts":contexts,"resolution_experiment":"matched cell type, dose and time-course perturbation with blinded outcome assessment"})
+    return {"conflicts":conflicts,"count":len(conflicts)}
+
+def evidence_paths(kg,start,end,max_hops=4):
+    base=kg.multi_hop(start,end,max_hops); paths=[]
+    for p in base['paths']:
+        support=[]
+        for a,r,b in zip(p['path'],p['relations'],p['path'][1:]):
+            idx=kg.edges.get((a,r,b),[]); support.append({"edge":[a,r,b],"papers":[kg.claims[i]['paper'] for i in idx],"evidence_weight":sum(kg._weight(kg.claims[i]) for i in idx)})
+        paths.append({**p,"support":support,"path_strength":min((x['evidence_weight'] for x in support),default=0)})
+    return {**base,"paths":sorted(paths,key=lambda x:-x['path_strength'])}
+
+def meta_analysis(effects,standard_errors):
+    e=np.asarray(effects,float); se=np.asarray(standard_errors,float)
+    if e.shape!=se.shape or not e.size or np.any(se<=0): raise ValueError("effects/SE invalid")
+    w=1/se**2; mean=float(w@e/w.sum()); q=float(np.sum(w*(e-mean)**2)); tau=max(0,(q-(len(e)-1))/(w.sum()-np.sum(w*w)/w.sum())) if len(e)>1 else 0; rw=1/(se**2+tau); pooled=float(rw@e/rw.sum()); std=math.sqrt(1/rw.sum()); return {"fixed_effect":mean,"random_effect":pooled,"tau_squared":tau,"heterogeneity_q":q,"ci95":[pooled-1.96*std,pooled+1.96*std],"study_count":len(e)}
+
+def prioritize_gaps(kg):
+    gaps=[]
+    for edge,idx in kg.edges.items():
+        weight=sum(kg._weight(kg.claims[i]) for i in idx); disagreement=1 if any(edge[0]==x[0] and edge[2]==x[2] and (edge[1],x[1]) in OPPOSING for x in kg.edges) else 0; leverage=(1/(1+weight))*(1+disagreement)*(1+math.log1p(len(idx))); gaps.append({"edge":edge,"evidence_weight":weight,"contradiction":bool(disagreement),"information_leverage":leverage})
+    return sorted(gaps,key=lambda x:-x['information_leverage'])
+
+def structured_hypothesis(kg,topic):
+    base=kg.hypothesize(topic); gaps=prioritize_gaps(kg); hypotheses=[]
+    for h in base['hypotheses']:
+        hypotheses.append({**h,"predicted_outcomes":["directional molecular response","context-dependent effect size"],"controls":["matched negative control","orthogonal perturbation"],"readouts":["target abundance","pathway activity"],"status":"non-procedural experimental rationale"})
+    return {**base,"hypotheses":hypotheses,"highest_leverage_gaps":gaps[:5]}
+
+def update_validation(kg,subject,relation,obj,confirmed,n=50):
+    before=kg.query(subject,obj); kg.ingest({"id":f"feedback:{len(kg.claims)+1}","year":2026,"citations":0,"replicated":confirmed,"rigor":.9,"claims":[{"subject":subject,"relation":relation if confirmed else {'activates':'inhibits','inhibits':'activates','increases':'decreases','decreases':'increases'}.get(relation,relation),"object":obj,"n":n,"condition":"validation feedback"}]}); return {"before":before,"after":kg.query(subject,obj),"confirmed":confirmed}
+
+def graph_diagnostics(kg):
+    papers={c['paper'] for c in kg.claims}; entities={c[k].lower() for c in kg.claims for k in ('subject','object')}; weights=np.array([kg._weight(c) for c in kg.claims],float) if kg.claims else np.array([0.]); years=np.array([c['year'] for c in kg.claims],float) if kg.claims else np.array([0.]); return {"claim_count":float(len(kg.claims)),"paper_count":float(len(papers)),"entity_count":float(len(entities)),"edge_count":float(len(kg.edges)),"contradiction_count":float(len(kg.contradictions())),"evidence_mean":float(weights.mean()),"evidence_std":float(weights.std()),"evidence_min":float(weights.min()),"evidence_max":float(weights.max()),"year_min":float(years.min()),"year_max":float(years.max()),"year_span":float(years.max()-years.min()),"replicated_fraction":sum(c['replicated'] for c in kg.claims)/max(1,len(kg.claims)),"preliminary_fraction":sum(evidence_quality(c,c)['preliminary'] for c in kg.claims)/max(1,len(kg.claims))}
+
+def literature_reasoning_report(kg,topic,start=None,end=None):
+    return {"topic":topic,"hypotheses":structured_hypothesis(kg,topic),"contradictions":[c for c in kg.contradictions() if topic.lower() in (c['subject'],c['object'])],"evidence_paths":evidence_paths(kg,start,end) if start and end else None,"diagnostics":graph_diagnostics(kg),"model_status":"Structured evidence/statistical reasoning; no trained transformer/GNN and not clinical guidance.","audit_note":"Every path preserves paper IDs and edge weights; generated hypotheses are labeled and non-procedural."}
