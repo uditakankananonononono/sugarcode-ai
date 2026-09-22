@@ -118,3 +118,23 @@ def _motif_heatmap(members: list[dict]) -> list[list[int]]:
         for b_i, base in enumerate("ACGT"):
             rows[b_i].append(col.count(base))
     return rows
+
+import math
+import numpy as np
+RBP={'lacI':'AATTGTGAGCGGATAACAATT','tetR':'TCCCTATCAGTGATAGAGA'}
+def thermodynamic_occupancy(tf_conc,kd,cooperativity=1): return tf_conc**cooperativity/(kd**cooperativity+tf_conc**cooperativity)
+def promoter_response(seq,tf_conc=0,tf_kd=1,repressor=True):
+ base=score_promoter(seq)['strength']; occ=thermodynamic_occupancy(tf_conc,tf_kd); return {'basal':base,'occupancy':occ,'expression':base*((1-occ) if repressor else (1+occ))}
+def sequence_features(seq):
+ s=clean_dna(seq); hairpin=sum(s[i:i+4]==s[i:i+4][::-1] for i in range(len(s)-3)); return {'gc':gc_content(s),'hairpin_proxy':hairpin,'length':len(s),'homopolymer_max':max(len(x) for b in 'ACGT' for x in s.split(b) if x) if s else 0}
+def host_context(seq,host='e_coli',copy_number=1,growth_rate=1):
+ strength=score_promoter(seq)['strength']; factors={'e_coli':1,'b_subtilis':.85,'yeast':.35}; burden=min(1,strength*copy_number/(10*growth_rate)); return {'host':host,'activity':strength*factors.get(host,.5)*(1-burden*.3),'burden':burden,'copy_number':copy_number}
+def motif_compatibility(seq,tf_motifs):
+ s=clean_dna(seq); return {name:{'count':s.count(clean_dna(motif)),'positions':[i for i in range(len(s)) if s.startswith(clean_dna(motif),i)]} for name,motif in tf_motifs.items()}
+def expression_noise(mean_expression,burst_size=5,degradation=.2): return {'mean':mean_expression,'variance':mean_expression*(1+burst_size),'cv':math.sqrt(mean_expression*(1+burst_size))/max(mean_expression,1e-9),'fano':1+burst_size,'degradation':degradation}
+def library_calibration(predicted,observed):
+ x=np.asarray(predicted,float); y=np.asarray(observed,float); A=np.vstack([x,np.ones(len(x))]).T; slope,intercept=np.linalg.lstsq(A,y,rcond=None)[0]; pred=slope*x+intercept; return {'slope':float(slope),'intercept':float(intercept),'rmse':float(np.sqrt(np.mean((pred-y)**2))),'calibrated':pred.tolist()}
+def promoter_report(target=.7,tfbs=None,host='e_coli'):
+ d=design_promoter(target,tfbs); s=d['sequence']; return {**d,'features':sequence_features(s),'host_context':host_context(s,host),'motif_compatibility':motif_compatibility(s,{f'tf{i}':x for i,x in enumerate(tfbs or [])}),'noise':expression_noise(d['achieved']['strength']),'model_status':'Sigma70 motif/thermodynamic heuristics; no trained sequence model and host predictions are not experimentally calibrated.'}
+def promoter_diagnostics(r):
+ a=r['achieved']; f=r['features']; h=r['host_context']; n=r['noise']; return {'target':r['target_strength'],'strength':a['strength'],'identity_35':a['identity_35'],'identity_10':a['identity_10'],'spacer':float(a['spacer']),'up_at':a['up_element_at'],'gc':f['gc'],'hairpin_proxy':float(f['hairpin_proxy']),'host_activity':h['activity'],'burden':h['burden'],'noise_cv':n['cv'],'noise_fano':n['fano']}
