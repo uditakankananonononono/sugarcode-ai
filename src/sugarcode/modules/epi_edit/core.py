@@ -161,8 +161,12 @@ def multiplex_design(guides,max_guides=4,min_spacing=50):
         if len(chosen)>=max_guides: break
     return {"selected":chosen,"count":len(chosen),"spacing_bp":min_spacing,"combined_occupancy":1-float(np.prod([1-g.get('composite',0) for g in chosen]))}
 
-def epiedit_diagnostics(seq,effector='KRAB',occupancy=.7):
-    land=chromatin_landscape(seq); track=land['track']; graph=chromatin_graph(land); response=effector_response(effector,occupancy); access=np.array([t['accessibility'] for t in track]); gc=np.array([t['gc'] for t in track]); motifs=np.array([t['tf_motifs'] for t in track],float)
+def epiedit_diagnostics(seq,effector='KRAB',occupancy=.7,transcribed_span=None):
+    s=clean_dna(seq)
+    # When no annotation is supplied, use the central half as an explicit gene-body proxy.
+    # This keeps every declared mark reachable while callers can pass a real span.
+    span=transcribed_span or (len(s)//4, max(len(s)//4 + 1, 3*len(s)//4))
+    land=chromatin_landscape(s,span); track=land['track']; graph=chromatin_graph(land); response=effector_response(effector,occupancy); access=np.array([t['accessibility'] for t in track]); gc=np.array([t['gc'] for t in track]); motifs=np.array([t['tf_motifs'] for t in track],float)
     d={"length":float(land['length']),"tile_count":float(len(track)),"accessibility_mean":float(access.mean()),"accessibility_std":float(access.std()),"accessibility_min":float(access.min()),"accessibility_max":float(access.max()),"gc_mean":float(gc.mean()),"gc_std":float(gc.std()),"motif_mean":float(motifs.mean()),"motif_max":float(motifs.max()),"graph_nodes":float(len(graph['nodes'])),"graph_edges":float(len(graph['edges'])),"effector_occupancy":occupancy,"recruited_fraction":response['recruited_fraction'],"post_accessibility":response['state']['accessibility'],"post_acetylation":response['state']['acetylation'],"post_methylation":response['state']['methylation'],"relative_expression":response['relative_expression']}
     for mark in HISTONE_MARKS: d[f'mark_fraction.{mark}']=sum(mark in t['marks'] for t in track)/len(track)
     return d

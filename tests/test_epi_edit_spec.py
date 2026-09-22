@@ -43,6 +43,9 @@ def test_multiplex_spacing_and_occupancy():
 def test_diagnostics_honest_finite():
  d=epiedit_diagnostics(SEQ); assert len(d)==23 and all(math.isfinite(v) for v in d.values()) and not any(k.startswith('position_') for k in d)
 
+def test_diagnostics_gene_body_mark_is_reachable():
+ d=epiedit_diagnostics(SEQ); explicit=epiedit_diagnostics(SEQ,transcribed_span=(300,700)); assert d['mark_fraction.H3K36me3']>0 and explicit['mark_fraction.H3K36me3']>0
+
 def test_diagnostics_change_with_effector():
  a=epiedit_diagnostics(SEQ,'KRAB',.8); b=epiedit_diagnostics(SEQ,'p300',.8); assert sum(a[k]!=b[k] for k in a)>=4
 
