@@ -57,3 +57,29 @@ def _tail_fiber(backbone: str) -> dict:
     return {"strategy": "tail-fiber swap / point mutagenesis for serotype tropism",
             "backbone_native_range": PHAGE_BACKBONES[backbone]["host_range"],
             "note": "adsorption is the host-range gate; CRISPR only acts after DNA entry"}
+
+import math
+
+def payload_budget(backbone, components_kb):
+    if backbone not in PHAGE_BACKBONES: raise ValueError(f"unknown backbone: {backbone}")
+    total=sum(float(x) for x in components_kb.values()); cap=PHAGE_BACKBONES[backbone]['capacity_kb']
+    return {'total_kb':total,'capacity_kb':cap,'headroom_kb':cap-total,'fits':total<=cap,'components_kb':dict(components_kb)}
+
+def kill_curve(moi, adsorption_rate=0.8, burst_size=50, resistant_fraction=0.0):
+    if moi < 0 or not 0 <= resistant_fraction <= 1: raise ValueError('MOI must be nonnegative and resistant_fraction in [0,1]')
+    infected=1-math.exp(-adsorption_rate*moi); surviving=(1-infected)*(1-resistant_fraction)+resistant_fraction
+    return {'moi':moi,'infected_fraction':infected,'surviving_fraction':surviving,'effective_burst':infected*burst_size}
+
+def escape_risk(target_count, mutation_rate=1e-7, population_size=1e9):
+    if target_count < 1: raise ValueError('target_count must be >= 1')
+    expected=population_size*(mutation_rate**target_count)
+    return {'expected_escapees':expected,'escape_probability':1-math.exp(-expected),'assumptions':{'independent_targets':True,'mutation_rate':mutation_rate,'population_size':population_size}}
+
+def cocktail_coverage(host_susceptibility):
+    hosts=sorted({h for covered in host_susceptibility.values() for h in covered}); per={h:[p for p,c in host_susceptibility.items() if h in c] for h in hosts}
+    return {'hosts':hosts,'coverage_by_host':per,'redundant_hosts':[h for h,p in per.items() if len(p)>1],'coverage_fraction':1.0 if hosts else 0.0}
+
+def forge_report(target_gene_seq, resistance_marker='NDM-1', backbone=None):
+    out=design_phage(target_gene_seq,resistance_marker,backbone)
+    out['validation_scope']='Transparent sequence and capacity heuristics; no trained efficacy model and not validated for clinical use.'
+    return out
