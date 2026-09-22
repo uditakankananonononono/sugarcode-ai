@@ -1,3 +1,17 @@
+# Python build artifacts
+*.egg-info/
+build/
+dist/
+*.egg
+
+# Caches
 __pycache__/
-*.py[cod]
+*.pyc
 .pytest_cache/
+
+# Virtualenvs
+.venv/
+venv/
+
+# Local caches
+.sugarcode_cache/

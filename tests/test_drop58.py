@@ -54,7 +54,13 @@ def test_wheel_contains_data_files_and_metadata(tmp_path):
     major = int(setuptools.__version__.split(".")[0])
     if major < 61:
         pytest.skip("setuptools < 61 ignores [project] (UNKNOWN-0.0.0 wheel)")
-    whl_name = sbm.build_wheel(str(tmp_path))
+    try:
+        whl_name = sbm.build_wheel(str(tmp_path))
+    finally:
+        # in-process PEP 517 builds leave egg-info/build in the tree
+        import shutil
+        shutil.rmtree(ROOT / "src" / "sugarcode_ai.egg-info", ignore_errors=True)
+        shutil.rmtree(ROOT / "build", ignore_errors=True)
     assert whl_name.startswith("sugarcode_ai-0.2.0"), whl_name
     names = zipfile.ZipFile(tmp_path / whl_name).namelist()
     assert any("codon_tables/e_coli_316407.csv" in n for n in names)

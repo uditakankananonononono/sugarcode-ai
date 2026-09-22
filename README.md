@@ -464,7 +464,7 @@ similarity_check("CC(=O)Oc1ccccc1C(=O)O")    # -> ASPIRIN, 100%, phase 4
 OpenClinVar now adds live ClinVar evidence to its ACMG-style weighing: a
 targeted phrase query, title-verified against the requested notation (ClinVar's
 phrase search returns near-misses - caught live when c.5266dup initially
-matched c.5488dup), with honest sign handling (conflicting/uncertain = weight
+matched c.5490dup), with honest sign handling (conflicting/uncertain = weight
 0, not positive). EvoFold 4D runs ANM normal modes on real RCSB coordinates
 and validates fluctuations against experimental B-factors (1TUP chain B:
 Pearson r = 0.05, honestly reported as weak agreement). ChemGPT designs are
@@ -500,7 +500,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 488 tests
+python -m pytest -q                 # 490 tests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
