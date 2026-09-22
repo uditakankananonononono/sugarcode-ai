@@ -322,13 +322,13 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
     if n < 0:
         # 5'-UTR intron variant (drop 33): CDS maps cannot see these - use
         # the mRNA-exon UTR map (GJB2's only intron is 5'-UTR: c.-23+1G>A).
-        # 3'-UTR (c.*N) is still out of scope, named by utr_junction_map.
+        # drop 38: with an explicit transcript, the full-cDNA alignment map
+        # covers UTR introns on ClinVar's own transcript (GJB2 NM_004004.6).
+        # 3'-UTR (c.*N) is still out of scope, named by the maps.
         if transcript:
-            return {"gene": gene, "notation": notation,
-                    "status": "outside scope",
-                    "detail": "UTR numbering with an explicit transcript map "
-                              "is not supported yet"}
-        jm = _sp.utr_junction_map(gene, offline=offline)
+            jm = _sp.cdna_full_junction_map(gene, transcript, offline=offline)
+        else:
+            jm = _sp.utr_junction_map(gene, offline=offline)
     elif transcript:
         jm = _sp.cdna_junction_map(gene, transcript, offline=offline)
     else:

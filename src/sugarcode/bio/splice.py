@@ -270,9 +270,113 @@ def utr_junction_map(gene: str, offline: bool = False) -> dict:
             "source": src}
 
 
+# --- full-transcript (UTR-aware) cDNA junction maps (drop 38) ----------------
+
+def cdna_full_junction_map(gene: str, transcript: str, offline: bool = False) -> dict:
+    """UTR-aware junction map for a SPECIFIC transcript (drop 38): aligns the
+    transcript's WHOLE cDNA record (UTRs included) to the RefSeqGene genomic
+    sequence, so 5'-UTR introns get negative c. keys on ClinVar's own
+    transcript (GJB2 NM_004004.6: c.-23+1G>A end-to-end on the explicit
+    transcript). Complements cdna_junction_map (CDS-only) - the drop-27
+    caveat stands: curated UTR leaders may be ABSENT from the genomic
+    record (NM_001165963.2's first 479 nt), so UTR segments that do not
+    align are skipped and counted in the source note, never guessed. Fails
+    loudly when the CDS part does not align (same rules as drop 27).
+    """
+    acc = refseqgene_accession(gene)
+    if not acc:
+        return {"status": "no RefSeqGene junction map for this gene", "gene": gene}
+    gtxt = _entrez._get("efetch.fcgi", {"db": "nuccore", "id": acc,
+                                        "rettype": "gb", "retmode": "text"},
+                        offline=offline).decode()
+    gseq = _parse_gb(gtxt)["sequence"]
+    ctxt = _entrez._get("efetch.fcgi", {"db": "nuccore", "id": transcript,
+                                        "rettype": "gb", "retmode": "text"},
+                        offline=offline).decode()
+    cgb = _parse_gb(ctxt)
+    cdna = cgb["sequence"]
+    cds_feats = [f for f in cgb["features"] if f["key"] == "CDS"]
+    if not cds_feats:
+        return {"status": f"no CDS feature in {transcript}", "gene": gene}
+    cds_a, cds_b = cds_feats[0]["spans"][0][0], cds_feats[0]["spans"][-1][1]
+
+    strand, target = 1, gseq
+    seg = _segment_cdna(cdna, target, min_cov=0.0)
+    if seg is None:
+        strand, target = -1, _rc(gseq)
+        seg = _segment_cdna(cdna, target, min_cov=0.0)
+    if seg is None:
+        return {"status": f"no part of {transcript} aligns to {acc}", "gene": gene}
+    # CDS must align on its own (drop-27 loud rules)
+    cds_seq = cdna[cds_a - 1:cds_b]
+    cds_cov = sum(max(0, min(c0 + ln, cds_b) - max(c0, cds_a - 1))
+                  for c0, t0, ln in seg) / len(cds_seq)
+    if cds_cov < 0.9:
+        return {"status": f"CDS of {transcript} does not align to {acc} "
+                          f"(<90% coverage) - refusing to guess c. numbering",
+                "gene": gene}
+    # the CDS-start base itself must be covered by an aligned segment (the
+    # drop-27 refusal was about the CDS start NOT aligning); a segment
+    # starting far upstream is fine - GJB2's CDS starts mid-exon-2
+    cds_start_seg = next((s for s in seg if s[0] <= cds_a - 1 < s[0] + s[2]), None)
+    if cds_start_seg is None:
+        return {"status": f"CDS start of {transcript} does not align to {acc} - "
+                          "refusing to guess c. numbering", "gene": gene}
+
+    seg = _refine_junctions(cdna, target, seg, donor_lod(), acceptor_lod())
+
+    def cnum(o):  # 0-based cDNA offset -> c. number
+        if o < cds_a - 1:
+            return -(cds_a - 1 - o)
+        if o >= cds_b:
+            return None                      # 3' UTR: c.*N unsupported
+        return o - cds_a + 2
+
+    donors, acceptors, exon_rows = {}, {}, []
+    for i, (c0, t0, ln) in enumerate(seg):
+        exon_rows.append({"cdna_start": cnum(c0), "cdna_end": cnum(c0 + ln - 1),
+                          "length": ln})
+        if i + 1 >= len(seg):
+            continue
+        c1, t1, _ = seg[i + 1]
+        g_gap = t1 - (t0 + ln)
+        if g_gap <= 40:
+            continue                           # version-mismatch merge residue
+        d_key, a_key = cnum(c0 + ln - 1), cnum(c1)
+        # window conventions (checked against junction_map and the mRNA
+        # harvest): donor = 3 exonic + 6 intronic; acceptor = 14 intronic +
+        # the FIRST exonic base. On the minus strand the cDNA aligns to
+        # target = rc(genome) in its own orientation, so slices of target
+        # are already transcript-oriented - no extra revcomp.
+        if strand == 1:
+            g_end, g_start = t0 + ln, t1       # 0-based, exclusive end
+            if d_key is not None:
+                donors[d_key] = gseq[g_end - 3:g_end + 6]
+            if a_key is not None:
+                acceptors[a_key] = gseq[g_start - 14:g_start + 1]
+        else:
+            if d_key is not None:
+                donors[d_key] = target[t0 + ln - 3:t0 + ln + 6]
+            if a_key is not None:
+                acceptors[a_key] = target[t1 - 14:t1 + 1]
+    utr_unaligned = (cds_a - 1) - sum(
+        max(0, min(c0 + ln, cds_a - 1) - c0) for c0, t0, ln in seg if c0 < cds_a - 1)
+    src = (f"NCBI {transcript} full-cDNA alignment to RefSeqGene {acc} "
+           f"({'cache' if offline else 'live'}), CDS coverage {cds_cov:.3f}")
+    if utr_unaligned:
+        src += (f"; {utr_unaligned} 5'-UTR bases absent from the genomic record "
+                "(curated leader) - skipped, not guessed")
+    return {"status": "ok", "gene": gene, "accession": acc, "transcript": transcript,
+            "donors": {k: v for k, v in donors.items() if k is not None},
+            "acceptors": {k: v for k, v in acceptors.items() if k is not None},
+            "sequence": gseq, "strand": strand, "exons": exon_rows,
+            "coverage": round(cds_cov, 4), "source": src}
+
+
 # --- transcript-isoform junction maps (drop 27): cDNA-record alignment ------
 
-def _segment_cdna(cdna: str, gseq: str, anchor: int = 30) -> list[list[int]] | None:
+def _segment_cdna(cdna: str, gseq: str, anchor: int = 30,
+                  min_cov: float = 0.9) -> list[list[int]] | None:
     """Segment a cDNA into genomic exon intervals by exact-match anchoring.
 
     Walks the cDNA; each 30-nt anchor is found in the genomic sequence at or
@@ -294,7 +398,7 @@ def _segment_cdna(cdna: str, gseq: str, anchor: int = 30) -> list[list[int]] | N
         spans.append([cpos, g, ln])
         cpos += ln
         gcur = g + ln
-    if not spans or sum(s[2] for s in spans) < 0.9 * n:
+    if not spans or sum(s[2] for s in spans) < min_cov * n:
         return None
     merged = [spans[0]]
     for s in spans[1:]:
