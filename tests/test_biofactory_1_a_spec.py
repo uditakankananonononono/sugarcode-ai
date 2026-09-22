@@ -13,3 +13,9 @@ def test_log_machine_readable(): assert experiment_log(generate_protocol('gibson
 def test_report_honest(): assert 'no AI optimizer' in dbtl_report('gibson')['model_status']
 def test_diagnostics():
  d=factory_diagnostics(dbtl_report('gibson')); assert len(d)==12 and all(math.isfinite(x) for x in d.values())
+
+def test_dbtl_assay_observations_drive_quality():
+ good=dbtl_report('gibson',assay_signal=[10,11,9],assay_background=[1,1.1,.9])
+ poor=dbtl_report('gibson',assay_signal=[2,2.1,1.9],assay_background=[1.6,1.8,2.0])
+ assert good['assay_quality']['z_prime'] > poor['assay_quality']['z_prime']
+ assert good['assay_quality']['signal_background'] > poor['assay_quality']['signal_background']
