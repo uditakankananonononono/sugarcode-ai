@@ -1,3 +1,5 @@
-"""Living Tx: engineered probiotic therapeutics + gut-community simulation."""
-from .core import design_living_therapeutic
-__all__ = ["design_living_therapeutic"]
+"""Living Tx: engineered probiotic design, community dynamics, and containment."""
+from .core import (CHASSIS, PAYLOADS, containment_risk, design_living_therapeutic,
+ design_living_therapy, enhancement_features, rank_designs,
+ simulate_gut_community, validate_design_inputs)
+__all__=["CHASSIS","PAYLOADS","containment_risk","design_living_therapeutic","design_living_therapy","enhancement_features","rank_designs","simulate_gut_community","validate_design_inputs"]
