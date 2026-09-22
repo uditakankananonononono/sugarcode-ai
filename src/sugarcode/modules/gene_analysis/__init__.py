@@ -1,3 +1,3 @@
-"""Gene Analysis: multi-omic gene profile (variants, CRISPR, pathways, trends)."""
-from .core import gene_profile, live_gene_profile, live_publication_trend
-__all__ = ["gene_profile", "live_gene_profile", "live_publication_trend"]
+"""Mechanistic multi-omic gene digital twin and variant inference."""
+from .core import *
+__all__=[name for name in globals() if not name.startswith('_')]

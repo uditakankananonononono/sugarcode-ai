@@ -123,3 +123,63 @@ def live_publication_trend(symbol: str, years: int = 5, offline: bool = False) -
              "falling" if len(vals) >= 2 and vals[-1] < vals[0] * 0.8 else "steady")
     return {"symbol": symbol, "source": "PubMed (live)", "counts_by_year": counts,
             "trend": trend, "note": "Title/Abstract mention counts per publication year"}
+
+# Explicit probabilistic/mechanistic digital-twin models. No trained model is
+# bundled and these outputs are not clinically validated.
+import math, json
+import numpy as np
+from scipy.integrate import solve_ivp
+
+def molecular_graph(symbol,variants=None,isoforms=None,interactions=None):
+    nodes=[{"id":symbol,"type":"gene"}]; edges=[]
+    for i,iso in enumerate(isoforms or []): nodes.append({"id":iso,"type":"isoform"}); edges.append({"source":symbol,"target":iso,"relation":"transcribes"})
+    for v in variants or []: nodes.append({"id":v['variant'],"type":"allele"}); edges.append({"source":v['variant'],"target":symbol,"relation":"perturbs"})
+    for x in interactions or []: nodes.append({"id":x,"type":"protein"}); edges.append({"source":symbol,"target":x,"relation":"interacts"})
+    return {"nodes":nodes,"edges":edges}
+
+def splice_outcome(consequence,position=None,exon_length=150):
+    consequence=(consequence or '').lower(); splice='splice' in consequence; stop='stop' in consequence or 'nonsense' in consequence; nmd=stop and (position is None or position<exon_length-50); return {"splice_disruption":.8 if splice else .05,"exon_inclusion":.2 if splice else .95,"nmd_probability":.8 if nmd else .1,"isoform_switch_probability":.65 if splice else .1}
+
+def structure_perturbation(conservation=.5,interface=False,active_site=False,buried=.5):
+    for v in (conservation,buried):
+        if not 0<=v<=1: raise ValueError("fractions must be in [0,1]")
+    ddg=.5+2.5*buried+1.2*conservation+.8*interface+1.0*active_site; return {"ddg_kcal_mol":ddg,"destabilization_probability":1/(1+math.exp(-(ddg-2))),"interface_loss_probability":min(1,.25+.5*interface+.2*conservation),"allosteric_disruption":min(1,.2+.4*active_site+.3*conservation)}
+
+def variant_posterior(conservation=.5,structural=None,regulatory=.1,splicing=.1,functional_prior=.5,calibration_n=100):
+    structural=structural or structure_perturbation(conservation); components={"conservation":conservation,"structural":structural['destabilization_probability'],"interface":structural['interface_loss_probability'],"regulatory":regulatory,"splicing":splicing,"functional":functional_prior}; weights={"conservation":.18,"structural":.22,"interface":.12,"regulatory":.15,"splicing":.15,"functional":.18}; logit=-2+sum(4*weights[k]*components[k] for k in components); p=1/(1+math.exp(-logit)); radius=1.96*math.sqrt(p*(1-p)/max(calibration_n,1)); contrib={k:weights[k]*components[k] for k in components}; total=sum(contrib.values()); return {"pathogenic_probability":p,"attributions":{k:v/total for k,v in contrib.items()},"conformal_interval":[max(0,p-radius),min(1,p+radius)],"calibration_n":calibration_n}
+
+def conformational_ensemble(ddg,states=None):
+    states=states or {"active":0,"inactive":1.5,"misfolded":4}; energies={k:v+(ddg if k=='misfolded' else .2*ddg if k=='inactive' else 0) for k,v in states.items()}; w={k:math.exp(-v/.593) for k,v in energies.items()}; z=sum(w.values()); return {"energies":energies,"populations":{k:v/z for k,v in w.items()}}
+
+def pathway_dynamics(hours=24,expression=1,drug_inhibition=0,feedback=.2):
+    if hours<=0 or not 0<=drug_inhibition<=1: raise ValueError("invalid dynamics")
+    def rhs(_t,y): signal,target,phenotype=y; return [expression*(1-drug_inhibition)-.5*signal-feedback*target,.8*signal-.3*target,.4*target-.2*phenotype]
+    t=np.linspace(0,hours,121); sol=solve_ivp(rhs,(0,hours),[0,0,0],t_eval=t,rtol=1e-8,atol=1e-9); return {"time_h":sol.t.tolist(),"signal":sol.y[0].tolist(),"biomarker":sol.y[1].tolist(),"phenotype":sol.y[2].tolist()}
+
+def counterfactual_variant(conservation=.5,interface=False,regulatory=.1,splicing=.1,condition=None):
+    condition=condition or {}; structural=structure_perturbation(conservation,interface,condition.get('active_site',False),condition.get('buried',.5)); posterior=variant_posterior(conservation,structural,regulatory,splicing,condition.get('functional_prior',.5)); pathway=pathway_dynamics(expression=max(.05,1-posterior['pathogenic_probability']),drug_inhibition=condition.get('drug_inhibition',0)); return {"structural":structural,"posterior":posterior,"ensemble":conformational_ensemble(structural['ddg_kcal_mol']),"pathway":pathway,"phenotype_delta":pathway['phenotype'][-1]-pathway_dynamics()['phenotype'][-1]}
+
+def outcome_aware_crispr(seq,desired='knockout',chromatin=.5,allele=None):
+    design=design_guides(seq,background=seq,top_n=10); ranked=[]
+    for g in design['guides']:
+        specificity=1/(1+g['off_target_risk']); allele_score=1 if not allele else sum(a!=b for a,b in zip(g['guide'],allele))/20; phenotype=g['on_target']*(.5+.5*chromatin)*specificity; ranked.append({**g,"chromatin_score":chromatin,"allele_specificity":allele_score,"predicted_phenotype_score":phenotype,"desired_outcome":desired})
+    return sorted(ranked,key=lambda x:-x['predicted_phenotype_score'])
+
+def power_estimate(effect_size,variance=.25,power=.8):
+    if effect_size<=0 or variance<=0 or not 0<power<1: raise ValueError("invalid power inputs")
+    z=1.96+(.84 if power<=.8 else 1.28); return {"replicates_per_group":math.ceil(2*variance*z*z/effect_size**2),"effect_size":effect_size,"target_power":power}
+
+def experimental_plan(symbol,effect_size=.5):
+    return {"symbol":symbol,"controls":["unedited control","non-targeting guide","positive perturbation control"],"readouts":["qPCR","protein abundance assay","single-cell RNA-seq for network effects"],"power":power_estimate(effect_size),"status":"Study-design guidance requiring institutional review; not an executable protocol."}
+
+def feedback_update(prior_probability,successes,total):
+    if not 0<=prior_probability<=1 or not 0<=successes<=total: raise ValueError("invalid feedback")
+    a=1+prior_probability*8+successes; b=1+(1-prior_probability)*8+total-successes; return {"alpha":a,"beta":b,"mean":a/(a+b),"std":math.sqrt(a*b/((a+b)**2*(a+b+1)))}
+
+def gene_diagnostics(symbol,seq,variants=None):
+    p=gene_profile(symbol,seq,variants=variants); d={"locus_length":float(p['locus']['length']),"gc_fraction":p['locus']['gc_content'],"protein_present":float(p['protein'] is not None),"protein_aa_length":float(p['protein']['aa_length'] if p['protein'] else 0),"protein_mw":float(p['protein']['molecular_weight_da'] if p['protein'] else 0),"enhancer_cluster_count":float(len(p['regulatory_landscape']['enhancer_clusters'])),"cpg_island_count":float(len(p['regulatory_landscape']['cpg_islands'])),"tf_motif_count":float(p['regulatory_landscape']['tf_motif_count']),"variant_count":float(len(p['variants'])),"crispr_target_count":float(len(p['crispr_targets'])),"pathway_count":float(len(p['pathway_links']))}
+    for name,val in (("conservation",.5),("regulatory",.1),("splicing",.1)): d[f'baseline.{name}']=val
+    return d
+
+def digital_twin(symbol,seq,variants=None,condition=None):
+    profile=gene_profile(symbol,seq,variants=variants); graph=molecular_graph(symbol,variants=variants,isoforms=['canonical']); cf=counterfactual_variant(condition=condition); return {"profile":profile,"causal_graph":graph,"counterfactual":cf,"crispr":outcome_aware_crispr(seq),"experimental_plan":experimental_plan(symbol),"diagnostics":gene_diagnostics(symbol,seq,variants),"model_status":"Transparent mechanistic/probabilistic models; no trained model and not clinically validated."}
