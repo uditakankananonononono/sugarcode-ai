@@ -55,9 +55,10 @@ def _cmd_version(_args) -> int:
 
 
 def _cmd_modules(_args) -> int:
-    from importlib import import_module  # noqa: F401
-    from . import modules
-    names = sorted(m.name for m in __import__("pkgutil").iter_modules(modules.__path__))
+    # The product surface is defined by the canonical registry, not every
+    # importable package that happens to be present in the source tree.
+    from omega.registry import module_slugs
+    names = sorted(module_slugs())
     print(f"{len(names)} modules")
     for n in names:
         print(n)

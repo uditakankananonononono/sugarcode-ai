@@ -105,3 +105,4 @@ if __name__ == "__main__":
     if "--side" in sys.argv:
         SIDE = sys.argv[sys.argv.index("--side") + 1]
     main()
+

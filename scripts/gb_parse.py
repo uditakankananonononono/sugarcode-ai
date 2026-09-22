@@ -2,3 +2,4 @@
 import sys
 sys.path.insert(0, "src")
 from sugarcode.bio.genbank import parse_genbank, revcomp, transcript_exons  # noqa: F401
+

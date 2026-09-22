@@ -202,3 +202,4 @@ def module_slugs(subnetwork: str | None = None) -> list[str]:
     if subnetwork is None:
         return list(REGISTRY)
     return [s for s, m in REGISTRY.items() if m.subnetwork == subnetwork]
+

@@ -84,3 +84,4 @@ tab-separated HEXAMER<TAB>score pairs. The original Burge-lab RESCUE-ESE
 server (genes.mit.edu/burgelab/rescue-ese) is dead (404, verified
 2026-09-22); the Ke et al. publisher supplement page also 404s - the
 Spliceogen packaging is the verifiable fetchable source, labeled as such.
+

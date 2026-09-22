@@ -15,3 +15,4 @@ Cross-validation against the previous in-memory "Kazusa-style" tables:
   table has an exact AGA/AGG tie (0.21 each) while the memory-built table broke
   the tie toward AGA (12.2 vs 12.0 per-thousand). Immaterial to optimization;
   memory-built tables are kept only as named legacy fallbacks.
+
