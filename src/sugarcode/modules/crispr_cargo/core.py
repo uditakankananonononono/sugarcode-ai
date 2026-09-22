@@ -106,6 +106,7 @@ def _composition(veh: str, payload: str, dose_ug: float) -> dict:
 
 # Transparent mechanistic extensions; no trained toxicity or efficacy model.
 import numpy as np
+_trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 from scipy.integrate import solve_ivp
 
 RECEPTOR_TROPISM={"liver":{"ASGPR":.9,"LDLR":.8},"t_cell":{"CD3":.8,"CD7":.7},"cns":{"AAVR":.75},"muscle":{"AAVR":.65},"lung":{"ICAM1":.6}}
@@ -131,14 +132,14 @@ def compartment_pk(vehicle,dose_ug=100,hours=96,tissue='liver'):
     trop=VEHICLES[vehicle]['tissues'].get(tissue,.1); ke=math.log(2)/VEHICLES[vehicle]['half_life_h']; kup=.03+.12*trop; kout=.04
     def rhs(t,y): return [-(ke+kup)*y[0]+kout*y[1],kup*y[0]-kout*y[1],ke*y[0]]
     t=np.linspace(0,hours,97); sol=solve_ivp(rhs,(0,hours),[dose_ug/3,0,0],t_eval=t,rtol=1e-8,atol=1e-10)
-    return {"time_h":t.tolist(),"plasma_ug_l":sol.y[0].tolist(),"target_ug_l":sol.y[1].tolist(),"cleared_ug_l":sol.y[2].tolist(),"target_auc":float(np.trapz(sol.y[1],t)),"mass_balance_error":float(np.max(abs(sol.y.sum(0)-dose_ug/3)))}
+    return {"time_h":t.tolist(),"plasma_ug_l":sol.y[0].tolist(),"target_ug_l":sol.y[1].tolist(),"cleared_ug_l":sol.y[2].tolist(),"target_auc":float(_trapz(sol.y[1],t)),"mass_balance_error":float(np.max(abs(sol.y.sum(0)-dose_ug/3)))}
 
 def immune_risk(vehicle,cpg_fraction=0,rna_uridine_fraction=.25,preexisting_antibody=.1):
     if min(cpg_fraction,rna_uridine_fraction,preexisting_antibody)<0: raise ValueError('risk inputs must be nonnegative')
     viral=1 if vehicle.startswith('AAV') else 0; innate=min(1,.5*cpg_fraction+.4*rna_uridine_fraction+.2*VEHICLES[vehicle]['immunogenicity']); adaptive=min(1,viral*(.55*preexisting_antibody+.45*VEHICLES[vehicle]['immunogenicity'])); return {"innate_activation":innate,"adaptive_risk":adaptive,"complement_risk":min(1,.15+VEHICLES[vehicle]['immunogenicity']*.5),"overall":max(innate,adaptive),"status":"relative mechanistic risk, not clinical prediction"}
 
 def expression_kinetics(payload,vehicle,hours=168):
-    arch=payload_architecture(payload); hl=24 if vehicle=='LNP' else 240; t=np.linspace(0,hours,85); active=(1-np.exp(-t/8))*np.exp(-math.log(2)*t/hl); off_target_burden=np.trapz(active,t)*(1+.08*arch['nls_count']); return {"time_h":t.tolist(),"relative_activity":active.tolist(),"active_auc":float(np.trapz(active,t)),"off_target_exposure_proxy":float(off_target_burden)}
+    arch=payload_architecture(payload); hl=24 if vehicle=='LNP' else 240; t=np.linspace(0,hours,85); active=(1-np.exp(-t/8))*np.exp(-math.log(2)*t/hl); off_target_burden=_trapz(active,t)*(1+.08*arch['nls_count']); return {"time_h":t.tolist(),"relative_activity":active.tolist(),"active_auc":float(_trapz(active,t)),"off_target_exposure_proxy":float(off_target_burden)}
 
 def optimize_delivery(payload,tissue,receptor_expression=None,repeat_dosing=False):
     base=recommend_vehicle(payload,tissue,repeat_dosing); ranked=[]

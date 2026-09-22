@@ -1,4 +1,6 @@
 from __future__ import annotations
+import numpy as _np
+_trapz = getattr(_np, "trapezoid", None) or _np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 import math
 from ..crispr_cargo.core import VEHICLES, pk_model
 
@@ -90,6 +92,7 @@ def simulate_delivery(tissue: str, vector: str, route: str, dose_vg_per_kg: floa
                       *, hours: float=168, sample_hours: float=6) -> dict:
     """Solve plasma, tissue, intracellular, and expression ODE compartments."""
     import numpy as np
+    _trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
     from scipy.integrate import solve_ivp
     validate_program(tissue,1,route,dose_vg_per_kg)
     if vector not in VEHICLES or not vector.startswith("AAV"): raise ValueError("vector must be a supported AAV capsid")
@@ -119,11 +122,11 @@ def enhancement_features(ranking: dict, delivery: dict) -> dict:
     "expression_range":float(np.ptp(exp)),"immune_risk_minimum":float(immune.min()),"immune_risk_maximum":float(immune.max()),"immune_risk_range":float(np.ptp(immune)),"cargo_margin_minimum_kb":float(margins.min()),
     "cargo_margin_maximum_kb":float(margins.max()),"capsid_count":len({x["vector"] for x in rows}),"promoter_count":len({x["promoter"] for x in rows}),"pairs_above_half_score":int(np.sum(score>.5)),"pairs_below_quarter_immune_risk":int(np.sum(immune<.25)),
     "simulation_timepoint_count":len(traj),"simulation_duration_hours":float(times[-1]),"dose_vg_per_kg":delivery["dose_vg_per_kg"],"initial_plasma_vg_per_kg":float(plasma[0]),"terminal_plasma_vg_per_kg":float(plasma[-1]),
-    "plasma_fraction_remaining":float(plasma[-1]/max(plasma[0],1)),"peak_tissue_vg_per_kg":float(tissue.max()),"peak_tissue_hour":float(times[tissue.argmax()]),"terminal_tissue_vg_per_kg":float(tissue[-1]),"tissue_auc":float(np.trapz(tissue,times)),
-    "peak_intracellular_vg_per_kg":float(intracellular.max()),"peak_intracellular_hour":float(times[intracellular.argmax()]),"terminal_intracellular_vg_per_kg":float(intracellular[-1]),"intracellular_auc":float(np.trapz(intracellular,times)),
-    "peak_expression":float(expression.max()),"peak_expression_hour":float(times[expression.argmax()]),"terminal_expression":float(expression[-1]),"expression_auc":float(np.trapz(expression,times)),"expression_fraction_at_terminal":float(expression[-1]/max(expression.max(),1e-30)),
+    "plasma_fraction_remaining":float(plasma[-1]/max(plasma[0],1)),"peak_tissue_vg_per_kg":float(tissue.max()),"peak_tissue_hour":float(times[tissue.argmax()]),"terminal_tissue_vg_per_kg":float(tissue[-1]),"tissue_auc":float(_trapz(tissue,times)),
+    "peak_intracellular_vg_per_kg":float(intracellular.max()),"peak_intracellular_hour":float(times[intracellular.argmax()]),"terminal_intracellular_vg_per_kg":float(intracellular[-1]),"intracellular_auc":float(_trapz(intracellular,times)),
+    "peak_expression":float(expression.max()),"peak_expression_hour":float(times[expression.argmax()]),"terminal_expression":float(expression[-1]),"expression_auc":float(_trapz(expression,times)),"expression_fraction_at_terminal":float(expression[-1]/max(expression.max(),1e-30)),
     "tissue_to_plasma_terminal_ratio":float(tissue[-1]/max(plasma[-1],1e-30)),"intracellular_to_tissue_terminal_ratio":float(intracellular[-1]/max(tissue[-1],1e-30)),"expression_onset_hour":float(times[np.argmax(expression>expression.max()*.1)]),
-    "expression_above_half_peak_hours":float(np.trapz((expression>=expression.max()*.5).astype(float),times)),"plasma_half_life_observed_hour":float(times[np.argmax(plasma<=plasma[0]/2)]) if np.any(plasma<=plasma[0]/2) else float(times[-1]),
+    "expression_above_half_peak_hours":float(_trapz((expression>=expression.max()*.5).astype(float),times)),"plasma_half_life_observed_hour":float(times[np.argmax(plasma<=plasma[0]/2)]) if np.any(plasma<=plasma[0]/2) else float(times[-1]),
     "mass_balance_terminal_fraction":float((plasma[-1]+tissue[-1]+intracellular[-1])/max(plasma[0],1)),"solver_evaluations":delivery["solver"]["nfev"],"program_delivery_alignment":float(sel["tropism"]*sel["route_access"]*(1-sel["immune_risk"]))}
     assert len(out)==53
     return out

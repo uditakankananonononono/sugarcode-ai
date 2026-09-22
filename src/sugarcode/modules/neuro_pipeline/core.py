@@ -89,7 +89,7 @@ def activation_trace(model: MLP, x: np.ndarray) -> dict:
         "input_norm": round(float(np.linalg.norm(x)), 3),
         "hidden_mean_abs": round(float(np.mean(np.abs(h))), 3),
         "hidden_active_fraction": round(float(np.mean(np.abs(h) > 0.5)), 3),
-        "output": [round(float(v), 3) for v in np.atleast_1d(y)],
+        "output": [round(float(v), 3) for v in np.atleast_1d(y).ravel()],
         "note": "per-layer activation magnitudes - spike-train analogue of inference",
     }
 

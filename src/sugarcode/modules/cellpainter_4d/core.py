@@ -1,4 +1,6 @@
 from __future__ import annotations
+import numpy as _np
+_trapz = getattr(_np, "trapezoid", None) or _np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 import math
 
 EVENTS = {
@@ -85,6 +87,7 @@ def simulate_population_4d(process: str, initial_state: dict, *, duration_h: flo
                            heterogeneity: float=.08, seed: int=42) -> dict:
     """Solve population morphology dynamics with an ODE and exact stochastic cells."""
     import numpy as np
+    _trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
     from scipy.integrate import solve_ivp
     if process not in EVENTS: raise ValueError(f"process must be one of {sorted(EVENTS)}")
     s=validate_morphology_state(initial_state)
@@ -137,11 +140,11 @@ def enhancement_features(simulation: dict) -> dict:
     f=simulation["frames"]; t=np.asarray([x["time_h"] for x in f]); a=np.asarray([x["area_um2"] for x in f]); c=np.asarray([x["circularity"] for x in f]); r=np.asarray([x["aspect_ratio"] for x in f]); i=np.asarray([x["intensity"] for x in f]); n=np.asarray([x["cell_count"] for x in f]); acv=np.asarray([x["area_cv"] for x in f]); scv=np.asarray([x["shape_cv"] for x in f])
     def slope(x): return float(np.polyfit(t,x,1)[0]) if len(t)>1 else 0.
     out={"duration_h":float(t[-1]-t[0]),"frame_count":len(f),"sample_interval_min_h":float(np.diff(t).min()),"sample_interval_max_h":float(np.diff(t).max()),
-    "initial_area_um2":float(a[0]),"terminal_area_um2":float(a[-1]),"area_absolute_change_um2":float(a[-1]-a[0]),"area_fold_change":float(a[-1]/a[0]),"area_slope_per_h":slope(a),"area_auc":float(np.trapz(a,t)),"area_peak_um2":float(a.max()),"area_peak_hour":float(t[a.argmax()]),
-    "initial_circularity":float(c[0]),"terminal_circularity":float(c[-1]),"circularity_absolute_change":float(c[-1]-c[0]),"circularity_slope_per_h":slope(c),"circularity_auc":float(np.trapz(c,t)),"circularity_minimum":float(c.min()),"circularity_minimum_hour":float(t[c.argmin()]),
-    "initial_aspect_ratio":float(r[0]),"terminal_aspect_ratio":float(r[-1]),"aspect_ratio_absolute_change":float(r[-1]-r[0]),"aspect_ratio_fold_change":float(r[-1]/r[0]),"aspect_ratio_slope_per_h":slope(r),"aspect_ratio_auc":float(np.trapz(r,t)),"aspect_ratio_peak":float(r.max()),"aspect_ratio_peak_hour":float(t[r.argmax()]),
-    "initial_intensity":float(i[0]),"terminal_intensity":float(i[-1]),"intensity_absolute_change":float(i[-1]-i[0]),"intensity_fold_change":float(i[-1]/max(i[0],1e-12)),"intensity_slope_per_h":slope(i),"intensity_auc":float(np.trapz(i,t)),"intensity_peak":float(i.max()),"intensity_peak_hour":float(t[i.argmax()]),
-    "initial_cell_count":int(n[0]),"terminal_cell_count":int(n[-1]),"cell_count_absolute_change":int(n[-1]-n[0]),"cell_count_fold_change":float(n[-1]/n[0]),"cell_count_slope_per_h":slope(n),"cell_count_auc":float(np.trapz(n,t)),"cell_count_peak":int(n.max()),"cell_count_peak_hour":float(t[n.argmax()]),
+    "initial_area_um2":float(a[0]),"terminal_area_um2":float(a[-1]),"area_absolute_change_um2":float(a[-1]-a[0]),"area_fold_change":float(a[-1]/a[0]),"area_slope_per_h":slope(a),"area_auc":float(_trapz(a,t)),"area_peak_um2":float(a.max()),"area_peak_hour":float(t[a.argmax()]),
+    "initial_circularity":float(c[0]),"terminal_circularity":float(c[-1]),"circularity_absolute_change":float(c[-1]-c[0]),"circularity_slope_per_h":slope(c),"circularity_auc":float(_trapz(c,t)),"circularity_minimum":float(c.min()),"circularity_minimum_hour":float(t[c.argmin()]),
+    "initial_aspect_ratio":float(r[0]),"terminal_aspect_ratio":float(r[-1]),"aspect_ratio_absolute_change":float(r[-1]-r[0]),"aspect_ratio_fold_change":float(r[-1]/r[0]),"aspect_ratio_slope_per_h":slope(r),"aspect_ratio_auc":float(_trapz(r,t)),"aspect_ratio_peak":float(r.max()),"aspect_ratio_peak_hour":float(t[r.argmax()]),
+    "initial_intensity":float(i[0]),"terminal_intensity":float(i[-1]),"intensity_absolute_change":float(i[-1]-i[0]),"intensity_fold_change":float(i[-1]/max(i[0],1e-12)),"intensity_slope_per_h":slope(i),"intensity_auc":float(_trapz(i,t)),"intensity_peak":float(i.max()),"intensity_peak_hour":float(t[i.argmax()]),
+    "initial_cell_count":int(n[0]),"terminal_cell_count":int(n[-1]),"cell_count_absolute_change":int(n[-1]-n[0]),"cell_count_fold_change":float(n[-1]/n[0]),"cell_count_slope_per_h":slope(n),"cell_count_auc":float(_trapz(n,t)),"cell_count_peak":int(n.max()),"cell_count_peak_hour":float(t[n.argmax()]),
     "initial_area_cv":float(acv[0]),"terminal_area_cv":float(acv[-1]),"area_cv_change":float(acv[-1]-acv[0]),"initial_shape_cv":float(scv[0]),"terminal_shape_cv":float(scv[-1]),"shape_cv_change":float(scv[-1]-scv[0]),
     "morphology_drift_norm":float(np.linalg.norm([(a[-1]-a[0])/a[0],c[-1]-c[0],(r[-1]-r[0])/r[0],(i[-1]-i[0])/max(i[0],1e-12)])),"solver_evaluations":simulation["solver"]["nfev"],"event_phase_count":len({x["phase"] for x in f})}
     assert len(out)==52

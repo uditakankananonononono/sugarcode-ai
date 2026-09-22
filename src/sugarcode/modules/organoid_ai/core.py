@@ -1,4 +1,6 @@
 from __future__ import annotations
+import numpy as _np
+_trapz = getattr(_np, "trapezoid", None) or _np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 import math
 
 ORGANOID_RECIPES = {
@@ -81,6 +83,7 @@ def drug_response(tissue: str, compounds: list[str], mutations: list[str] | None
 def optimize_growth_conditions(tissue: str, observations: list[dict] | None = None) -> dict:
     """Fit growth rate and carrying capacity to patient-derived count observations."""
     import numpy as np
+    _trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
     from scipy.optimize import least_squares
     key=tissue.lower()
     if key not in ORGANOID_RECIPES: raise KeyError(f"unknown tissue {tissue!r}")
@@ -173,8 +176,8 @@ def enhancement_features(tissue: str, trajectory: list[dict], spatial: dict | No
     "tissue":tissue,"timepoint_count":len(t),"simulation_duration_days":float(t[-1]-t[0]),"initial_live_cells":float(live[0]),"final_live_cells":float(live[-1]),
     "absolute_live_cell_gain":float(live[-1]-live[0]),"fold_expansion":float(live[-1]/max(live[0],1)),"peak_live_cells":float(live.max()),"peak_live_day":float(t[live.argmax()]),
     "terminal_growth_rate":float(growth[-1]),"max_growth_rate":float(growth.max()),"growth_rate_sign_changes":int(np.sum(np.diff(np.sign(growth))!=0)),
-    "doubling_time_terminal":float(math.log(2)/growth[-1]) if growth[-1]>0 else 0.,"area_under_live_curve":float(np.trapz(live,t)),"terminal_dead_cells":float(dead[-1]),
-    "peak_dead_cells":float(dead.max()),"terminal_viability":float(live[-1]/max(live[-1]+dead[-1],1)),"cumulative_death_proxy":float(np.trapz(dead,t)),
+    "doubling_time_terminal":float(math.log(2)/growth[-1]) if growth[-1]>0 else 0.,"area_under_live_curve":float(_trapz(live,t)),"terminal_dead_cells":float(dead[-1]),
+    "peak_dead_cells":float(dead.max()),"terminal_viability":float(live[-1]/max(live[-1]+dead[-1],1)),"cumulative_death_proxy":float(_trapz(dead,t)),
     "initial_diameter_um":float(diam[0]),"terminal_diameter_um":float(diam[-1]),"diameter_gain_um":float(diam[-1]-diam[0]),"peak_diameter_um":float(diam.max()),
     "necrotic_core_risk":bool(diam.max()>500),"terminal_nutrient_fraction":float(nutrient[-1]),"minimum_nutrient_fraction":float(nutrient.min()),
     "nutrient_depletion":float(nutrient[0]-nutrient[-1]),"nutrient_below_half_timepoints":int(np.sum(nutrient<.5)),"confluence_proxy":float(min(1,live[-1]/5e6)),
