@@ -58,3 +58,15 @@ def design_lysin(gram_type: str = "gram+", domains: list[str] | None = None) -> 
         "validation": ["turbidity reduction assay", "MIC against clinical isolates panel",
                        "biofilm disruption (crystal violet)"],
     }
+
+import math
+
+def adsorption_kinetics(phage,bacteria,k_ads,time_min=60):
+ bound=phage*bacteria/(bacteria+1/k_ads); remaining=phage-bound; return {'bound':bound,'free':remaining,'adsorbed_fraction':bound/phage,'time_min':time_min}
+def host_range(receptor_profile,design):
+ scores={strain:sum(float(expr.get(design['target_receptor'],0))*design['predicted_adsorption_rate'] for _ in [0]) for strain,expr in receptor_profile.items()}; return {'strain_scores':scores,'predicted_hosts':[s for s,v in scores.items() if v>.3]}
+def escape_probability(mutation_rate,target_sites,population): return {'escape_probability':1-math.exp(-mutation_rate*target_sites*population),'expected_escape_variants':mutation_rate*target_sites*population}
+def cocktail_design(phages,strains):
+ cover={s:[p['target_receptor'] for p in phages if s in p.get('predicted_hosts',[])] for s in strains}; return {'coverage':cover,'covered_fraction':sum(bool(v) for v in cover.values())/max(1,len(strains)),'redundant_hosts':[s for s,v in cover.items() if len(v)>1]}
+def phage_report(receptor,profiles):
+ d=design_fiber(receptor); hr=host_range(profiles,d); return {**d,'host_range':hr,'escape':escape_probability(1e-8,1,1e8),'model_status':'Curated binder/kinetic heuristics; no trained host-range or clinical efficacy model. Engineering text is non-procedural concept only.'}
