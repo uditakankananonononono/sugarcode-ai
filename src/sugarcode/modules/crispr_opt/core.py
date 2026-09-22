@@ -300,3 +300,57 @@ def score_off_targets_cfd_fasta(guide: str, fasta_path: str,
             "high_risk": [h for h in hits if h["risk"] == "high"],
             "model": "cfd_doench2016 (published)",
             "note": "streaming scan - memory constant in file size"}
+
+# Transparent sequence/biophysical context models. No trained deep model is
+# bundled, and predictions are not clinically validated.
+import json
+import numpy as np
+NUCLEASES={"SpCas9":{"pam":"NGG","guide_length":20},"SaCas9":{"pam":"NNGRRT","guide_length":21},"Cas12a":{"pam":"TTTV","guide_length":23},"Cas9-NG":{"pam":"NG","guide_length":20}}
+
+def mismatch_profile(guide,target):
+    g=clean_dna(guide); t=clean_dna(target)
+    if len(g)!=len(t): raise ValueError("guide and target lengths must match")
+    positions=[i+1 for i,(a,b) in enumerate(zip(g,t)) if a!=b]; weights=[.35 if i>len(g)-12 else .13 for i in positions]; binding=float(np.prod([1-w for w in weights]))
+    return {"mismatch_positions":positions,"mismatch_count":len(positions),"pam_proximal_mismatches":sum(i>len(g)-12 for i in positions),"binding_probability":binding}
+
+def bulge_alignment(guide,target,max_bulge=1):
+    g=clean_dna(guide); t=clean_dna(target); best={"identity":0,"bulge":None}
+    for deletion in range(-max_bulge,max_bulge+1):
+        if deletion==0: pairs=zip(g,t)
+        elif deletion>0: pairs=zip(g[deletion:],t)
+        else: pairs=zip(g,t[-deletion:])
+        pairs=list(pairs); identity=sum(a==b for a,b in pairs)/max(1,len(pairs))
+        if identity>best['identity']: best={"identity":identity,"bulge":deletion}
+    return best
+
+def hybrid_thermodynamics(guide,target):
+    profile=mismatch_profile(guide,target); gc=gc_content(guide); dg=-1.5*len(guide)*(1+.4*gc)+2.2*profile['mismatch_count']+1.5*profile['pam_proximal_mismatches']; return {"delta_g_kcal_mol":dg,"binding_probability":profile['binding_probability']*math.exp(-max(0,dg+35)/8),"mismatch_profile":profile}
+
+def chromatin_adjustment(base_score,atac=.5,dnase=.5,h3k27ac=.5,h3k4me3=.5,methylation=.5,nucleosome=.5):
+    for v in (atac,dnase,h3k27ac,h3k4me3,methylation,nucleosome):
+        if not 0<=v<=1: raise ValueError("chromatin tracks must be in [0,1]")
+    accessibility=.3*atac+.2*dnase+.2*h3k27ac+.15*h3k4me3+.1*(1-methylation)+.05*(1-nucleosome); return {"base_score":base_score,"accessibility":accessibility,"context_score":base_score*(.35+.65*accessibility)}
+
+def binding_kinetics(guide,target,cas_concentration=1):
+    thermo=hybrid_thermodynamics(guide,target); on_rate=cas_concentration*1e6*thermo['binding_probability']; off_rate=math.exp((thermo['delta_g_kcal_mol']+40)/8)*.01; cleavage=on_rate/(on_rate+off_rate+1); return {"on_rate":on_rate,"off_rate":off_rate,"cleavage_probability":cleavage,"residence_time":1/max(off_rate,1e-12)}
+
+def functional_offtarget_risk(hit,annotations=None):
+    annotations=annotations or {}; consequence=1.0 if annotations.get('coding') else .8 if annotations.get('enhancer') else .5; essential=1+.5*float(annotations.get('essential_gene_proximity',False)); score=float(hit.get('cfd_score',hit.get('binding_probability',0)))*consequence*essential; return {"sequence_risk":float(hit.get('cfd_score',0)),"functional_weight":consequence*essential,"functional_risk":score}
+
+def base_editor_window(guide,target_base='C',window=(4,8),activity_profile=None):
+    g=clean_dna(guide); start,end=window
+    if not 1<=start<=end<=len(g): raise ValueError("invalid 1-based editing window")
+    profile=activity_profile or [math.exp(-((i-(start+end)/2)/2)**2) for i in range(1,len(g)+1)]; sites=[{"position":i,"base":b,"activity":profile[i-1]} for i,b in enumerate(g,1) if start<=i<=end and b==target_base]; return {"target_base":target_base,"window":list(window),"sites":sites,"bystander_count":max(0,len(sites)-1),"total_activity":sum(x['activity'] for x in sites)}
+
+def prime_editor_architecture(spacer,pbs,rt_template,mmr_activity=.7):
+    g=clean_dna(spacer); p=clean_dna(pbs); r=clean_dna(rt_template); tm=2*(p.count('A')+p.count('T'))+4*(p.count('G')+p.count('C')); structure=_hairpin_score(g+p+r); process=.96**len(r)*math.exp(-.2*abs(gc_content(r)-.5)); flap=1-math.exp(-len(r)/10); efficiency=(1/(1+math.exp(-(tm-30)/4)))*process*flap*(1-.4*structure); return {"pbs_tm_c":tm,"structure_penalty":structure,"rt_processivity":process,"flap_resolution":flap,"mmr_retention":1-.5*mmr_activity,"efficiency":efficiency}
+
+def design_report(seq,pam='NGG',background=None,tracks=None,top_n=5):
+    design=design_guides(seq,pam,background,top_n,tracks); guides=[]
+    for g in design['guides']:
+        context=chromatin_adjustment(g['on_target'],**(tracks[0].get('values',{}) if tracks and tracks[0].get('values') else {})); guides.append({**g,"chromatin":context,"context_efficiency":context['context_score'],"validation":{"assay":"amplicon sequencing","off_target_assay":"GUIDE-seq or orthogonal equivalent"}})
+    return {**design,"guides":guides,"model_status":"Published CFD/RS1 plus transparent biophysical surrogates; no trained deep model and not clinically validated.","exports":{"json":json.dumps(guides,sort_keys=True),"bed":[f"target\t{g['start']}\t{g['end']}\t{g['guide']}\t{g['composite']}\t{g['strand']}" for g in guides]}}
+
+def guide_diagnostics(guide,target=None,chromatin=None):
+    g=clean_dna(guide); target=clean_dna(target or guide); mm=mismatch_profile(g,target); thermo=hybrid_thermodynamics(g,target); kinetics=binding_kinetics(g,target); context=chromatin_adjustment(score_on_target(g),**(chromatin or {})); base=base_editor_window(g); prime=prime_editor_architecture(g,g[:13],g[:15]); d={"gc":gc_content(g),"on_target":score_on_target(g),"hairpin":_hairpin_score(g),"mismatch_count":float(mm['mismatch_count']),"seed_mismatch_count":float(mm['pam_proximal_mismatches']),"binding_probability":mm['binding_probability'],"hybrid_delta_g":thermo['delta_g_kcal_mol'],"thermo_binding_probability":thermo['binding_probability'],"on_rate":kinetics['on_rate'],"off_rate":kinetics['off_rate'],"cleavage_probability":kinetics['cleavage_probability'],"residence_time":kinetics['residence_time'],"accessibility":context['accessibility'],"context_efficiency":context['context_score'],"base_edit_site_count":float(len(base['sites'])),"base_edit_bystander_count":float(base['bystander_count']),"base_edit_activity":base['total_activity'],"prime_pbs_tm":prime['pbs_tm_c'],"prime_structure_penalty":prime['structure_penalty'],"prime_processivity":prime['rt_processivity'],"prime_flap_resolution":prime['flap_resolution'],"prime_mmr_retention":prime['mmr_retention'],"prime_efficiency":prime['efficiency'],"poly_t":float('TTTT' in g),"seed_gc":gc_content(g[-12:]),"distal_gc":gc_content(g[:-12])}
+    return d
