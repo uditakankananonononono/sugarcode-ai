@@ -235,8 +235,8 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
     # delta on the gene's real RefSeqGene junction map; deep-intronic ->
     # cryptic_scan; AT-AC sites named out-of-scope; weak perturbations add
     # ZERO (BRCA1-validated non-discriminating). Weights are calibrated
-    # against the 17-gene golden: 1,802/1,802 canonical U2 sites called
-    # loss, benign specificity 62/63.
+    # against the 28-gene golden: 2,405/2,405 canonical U2 sites called
+    # loss, benign specificity 85/86.
     import re as _re
     clean = variant.split(":")[-1].replace(" ", "")
     if _re.fullmatch(r"c\.\d+[+-]\d+[ACGT]>[ACGT]", clean):
@@ -255,8 +255,8 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
                     r["evidence"].append({
                         "rule": "SPLICE_PWM_LOSS", "weight": w,
                         "detail": (f"predicted loss of natural {sa['site_type']} site "
-                                   f"(delta {d:+.2f} on the RefSeqGene map; 17-gene golden: "
-                                   "100% of 1,802 canonical U2 sites called loss)")})
+                                   f"(delta {d:+.2f} on the RefSeqGene map; 28-gene golden: "
+                                   "100% of 2,405 canonical U2 sites called loss)")})
                 elif d <= -0.05:
                     r["evidence"].append({
                         "rule": "SPLICE_PWM_WEAKENED", "weight": 0.1,

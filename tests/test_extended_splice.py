@@ -1,6 +1,6 @@
 """Extended splice goldens - 10 more genes + AT-AC site-class detection
 (drop 26). Fixtures: ClinVar live pulls (2026-09-22) on title-verified
-RefSeqGene records. Pooled across all 17 genes: 2,050 pathogenic + 63
+RefSeqGene records. Pooled across all 17 genes: 2,059 pathogenic + 63
 benign; 1,802/1,802 canonical U2 (GT/GC-AG) sites called loss (100%); 8
 canonical AT-AC (U12 minor-spliceosome) sites detected and labeled
 out-of-scope instead of silently mis-scored.

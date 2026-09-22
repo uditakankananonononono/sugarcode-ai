@@ -23,7 +23,7 @@ def test_natural_site_loss_evidence(monkeypatch):
                          "consequence": "loss", "source": "fixture"})
     r = oc.interpret_variant_live("BRCA1", "c.212+1G>A")
     ev = next(e for e in r["evidence"] if e["rule"] == "SPLICE_PWM_LOSS")
-    assert ev["weight"] == 0.4 and "1,802" in ev["detail"]
+    assert ev["weight"] == 0.4 and "2,405" in ev["detail"]
     assert r["splice_assessment"]["status"] == "natural_site"
     assert r["clinvar_live"]["status"].startswith("no live ClinVar")
 

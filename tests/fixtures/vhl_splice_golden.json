@@ -1,0 +1,223 @@
+{
+ "source": "ClinVar live query 2026-09-22 + RefSeqGene NG_008212.3 windows (NM_000551.3 CDS numbering; ClinVar transcript NM_000551 via TX_OVERRIDE)",
+ "pathogenic": [
+  {
+   "notation": "c.341-2A>C",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 12,
+   "ref_score": 0.7765,
+   "alt_score": 0.5927,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.340+2T>G",
+   "site_type": "donor",
+   "window": "GAGGTACGG",
+   "index": 4,
+   "ref_score": 0.8804,
+   "alt_score": 0.6265,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.464-2A>C",
+   "site_type": "acceptor",
+   "window": "TTTTGCCCTTCCAGT",
+   "index": 12,
+   "ref_score": 0.8653,
+   "alt_score": 0.6815,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.341-1G>T",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 13,
+   "ref_score": 0.7765,
+   "alt_score": 0.5927,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.341-2A>T",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 12,
+   "ref_score": 0.7765,
+   "alt_score": 0.5927,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.463+1G>T",
+   "site_type": "donor",
+   "window": "CAGGTACTG",
+   "index": 3,
+   "ref_score": 0.8238,
+   "alt_score": 0.5699,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.341-1G>A",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 13,
+   "ref_score": 0.7765,
+   "alt_score": 0.5927,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.463+2T>C",
+   "site_type": "donor",
+   "window": "CAGGTACTG",
+   "index": 4,
+   "ref_score": 0.8238,
+   "alt_score": 0.5699,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.463+1G>A",
+   "site_type": "donor",
+   "window": "CAGGTACTG",
+   "index": 3,
+   "ref_score": 0.8238,
+   "alt_score": 0.5699,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "reviewed by expert panel",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.464-2A>G",
+   "site_type": "acceptor",
+   "window": "TTTTGCCCTTCCAGT",
+   "index": 12,
+   "ref_score": 0.8653,
+   "alt_score": 0.6815,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.464-1G>T",
+   "site_type": "acceptor",
+   "window": "TTTTGCCCTTCCAGT",
+   "index": 13,
+   "ref_score": 0.8653,
+   "alt_score": 0.6815,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.464-1G>C",
+   "site_type": "acceptor",
+   "window": "TTTTGCCCTTCCAGT",
+   "index": 13,
+   "ref_score": 0.8653,
+   "alt_score": 0.6815,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, single submitter",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.341-2A>G",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 12,
+   "ref_score": 0.7765,
+   "alt_score": 0.5927,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "reviewed by expert panel",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.340+1G>A",
+   "site_type": "donor",
+   "window": "GAGGTACGG",
+   "index": 3,
+   "ref_score": 0.8804,
+   "alt_score": 0.6265,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.340+1G>C",
+   "site_type": "donor",
+   "window": "GAGGTACGG",
+   "index": 3,
+   "ref_score": 0.8804,
+   "alt_score": 0.6265,
+   "delta": -0.2539,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  },
+  {
+   "notation": "c.464-1G>A",
+   "site_type": "acceptor",
+   "window": "TTTTGCCCTTCCAGT",
+   "index": 13,
+   "ref_score": 0.8653,
+   "alt_score": 0.6815,
+   "delta": -0.1838,
+   "sig": "pathogenic",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "likely loss of natural site - exon skipping or intron retention risk"
+  }
+ ],
+ "benign": [
+  {
+   "notation": "c.341-6C>T",
+   "site_type": "acceptor",
+   "window": "GCTTGTCCCGATAGG",
+   "index": 8,
+   "ref_score": 0.7765,
+   "alt_score": 0.7935,
+   "delta": 0.017,
+   "sig": "benign",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "minimal predicted effect on splicing"
+  },
+  {
+   "notation": "c.340+5G>C",
+   "site_type": "donor",
+   "window": "GAGGTACGG",
+   "index": 7,
+   "ref_score": 0.8804,
+   "alt_score": 0.7923,
+   "delta": -0.0881,
+   "sig": "benign",
+   "review": "criteria provided, multiple submitters, no conflicts",
+   "consequence": "weakened site - increased leaky/cryptic splicing risk"
+  }
+ ]
+}

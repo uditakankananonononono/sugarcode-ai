@@ -1,4 +1,4 @@
-"""Pooled splice-golden statistics across ALL fixture genes (17 as of drop 26),
+"""Pooled splice-golden statistics across ALL fixture genes (28 as of drop 29),
 split by site class. Reproducibility entry for the README/STATUS numbers:
 reads only the hermetic fixtures, no network.
 """
