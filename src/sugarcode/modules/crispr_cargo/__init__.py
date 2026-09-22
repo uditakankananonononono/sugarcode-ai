@@ -1,3 +1,4 @@
-"""CRISPR Cargo: delivery-vehicle selection + pharmacokinetic modeling."""
-from .core import recommend_vehicle, pk_model, delivery_blueprint
-__all__ = ["recommend_vehicle", "pk_model", "delivery_blueprint"]
+"""CRISPR Cargo delivery intelligence."""
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)] + ['VEHICLES','PAYLOADS','RECEPTOR_TROPISM']
