@@ -14,6 +14,9 @@ FIX = sorted(Path("tests/fixtures").glob("*_splice_golden.json"))
 # are already in the main fixtures; these are the 8 NEW family cases)
 FIX += sorted(Path("tests/fixtures").glob("*_u12_golden.json"))
 FIX += sorted(Path("tests/fixtures").glob("*_u12_gtag_golden.json"))  # PTEN (drop 31)
+# drop 41: GC-AG donor golden (cases-format; VUS cases carried but counted
+# in NEITHER pathogenic nor benign - specificity side has zero benign data)
+FIX += sorted(Path("tests/fixtures").glob("gc_donor_golden.json"))
 
 
 def k_of(case):
@@ -21,49 +24,54 @@ def k_of(case):
 
 
 def main():
-    tot = {"path": 0, "ben": 0}
-    canon_u2 = canon_u2_loss = canon_atac = 0
-    atac_cases = []
-    ben_tp = ben_n = 0
+    # Collect every case into (gene, notation)-keyed maps FIRST, so overlaps
+    # between fixtures (drop-31 PTEN trio, drop-41 GC-donor cases also sitting
+    # in the main BRCA2/ATM/PALB2 goldens) count ONCE in the pooled headline.
+    # Genes are lowercased - the gc fixture carries real gene names while the
+    # main fixtures key by filename.
+    path_cases, ben_cases = {}, {}
     per_gene = {}
     for f in FIX:
         gene = f.name.replace("_splice_golden.json", "")
         d = json.loads(f.read_text())
-        if "cases" in d:  # U12 golden format (drop 31/35): sig-tagged cases
+        if "cases" in d:  # sig-tagged cases format (U12 goldens, GC golden)
             pc = [c for c in d["cases"] if c["sig"] == "pathogenic"]
             bc = [c for c in d["cases"] if c["sig"] == "benign"]
-            gene = f.name.split("_u12")[0] + ("_scn" if "scn_atac" in f.name else "")
+            if "_u12" in f.name:
+                gene = f.name.split("_u12")[0] + ("_scn" if "scn_atac" in f.name else "")
+            elif f.name == "gc_donor_golden.json":
+                gene = "gc_donor"
+                # per-case real genes for the pooled maps
+                for c in pc:
+                    path_cases[(c["gene"].lower(), c["notation"])] = c
+                per_gene[gene] = {"pathogenic": len(pc), "benign": 0}
+                continue
         else:
             pc, bc = d["pathogenic"], d["benign"]
-        tot["path"] += len(pc); tot["ben"] += len(bc)
-        cu = cl = ca = 0
         for c in pc:
-            if k_of(c) > 2:
-                continue
-            cls = site_class(c["window"], c["site_type"])
-            if cls in ("GT", "GC", "AG"):
-                cu += 1
-                cl += c["delta"] <= -0.15
-            else:
-                ca += 1
-                atac_cases.append((gene, c["notation"], cls, c["delta"]))
-        canon_u2 += cu; canon_u2_loss += cl; canon_atac += ca
-        ben_n += len(bc)
-        ben_tp += sum(1 for c in bc if c["delta"] > -0.15)
-        per_gene[gene] = {"pathogenic": len(pc), "benign": len(bc),
-                          "canon_u2": cu, "canon_u2_loss": cl, "canon_atac": ca}
-    # drop 31 overlap: pten_u12_gtag's acceptor trio (c.80-1G>A/C, c.80-2A>C)
-    # also sits in the main pten fixture - dedupe the pooled totals by
-    # (gene, notation); per-gene rows stay as recorded
-    seen = set()
-    for f in FIX:
-        d = json.loads(f.read_text())
-        g = f.name.split("_u12")[0].replace("_splice_golden.json", "").replace("_golden.json", "")
-        rows = d.get("pathogenic", []) or [c for c in d["cases"] if c["sig"] == "pathogenic"]
-        for c in rows:
-            seen.add((g, c["notation"]))
-    print(f"genes: {len(FIX)}  pathogenic: {tot['path']}  benign: {tot['ben']}")
-    print(f"unique (gene, notation) pathogenic after dedupe: {len(seen)}")
+            path_cases[(gene.lower(), c["notation"])] = c
+        for c in bc:
+            ben_cases[(gene.lower(), c["notation"])] = c
+        per_gene[gene] = {"pathogenic": len(pc), "benign": len(bc)}
+    tot_path, tot_ben = len(path_cases), len(ben_cases)
+    canon_u2 = canon_u2_loss = canon_atac = 0
+    atac_cases = []
+    for (g, n), c in path_cases.items():
+        if k_of(c) > 2:
+            continue
+        cls = site_class(c["window"], c["site_type"])
+        if cls in ("GT", "GC", "AG"):
+            canon_u2 += 1
+            canon_u2_loss += c["delta"] <= -0.15
+        else:
+            canon_atac += 1
+            atac_cases.append((g, n, cls, c["delta"]))
+    ben_n = len(ben_cases)
+    ben_tp = sum(1 for c in ben_cases.values() if c["delta"] > -0.15)
+    print(f"fixtures: {len(FIX)}  unique pathogenic: {tot_path}  unique benign: {tot_ben}")
+    print("(pooled counts are deduped by (gene, notation) as of drop 41 -")
+    print(" the drop-31 PTEN trio and drop-41 GC-donor overlap with the main")
+    print(" fixtures counts once)")
     print(f"canonical U2 (GT/GC donor, AG acceptor): {canon_u2_loss}/{canon_u2} called loss")
     atac_loss = sum(1 for _, _, _, dl in atac_cases if dl <= -0.15)
     print(f"canonical AT-AC (U12 matrices, drop 27): {atac_loss}/{canon_atac} called loss")
@@ -71,8 +79,7 @@ def main():
         print(f"   {g} {n} class={cls} delta={dl:+.3f}")
     print(f"benign specificity: {ben_tp}/{ben_n}")
     for g, s in sorted(per_gene.items()):
-        print(f"   {g:7s} path={s['pathogenic']:4d} ben={s['benign']:3d} "
-              f"canon_u2={s['canon_u2_loss']}/{s['canon_u2']} atac={s['canon_atac']}")
+        print(f"   {g:9s} path={s['pathogenic']:4d} ben={s['benign']:3d}")
 
 if __name__ == "__main__":
     main()
