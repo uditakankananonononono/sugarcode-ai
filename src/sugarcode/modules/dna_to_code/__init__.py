@@ -1,3 +1,3 @@
-"""DNA-to-Code: biological mechanisms rendered as Python analogies."""
-from .core import translate_concept, CONCEPTS
-__all__ = ["translate_concept", "CONCEPTS"]
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and (callable(v) or k=='CONCEPTS')]

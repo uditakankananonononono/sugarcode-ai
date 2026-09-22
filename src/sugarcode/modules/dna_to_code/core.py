@@ -90,3 +90,19 @@ def translate_concept(concept: str) -> dict:
     c = CONCEPTS[key]
     return {"concept": key, "analogy": c["analogy"], "python": c["code"],
             "explanation": c["detail"]}
+
+def execute_transcription(dna):
+ s=''.join(x for x in dna.upper() if x in 'ACGT'); return s.replace('T','U')
+def execute_translation(rna):
+ from ...bio.sequence import translate
+ return translate(rna.replace('U','T'),to_stop=True)
+def execute_mutation(dna,pos,base):
+ if not 0<=pos<len(dna) or base not in 'ACGT': raise ValueError('invalid mutation')
+ before=execute_translation(dna); mutant=dna[:pos]+base+dna[pos+1:]; after=execute_translation(mutant); return {'mutant_dna':mutant,'before_protein':before,'after_protein':after,'silent':before==after,'nonsense':len(after)<len(before)}
+def analogy_limits(concept):
+ limits={'transcription':['RNA processing and chromatin are omitted'],'translation':['ribosome kinetics and folding are omitted'],'crispr':['off-target search and DNA repair outcomes are simplified'],'mutation':['cell context and regulation are omitted']}; return {'concept':concept,'limits':limits.get(concept,['analogy is educational, not a mechanistic simulator']),'status':'educational analogy'}
+def concept_report(concept,sequence=None):
+ base=translate_concept(concept); result=None
+ if sequence and base['concept']=='transcription':result=execute_transcription(sequence)
+ if sequence and base['concept']=='translation':result=execute_translation(sequence)
+ return {**base,'executable_example_result':result,'limits':analogy_limits(base['concept']),'model_status':'Deterministic educational utilities; no biological prediction model.'}
