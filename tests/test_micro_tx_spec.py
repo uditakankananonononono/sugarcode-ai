@@ -21,7 +21,9 @@ def test_spatial_glv_is_normalized_and_environment_sensitive():
 def test_host_outcomes_link_scfa_to_indication():
  e=simulate_spatial_ecology({}, {"resistant_starch":5})
  r=host_outcomes(e,"IBD")
- assert 0<=r["therapeutic_efficacy"]<=1 and r["butyrate_output"] if False else True
+ assert 0 <= r["therapeutic_efficacy"] <= 1
+ assert e["metabolite_profile"]["butyrate"] > 0
+ assert r["indication"] == "IBD"
 
 def test_optimizer_returns_exactly_50_meaningful_diagnostics():
  r=optimize_synbiotic("metabolic_syndrome",total_fiber_g=8)
