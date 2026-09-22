@@ -1,3 +1,3 @@
-"""RNA Decoder: m6A/epitranscriptomic prediction and mRNA optimization."""
-from .core import predict_m6a, modification_map, optimize_mrna
-__all__ = ["predict_m6a", "modification_map", "optimize_mrna"]
+from .core import *
+from .core import __dict__ as _d
+__all__=[k for k,v in _d.items() if not k.startswith('_') and callable(v)]
