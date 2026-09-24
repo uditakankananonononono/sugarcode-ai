@@ -18,3 +18,15 @@ def test_report_threads_temperature_porosity_and_calibrates_network_modulus():
  r=material_report('PHA','scaffold')
  assert r['network_mechanics']['porosity']==r['predicted_properties']['recommended_porosity']
  assert abs(r['network_mechanics']['youngs_modulus_mpa']-r['predicted_properties']['youngs_modulus_mpa'])<1e-6
+def test_degradation_curve_matches_reported_half_life():
+    from sugarcode.modules.bio_material.core import _degradation
+    d=_degradation('PHA','soft_tissue')
+    k=d['k_per_day']; hl=d['half_life_days']
+    import math
+    assert abs(hl-math.log(2)/k)<0.06
+    # curve value at one reported half-life must be ~50%
+    t=d['days']; r=d['mass_remaining_pct']
+    import numpy as np
+    assert abs(np.interp(hl,t,r)-50)<1.5
+    # curve equals first-order exp decay
+    for ti,ri in zip(t,r): assert abs(ri-100*math.exp(-k*ti))<0.15
