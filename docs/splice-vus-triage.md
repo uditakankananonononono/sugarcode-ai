@@ -26,3 +26,6 @@ Evidence and limits (all in mega27-01 `discovery/splice_region_vus/`):
 - The PPV comes from sensitivity and FPR at each CNN threshold (cnn_calibration.json), assuming the prior you set.
 - This is research triage only, not an ACMG classification.
 - Variants whose strand can't be inferred from a canonical GT/AG are reported as errors.
+
+## Model (v2)
+When `maxentpy` is installed, scoring uses a logistic model on PWM plus MaxEntScan features. In gene-grouped 5-fold CV on 9,235 ClinVar splice-region variants it reached AUROC 0.9674, vs 0.9635 for MaxEntScan alone and 0.9355 for the CNN (mega27-01 discovery/splice_region_vus/cv_results_me.json). Without maxentpy it falls back to the CNN.
