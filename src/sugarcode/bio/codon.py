@@ -151,12 +151,18 @@ def load_published_table(species: str) -> dict[str, float]:
 ECOLI_PUBLISHED = load_published_table("e_coli_316407")
 HUMAN_PUBLISHED = load_published_table("h_sapiens_9606")
 YEAST_PUBLISHED = load_published_table("s_cerevisiae_4932")
+# Sharp & Li-style highly-expressed reference: codon usage of 36 ribosomal-protein
+# CDS (rpl/rps/rpm) from NCBI GCF_000005845.2. On PaxDb integrated E. coli protein
+# abundance (n=3453 non-ribosomal genes) CAI Spearman rises 0.496 -> 0.580 vs the
+# genome-wide table (mega27-01 benchmarks/sweep_codon_cai.json).
+ECOLI_HIGHEXPR = load_published_table("e_coli_highexpr_ribo")
 
 # published tables become the canonical defaults; memory-built tables kept as
 # named legacy fallbacks
 ECOLI_LEGACY = ECOLI_K12
 H_SAPIENS_LEGACY = H_SAPIENS
 HOST_TABLES.update({
+    "ecoli_highexpr": ECOLI_HIGHEXPR,
     "ecoli": ECOLI_PUBLISHED, "ecoli_published": ECOLI_PUBLISHED,
     "h_sapiens_published": HUMAN_PUBLISHED, "human": HUMAN_PUBLISHED,
     "s_cerevisiae": YEAST_PUBLISHED, "yeast": YEAST_PUBLISHED,
