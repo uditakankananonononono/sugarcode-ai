@@ -1,4 +1,44 @@
 
+## acmg_bayesian model constants and fixtures (2026-09-24, branch pb6)
+
+- Source: Tavtigian SV, Greenblatt MS, Harrison SM, et al. "Modeling the ACMG/AMP
+  variant classification guidelines as a Bayesian classification framework."
+  Genet Med 2018;20:1054-1060. DOI 10.1038/gim.2017.210, PMID 29300386, free
+  author manuscript PMC6336098 (NIHMS915467). A paper, not a code repository, so
+  there is no commit to pin; the fetched full text is hash-pinned instead:
+  BioC JSON from
+  https://www.ncbi.nlm.nih.gov/research/bionlp/RESTful/pmcoa.cgi/BioC_json/PMC6336098/unicode
+  SHA-256 `6af181739e6d462e316b2489702974eca5f95990ebe25cef2baa505f0dab543d`
+  (81,882 bytes; fetched twice on 2026-09-24, identical).
+- Constants taken from that text: OP_VSt = 350; exponent X = 2 (so strong
+  350^(1/2) = 18.7, moderate 350^(1/4) = 4.3, supporting 350^(1/8) = 2.08, as
+  printed); benign categories "assigned reciprocal OP"; Prior_P = 0.10; bands
+  Pathogenic > 0.99, Likely pathogenic 0.90-0.99, Likely benign 0.001-<0.10,
+  Benign < 0.001; "OP of 81 are the exact odds required to convert a Prior_P of
+  0.10 to a Post_P of 0.90" (basis for placing 6 points = 350^0.75 at the LP
+  floor); BA1 excluded "because it is used as absolute evidence that a variant is
+  benign, irrespective of other evidence, which is contrary to Bayesian
+  reasoning" (basis for the stand-alone override). No constant was fitted or
+  invented; the orphan's BA1 odds of 1/1000 had no source and were dropped.
+- Fixtures in `tests/test_acmg_bayesian.py`: the 17 combining-rule rows of the
+  paper's Table 2 and the 4 mixed-evidence rows of Table 3, with the printed
+  combined odds and posterior (e.g. Path (ia) 6,548 / 0.999, Likely Path (ii)-(vi)
+  81 / 0.900, Benign (ii) 0.0028 / 0.00032, two strong + BS1 18.7 / 0.675).
+  Criterion codes per row follow the ACMG/AMP 2015 combining rules the rows name.
+- Recorded NCBI E-utilities responses in `tests/fixtures/acmg_ncbi_cache/`
+  (fetched live 2026-09-24, no API key; request URLs kept in the .json sidecars):
+  ClinVar esearch `BRCA1[gene] AND "c.68_69del"` -> IDs 54425, 17662; esummary of
+  both (17662 = NM_007294.4(BRCA1):c.68_69del, Pathogenic, reviewed by expert
+  panel); PubMed esearch + efetch for the orphan-style literature query.
+  Body SHA-256:
+  - esearch clinvar `c23ffa81134f2538120b0112014c70b7fb3c5e4ca1d124ecb4440e75d4d411e7`
+  - esummary clinvar `1c7a773a756708bb6ce3d61a1a687cdb2c3a850545c218b434e2fb07be3c3e54`
+  - esearch pubmed `1a07d7ce910a931f9202b6ce1a59585856d174e09252c9bb7936c8aacd00f93c`
+  - efetch pubmed `f28f16d8e490c67ea669a2117eff8f560916c14e68942397de8d541f0b9bc57f`
+- NCBI client code carried over from orphan commit b78b943 (module-local,
+  urllib only), with two fixes: ClinVar-style HGVS normalization and exact-title
+  matching (unrelated search hits are no longer summarized).
+
 ## crisprscan_score model data (2026-09-24, branch pb6)
 
 - `src/sugarcode/modules/crisprscan_score/data/coefficients.csv`: the 91

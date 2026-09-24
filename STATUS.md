@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests (**1371 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests (**1404 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -139,6 +139,22 @@ continues drop by drop in order of scientific usefulness.
   (one-based motif starts, additive intercept + features, GG required at
   positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
   note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
+- acmg_bayesian: NEW MODULE (2026-09-24, branch pb6), the fixed rebuild of the
+  unpromoted clinical_evidence_fusion orphan (entry below). Tavtigian et al. 2018
+  Bayesian ACMG/AMP classifier at src/sugarcode/modules/acmg_bayesian/,
+  registered under therapeutics (90 modules total). Exact odds 350^(1/2^k)
+  carried as integer points; bands at prior 0.10 on the point total, so all five
+  likely-pathogenic combining rules the paper prints at 0.900 are Likely
+  pathogenic; BA1 is a stand-alone Benign override outside the Bayesian math.
+  Fidelity: all 17 combining-rule rows of the paper's Table 2 and the 4
+  mixed-evidence rows of Table 3 reproduce (combined odds + posterior within one
+  unit of the printed last digit). Source text hash in PROVENANCE.md. The NCBI
+  ClinVar/PubMed client is kept as an optional context layer, never fed into the
+  score; its search was fixed to use ClinVar-style HGVS (c.68_69delAG ->
+  c.68_69del) and to summarize only records whose title carries the exact
+  variant (the orphan fell back to unrelated gene hits and reported BRCA1
+  c.68_69delAG as "Conflicting"; it now reports ClinVar 17662, Pathogenic,
+  expert panel). Offline tests use recorded live E-utilities responses.
 - CRISPR on-target Rule Set 2 (Fusi/Doench 2016, Azimuth V3): RESOLVED (2026-09-24,
   branch pb6). The published sklearn-0.17 GBRT (100 depth-3 trees, 630 features)
   was extracted from Microsoft's BSD-3-Clause pickle into framework-free JSON and
@@ -168,9 +184,9 @@ continues drop by drop in order of scientific usefulness.
   VUS; (2) it scores BA1 with an invented odds of 1/1000, while the paper
   explicitly excludes BA1 as contrary to Bayesian reasoning, so BA1 + PVS1 returns
   "Likely benign"; (3) it ships no tests or fixtures ("pytest unavailable" in its
-  own commit) and sits outside src/. Fixable (exact 350^(1/2^k) odds or
-  table-matched banding, BA1 as a stand-alone override, table-row fixtures), but
-  that is new work, not a promotion.
+  own commit) and sits outside src/. Fixed as new work, not a promotion:
+  see acmg_bayesian above (exact odds, point-total banding, BA1 stand-alone
+  override, table-row fixtures).
 
 ## Missing (labeled, not faked)
 
