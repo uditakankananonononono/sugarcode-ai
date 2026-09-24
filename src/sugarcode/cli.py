@@ -129,6 +129,49 @@ def _cmd_pwm_score(args) -> int:
     return _emit(out)
 
 
+def _cmd_models_list(args) -> int:
+    from .llm.providers import profile_status
+    return _emit(profile_status(probe=args.probe, allow_paid=args.allow_paid or None))
+
+
+def _cmd_models_check(args) -> int:
+    from .llm.providers import ProviderError, parse_route, resolve
+    names = [args.profile] if args.profile else parse_route()
+    out = []
+    for n in names:
+        try:
+            out.append(resolve(n, allow_paid=args.allow_paid or None).health())
+        except ProviderError as e:
+            out.append({"profile": n, "ok": False, "error": str(e)})
+    _emit(out)
+    return 0 if any(r.get("ok") for r in out) else 1
+
+
+def _cmd_route(args) -> int:
+    from .llm.router import route
+    from .llm.tools import tools_for_modules
+    mods = route(args.question, k=args.k)
+    return _emit({"modules": mods,
+                  "tools": [t.name for t in tools_for_modules([m["module"] for m in mods])]})
+
+
+def _cmd_tool(args) -> int:
+    from .llm.tools import call_tool, catalog
+    if args.name == "list":
+        return _emit(sorted(catalog()))
+    res = call_tool(args.name, args.arguments or "{}")
+    _emit(res)
+    return 0 if "error" not in res else 1
+
+
+def _cmd_ask(args) -> int:
+    from .llm.agent import ask
+    res = ask(args.question, profile=args.profile, route=args.route, model=args.model,
+              allow_paid=args.allow_paid or None)
+    _emit(res.to_dict())
+    return 0 if res.answer else 1
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -186,6 +229,35 @@ def main(argv: list[str] | None = None) -> int:
     v.set_defaults(func=_cmd_version)
     m = sub.add_parser("modules", help="list the 88 registered modules")
     m.set_defaults(func=_cmd_modules)
+    md = sub.add_parser("models", help="model profiles: list | check")
+    mdsub = md.add_subparsers(dest="sub", required=True)
+    ml = mdsub.add_parser("list", help="every model profile and whether it is configured")
+    ml.add_argument("--probe", action="store_true", help="also run the zero-token health probe")
+    ml.add_argument("--allow-paid", action="store_true")
+    ml.set_defaults(func=_cmd_models_list)
+    mc = mdsub.add_parser("check", help="zero-token health probe (GET /models)")
+    mc.add_argument("profile", nargs="?", default=None)
+    mc.add_argument("--allow-paid", action="store_true")
+    mc.set_defaults(func=_cmd_models_check)
+
+    r = sub.add_parser("route", help="trained router: which modules answer this question")
+    r.add_argument("question")
+    r.add_argument("-k", type=int, default=3)
+    r.set_defaults(func=_cmd_route)
+
+    t = sub.add_parser("tool", help="run one module tool: tool NAME 'JSON args' | tool list")
+    t.add_argument("name")
+    t.add_argument("arguments", nargs="?", default=None)
+    t.set_defaults(func=_cmd_tool)
+
+    k = sub.add_parser("ask", help="ask the copilot (router + module tools + chat model)")
+    k.add_argument("question")
+    k.add_argument("--profile", default=None, help="pin one model profile")
+    k.add_argument("--route", default=None, help="ordered fallback, e.g. inkling-local,ollama,inkling")
+    k.add_argument("--model", default=None)
+    k.add_argument("--allow-paid", action="store_true", help="permit hosted_paid profiles (Fugu)")
+    k.set_defaults(func=_cmd_ask)
+
     args = p.parse_args(argv)
     return args.func(args)
 
