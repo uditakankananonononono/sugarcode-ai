@@ -19,6 +19,11 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   phylo mrca FILE --leaves a,b,c
   phylo distance FILE --a X --b Y
   phylo prune FILE --drop a,b [--out F]
+  msa stats FILE                 Stockholm/A3M summary, auto-detect (drop 69)
+  msa consensus FILE [--threshold 0.5]
+  msa pid FILE --a id1 --b id2
+  msa filter FILE [--min-occupancy F] [--min-coverage F] [--out F]
+  msa a2m FILE [--out F]         strip A3M inserts -> match states
   sam filter FILE [--mapped-only --min-mapq N --rname .. --primary-only]
   sam to-bed FILE                mapped reads to BED6
   bed merge FILE [--out F]       merge overlapping intervals
@@ -457,6 +462,69 @@ def _cmd_phylo_prune(args) -> int:
 
 
 
+def _load_alignment(path):
+    """Auto-detect Stockholm (header) vs A3M and return equal-width records
+    plus the raw parse for Stockholm markup."""
+    from .bio.stockholm import parse_stockholm, parse_a3m, a3m_match_states
+    text = Path(path).read_text()
+    if text.startswith("# STOCKHOLM"):
+        aln = parse_stockholm(text)
+        return ([{"id": n, "sequence": s} for n, s in aln["seqs"]], aln)
+    return a3m_match_states(parse_a3m(text)), None
+
+
+def _cmd_msa_stats(args) -> int:
+    from .bio.stockholm import stats
+    records, _ = _load_alignment(args.file)
+    return _emit({"file": args.file, **stats(records)})
+
+
+def _cmd_msa_consensus(args) -> int:
+    from .bio.stockholm import consensus
+    records, _ = _load_alignment(args.file)
+    return _emit({"file": args.file, "threshold": args.threshold,
+                  "consensus": consensus(records, args.threshold)})
+
+
+def _cmd_msa_pid(args) -> int:
+    from .bio.stockholm import pairwise_identity
+    records, _ = _load_alignment(args.file)
+    by_id = {r["id"]: r["sequence"] for r in records}
+    if args.a not in by_id or args.b not in by_id:
+        raise SystemExit(f"unknown id: {args.a!r} or {args.b!r}")
+    return _emit({"file": args.file, "a": args.a, "b": args.b,
+                  "identity": pairwise_identity(by_id[args.a], by_id[args.b])})
+
+
+def _cmd_msa_filter(args) -> int:
+    from .bio.stockholm import write_a3m, filter_columns, filter_sequences
+    records, _ = _load_alignment(args.file)
+    if args.min_occupancy is not None:
+        records = filter_columns(records, args.min_occupancy)
+    if args.min_coverage is not None:
+        records = filter_sequences(records, args.min_coverage)
+    text = write_a3m(records)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_msa_a2m(args) -> int:
+    from .bio.stockholm import parse_a3m, write_a3m, a3m_match_states
+    records = a3m_match_states(parse_a3m(Path(args.file).read_text()))
+    text = write_a3m(records)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -509,6 +577,31 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    msa = sub.add_parser("msa", help="Stockholm/A3M alignment toolkit")
+    msasub = msa.add_subparsers(dest="sub", required=True)
+    mstat = msasub.add_parser("stats", help="alignment summary (auto-detect format)")
+    mstat.add_argument("file")
+    mstat.set_defaults(func=_cmd_msa_stats)
+    mcon = msasub.add_parser("consensus", help="majority-residue consensus")
+    mcon.add_argument("file")
+    mcon.add_argument("--threshold", type=float, default=0.5)
+    mcon.set_defaults(func=_cmd_msa_consensus)
+    mpid = msasub.add_parser("pid", help="pairwise identity between two seqs")
+    mpid.add_argument("file")
+    mpid.add_argument("--a", required=True)
+    mpid.add_argument("--b", required=True)
+    mpid.set_defaults(func=_cmd_msa_pid)
+    mfil = msasub.add_parser("filter", help="drop sparse columns/sequences")
+    mfil.add_argument("file")
+    mfil.add_argument("--min-occupancy", type=float, default=None)
+    mfil.add_argument("--min-coverage", type=float, default=None)
+    mfil.add_argument("--out", default=None)
+    mfil.set_defaults(func=_cmd_msa_filter)
+    ma2m = msasub.add_parser("a2m", help="A3M -> match-state alignment")
+    ma2m.add_argument("file")
+    ma2m.add_argument("--out", default=None)
+    ma2m.set_defaults(func=_cmd_msa_a2m)
 
     ph = sub.add_parser("phylo", help="Newick tree toolkit")
     phsub = ph.add_subparsers(dest="sub", required=True)
