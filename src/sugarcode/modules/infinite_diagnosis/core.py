@@ -1,8 +1,9 @@
 from __future__ import annotations
 from omega.search import UnifiedSearch
+from ...bio.entrez import pubmed_ids, pubmed_abstracts, EntrezError
 
 
-def cross_domain_diagnosis(case: str, limit: int = 8) -> dict:
+def cross_domain_diagnosis(case: str, limit: int = 8, offline: bool = False) -> dict:
     """Mine the platform's full module corpus for non-standard angles on a case.
 
     Clusters search hits by sub-network to surface hidden diagnostic angles,
@@ -21,13 +22,15 @@ def cross_domain_diagnosis(case: str, limit: int = 8) -> dict:
             "diagnostic_hook": _hook(sn),
         })
     roadmap = _roadmap(case, perspectives)
+    leads, lit_status = _literature_leads(case, limit, offline)
     return {
         "case": case,
         "hidden_clusters": perspectives,
-        "biomarker_candidates": _biomarkers(hits),
+        "biomarker_candidates": leads,
         "experimental_roadmap": roadmap,
-        "novelty_note": ("cross-domain links assembled from platform-wide corpus; "
-                         "each angle names the module that can execute it"),
+        "novelty_note": ("angles come from a keyword match against Sugarcode's own module "
+                         "catalog; biomarker candidates are PubMed records (live NCBI "
+                         f"E-utilities) for the case terms - {lit_status}"),
     }
 
 
@@ -57,11 +60,27 @@ def _roadmap(case: str, perspectives: list[dict]) -> list[dict]:
     return steps
 
 
-def _biomarkers(hits: list[dict]) -> list[str]:
-    out = []
-    for h in hits[:5]:
-        out.append(f"{h['name']}-derived candidate marker panel")
-    return out
+_STOP = {"with", "and", "or", "of", "the", "a", "an", "in", "on", "for", "to",
+         "patient", "child", "poor"}
+
+
+def _literature_leads(case: str, limit: int, offline: bool) -> tuple[list[str], str]:
+    """PubMed biomarker/diagnosis records for the case terms. Empty on no hits or
+    lookup failure - the status string says which; nothing is invented."""
+    import re
+    terms = [t for t in re.findall(r"[A-Za-z0-9\-]+", case.lower()) if t not in _STOP]
+    if not terms:
+        return [], "no searchable case terms"
+    query = " ".join(terms) + " AND (biomarker[tiab] OR diagnosis[tiab])"
+    try:
+        ids = pubmed_ids(query, retmax=limit, offline=offline)
+        recs = pubmed_abstracts(ids, offline=offline) if ids else []
+    except (EntrezError, ValueError, KeyError) as e:
+        return [], f"literature lookup failed: {type(e).__name__}: {e}"
+    if not recs:
+        return [], f"PubMed returned no records for: {query}"
+    return ([f"PMID {r['pmid']} ({r['year']}): {r['title']}" for r in recs],
+            f"{len(recs)} PubMed records for: {query}")
 
 
 # --- drop 20: joint symptom x variant view -------------------------------------
@@ -83,6 +102,11 @@ def joint_case_view(symptoms: list[str], variants: list[dict],
     joint = []
     for v in panel["panel"]:
         gene = (v.get("gene") or "").upper()
+        # a 0.0 from failed lookups is "not assessed", not "no support"
+        failed = [k for k in ("clinvar", "gnomad", "gene_constraint")
+                  if "failed" in str((v.get(k) or {}).get("status", ""))]
+        if failed and not v.get("score_components"):
+            v = {**v, "evidence_class": "not assessed - lookups failed: " + ", ".join(failed)}
         gene_in_diff = gene in diff_genes
         lead = v["support_score"] >= 0.75 and (gene_in_diff or not sym_diseases)
         joint.append({

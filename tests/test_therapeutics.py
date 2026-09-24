@@ -166,7 +166,9 @@ def test_pdx_insight_fidelity_drift():
     assert "verdict" in r
 
 
-def test_infinite_diagnosis_cross_domain():
+def test_infinite_diagnosis_cross_domain(monkeypatch):
+    from sugarcode.modules.infinite_diagnosis import core as _idx
+    monkeypatch.setattr(_idx, "pubmed_ids", lambda q, retmax=10, offline=False: [])
     r = cross_domain_diagnosis("child with developmental delay, lactic acidosis, muscle weakness")
     clusters = r["hidden_clusters"]
     assert len(clusters) >= 1
