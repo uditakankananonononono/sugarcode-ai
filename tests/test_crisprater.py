@@ -7,7 +7,7 @@ from sugarcode.modules.crisprater import score, score_many
 
 def manual_score(s):
     values = [
-        (s[3:14].count("G") + s[3:14].count("C")) / 11,
+        (s[3:13].count("G") + s[3:13].count("C")) / 10,  # published GC4-13 window (Labuhn 2018 Fig 4C)
         s[19] == "G", s[2] in "AT", s[11] in "AG", s[5] == "G",
         s[3] in "AT", s[17] in "AG", s[4] in "AC", s[13] == "G", s[14] == "A",
     ]
@@ -52,4 +52,4 @@ def test_vendored_model_integrity_and_shape():
     raw = files("sugarcode.modules.crisprater").joinpath("data/model.json").read_bytes()
     model = json.loads(raw)
     assert len(model["features"]) == 10
-    assert hashlib.sha256(raw).hexdigest() == "165bd27ebc4bebc9427806c1fbcf4f004d45c75c631323a5c4a60283d3339ac1"
+    assert hashlib.sha256(raw).hexdigest() == "5d0772c1d5a6dda2fa068957d5debd64a981aba7d7cd98c7c52dd6ceb73a9c11"  # corrected GC4-13 window

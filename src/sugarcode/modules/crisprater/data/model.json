@@ -1,16 +1,79 @@
 {
   "intercept": 0.6505037,
   "features": [
-    {"name": "gc_fraction_positions_4_14", "kind": "gc_fraction", "start": 4, "end": 14, "coefficient": 0.14177385},
-    {"name": "G_at_20", "kind": "base", "position": 20, "bases": "G", "coefficient": 0.06966514},
-    {"name": "A_or_T_at_3", "kind": "base", "position": 3, "bases": "AT", "coefficient": 0.04216254},
-    {"name": "A_or_G_at_12", "kind": "base", "position": 12, "bases": "AG", "coefficient": 0.03303432},
-    {"name": "G_at_6", "kind": "base", "position": 6, "bases": "G", "coefficient": 0.02355430},
-    {"name": "A_or_T_at_4", "kind": "base", "position": 4, "bases": "AT", "coefficient": -0.04746424},
-    {"name": "A_or_G_at_18", "kind": "base", "position": 18, "bases": "AG", "coefficient": -0.04878001},
-    {"name": "A_or_C_at_5", "kind": "base", "position": 5, "bases": "AC", "coefficient": -0.06981921},
-    {"name": "G_at_14", "kind": "base", "position": 14, "bases": "G", "coefficient": -0.07087756},
-    {"name": "A_at_15", "kind": "base", "position": 15, "bases": "A", "coefficient": -0.08160700}
+    {
+      "name": "gc_fraction_positions_4_13",
+      "kind": "gc_fraction",
+      "start": 4,
+      "end": 13,
+      "coefficient": 0.14177385
+    },
+    {
+      "name": "G_at_20",
+      "kind": "base",
+      "position": 20,
+      "bases": "G",
+      "coefficient": 0.06966514
+    },
+    {
+      "name": "A_or_T_at_3",
+      "kind": "base",
+      "position": 3,
+      "bases": "AT",
+      "coefficient": 0.04216254
+    },
+    {
+      "name": "A_or_G_at_12",
+      "kind": "base",
+      "position": 12,
+      "bases": "AG",
+      "coefficient": 0.03303432
+    },
+    {
+      "name": "G_at_6",
+      "kind": "base",
+      "position": 6,
+      "bases": "G",
+      "coefficient": 0.0235543
+    },
+    {
+      "name": "A_or_T_at_4",
+      "kind": "base",
+      "position": 4,
+      "bases": "AT",
+      "coefficient": -0.04746424
+    },
+    {
+      "name": "A_or_G_at_18",
+      "kind": "base",
+      "position": 18,
+      "bases": "AG",
+      "coefficient": -0.04878001
+    },
+    {
+      "name": "A_or_C_at_5",
+      "kind": "base",
+      "position": 5,
+      "bases": "AC",
+      "coefficient": -0.06981921
+    },
+    {
+      "name": "G_at_14",
+      "kind": "base",
+      "position": 14,
+      "bases": "G",
+      "coefficient": -0.07087756
+    },
+    {
+      "name": "A_at_15",
+      "kind": "base",
+      "position": 15,
+      "bases": "A",
+      "coefficient": -0.081607
+    }
   ],
-  "classes": {"low_max_exclusive": 0.56, "high_min_exclusive": 0.74}
+  "classes": {
+    "low_max_exclusive": 0.56,
+    "high_min_exclusive": 0.74
+  }
 }
