@@ -164,3 +164,20 @@ def test_copilot_falls_back_and_reports(fake_server):
     none = ask("design a synthetic promoter library", route="ollama",
                env={"SUGARCODE_OLLAMA_BASE_URL": "http://127.0.0.1:9/v1"})
     assert none.answer is None and none.modules and none.tools and none.error
+
+
+def test_ailibrary_parsers_offline():
+    from sugarcode.llm import ailibrary
+    xml = ("<urlset><url><loc>https://www.theailibrary.co/tool/magicshot</loc></url>"
+           "<url><loc>https://www.theailibrary.co/blog/x</loc></url>"
+           "<url><loc>https://www.theailibrary.co/tool/codeaid</loc></url></urlset>")
+    assert ailibrary.parse_sitemap(xml) == ["codeaid", "magicshot"]
+    page = ('<title>MagicShot</title><meta property="og:title" content="MagicShot"/>'
+            '<meta property="og:description" content="All in one AI image &amp; video generator"/>'
+            '<meta property="og:url" content="https://www.theailibrary.co/tool/magicshot"/>')
+    info = ailibrary.parse_tool_page(page, "magicshot")
+    assert info == {"slug": "magicshot", "name": "MagicShot",
+                    "description": "All in one AI image & video generator",
+                    "url": "https://www.theailibrary.co/tool/magicshot"}
+    with pytest.raises(ValueError):
+        ailibrary.tool("../admin")
