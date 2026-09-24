@@ -25,3 +25,10 @@ def test_cli_context_mode(capsys):
     assert t.main([str(FIX)]) == 0
     out = list(csv.DictReader(io.StringIO(capsys.readouterr().out), delimiter="\t"))
     assert len(out) == 3 and all(o["tier"] for o in out) and not any(o["error"] for o in out)
+
+def test_logit_me_model_when_maxentpy_available():
+    pytest.importorskip("maxentpy")
+    rows = list(csv.DictReader(open(FIX), delimiter="\t"))
+    hi = t.triage_row(rows[2]); lo = t.triage_row(rows[0])
+    assert hi["model"] == "logit_me" and hi["model_score"] > lo["model_score"]
+    assert hi["maxent_delta"] != "NA"

@@ -1,0 +1,83 @@
+{
+ "model": "logistic regression on deepsplice PWM ref/alt/delta, donor flag, MaxEntScan ref/alt/delta (/10), offset one-hot",
+ "feature_order": "[pwm_ref,pwm_alt,pwm_delta,is_donor,me_ref/10,me_alt/10,me_delta/10]+onehot(k in KS)",
+ "KS": [
+  3,
+  4,
+  5,
+  6,
+  -14,
+  -13,
+  -12,
+  -11,
+  -10,
+  -9,
+  -8,
+  -7,
+  -6,
+  -5,
+  -4,
+  -3
+ ],
+ "coef": [
+  1.772922,
+  -1.720582,
+  -3.493504,
+  -0.642933,
+  2.612892,
+  -3.953291,
+  6.566183,
+  -0.048177,
+  -0.037801,
+  -0.469658,
+  -0.087296,
+  0.133881,
+  -0.341973,
+  -0.264623,
+  -0.177437,
+  -0.252474,
+  -0.515463,
+  -0.336021,
+  -0.741823,
+  -0.106864,
+  -0.074792,
+  0.017315,
+  1.862745
+ ],
+ "intercept": -2.376633,
+ "n_train": 9235,
+ "cv_auroc": 0.9674,
+ "calibration": {
+  "0.5": {
+   "tp": 1899,
+   "fp": 259,
+   "sensitivity": 0.815,
+   "fpr": 0.03751
+  },
+  "0.8": {
+   "tp": 1503,
+   "fp": 100,
+   "sensitivity": 0.6451,
+   "fpr": 0.01448
+  },
+  "0.9": {
+   "tp": 1230,
+   "fp": 56,
+   "sensitivity": 0.5279,
+   "fpr": 0.00811
+  },
+  "0.95": {
+   "tp": 950,
+   "fp": 28,
+   "sensitivity": 0.4077,
+   "fpr": 0.00406
+  },
+  "0.98": {
+   "tp": 692,
+   "fp": 15,
+   "sensitivity": 0.297,
+   "fpr": 0.00217
+  }
+ },
+ "source": "mega27-01 discovery/splice_region_vus/cv_results_me.json"
+}

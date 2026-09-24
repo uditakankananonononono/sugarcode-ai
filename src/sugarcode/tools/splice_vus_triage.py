@@ -1,5 +1,7 @@
 """splice-vus-triage: score splice-region SNVs (donor +3..+6, acceptor -3..-14)
-with a ClinVar-trained CNN, optional SpliceAI, and a calibrated PPV.
+with the best cross-validated model (logistic on PWM + MaxEntScan features,
+AUROC 0.9674; falls back to the ClinVar CNN without maxentpy), optional
+SpliceAI, and a calibrated PPV.
 
 Evidence (mega27-01, discovery/splice_region_vus/): gene-grouped 5-fold CV
 AUROC 0.936 (CNN) vs 0.889 (PWM); SpliceAI is stronger (0.9775 vs 0.929,
@@ -107,8 +109,42 @@ def cnn_score(ref_ctx: str, alt_ctx: str, k: int) -> float:
         return float(torch.sigmoid(_net()(x, f))[0])
 
 
-def calibrated(cnn: float, prior: float) -> dict:
-    tab = json.load(open(_DATA / "splice_cnn_calibration.json"))["thresholds"]
+def maxent_scores(ref_ctx: str, alt_ctx: str, k: int):
+    """MaxEntScan (Yeo & Burge 2004) ref/alt scores via maxentpy; None if not installed."""
+    try:
+        from maxentpy import maxent
+    except ImportError:
+        return None
+    global _ME
+    try:
+        _ME
+    except NameError:
+        _ME = (maxent.load_matrix5(), maxent.load_matrix3())
+    if k > 0:
+        b = F - k
+        return maxent.score5(ref_ctx[b - 2:b + 7], matrix=_ME[0]), maxent.score5(alt_ctx[b - 2:b + 7], matrix=_ME[0])
+    e = F - k
+    return maxent.score3(ref_ctx[e - 20:e + 3], matrix=_ME[1]), maxent.score3(alt_ctx[e - 20:e + 3], matrix=_ME[1])
+
+
+def logit_me_score(ref_ctx: str, alt_ctx: str, k: int):
+    """Best CV model (AUROC 0.9674 vs MaxEntScan 0.9635): logistic on PWM + MaxEntScan features."""
+    me = maxent_scores(ref_ctx, alt_ctx, k)
+    if me is None:
+        return None
+    import math
+    m = json.load(open(_DATA / "splice_logit_me_v1.json"))
+    f = pwm_features(ref_ctx, alt_ctx, k)
+    x = f[:4] + [me[0] / 10, me[1] / 10, (me[0] - me[1]) / 10] + f[4:]
+    z = m["intercept"] + sum(c * v for c, v in zip(m["coef"], x))
+    return 1 / (1 + math.exp(-z))
+
+
+def calibrated(cnn: float, prior: float, table: str = "cnn") -> dict:
+    if table == "logit_me":
+        tab = json.load(open(_DATA / "splice_logit_me_v1.json"))["calibration"]
+    else:
+        tab = json.load(open(_DATA / "splice_cnn_calibration.json"))["thresholds"]
     best = None
     for t in sorted(tab, key=float):
         if cnn >= float(t):
@@ -123,13 +159,13 @@ def calibrated(cnn: float, prior: float) -> dict:
 def tier(cnn: float, sai: float | None) -> str:
     if sai is not None:
         if sai >= 0.8 and cnn >= 0.9:
-            return "strong: SpliceAI>=0.8 and CNN>=0.9"
+            return "strong: SpliceAI>=0.8 and model>=0.9"
         if sai >= 0.5 and cnn >= 0.5:
-            return "moderate: SpliceAI>=0.5 and CNN>=0.5"
+            return "moderate: SpliceAI>=0.5 and model>=0.5"
         if sai < 0.2 and cnn < 0.5:
             return "unlikely splice-disruptive"
         return "discordant: review"
-    return "strong (CNN only)" if cnn >= 0.98 else "moderate (CNN only)" if cnn >= 0.9 else "weak/none (CNN only)"
+    return "strong (model only)" if cnn >= 0.98 else "moderate (model only)" if cnn >= 0.9 else "weak/none (model only)"
 
 
 def spliceai_score(genome, chrom, pos, ref, alt, strand, D=50):
@@ -166,13 +202,18 @@ def triage_row(row: dict, genome=None, use_spliceai=False, prior=0.03) -> dict:
             raise ValueError("need --genome or ref_ctx/alt_ctx columns")
         R, A, strand = windows_from_genome(genome, row["chrom"], int(row["pos"]), row["ref"], row["alt"], k)
     c = cnn_score(R, A, k)
+    lm = logit_me_score(R, A, k)
+    me = maxent_scores(R, A, k)
+    score, model = (lm, "logit_me") if lm is not None else (c, "cnn")
     sai = None
     if use_spliceai and genome is not None and row.get("chrom"):
         sai = spliceai_score(genome, row["chrom"], int(row["pos"]), row["ref"].upper(), row["alt"].upper(), strand)
-    cal = calibrated(c, prior)
+    cal = calibrated(score, prior, model)
     return {"name": row["name"], "site": "donor" if k > 0 else "acceptor", "offset": k, "strand": strand,
-            "cnn": round(c, 5), "spliceai_ds_max": (round(sai, 4) if sai is not None else "NA"),
-            "cnn_bin": cal["threshold_bin"], "ppv_at_prior": cal["ppv"], "tier": tier(c, sai)}
+            "model": model, "model_score": round(score, 5), "cnn": round(c, 5),
+            "maxent_delta": (round(me[0] - me[1], 3) if me else "NA"),
+            "spliceai_ds_max": (round(sai, 4) if sai is not None else "NA"),
+            "score_bin": cal["threshold_bin"], "ppv_at_prior": cal["ppv"], "tier": tier(score, sai)}
 
 
 def main(argv=None):
@@ -184,7 +225,7 @@ def main(argv=None):
     if a.genome:
         import twobitreader
         genome = twobitreader.TwoBitFile(a.genome)
-    cols = ["name", "site", "offset", "strand", "cnn", "spliceai_ds_max", "cnn_bin", "ppv_at_prior", "tier", "error"]
+    cols = ["name", "site", "offset", "strand", "model", "model_score", "cnn", "maxent_delta", "spliceai_ds_max", "score_bin", "ppv_at_prior", "tier", "error"]
     w = csv.DictWriter(sys.stdout, cols, delimiter="\t", extrasaction="ignore"); w.writeheader()
     for row in csv.DictReader(open(a.variants), delimiter="\t"):
         try:
