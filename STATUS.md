@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 24 profile_hmm tests incl. Baum-Welch and 8 chem_descriptors oracle tests (**1458 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 24 profile_hmm tests incl. Baum-Welch and 8 chem_descriptors oracle tests and 8 chem_similarity tests (**1466 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -139,6 +139,22 @@ continues drop by drop in order of scientific usefulness.
   (one-based motif starts, additive intercept + features, GG required at
   positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
   note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
+- chem_similarity: NEW MODULE (2026-09-24, branch pb6). Morgan/ECFP circular
+  fingerprints (Rogers & Hahn 2010) re-implemented from RDKit's MorganGenerator
+  with RDKit's 32-bit hash, at src/sugarcode/modules/chem_similarity/,
+  registered under fabrication-evolution (94 modules total). Unfolded counts,
+  folded bits, bit info, Tanimoto/Jaccard and Dice (bits or counts),
+  nearest-neighbour search with threshold and reported invalid SMILES,
+  similarity matrices. Verified: for PubChem CIDs 1-400 every count
+  fingerprint at radius 1, 2 and 3 and every 2048-bit ECFP4 equals RDKit
+  2024.09.6 exactly; bulk Tanimoto/Dice for 10 queries x 400 equal RDKit to
+  1e-12; methane/ethane codes hand-hashed. The same 400 compounds also check
+  chem_descriptors (all descriptors equal RDKit except carbon-free Hill
+  formula order). Getting there tightened chem_descriptors aromaticity
+  (exocyclic C=C gives 1 electron, pyrrolide [N-] gives 2, a fused pair
+  aromatic only as a whole gets an aromatic envelope with a non-aromatic
+  fusion bond, as RDKit does). Limits: no FCFP, chirality, path-based or
+  MACCS fingerprints; linear-scan search.
 - chem_descriptors: NEW MODULE (2026-09-24, branch pb6). Cheminformatics-lite at
   src/sugarcode/modules/chem_descriptors/, registered under fabrication-evolution
   (93 modules total). Pure-Python SMILES parser (organic subset + bracket atoms,

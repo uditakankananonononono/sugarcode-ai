@@ -101,11 +101,14 @@ def test_parser_features_and_errors():
 
 def test_kekule_aromaticity_perception():
     for s, n in [("C1=CC=CC=C1", 1), ("C1=CNC=C1", 1), ("O=C1C=CNC=C1", 1),
-                 ("C1=CC2=CC=CC=CC2=C1", 2),          # azulene: aromatic only as a fused pair
+                 ("C1=CC2=CC=CC=CC2=C1", 0),          # azulene: 10-atom envelope aromatic, fusion
+                                                      # bond single -> no all-aromatic ring (RDKit: 0)
                  ("C1=CC=CC=CC=C1", 0),               # cyclooctatetraene, 8 pi
                  ("CC1=CC(=O)C=CC1=O", 0),            # quinone
                  ("C1C=CC=C1", 0)]:                    # cyclopentadiene, sp3 CH2
         assert compute_descriptors(s)["aromatic_ring_count"] == n, s
+    az = parse_smiles("C1=CC2=CC=CC=CC2=C1")
+    assert all(a.aromatic for a in az.atoms) and sum(b.aromatic for b in az.bonds) == 10
 
 
 def test_lipinski_and_veber():
