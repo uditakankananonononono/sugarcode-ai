@@ -91,12 +91,6 @@ BUILTIN_PROFILES: dict[str, ModelProfile] = {p.name: p for p in [
                      "through Ollama: `ollama pull hf.co/ornith-ai/Ornith-1.5-9B-GGUF`."),
         source_url="https://huggingface.co/ornith-ai/Ornith-1.5-9B-GGUF"),
     ModelProfile(
-        name="union-alpha", kind="hosted_free", base_url="https://openrouter.ai/api/v1",
-        model="stealth/union-alpha", api_key_env="OPENROUTER_API_KEY", requires_key=True,
-        description=("Union Alpha stealth model on OpenRouter ($0 during preview). Anonymous provider "
-                     "that may retain prompts, so it also needs SUGARCODE_ALLOW_STEALTH=1."),
-        source_url="https://openrouter.ai/stealth/union-alpha"),
-    ModelProfile(
         name="fugu", kind="hosted_paid", base_url="https://api.sakana.ai/v1", model="fugu",
         api_key_env="SAKANA_API_KEY", requires_key=True, base_url_env="SUGARCODE_FUGU_BASE_URL",
         description="Sakana Fugu multi-agent orchestrator (hosted, paid plans from $20/month).",
@@ -268,9 +262,6 @@ def resolve(name: str | None = None, model: str | None = None, env: dict | None 
         how = (" Get a free token at https://huggingface.co/settings/tokens (fine-grained, "
                "permission 'Make calls to Inference Providers')." if p.api_key_env == "HF_TOKEN" else "")
         raise ProviderError(f"{name} needs {p.api_key_env}.{how}")
-    if p.name == "union-alpha" and not _truthy(env.get("SUGARCODE_ALLOW_STEALTH")):
-        raise ProviderError("union-alpha is an anonymous stealth provider that may retain prompts; "
-                            "set SUGARCODE_ALLOW_STEALTH=1 to opt in.")
     if p.kind == "hosted_paid":
         ok = allow_paid if allow_paid is not None else _truthy(env.get("SUGARCODE_ALLOW_PAID"))
         if not ok:
