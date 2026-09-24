@@ -45,6 +45,8 @@ def test_roundtrip_is_exact():
 def test_percent_escape_symmetry():
     s = "a;b=c,d% e"
     assert unescape_value(escape_value(s)) == s
+    assert unescape_value("%2520") == "%20"     # literal, not a space
+    assert unescape_value("%20") == " "
 
 
 def test_variant_type_cases():

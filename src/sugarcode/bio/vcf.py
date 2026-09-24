@@ -20,10 +20,17 @@ def escape_value(s: str) -> str:
 
 
 def unescape_value(s: str) -> str:
-    out = s
-    for v, k in sorted(_DECODINGS.items(), key=lambda kv: -len(kv[0])):
-        out = out.replace(v, k)
-    return out
+    """Single-pass decode: %25 -> % and stops, so a literal '%2520' in the
+    file correctly means the two characters '%20', not a space."""
+    out, i = [], 0
+    while i < len(s):
+        if s[i] == "%" and s[i:i + 3] in _DECODINGS:
+            out.append(_DECODINGS[s[i:i + 3]])
+            i += 3
+        else:
+            out.append(s[i])
+            i += 1
+    return "".join(out)
 
 
 def _parse_meta_angle(body: str) -> dict:
