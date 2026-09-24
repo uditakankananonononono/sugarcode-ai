@@ -19,6 +19,7 @@ out = []
 for name in NAMES:
     url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/%s/property/%s/JSON" % (urllib.parse.quote(name), props)
     import os
+    os.makedirs("cache", exist_ok=True)
     cf = "cache/" + name.replace(" ","_") + ".json"
     if os.path.exists(cf):
         p = json.load(open(cf))
