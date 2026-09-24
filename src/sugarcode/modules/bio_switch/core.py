@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 BINDING_DOMAINS = {
-    "tetracycline": {"domain": "TetR", "kd_uM": 0.01, "mechanism": "repressor release"},
+    "tetracycline": {"domain": "TetR", "kd_uM": 0.001, "mechanism": "repressor release"},
     "lactose": {"domain": "LacI", "kd_uM": 1.0, "mechanism": "repressor release (IPTG/allo)"},
     "arabinose": {"domain": "AraC", "kd_uM": 50.0, "mechanism": "activator induction"},
     "theophylline": {"domain": "riboswitch (theo aptamer)", "kd_uM": 0.3, "mechanism": "RNA conformational switch"},
@@ -229,8 +229,8 @@ def cheminformatics_descriptors(analyte):
 	if key not in _CHEM_DESCRIPTORS:
 		raise KeyError(f"no cheminformatics descriptors for {analyte!r}")
 	desc = _CHEM_DESCRIPTORS[key]
-	violations = bool((desc["molecular_weight"] > 500) + (desc["clogp"] > 5)
-		+ (desc["hbond_donors"] > 5) + (desc["hbond_acceptors"] > 10))
+	violations = int(desc["molecular_weight"] > 500) + int(desc["clogp"] > 5) \
+		+ int(desc["hbond_donors"] > 5) + int(desc["hbond_acceptors"] > 10)
 	if violations == 0:
 		bioavailability = "high"
 	elif violations == 1:
