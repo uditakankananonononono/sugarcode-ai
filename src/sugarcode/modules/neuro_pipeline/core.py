@@ -40,7 +40,10 @@ class MLP:
 
 def train(n_in: int = 6, n_hidden: int = 12, epochs: int = 300, lr: float = 0.5,
           stdp_mod: float = 0.0, seed: int = 42) -> dict:
-    """Train on a synthetic motif-classification task (sequence -> functional class)."""
+    """Train on a synthetic toy task (Gaussian features -> class).
+
+    Kept for backward compatibility and quick smoke tests. For biological
+    sequence classification (DNA motifs), use train_on_sequences()."""
     rng = np.random.default_rng(seed)
     n = 400
     X = rng.normal(0, 1, (n, n_in))
@@ -55,15 +58,23 @@ def train(n_in: int = 6, n_hidden: int = 12, epochs: int = 300, lr: float = 0.5,
         "train_accuracy": round(acc, 3),
         "loss_curve": [round(l, 4) for l in losses[:: max(1, epochs // 20)]],
         "stdp_modulation": stdp_mod,
-        "continual_learning_note": "EWC-style penalty hook in backward() via stdp_mod",
+        "plasticity_note": ("stdp_mod applies STDP-style co-activation potentiation "
+                            "to W1; it is NOT an EWC penalty. For continual learning "
+                            "with an EWC anchor penalty, use continual_update()."),
     }
 
 
-def lesion_study(model: MLP, n_in: int = 6, seed: int = 42) -> dict:
-    """Virtual lesioning: ablate each hidden unit, measure accuracy drop."""
-    rng = np.random.default_rng(seed + 1)
-    X = rng.normal(0, 1, (200, n_in))
-    y = ((X[:, 0] + X[:, 1] - X[:, 2]) > 0).astype(float).reshape(-1, 1)
+def lesion_study(model: MLP, n_in: int = 6, seed: int = 42,
+                 X: np.ndarray | None = None, y: np.ndarray | None = None) -> dict:
+    """Virtual lesioning: ablate each hidden unit, measure accuracy drop.
+
+    Pass X/y to lesion on a specific dataset (e.g. encoded DNA sequences);
+    defaults to the built-in toy task."""
+    if X is None or y is None:
+        rng = np.random.default_rng(seed + 1)
+        X = rng.normal(0, 1, (200, n_in))
+        y = ((X[:, 0] + X[:, 1] - X[:, 2]) > 0).astype(float).reshape(-1, 1)
+    X = np.asarray(X, float); y = np.asarray(y, float).reshape(-1, 1)
     base = float(np.mean((model.forward(X) > 0.5) == y))
     effects = []
     for u in range(model.W1.shape[1]):
@@ -115,6 +126,144 @@ def rsa(model: MLP, n_in: int = 6, n_stimuli: int = 40, seed: int = 7) -> dict:
         "interpretation": ("high" if corr > 0.5 else "moderate" if corr > 0.25 else "low")
         + " geometry preservation between input and hidden manifolds",
     }
+
+# ---------------------------------------------------------------------------
+# Biological sequence support (DNA motif classification).
+# ---------------------------------------------------------------------------
+
+_DNA = "ACGT"
+
+
+def one_hot_encode(sequences, max_len: int | None = None) -> np.ndarray:
+    """One-hot encode DNA sequences (A/C/G/T) into a flat float array.
+
+    Non-ACGT bases raise ValueError. Sequences are truncated or
+    zero-padded to max_len (default: longest input)."""
+    seqs = [str(s).upper() for s in sequences]
+    if not seqs:
+        raise ValueError("at least one sequence required")
+    bad = {b for s in seqs for b in s if b not in _DNA}
+    if bad:
+        raise ValueError(f"invalid DNA base(s): {sorted(bad)}")
+    L = max_len or max(len(s) for s in seqs)
+    X = np.zeros((len(seqs), L * 4))
+    for i, s in enumerate(seqs):
+        for j, base in enumerate(s[:L]):
+            k = _DNA.find(base)
+            if k >= 0:
+                X[i, j * 4 + k] = 1.0
+    return X
+
+
+def kmer_encode(sequences, k: int = 3) -> np.ndarray:
+    """Normalised k-mer frequency vectors for DNA sequences (4**k features)."""
+    if not 1 <= k <= 5:
+        raise ValueError("k must be in 1..5")
+    seqs = [str(s).upper() for s in sequences]
+    if not seqs:
+        raise ValueError("at least one sequence required")
+    bad = {b for s in seqs for b in s if b not in _DNA}
+    if bad:
+        raise ValueError(f"invalid DNA base(s): {sorted(bad)}")
+    idx = {}
+    n = 0
+    for a in range(4 ** k):
+        pass
+    # map k-mer -> column index
+    order = []
+    def _rec(prefix, depth):
+        if depth == k:
+            order.append(prefix); return
+        for b in _DNA:
+            _rec(prefix + b, depth + 1)
+    _rec("", 0)
+    idx = {w: i for i, w in enumerate(order)}
+    X = np.zeros((len(seqs), 4 ** k))
+    for i, s in enumerate(seqs):
+        counts = np.zeros(4 ** k)
+        for j in range(len(s) - k + 1):
+            w = s[j:j + k]
+            if w in idx:
+                counts[idx[w]] += 1
+        total = counts.sum()
+        X[i] = counts / total if total else counts
+    return X
+
+
+def synthetic_promoter_dataset(n: int = 400, seq_len: int = 50,
+                               motif: str = "TATAAA", seed: int = 42) -> dict:
+    """Promoter-like DNA dataset: half the sequences carry a planted motif.
+
+    Positives get `motif` (default TATA-box consensus) inserted at a random
+    position; negatives are random sequence with the motif censored. This is
+    synthetic-but-biological data (real DNA alphabet, real motif grammar),
+    not Gaussian blobs. Returns {sequences, labels, motif, seq_len}."""
+    rng = np.random.default_rng(seed)
+    seqs, labels = [], []
+    m = str(motif).upper()
+    for i in range(n):
+        s = "".join(rng.choice(list(_DNA), size=seq_len))
+        if i % 2 == 0:
+            pos = int(rng.integers(0, seq_len - len(m) + 1))
+            s = s[:pos] + m + s[pos + len(m):]
+            labels.append(1.0)
+        else:
+            while m in s:  # censor accidental motif in negatives
+                pos = s.index(m)
+                s = s[:pos] + "".join(rng.choice(list(_DNA), size=len(m))) + s[pos + len(m):]
+            labels.append(0.0)
+        seqs.append(s)
+    return {"sequences": seqs, "labels": np.array(labels).reshape(-1, 1),
+            "motif": m, "seq_len": seq_len}
+
+
+def train_on_sequences(sequences=None, labels=None, k: int = 3,
+                       encoding: str = "onehot", n_hidden: int = 24,
+                       epochs: int = 800, lr: float = 0.8,
+                       stdp_mod: float = 0.0, seed: int = 42) -> dict:
+    """Train the MLP to classify DNA sequences by motif content.
+
+    Defaults to synthetic_promoter_dataset() (TATA-box vs random). Pass your
+    own sequences + labels (0/1) for real biological data. encoding is
+    'kmer' (default, 4**k frequency features) or 'onehot'."""
+    if sequences is None:
+        data = synthetic_promoter_dataset(seed=seed)
+        sequences, labels = data["sequences"], data["labels"]
+        dataset_note = ("built-in synthetic promoter dataset: planted "
+                        f"{data['motif']} motif vs motif-free random DNA")
+    else:
+        if labels is None:
+            raise ValueError("labels required when sequences are provided")
+        labels = np.asarray(labels, float).reshape(-1, 1)
+        dataset_note = "user-supplied sequences"
+    X = kmer_encode(sequences, k=k) if encoding == "kmer" else one_hot_encode(sequences)
+    model = MLP(X.shape[1], n_hidden, 1, seed=seed)
+    losses = []
+    for _ in range(epochs):
+        losses.append(model.backward(X, labels, lr, stdp_mod))
+    acc = float(np.mean((model.forward(X) > 0.5) == labels))
+    return {
+        "model": model, "final_loss": round(losses[-1], 4),
+        "train_accuracy": round(acc, 3),
+        "loss_curve": [round(l, 4) for l in losses[:: max(1, epochs // 20)]],
+        "encoding": encoding, "k": k if encoding == "kmer" else None,
+        "n_sequences": len(sequences), "n_features": int(X.shape[1]),
+        "dataset": dataset_note,
+        "plasticity_note": ("stdp_mod applies STDP-style co-activation potentiation; "
+                            "use continual_update() for EWC."),
+    }
+
+
+def sequence_pipeline_demo(seed: int = 42) -> dict:
+    """End-to-end biological demo: train on the TATA-box promoter dataset,
+    then lesion the trained model on the encoded sequences."""
+    run = train_on_sequences(seed=seed)
+    data = synthetic_promoter_dataset(seed=seed)
+    X = one_hot_encode(data["sequences"])
+    y = data["labels"]
+    lesion = lesion_study(run["model"], X=X, y=y)
+    return {"training": {k: v for k, v in run.items() if k != "model"},
+            "lesion_on_sequences": lesion}
 
 # Explicit multimodal, continual-learning and causal-debugging extensions.
 def align_modalities(modalities,latent_dim=4):
