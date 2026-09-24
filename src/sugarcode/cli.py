@@ -430,7 +430,7 @@ def _cmd_bed_stats(args) -> int:
 def _cmd_bed_merge(args) -> int:
     from .bio.bed import parse_bed, write_bed, merge_intervals
     b = parse_bed(Path(args.file).read_text())
-    merged = merge_intervals(b["records"])
+    merged = merge_intervals(b["records"], min_dist=getattr(args, "min_dist", 0))
     text = write_bed({"header": b["header"], "records": merged})
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
@@ -1430,6 +1430,7 @@ def main(argv: list[str] | None = None) -> int:
     bm = bdsub.add_parser("merge", help="merge overlapping intervals per chrom")
     bm.add_argument("file")
     bm.add_argument("--out", default=None)
+    bm.add_argument("-d", "--min-dist", type=int, default=0, help="join intervals with gap <= d (bedtools -d; 0 joins book-ended, -1 overlap-only)")
     bm.set_defaults(func=_cmd_bed_merge)
     bf = bdsub.add_parser("filter", help="filter by chrom/width/score")
     bf.add_argument("file")

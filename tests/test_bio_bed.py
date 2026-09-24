@@ -51,12 +51,26 @@ def test_half_open_overlap():
         overlaps(r0, "chr1", 5, 5)
 
 
-def test_merge_overlapping_not_bookended():
+def test_merge_bedtools_default_joins_bookended():
     merged = merge_intervals(parse_bed(BED)["records"])
-    # chr1: [0,100)+[50,150) -> [0,150); [150,200) bookended, stays separate
+    # bedtools merge -d 0: [0,100)+[50,150)+[150,200) -> [0,200)
+    assert merged == [{"chrom": "chr1", "start": 0, "end": 200},
+                      {"chrom": "chr2", "start": 10, "end": 30}]
+
+
+def test_merge_strict_overlap_only():
+    merged = merge_intervals(parse_bed(BED)["records"], min_dist=-1)
     assert merged == [{"chrom": "chr1", "start": 0, "end": 150},
                       {"chrom": "chr1", "start": 150, "end": 200},
                       {"chrom": "chr2", "start": 10, "end": 30}]
+
+
+def test_merge_gap_distance():
+    recs = parse_bed("c\t0\t10\nc\t15\t20\n")["records"]
+    assert len(merge_intervals(recs)) == 2
+    assert merge_intervals(recs, min_dist=5) == [{"chrom": "c", "start": 0, "end": 20}]
+    with pytest.raises(ValueError):
+        merge_intervals(recs, min_dist=-2)
 
 
 def test_to_gff_coordinate_math():
