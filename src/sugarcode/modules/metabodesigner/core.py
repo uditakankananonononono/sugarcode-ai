@@ -7,17 +7,18 @@ REACTION_DB = [
     {"id": "R_PGI", "substrates": ["g6p"], "products": ["f6p"], "enzyme": "phosphoglucose isomerase", "ec": "5.3.1.9", "cofactors": []},
     {"id": "R_PFK", "substrates": ["f6p"], "products": ["f1,6bp"], "enzyme": "phosphofructokinase", "ec": "2.7.1.11", "cofactors": ["ATP"]},
     {"id": "R_ALD", "substrates": ["f1,6bp"], "products": ["gap", "dhap"], "enzyme": "aldolase", "ec": "4.1.2.13", "cofactors": []},
+    {"id": "R_TPI", "substrates": ["dhap"], "products": ["gap"], "enzyme": "triose-phosphate isomerase", "ec": "5.3.1.1", "cofactors": []},
     {"id": "R_GAPDH", "substrates": ["gap"], "products": ["1,3bpg"], "enzyme": "GAP dehydrogenase", "ec": "1.2.1.12", "cofactors": ["NAD+"]},
     {"id": "R_PGK", "substrates": ["1,3bpg"], "products": ["3pg"], "enzyme": "phosphoglycerate kinase", "ec": "2.7.2.3", "cofactors": ["ADP"]},
     {"id": "R_ENO", "substrates": ["3pg"], "products": ["pep"], "enzyme": "enolase (via 2pg)", "ec": "4.2.1.11", "cofactors": []},
     {"id": "R_PYK", "substrates": ["pep"], "products": ["pyruvate"], "enzyme": "pyruvate kinase", "ec": "2.7.1.40", "cofactors": ["ADP"]},
-    {"id": "R_PDH", "substrates": ["pyruvate"], "products": ["acetyl-coa"], "enzyme": "pyruvate dehydrogenase", "ec": "1.2.4.1", "cofactors": ["CoA", "NAD+"]},
+    {"id": "R_PDH", "substrates": ["pyruvate"], "products": ["acetyl-coa", "co2"], "enzyme": "pyruvate dehydrogenase", "ec": "1.2.4.1", "cofactors": ["CoA", "NAD+"]},
     {"id": "R_LDH", "substrates": ["pyruvate"], "products": ["lactate"], "enzyme": "lactate dehydrogenase", "ec": "1.1.1.27", "cofactors": ["NADH"]},
     {"id": "R_ADH", "substrates": ["acetyl-coa"], "products": ["ethanol"], "enzyme": "alcohol dehydrogenase (via acetaldehyde)", "ec": "1.1.1.1", "cofactors": ["NADH"]},
     {"id": "R_CS", "substrates": ["acetyl-coa"], "products": ["citrate"], "enzyme": "citrate synthase", "ec": "2.3.3.1", "cofactors": ["OAA"]},
     {"id": "R_ICL", "substrates": ["citrate"], "products": ["succinate", "glyoxylate"], "enzyme": "isocitrate lyase (glyoxylate shunt)", "ec": "4.1.3.1", "cofactors": []},
     {"id": "R_MLS", "substrates": ["glyoxylate", "acetyl-coa"], "products": ["malate"], "enzyme": "malate synthase", "ec": "2.3.3.9", "cofactors": []},
-    {"id": "R_3HBD", "substrates": ["acetyl-coa"], "products": ["3-hydroxybutyrate"], "enzyme": "thiolase + reductase", "ec": "2.3.1.9", "cofactors": ["NADPH"]},
+    {"id": "R_3HBD", "substrates": ["acetyl-coa", "acetyl-coa"], "products": ["3-hydroxybutyrate"], "enzyme": "thiolase + reductase", "ec": "2.3.1.9", "cofactors": ["NADPH"]},
     {"id": "R_PHA", "substrates": ["3-hydroxybutyrate"], "products": ["PHB_polymer"], "enzyme": "PHA synthase", "ec": "2.3.1.-", "cofactors": []},
 ]
 
@@ -69,8 +70,27 @@ def design_pathway(target: str, source: str = "glucose", max_steps: int = 10) ->
             continue
         path.append(rxn)
         needed.extend(x.lower() for x in rxn["substrates"] if x.lower() != source)
+    # Closure: add DB reactions that recycle a dead-end byproduct of the route back
+    # into a metabolite the route consumes (e.g. triose-phosphate isomerase turning
+    # aldolase's DHAP into GAP). Without this the second triose was discarded and
+    # every glucose-derived molar yield came out at half the textbook value.
+    added = True
+    while added:
+        added = False
+        made = {p.lower() for r in path for p in r["products"]}
+        used = {x.lower() for r in path for x in r["substrates"]} | {source}
+        dead = made - used - {target}
+        for rxn in REACTION_DB:
+            if any(r["id"] == rxn["id"] for r in path):
+                continue
+            subs = {x.lower() for x in rxn["substrates"]}
+            prods = {x.lower() for x in rxn["products"]}
+            if subs and subs <= dead and prods and prods <= (used | {target}):
+                path.append(rxn)
+                added = True
     # Topological order: by the wave in which each reaction first became fireable.
-    path.sort(key=lambda r: fire_round[r["id"]])
+    order = {r["id"]: i for i, r in enumerate(REACTION_DB)}
+    path.sort(key=lambda r: (fire_round.get(r["id"], len(REACTION_DB)), order[r["id"]]))
     cofactors: dict[str, int] = {}
     for r in path:
         for c in r["cofactors"]:
