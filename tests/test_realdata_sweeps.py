@@ -62,3 +62,17 @@ def test_power_estimate_matches_normal_power_solver():
     assert power_estimate(0.5, 0.25, 0.5)["replicates_per_group"] == 8
     assert power_estimate(0.5, 0.25, 0.8)["replicates_per_group"] == 16
     assert power_estimate(0.5, 0.25, 0.95)["replicates_per_group"] == 26
+
+
+def test_qsar_descriptors_rdkit_parity_cases():
+    from sugarcode.modules.qsar_bench.chemistry import descriptors
+    # tamoxifen-like stereo bonds parse; values match RDKit (MolWt, NonStrict rotors, FractionCSP3)
+    d = descriptors("CC/C(=C(/CC)c1ccc(O)cc1)c1ccc(O)cc1")  # diethylstilbestrol
+    assert d["heavy_atoms"] == 20 and abs(d["molecular_weight"] - 268.356) < 0.01
+    assert d["rotatable_bonds_heuristic"] == 4 and abs(d["fraction_csp3"] - 4 / 18) < 1e-9
+    d = descriptors("CN1CCC[C@H]1c1cccnc1")  # nicotine: 1 rotor, not 4
+    assert d["rotatable_bonds_heuristic"] == 1
+    d = descriptors("O=[N+]([O-])OC")  # bracket atoms get no implicit H
+    assert abs(d["molecular_weight"] - 77.039) < 0.01
+    d = descriptors("CCCC(CCC)C(=O)[O-].[Na+]")  # sodium valproate
+    assert abs(d["molecular_weight"] - 166.196) < 0.01
