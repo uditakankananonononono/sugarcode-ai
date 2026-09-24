@@ -27,6 +27,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   motif scan --sites F|--iupac S|--jaspar F --sequence S|--fasta F  (drop 74)
   digest run --fasta F --enzymes EcoRI,BamHI [--circular] [--cuts]  (drop 75)
   align run --a S1 --b S2 [--mode global|local] [--matrix BLOSUM62]  (drop 76)
+  kmer count|compare|sketch [--k K] [--w W]  (drop 77)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -766,6 +767,55 @@ def _cmd_align_run(args) -> int:
     return _emit(r)
 
 
+def _cmd_kmer_count(args) -> int:
+    from .bio.kmer import count_kmers, load_sequences
+    canonical = not args.no_canonical
+    if args.sequence:
+        counts = count_kmers(args.sequence, args.k, canonical)
+    else:
+        counts = {}
+        for seq in load_sequences(args.file):
+            for km, c in count_kmers(seq, args.k, canonical).items():
+                counts[km] = counts.get(km, 0) + c
+    top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:args.top]
+    return _emit({"k": args.k, "canonical": canonical,
+                  "distinct": len(counts), "total": sum(counts.values()),
+                  "top": [{"kmer": km, "count": c} for km, c in top]})
+
+
+def _cmd_kmer_compare(args) -> int:
+    from .bio import kmer as km
+    if args.a and not args.b:
+        raise SystemExit("--a requires --b")
+    if args.file_a and not args.file_b:
+        raise SystemExit("--file-a requires --file-b")
+    canonical = not args.no_canonical
+    if args.w:
+        if args.a:
+            return _emit(km.compare_sketches(args.a, args.b, args.k, args.w,
+                                             canonical, args.order))
+        return _emit(km.compare_file_sketches(args.file_a, args.file_b,
+                                              args.k, args.w, canonical,
+                                              args.order))
+    if args.a:
+        return _emit(km.compare_sequences(args.a, args.b, args.k, canonical))
+    return _emit(km.compare_files(args.file_a, args.file_b, args.k, canonical))
+
+
+def _cmd_kmer_sketch(args) -> int:
+    from .bio.kmer import minimizers, load_sequences
+    canonical = not args.no_canonical
+    if args.sequence:
+        mins = minimizers(args.sequence, args.k, args.w, canonical, args.order)
+    else:
+        mins = sorted({m for seq in load_sequences(args.file)
+                       for m in minimizers(seq, args.k, args.w, canonical,
+                                             args.order)})
+    return _emit({"k": args.k, "w": args.w, "order": args.order,
+                  "canonical": canonical, "sketch_size": len(mins),
+                  "minimizers": mins})
+
+
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
@@ -834,6 +884,38 @@ def main(argv: list[str] | None = None) -> int:
     ar.add_argument("--gap-open", type=float, default=-5.0)
     ar.add_argument("--gap-extend", type=float, default=-1.0)
     ar.set_defaults(func=_cmd_align_run)
+
+    kp = sub.add_parser("kmer", help="k-mer toolkit (count/compare/sketch)")
+    kpsub = kp.add_subparsers(dest="sub", required=True)
+    kc = kpsub.add_parser("count", help="canonical k-mer counts")
+    kcsrc = kc.add_mutually_exclusive_group(required=True)
+    kcsrc.add_argument("--sequence", default=None)
+    kcsrc.add_argument("--file", default=None, help="FASTA/FASTQ (auto-detect)")
+    kc.add_argument("--k", type=int, default=21)
+    kc.add_argument("--no-canonical", action="store_true")
+    kc.add_argument("--top", type=int, default=10)
+    kc.set_defaults(func=_cmd_kmer_count)
+    km2 = kpsub.add_parser("compare", help="Jaccard/containment between two sources")
+    kmsrc = km2.add_mutually_exclusive_group(required=True)
+    kmsrc.add_argument("--a", default=None, help="first sequence (with --b)")
+    kmsrc.add_argument("--file-a", default=None, help="first file (with --file-b)")
+    km2.add_argument("--b", default=None)
+    km2.add_argument("--file-b", default=None)
+    km2.add_argument("--k", type=int, default=21)
+    km2.add_argument("--w", type=int, default=None,
+                     help="minimizer window size (sketch estimate mode)")
+    km2.add_argument("--order", choices=["hash", "lex"], default="hash")
+    km2.add_argument("--no-canonical", action="store_true")
+    km2.set_defaults(func=_cmd_kmer_compare)
+    ks = kpsub.add_parser("sketch", help="minimizer sketch of a sequence/file")
+    kssrc = ks.add_mutually_exclusive_group(required=True)
+    kssrc.add_argument("--sequence", default=None)
+    kssrc.add_argument("--file", default=None, help="FASTA/FASTQ (auto-detect)")
+    ks.add_argument("--k", type=int, default=21)
+    ks.add_argument("--w", type=int, default=20)
+    ks.add_argument("--order", choices=["hash", "lex"], default="hash")
+    ks.add_argument("--no-canonical", action="store_true")
+    ks.set_defaults(func=_cmd_kmer_sketch)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
