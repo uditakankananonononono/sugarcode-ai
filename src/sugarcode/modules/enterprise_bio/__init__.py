@@ -1,2 +1,2 @@
-from .core import TIERS, Entitlements, GovernedEntitlements
-__all__=['TIERS','Entitlements','GovernedEntitlements']
+from .core import TIERS, Entitlements, GovernedEntitlements, GovernedOperations
+__all__=["TIERS","Entitlements","GovernedEntitlements","GovernedOperations"]
