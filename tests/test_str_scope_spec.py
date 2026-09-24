@@ -20,4 +20,22 @@ def test_intervention_nonprocedural_and_risk_adjusted():
 def test_report_complete_honest():
  r=str_report(SEQ,'CAG',['CAG'*20]); assert r['single_molecule'] and r['repair_network'] and r['interventions'] and 'no trained transformer/GNN' in r['model_status']
 def test_diagnostics_honest_finite():
- d=str_diagnostics(str_report(SEQ,'CAG',['CAG'*20])); assert len(d)==12 and all(math.isfinite(x) for x in d.values())
+ d=str_diagnostics(str_report(SEQ,'CAG',['CAG'*20])); assert len(d)>=50 and all(math.isfinite(x) for x in d.values())
+
+def test_find_strs_feeds_diagnostic_index():
+ hits=find_strs('ACGT'*5+'CAG'*40+'TTGACCA'*3); r=diagnostic_index(hits)
+ cag=[l for l in r['loci'] if l['unit']=='CAG'][0]
+ assert cag['delta']==14 and cag['delta_source']=='derived_from_reference' and cag['contribution']>0 and r['diagnostic_potential_index']>0
+ assert diagnostic_index(find_strs('CAG'*20))['diagnostic_potential_index']==0
+def test_hot_motif_matches_rotation_and_revcomp():
+ r=diagnostic_index([{'unit':'AGC','repeats':60},{'unit':'CTG','repeats':60}]); assert all(l['hot_motif'] for l in r['loci'])
+def test_reference_override():
+ h=[{'unit':'CAG','repeats':40}]; assert diagnostic_index(h,reference_repeats=39)['loci'][0]['delta']==1
+def test_architecture_detects_interruptions():
+ r=locus_architecture('TTT'+'CAG'*10+'CAA'+'CAG'*10+'TTT','CAG',3)
+ assert r['repeat_count']==21 and len(r['interruptions'])==1 and r['interruptions'][0]['observed']=='CAA' and abs(r['purity']-20/21)<1e-9 and r['left_flank']=='TTT' and r['right_flank']=='TTT'
+def test_architecture_trims_edge_mismatch():
+ r=locus_architecture('GGG'+'CAG'*10+'CAT'+'GGG','CAG'); assert r['repeat_count']==10 and not r['interruptions']
+def test_diagnostics_track_interruptions_and_reads():
+ d=str_diagnostics(str_report('TTT'+'CAG'*30+'CAA'+'CAG'*30+'TTT','CAG',['CAG'*55,'CAG'*70]))
+ assert d['interruption_count']==1 and d['repeat_count']==61 and d['reads_expanded_fraction']==1.0 and d['longest_pure_run']==30

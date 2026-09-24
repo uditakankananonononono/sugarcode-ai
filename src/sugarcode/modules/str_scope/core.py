@@ -51,22 +51,66 @@ def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "") 
     }
 
 
-def diagnostic_index(str_loci: list[dict], repair_pathway_links: int = 0) -> dict:
+# Normal-range upper bounds (repeat units) at canonical disease loci, used only
+# when a locus carries no explicit 'delta' and no caller reference is given:
+# HTT CAG 26, DMPK CTG 34, FMR1 CGG 44, FXN GAA 33, CNBP CCTG 26, C9orf72 GGGGCC 24.
+# Loci whose motif matches none of these use DEFAULT_REFERENCE_REPEATS.
+# Override per locus with reference_repeats (int, or {motif: repeats}).
+REFERENCE_REPEATS = {"CAG": 26, "CTG": 34, "CGG": 44, "GAA": 33, "CCTG": 26, "GGGGCC": 24}
+DEFAULT_REFERENCE_REPEATS = 10
+_HOT_MOTIFS = ("CAG", "CTG", "CGG", "GCC", "GAA", "CAGG", "CCTG", "GGGGCC")
+_COMP = str.maketrans("ACGT", "TGCA")
+
+
+def _motif_class(unit: str) -> set[str]:
+    """All cyclic rotations of a motif and of its reverse complement."""
+    u = unit.upper()
+    rc = u.translate(_COMP)[::-1]
+    return {x[i:] + x[:i] for x in (u, rc) for i in range(len(x))}
+
+
+def _reference_for(unit: str, reference_repeats=None) -> int:
+    if isinstance(reference_repeats, (int, float)):
+        return int(reference_repeats)
+    cls = _motif_class(unit)
+    table = dict(REFERENCE_REPEATS)
+    if isinstance(reference_repeats, dict):
+        table.update({k.upper(): v for k, v in reference_repeats.items()})
+    for motif, ref in table.items():
+        if motif in cls:
+            return int(ref)
+    return DEFAULT_REFERENCE_REPEATS
+
+
+def diagnostic_index(str_loci: list[dict], repair_pathway_links: int = 0,
+                     reference_repeats=None) -> dict:
     """Diagnostic potential index across loci.
 
-    Combines expansion burden, motif pathogenicity priors (CAG/CTG/CGG known
-    expansion disease motifs) and DNA-repair-pathway disruption links.
+    Combines expansion burden, motif pathogenicity priors (known expansion
+    disease motifs, matched across rotations and reverse complement) and
+    DNA-repair-pathway disruption links. Accepts expansion_call() records
+    (which carry 'delta') or raw find_strs() hits (delta derived from
+    'repeats' minus the motif reference; see REFERENCE_REPEATS).
     """
-    hot = {"CAG", "CTG", "CGG", "GCC", "GAA", "CAGG", "CCTG"}
+    hot = set().union(*(_motif_class(m) for m in _HOT_MOTIFS))
     score = 0.0
     annotated = []
     for locus in str_loci:
         unit = locus["unit"].upper()
-        delta = locus.get("delta", 0)
-        w = 1.5 if unit in hot or unit[::-1] in hot else 1.0
+        if "delta" in locus:
+            delta, ref, source = locus["delta"], locus.get("reference_repeats"), "supplied"
+        elif "repeats" in locus:
+            ref = _reference_for(unit, reference_repeats)
+            delta, source = locus["repeats"] - ref, "derived_from_reference"
+        else:
+            raise ValueError("each locus needs 'delta' or 'repeats'")
+        is_hot = unit in hot
+        w = 1.5 if is_hot else 1.0
         contrib = w * min(max(delta, 0) / 10.0, 3.0)
         score += contrib
-        annotated.append({**locus, "hot_motif": unit in hot, "contribution": round(contrib, 3)})
+        annotated.append({**locus, "hot_motif": is_hot, "delta": delta,
+                          "reference_repeats": ref, "delta_source": source,
+                          "contribution": round(contrib, 3)})
     score += 0.5 * repair_pathway_links
     index = round(1 - math.exp(-score / 5.0), 3)
     return {
@@ -96,10 +140,34 @@ def reconstruct_repeat_reads(reads,motif):
         rows.append({'read_id':rid,**best,'purity':1-len(best['interruptions'])/max(1,best['repeat_count'])})
     counts=np.array([r['repeat_count'] for r in rows],float); return {'reads':rows,'molecule_count':len(rows),'median_repeats':float(np.median(counts)) if len(counts) else 0,'mosaicism_std':float(counts.std()) if len(counts) else 0}
 
-def locus_architecture(sequence,motif,flank=20):
-    hits=find_strs(sequence,min_unit=len(motif),max_unit=len(motif),min_repeats=2); candidates=[h for h in hits if h['unit']==motif];
-    if not candidates: return {'motif':motif,'repeat_count':0,'interruptions':[],'left_flank':'','right_flank':''}
-    h=max(candidates,key=lambda x:x['length']); s=clean_dna(sequence); return {**h,'motif':motif,'repeat_count':h['repeats'],'purity':1.0,'interruptions':[],'left_flank':s[max(0,h['start']-flank):h['start']],'right_flank':s[h['start']+h['length']:h['start']+h['length']+flank]}
+def locus_architecture(sequence,motif,flank=20,max_mismatch=1):
+    """Locus repeat architecture with interruption-tolerant tract extension.
+
+    Seeds on the longest exact run of the motif, then extends in-frame over
+    units with <= max_mismatch substitutions, trimming so the tract starts
+    and ends on an exact unit. Reports purity and each interruption.
+    """
+    motif=clean_dna(motif); s=clean_dna(sequence); u=len(motif)
+    empty={'motif':motif,'repeat_count':0,'purity':0.0,'interruptions':[],'left_flank':'','right_flank':''}
+    if not u: raise ValueError('motif must be non-empty')
+    best=(0,-1)  # (exact repeats, start); phase-locked to the motif, unlike find_strs' greedy scan
+    for i0 in range(len(s)-u+1):
+        if s[i0:i0+u]==motif and (i0<u or s[i0-u:i0]!=motif):
+            r=1
+            while s[i0+r*u:i0+(r+1)*u]==motif: r+=1
+            if r>best[0]: best=(r,i0)
+    if best[0]<2: return empty
+    h={'repeats':best[0]}; start,end=best[1],best[1]+best[0]*u
+    def ok(c): return len(c)==u and sum(x!=y for x,y in zip(c,motif))<=max_mismatch
+    while end+u<=len(s) and ok(s[end:end+u]): end+=u
+    while start-u>=0 and ok(s[start-u:start]): start-=u
+    while end-start>u and s[end-u:end]!=motif: end-=u
+    while end-start>u and s[start:start+u]!=motif: start+=u
+    units=[s[i:i+u] for i in range(start,end,u)]
+    ints=[{'repeat_index':j,'position':start+j*u,'observed':c,'expected':motif} for j,c in enumerate(units) if c!=motif]
+    return {'start':start,'unit':motif,'unit_len':u,'repeats':len(units),'length':end-start,'motif':motif,'repeat_count':len(units),
+            'pure_repeats':h['repeats'],'purity':1-len(ints)/len(units),'interruptions':ints,
+            'left_flank':s[max(0,start-flank):start],'right_flank':s[end:end+flank]}
 
 def repeat_instability(initial_repeats,divisions=50,slippage=.05,mmr=.8,ber=.5,seed=0,trajectories=500):
     if not 0<=min(slippage,mmr,ber)<=max(slippage,mmr,ber)<=1: raise ValueError('rates must be in [0,1]')
@@ -122,4 +190,43 @@ def str_report(sequence,motif,reads=None,region='coding'):
     arch=locus_architecture(sequence,motif); n=arch['repeat_count']; return {'architecture':arch,'single_molecule':reconstruct_repeat_reads(reads,motif) if reads else None,'instability':repeat_instability(n or 1,divisions=20),'molecular_consequence':molecular_consequence(motif,n,region),'repair_network':repair_network(n),'interventions':[intervention_assessment(n,s) for s in ('repeat_interruption','rna_targeting','repair_modulation')],'model_status':'Transparent repeat parsing, stochastic repair and pathway equations; no trained transformer/GNN and not clinical guidance.'}
 
 def str_diagnostics(report):
-    a=report['architecture']; i=report['instability']; c=report['molecular_consequence']; n=report['repair_network']; sm=report['single_molecule']; return {'repeat_count':float(a['repeat_count']),'unit_length':float(a.get('unit_len',len(a['motif']))),'repeat_length':float(a.get('length',0)),'purity':float(a.get('purity',0)),'interruption_count':float(len(a['interruptions'])),'molecule_count':float(sm['molecule_count'] if sm else 0),'mosaicism_std':float(sm['mosaicism_std'] if sm else 0),'expansion_probability':i['expansion_probability'],'contraction_probability':i['contraction_probability'],'final_variance':i['variance_trajectory'][-1],'consequence_burden':float(max(v for k,v in c.items() if k!='region')),'instability_index':n['genomic_instability_index']}
+    """Flat numeric diagnostic panel (>=50 features) derived from str_report()."""
+    a=report['architecture']; i=report['instability']; c=report['molecular_consequence']; n=report['repair_network']; sm=report['single_molecule']; iv=report['interventions']
+    motif=a['motif']; n_rep=float(a['repeat_count']); ref=_reference_for(motif) if motif else DEFAULT_REFERENCE_REPEATS
+    mt=np.asarray(i['mean_trajectory'],float); vt=np.asarray(i['variance_trajectory'],float); fd=np.asarray(i['final_distribution'],float)
+    gc=(motif.count('G')+motif.count('C'))/len(motif) if motif else 0.0
+    ints=a['interruptions']; pos=[x['repeat_index'] for x in ints]
+    reads=sm['reads'] if sm else []; rc=np.asarray([r['repeat_count'] for r in reads],float) if reads else np.zeros(1)
+    rp=np.asarray([r['purity'] for r in reads],float) if reads else np.zeros(1)
+    cvals={k:float(v) for k,v in c.items() if isinstance(v,(int,float)) and not isinstance(v,bool)}
+    nodes=n['nodes']; eff={x['strategy']:x for x in iv}; best=max(iv,key=lambda x:x['net_benefit'])
+    d={'repeat_count':n_rep,'unit_length':float(len(motif)),'repeat_length':float(a.get('length',0)),'pure_repeats':float(a.get('pure_repeats',0)),
+       'purity':float(a.get('purity',0)),'interruption_count':float(len(ints)),
+       'first_interruption_index':float(min(pos)) if pos else -1.0,'last_interruption_index':float(max(pos)) if pos else -1.0,
+       'longest_pure_run':float(max(np.diff([-1]+pos+[int(n_rep)])-1)) if n_rep else 0.0,
+       'motif_gc_fraction':gc,'left_flank_gc':_gc(a.get('left_flank','')),'right_flank_gc':_gc(a.get('right_flank','')),
+       'hot_motif':float(any(m in _motif_class(motif) for m in _HOT_MOTIFS)) if motif else 0.0,
+       'reference_repeats':float(ref),'delta_vs_reference':n_rep-ref,'fold_over_reference':n_rep/ref if ref else 0.0,
+       'expansion_call_risk':expansion_call(int(n_rep),ref,motif)['instability_risk'],
+       'molecule_count':float(sm['molecule_count'] if sm else 0),'median_read_repeats':float(sm['median_repeats'] if sm else 0),
+       'mosaicism_std':float(sm['mosaicism_std'] if sm else 0),'read_repeat_min':float(rc.min()),'read_repeat_max':float(rc.max()),
+       'read_repeat_range':float(np.ptp(rc)),'read_mean_purity':float(rp.mean()),'read_min_purity':float(rp.min()),
+       'reads_expanded_fraction':float(np.mean(rc>ref)) if reads else 0.0,
+       'expansion_probability':i['expansion_probability'],'contraction_probability':i['contraction_probability'],
+       'stable_probability':1-i['expansion_probability']-i['contraction_probability'],'final_mean':float(fd.mean()),
+       'final_median':float(np.median(fd)),'final_p90':float(np.percentile(fd,90)),'final_max':float(fd.max()),'final_min':float(fd.min()),
+       'final_variance':float(vt[-1]),'mean_drift':float(mt[-1]-mt[0]),'drift_per_division':float((mt[-1]-mt[0])/max(1,len(mt)-1)),
+       'variance_growth_per_division':float((vt[-1]-vt[0])/max(1,len(vt)-1)),'crossing_reference_fraction':float(np.mean(fd>ref)),
+       'instability_index':float(n['genomic_instability_index'])}
+    d.update({f'consequence_{k}':v for k,v in cvals.items()})
+    d['consequence_burden']=max(cvals.values()) if cvals else 0.0
+    d.update({f'network_{k}':float(v) for k,v in nodes.items()})
+    d['network_edge_count']=float(len(n['edges']))
+    for k in ('repeat_interruption','rna_targeting','repair_modulation'):
+        if k in eff: d[f'intervention_{k}_net_benefit']=float(eff[k]['net_benefit']); d[f'intervention_{k}_expected_repeats']=float(eff[k]['expected_repeats_or_burden'])
+    d['best_intervention_net_benefit']=float(best['net_benefit'])
+    return d
+
+
+def _gc(seq):
+    return (seq.count('G')+seq.count('C'))/len(seq) if seq else 0.0
