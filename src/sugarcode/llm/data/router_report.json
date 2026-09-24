@@ -1,0 +1,29 @@
+{
+ "trained_at": "2026-09-24 14:55:08 +0530",
+ "seed": 7,
+ "n_modules": 88,
+ "n_passages": 1415,
+ "n_train": 1166,
+ "n_test": 249,
+ "vocab": 6000,
+ "heldout_passages": {
+  "softmax_top1": 0.4899598393574297,
+  "softmax_top3": 0.6746987951807228,
+  "centroid_top1": 0.5020080321285141,
+  "centroid_top3": 0.6987951807228916,
+  "majority_top1": 0.05220883534136546
+ },
+ "author_queries": {
+  "n": 88,
+  "softmax_top1": 0.875,
+  "softmax_top3": 0.9545454545454546,
+  "centroid_top1": 0.9431818181818182,
+  "centroid_top3": 0.9772727272727273
+ },
+ "final_model": {
+  "trained_on": "all passages",
+  "vocab": 6000,
+  "author_queries_top3_after_refit": 0.9659090909090909
+ },
+ "train_seconds": 24.5
+}
