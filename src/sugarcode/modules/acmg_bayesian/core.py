@@ -110,8 +110,15 @@ def classify_posterior(posterior: float) -> str:
 
 
 def _normalise(raw) -> dict:
+    """Accept "PM2", {"code": "PM2", "strength": ...} or ClinGen notation
+    "PM2_Supporting" / "PVS1_Very Strong" / "BS1_Stand Alone" (the form used by
+    the ClinGen Evidence Repository); the suffix becomes the strength."""
     item = {"code": raw} if isinstance(raw, str) else dict(raw)
-    item["code"] = str(item.get("code", "")).strip().upper()
+    code = str(item.get("code", "")).strip()
+    if "_" in code and "strength" not in item:
+        code, suffix = code.split("_", 1)
+        item["strength"] = suffix.strip()
+    item["code"] = code.strip().upper()
     return item
 
 
@@ -138,6 +145,11 @@ def bayesian_acmg(criteria: Iterable[str | dict], *,
             else:
                 ba1.append({"code": code, "direction": "benign", "strength": "stand_alone",
                             "provenance": prov})
+            continue
+        if code in DEFAULT_STRENGTH and DEFAULT_STRENGTH[code][0] == "benign" and \
+                str(item.get("strength", "")).lower().replace("-", "_").replace(" ", "_") == "stand_alone":
+            ba1.append({"code": code, "direction": "benign", "strength": "stand_alone",
+                        "provenance": prov})
             continue
         if code not in DEFAULT_STRENGTH:
             rejected.append({"input": raw, "reason": "unknown ACMG/AMP evidence code"})
