@@ -24,6 +24,9 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   pdb stats FILE                 structure summary, PDB or mmCIF (drop 71)
   protein props FILE|--sequence  pI, MW, extinction, instability, GRAVY (drop 72)
   primer tm SEQ                  SantaLucia NN Tm (drop 73)
+  motif scan --sites F|--iupac S|--jaspar F --sequence S|--fasta F  (drop 74)
+  motif info <source>            consensus, score range, PWM
+  motif to-jaspar <source>
   primer check SEQ               GC/homopolymer/hairpin/dimer heuristics
   primer pick FILE --region S:E  primer pairs flanking a region
   pdb chains FILE [--residues [--chain X]]
@@ -654,6 +657,64 @@ def _cmd_primer_pick(args) -> int:
 
 
 
+def _load_motif(args):
+    from .bio.motif import read_jaspar, from_iupac, from_alignment
+    from .bio.fasta import parse_fasta
+    if args.iupac:
+        return from_iupac(args.iupac)
+    if args.jaspar:
+        return read_jaspar(Path(args.jaspar).read_text())[0]
+    return from_alignment([r["sequence"]
+                           for r in parse_fasta(Path(args.sites).read_text())])
+
+
+def _motif_source_args(p):
+    src = p.add_mutually_exclusive_group(required=True)
+    src.add_argument("--sites", default=None,
+                     help="FASTA of aligned binding sites")
+    src.add_argument("--iupac", default=None, help="IUPAC consensus string")
+    src.add_argument("--jaspar", default=None, help="JASPAR matrix file")
+
+
+def _cmd_motif_scan(args) -> int:
+    from .bio.motif import scan
+    from .bio.fasta import parse_fasta
+    motif = _load_motif(args)
+    seqs = ([args.sequence] if args.sequence
+            else [r["sequence"]
+                  for r in parse_fasta(Path(args.fasta).read_text())])
+    out = []
+    for s in seqs:
+        kw = {"both_strands": not args.forward_only}
+        if args.threshold is not None:
+            kw["threshold"] = args.threshold
+            kw["threshold_fraction"] = None
+        else:
+            kw["threshold_fraction"] = args.fraction
+        out.append({"hits": scan(s, motif, **kw)})
+    return _emit({"motif": motif["name"], "length": motif["length"],
+                  "results": out})
+
+
+def _cmd_motif_info(args) -> int:
+    from .bio.motif import iupac_consensus, threshold_score
+    motif = _load_motif(args)
+    return _emit({"name": motif["name"], "length": motif["length"],
+                  "consensus": iupac_consensus(motif),
+                  "min_score": round(motif["min_score"], 4),
+                  "max_score": round(motif["max_score"], 4),
+                  "threshold_80pct": round(threshold_score(motif, 0.8), 4),
+                  "pwm": motif["pwm"]})
+
+
+def _cmd_motif_jaspar_convert(args) -> int:
+    from .bio.motif import write_jaspar
+    motif = _load_motif(args)
+    sys.stdout.write(write_jaspar([motif]))
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -706,6 +767,24 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    mot = sub.add_parser("motif", help="PWM motif toolkit")
+    motsub = mot.add_subparsers(dest="sub", required=True)
+    msc = motsub.add_parser("scan", help="scan sequences for motif hits")
+    _motif_source_args(msc)
+    tgt = msc.add_mutually_exclusive_group(required=True)
+    tgt.add_argument("--sequence", default=None)
+    tgt.add_argument("--fasta", default=None)
+    msc.add_argument("--threshold", type=float, default=None)
+    msc.add_argument("--fraction", type=float, default=0.8)
+    msc.add_argument("--forward-only", action="store_true")
+    msc.set_defaults(func=_cmd_motif_scan)
+    minfo = motsub.add_parser("info", help="motif summary + PWM")
+    _motif_source_args(minfo)
+    minfo.set_defaults(func=_cmd_motif_info)
+    mcv = motsub.add_parser("to-jaspar", help="emit JASPAR matrix")
+    _motif_source_args(mcv)
+    mcv.set_defaults(func=_cmd_motif_jaspar_convert)
 
     prm = sub.add_parser("primer", help="PCR primer toolkit")
     prmsub = prm.add_subparsers(dest="sub", required=True)
