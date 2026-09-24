@@ -70,3 +70,54 @@ def test_top_hypothesis_matches_lead():
  panel = r["variant_panel_summary"]
  lead = next((item for item in panel if item["lead_hypothesis"]), None)
  assert r["top_hypothesis"] == lead
+
+
+# --- hermetic literature + joint-view fixtures (no live NCBI in CI) ---
+from sugarcode.modules.infinite_diagnosis import core as _core
+from sugarcode.bio.entrez import EntrezError
+
+_RECS = [{"pmid": "11111111", "year": "2024", "title": "Sweat chloride as a diagnostic biomarker", "abstract": "", "journal": "J"}]
+
+
+@pytest.fixture(autouse=True)
+def _no_live_pubmed(monkeypatch):
+ monkeypatch.setattr(_core, "pubmed_ids", lambda q, retmax=10, offline=False: ["11111111"])
+ monkeypatch.setattr(_core, "pubmed_abstracts", lambda ids, offline=False: list(_RECS))
+
+
+def test_literature_hits_become_biomarker_candidates():
+ r = cross_domain_diagnosis(CASE_TEXT)
+ assert r["biomarker_candidates"] == ["PMID 11111111 (2024): Sweat chloride as a diagnostic biomarker"]
+ assert "1 PubMed records" in r["novelty_note"]
+
+
+def test_literature_no_hits_is_not_a_failure(monkeypatch):
+ calls = []
+ monkeypatch.setattr(_core, "pubmed_ids", lambda q, retmax=10, offline=False: [])
+ monkeypatch.setattr(_core, "pubmed_abstracts", lambda ids, offline=False: calls.append(ids) or [])
+ r = cross_domain_diagnosis(CASE_TEXT)
+ assert r["biomarker_candidates"] == [] and calls == []
+ assert "no records" in r["novelty_note"] and "failed" not in r["novelty_note"]
+
+
+def test_literature_failure_is_reported(monkeypatch):
+ def boom(q, retmax=10, offline=False):
+  raise EntrezError("network down")
+ monkeypatch.setattr(_core, "pubmed_ids", boom)
+ r = cross_domain_diagnosis(CASE_TEXT)
+ assert r["biomarker_candidates"] == []
+ assert "lookup failed" in r["novelty_note"]
+
+
+def test_joint_failed_lookups_marked_not_assessed(monkeypatch):
+ from sugarcode.modules.rarenet_ai import core as rn
+ panel = {"panel": [{"gene": "CFTR", "hgvs": "c.1521_1523del",
+   "clinvar": {"status": "lookup failed: EntrezError: offline"},
+   "gnomad": {"status": "lookup failed: GnomADError: offline"},
+   "gene_constraint": {"status": "ok"},
+   "support_score": 0.0, "score_components": [], "evidence_class": "little/no support"}],
+  "disclaimer": "d"}
+ monkeypatch.setattr(rn, "variant_evidence_panel", lambda v, offline=False: panel)
+ row = _joint_result()["variant_panel_summary"][0]
+ assert row["evidence_class"] == "not assessed - lookups failed: clinvar, gnomad"
+ assert row["support_score"] == 0.0 and row["lead_hypothesis"] is False
