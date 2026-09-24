@@ -1,4 +1,31 @@
 
+## chem_descriptors (2026-09-24, branch pb6)
+- `src/sugarcode/modules/chem_descriptors/data/periodic_table.json` (sha256
+  459ca66f1511a5e584c061982ab6f5f51e950d8d3687270324cdbce15ab3e644): element
+  average weights, most-common-isotope and isotope masses parsed by
+  `vendor_atomic_data.py` from RDKit `Code/GraphMol/atomic_data.cpp` at tag
+  Release_2024_09_6 (commit b3076c77284b9a8b9d5ef78957ee067037f373a8; source
+  sha256 7f9cee6e430b60d303a0a7fa9e33c45e5c529ee204f86afeab6a20f68b6b0631),
+  https://raw.githubusercontent.com/rdkit/rdkit/Release_2024_09_6/Code/GraphMol/atomic_data.cpp.
+  BSD-3-Clause; license copied to data/RDKIT_LICENSE.txt and
+  LICENSES/RDKIT-BSD-3-CLAUSE.txt (sha256 daeb8d19...9fca30).
+- HBD/HBA SMARTS and Strict rotatable-bond definitions re-implemented (not
+  copied) from RDKit `Code/GraphMol/Descriptors/Lipinski.cpp` at the same tag
+  (sha256 4a5b49e7007b65b4375e3252ef37b0a4a904a54b89e7c3fbdd2b19208a8f2b4f).
+- TPSA fragment contributions: Ertl, Rohde & Selzer 2000, J Med Chem 43:3714
+  (PMID 11020286, doi 10.1021/jm000942e), rule order as coded in RDKit
+  `Code/GraphMol/Descriptors/MolSurf.cpp` at the same tag (sha256
+  3496f0251bc07ac5a49c21fdde9262cb8c3d4b3c917c0b1d35b7f863c6b3296b).
+- Filters: Lipinski et al. 2001, Adv Drug Deliv Rev 46:3 (PMID 11259830, doi
+  10.1016/s0169-409x(00)00129-0); Veber et al. 2002, J Med Chem 45:2615 (PMID
+  12036371, doi 10.1021/jm020017n).
+- `tests/fixtures/chem_descriptors_oracle.json` (sha256
+  89d947403cb10baee294d50145519db65576aaa55b821bb304b879ddf6c9f7b0): RDKit
+  2024.09.6 descriptor values plus PubChem PUG-REST properties (formula, MW,
+  exact mass, TPSA, XLogP, SMILES; fetched 2026-09-24) for 66 named compounds,
+  and RDKit values for 60 stress SMILES. Regenerate with
+  scripts/chem_descriptors_oracle_ladder.py and scripts/chem_descriptors_oracle_stress.py.
+
 ## profile_hmm (2026-09-24, branch pb6)
 
 - Topology and algorithms: Durbin R, Eddy SR, Krogh A, Mitchison G, "Biological
