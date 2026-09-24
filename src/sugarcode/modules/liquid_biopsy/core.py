@@ -1,9 +1,11 @@
 from __future__ import annotations
 import numpy as np
 
+# TP53 added to lung and pancreatic (curation fix): mutated in 52.1% of 566 TCGA LUAD and 59.8% of 179
+# TCGA PAAD sequenced samples (cBioPortal PanCancer Atlas, 2026-09-25; TCGA Nature 2014, Cancer Cell 2017).
 CTDNA_MARKERS = {
-    "colorectal": ["KRAS", "APC", "TP53"], "lung": ["EGFR", "KRAS", "ALK"],
-    "breast": ["PIK3CA", "ESR1", "TP53"], "pancreatic": ["KRAS", "CDKN2A"],
+    "colorectal": ["KRAS", "APC", "TP53"], "lung": ["EGFR", "KRAS", "ALK", "TP53"],
+    "breast": ["PIK3CA", "ESR1", "TP53"], "pancreatic": ["KRAS", "CDKN2A", "TP53"],
     "prostate": ["AR", "TMPRSS2-ERG"], "melanoma": ["BRAF", "NRAS", "TERT"],
 }
 
@@ -60,9 +62,11 @@ def fragment_length_model(tumor_fraction: float = 0.0, n_fragments: int = 20000,
     healthy cfDNA peaks at ~166 bp (mono-nucleosomal, 147 bp core + linker);
     ctDNA is shorter, modal ~134-144 bp (Snyder et al. 2016; Underhill et al.
     2016). Model: mixture of gamma components for mono/di-nucleosomal peaks,
-    tumor fragments sampled from the short component; Shannon entropy of the
-    length histogram increases with tumor fraction; a log-likelihood-ratio
-    classifies a sampled profile."""
+    tumor fragments sampled from the short component. The short-fragment
+    fraction and the KL divergence to the healthy reference rise monotonically
+    with tumor fraction; Shannon entropy does NOT - it peaks when the healthy and
+    tumor components are balanced (4.42 -> 4.60 bits from tf 0 to 0.3, back to
+    4.55 at tf 0.6), so use KL or short fraction, not entropy, as the burden score."""
     import math
     import numpy as np
     if not 0.0 <= tumor_fraction <= 1.0:
@@ -198,6 +202,37 @@ def transformer_denoise(fragment_features, *, heads: int = 4, seed: int = 17,
     }
 
 
+def _haplotype_candidates(bits, observed, exhaustive_max_loci: int = 12):
+    """Candidate haplotypes for the EM.
+
+    BUG 45 fix: candidates used to be the unique rows with every unobserved locus
+    filled with 0, so two partial fragments 11- and -11 of the true haplotype 111
+    seeded 110 and 011 but never 111, and the EM could not recover it. Now: with
+    at most ``exhaustive_max_loci`` loci every haplotype is a candidate (the
+    Dirichlet prior keeps unsupported ones small); above that, fully observed
+    patterns plus unions of pairs of partial fragments that agree on >=1 shared
+    locus, with loci still unobserved filled by the per-locus majority allele.
+    """
+    n_loci = bits.shape[1]
+    if n_loci <= exhaustive_max_loci:
+        return ((np.arange(2 ** n_loci)[:, None] >> np.arange(n_loci - 1, -1, -1)) & 1).astype(int)
+    obs_n = observed.sum(0); ones = (bits * observed).sum(0)
+    majority = (ones * 2 > obs_n).astype(int)
+    patterns = {}
+    for b, o in zip(bits, observed):
+        patterns[tuple(np.where(o, b, -1))] = None
+    pats = [np.array(p) for p in patterns]
+    seeds = [np.where(p >= 0, p, majority) for p in pats]
+    for i in range(len(pats)):
+        for j in range(i + 1, min(len(pats), i + 200)):
+            a, b = pats[i], pats[j]
+            both = (a >= 0) & (b >= 0)
+            if both.any() and np.all(a[both] == b[both]):
+                u = np.where(a >= 0, a, b)
+                seeds.append(np.where(u >= 0, u, majority))
+    return np.unique(np.array(seeds, dtype=int), axis=0)
+
+
 def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
                                  max_iter: int = 200, tol: float = 1e-9) -> dict:
     """Reconstruct partial tumor haplotypes with a Dirichlet-mixture EM model.
@@ -211,7 +246,7 @@ def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
         raise ValueError("fragment_alleles must be a non-empty 2D matrix")
     observed = np.isfinite(f) & (f >= 0)
     bits = np.where(observed, (f >= .5).astype(int), 0)
-    candidates = np.unique(bits, axis=0)
+    candidates = _haplotype_candidates(bits, observed)
     if len(candidates) == 1:
         candidates = np.vstack([candidates, 1 - candidates])
     weights = np.full(len(candidates), 1 / len(candidates))
