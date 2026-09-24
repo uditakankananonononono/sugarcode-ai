@@ -33,6 +33,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   kmer count|compare|sketch [--k K] [--w W]  (drop 77)
   orf find|translate [--table N] [--starts atg|table]  (drop 79)
   rnaseq normalize|filter|sizefactors --counts F  (drop 80)
+  gstats hwe|allelic|genotypic|or|adjust  (drop 81)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -810,6 +811,43 @@ def _cmd_align_run(args) -> int:
     return _emit(r)
 
 
+def _triple(text):
+    parts = [int(x) for x in text.split(",")]
+    if len(parts) != 3:
+        raise SystemExit("expected three comma-separated counts (AA,AB,BB)")
+    return tuple(parts)
+
+
+def _cmd_gstats_hwe(args) -> int:
+    from .bio.gstats import hwe_exact
+    return _emit({"counts": [args.aa, args.ab, args.bb],
+                  "p_hwe_exact": hwe_exact(args.aa, args.ab, args.bb)})
+
+
+def _cmd_gstats_allelic(args) -> int:
+    from .bio.gstats import allelic_test
+    r = allelic_test(_triple(args.cases), _triple(args.controls), args.yates)
+    return _emit(r)
+
+
+def _cmd_gstats_genotypic(args) -> int:
+    from .bio.gstats import genotypic_test
+    return _emit(genotypic_test(_triple(args.cases), _triple(args.controls)))
+
+
+def _cmd_gstats_or(args) -> int:
+    from .bio.gstats import odds_ratio
+    return _emit(odds_ratio(args.a, args.b, args.c, args.d, args.ci))
+
+
+def _cmd_gstats_adjust(args) -> int:
+    from .bio import gstats as gs
+    pvals = [float(x) for x in args.pvalues.split(",") if x.strip()]
+    fn = gs.bonferroni if args.method == "bonferroni" else         gs.benjamini_hochberg
+    return _emit({"method": args.method, "pvalues": pvals,
+                  "adjusted": fn(pvals)})
+
+
 def _load_lengths(path):
     lens = {}
     for i, ln in enumerate(Path(path).read_text().splitlines()):
@@ -1087,6 +1125,33 @@ def main(argv: list[str] | None = None) -> int:
     rf.add_argument("--min-samples", type=int, default=1)
     rf.add_argument("--out", default=None)
     rf.set_defaults(func=_cmd_rnaseq_filter)
+
+    gs = sub.add_parser("gstats", help="genetics statistics toolkit")
+    gssub = gs.add_subparsers(dest="sub", required=True)
+    gh = gssub.add_parser("hwe", help="HWE exact test (Wigginton 2005)")
+    gh.add_argument("--aa", type=int, required=True)
+    gh.add_argument("--ab", type=int, required=True)
+    gh.add_argument("--bb", type=int, required=True)
+    gh.set_defaults(func=_cmd_gstats_hwe)
+    for name, helptext in (("allelic", "2x2 allelic chi-square + OR"),
+                           ("genotypic", "2x3 genotypic chi-square")):
+        gp = gssub.add_parser(name, help=helptext)
+        gp.add_argument("--cases", required=True, help="AA,AB,BB")
+        gp.add_argument("--controls", required=True, help="AA,AB,BB")
+        if name == "allelic":
+            gp.add_argument("--yates", action="store_true")
+        gp.set_defaults(func=_cmd_gstats_allelic if name == "allelic"
+                        else _cmd_gstats_genotypic)
+    go = gssub.add_parser("or", help="odds ratio + Woolf CI on a 2x2")
+    for cell in "abcd":
+        go.add_argument(f"--{cell}", type=float, required=True)
+    go.add_argument("--ci", type=float, default=0.95)
+    go.set_defaults(func=_cmd_gstats_or)
+    ga = gssub.add_parser("adjust", help="multiple-testing correction")
+    ga.add_argument("--pvalues", required=True, help="comma-separated")
+    ga.add_argument("--method", choices=["bonferroni", "bh"],
+                    default="bh")
+    ga.set_defaults(func=_cmd_gstats_adjust)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
