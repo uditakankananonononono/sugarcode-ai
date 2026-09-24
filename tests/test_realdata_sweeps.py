@@ -24,3 +24,12 @@ def test_locus_bands_genereviews():
     assert expansion_call(201, 44, "CGG", "FMR1")["classification"] == "full mutation range"
     # no locus: legacy behaviour unchanged
     assert expansion_call(80, 44, "CGG")["classification"].startswith("expanded")
+
+
+def test_acmg_clingen_suffix_notation():
+    from sugarcode.modules.acmg_bayesian.core import bayesian_acmg
+    a = bayesian_acmg(["PVS1_Strong", "PM2_Supporting", "PS4"])
+    b = bayesian_acmg([{"code": "PVS1", "strength": "strong"}, {"code": "PM2", "strength": "supporting"}, "PS4"])
+    assert a["points"] == b["points"] == 9 and not a["rejected_evidence"]
+    assert bayesian_acmg(["PM3_Very Strong", "PP4_Moderate"])["points"] == 10
+    assert bayesian_acmg(["BS1_Stand Alone"])["classification"] == "Benign"
