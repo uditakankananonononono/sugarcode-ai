@@ -2,7 +2,7 @@ from __future__ import annotations
 from ...bio.sequence import clean_dna, reverse_complement, tm_wallace, gc_content
 from ..crispr_opt.core import pam_sites, score_off_targets
 
-PBS_RANGE = (10, 17)   # primer binding site lengths (nt) per Anzalone et al.
+PBS_RANGE = (10, 16)   # PBS lengths (nt) per Anzalone et al.; the published PBS/RTT boundary leaves a 16 nt flap on the spacer, so longer PBS needs genomic context this function does not receive
 RTT_RANGE = (10, 20)   # reverse-transcriptase template lengths (nt)
 
 
@@ -11,8 +11,14 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
     """Build a pegRNA from a 20 nt spacer and the desired edited strand context.
 
     edit_seq: the desired post-edit sequence 3' of the nick on the edited
-    strand (RT template content). PBS is chosen by Wallace-Tm targeting
-    ~30-34 C within 10-17 nt; RTT within 10-20 nt.
+    strand (RT template content). The PBS anneals to the 3' flap of the
+    nicked strand, i.e. the genomic sequence immediately 5' of the nick;
+    with an NGG PAM the PBS/RTT boundary follows the convention of the
+    published, experimentally validated pegRNAs (Anzalone et al. 2019 HEK3
+    +1 CTT and RNF2 +5 G>T; Chow et al. 2021): the PBS is the reverse
+    complement of spacer[16-pbs_len:16] and the RTT templates from spacer
+    position 17 (1-based). PBS length is chosen by Wallace-Tm targeting
+    ~30-34 C within 10-16 nt; RTT within 10-20 nt.
     """
     spacer = clean_dna(spacer)
     if len(spacer) != 20:
@@ -23,7 +29,7 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
     if pbs_len is None:
         best, best_d = PBS_RANGE[0], 1e9
         for L in range(PBS_RANGE[0], PBS_RANGE[1] + 1):
-            cand = rc_edit[:L]
+            cand = reverse_complement(spacer[16 - L:16])
             d = abs(tm_wallace(cand) - 32.0)
             if d < best_d:
                 best, best_d = L, d
@@ -34,7 +40,7 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
     if not RTT_RANGE[0] <= rtt_len <= RTT_RANGE[1]:
         raise ValueError(f"RTT length must be {RTT_RANGE[0]}-{RTT_RANGE[1]} nt")
 
-    pbs = rc_edit[:pbs_len]
+    pbs = reverse_complement(spacer[16 - pbs_len:16])
     rtt = rc_edit[:rtt_len]
     ext = rtt + pbs  # 3' extension, 5'->3'
     # first base of RTT should not be C (pairs with scaffold G -> mispriming)
@@ -89,15 +95,20 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
             if g_start < 0:
                 continue
             spacer = region[g_start:site["position"]]
-            # RT template = edited strand 3' of nick (nick at PAM-3)
-            nick = site["position"] - 3
-            rtt_source = edited[pos:pos + 20] if etype != "deletion" else edited[max(0, nick - 0):nick + 20]
+            # RT template = edited strand 3' of the nick; the PBS/RTT
+            # boundary is 4 nt upstream of the PAM per the published convention
+            nick = site["position"] - 4
+            if pos < nick or pos - nick >= 20:
+                continue  # edit outside the reverse-transcribed window
+            rtt_source = edited[nick:nick + 20]
         else:
             g_start = site["position"] + 3
             if g_start + 20 > len(region):
                 continue
             spacer = reverse_complement(region[g_start:g_start + 20])
-            nick = site["position"] + 3
+            nick = site["position"] + 4
+            if pos >= nick or nick - pos > 20:
+                continue  # edit outside the reverse-transcribed window
             rtt_source = reverse_complement(edited[max(0, nick - 20):nick])
         try:
             peg = design_pegrna(spacer, rtt_source[:20] if len(rtt_source) >= 10 else rtt_source)
@@ -216,7 +227,7 @@ def edit_window_score(edit_distance,rtt_length,optimal=(4,15)):
 def outcome_distribution(peg,repair=None,nick=None):
     repair=repair or repair_competition(peg['rt_template']); tm=max(0,1-abs(peg['pbs_tm_c']-32)/15); process=rt_processivity(peg['rt_template'])['completion_probability']; nick_gain=.15*(nick or {}).get('score',0); intended=min(1,repair['intended']*.5+.3*tm+.2*process+nick_gain); partial=repair['partial_edit']*(1-intended); indel=min(.5,repair['indel']+.2*(nick or {}).get('dsb_like_risk',0)); reverted=repair['reverted']; raw=np.array([intended,partial,indel,reverted,max(0,1-intended-partial-indel-reverted)]); raw=raw/raw.sum(); return {"intended_edit":float(raw[0]),"partial_edit":float(raw[1]),"indel":float(raw[2]),"reverted":float(raw[3]),"unedited":float(raw[4])}
 
-def architecture_variants(spacer,edit_seq,pbs_lengths=range(10,18),rtt_lengths=range(10,21)):
+def architecture_variants(spacer,edit_seq,pbs_lengths=range(10,17),rtt_lengths=range(10,21)):
     designs=[]
     for pbs in pbs_lengths:
         for rtt in rtt_lengths:
