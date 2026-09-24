@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1807 passed, 0 failed, 8 skipped** after the 2026-09-24 audit fix wave (earlier: 1709 passed / 7 skipped on the pb3 + pb6 integration merge), 95 modules, run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
+Test suite: **1825 passed, 0 failed, 8 skipped** after the 2026-09-24 audit fix wave (earlier: 1709 passed / 7 skipped on the pb3 + pb6 integration merge), 95 modules, run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
