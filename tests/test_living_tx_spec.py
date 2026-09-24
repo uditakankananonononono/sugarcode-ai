@@ -17,3 +17,15 @@ def test_validation_errors_are_informative():
  with pytest.raises(ValueError,match="payload"): validate_design_inputs("fake","Lactobacillus",1e9)
  with pytest.raises(ValueError,match="chassis"): validate_design_inputs("IL-10","fake",1e9)
  with pytest.raises(ValueError,match="dose_cfu"): validate_design_inputs("IL-10","Lactobacillus",1)
+def test_flagship_reports_washout_not_ready():
+ r=design_living_therapy("IL-10",dose_cfu=1e9,days=14)
+ assert r["verdict"]["status"]=="washed_out" and r["readiness"]=="not_ready"
+ assert isinstance(r["verdict"]["persisting_alternatives"],list)
+def test_flagship_ready_when_persistent():
+ r=design_living_therapy("phenylalanine_degradase",days=1)
+ assert r["verdict"]["status"]=="persists" and r["readiness"]=="ready_for_lab"
+def test_verdict_reports_thresholds():
+ s=simulate_gut_community("Lactobacillus","IL-10",dose_cfu=1e6,days=2)
+ v=simulation_verdict(s)
+ assert v["status"] in ("persists","washed_out","resident_takeover")
+ assert v["terminal_engraftment_fraction"]==s["terminal_engraftment_fraction"]
