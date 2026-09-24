@@ -60,3 +60,12 @@ def test_diagnostics_change_with_sequence():
 
 def test_invalid_transition_rejected():
  with pytest.raises(ValueError): temporal_trajectory([1,0],[[1,1],[0,1]])
+
+
+def test_sweep_binding_energy_iupac_sets():
+    from sugarcode.modules.dark_genome import motif_binding_energy
+    # degenerate codes must match only their own base set: R={A,G}, never C
+    assert motif_binding_energy("C" * 20, "RRR")["match"] == 0.0
+    assert motif_binding_energy("A" * 20, "RRR")["match"] == 1.0
+    assert motif_binding_energy("CATG" * 5, "CWWG")["match"] == 1.0
+    assert motif_binding_energy("CGCG" * 5, "CWWG")["match"] < 1.0
