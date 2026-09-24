@@ -24,11 +24,13 @@ def _yield_model(mg, k, pep, tpl, peg) -> float:
 def optimize_cfps(grid_step: int = 2) -> dict:
     """Grid search over reagent space for max yield under cost ceiling."""
     best = None
-    mg_v = range(4, 21, grid_step)
-    k_v = range(40, 201, 2 * grid_step * 10)
-    pep_v = range(0, 41, 2 * grid_step)
-    tpl_v = range(2, 31, grid_step * 2)
-    peg_v = range(0, 5, 1)
+    # grids always include each reagent's documented optimum; otherwise some
+    # steps (e.g. grid_step=2 for template: 2,6,10,14,...) never evaluate it
+    mg_v = sorted(set(range(4, 21, grid_step)) | {REAGENTS["mg_mm"]["opt"]})
+    k_v = sorted(set(range(40, 201, 2 * grid_step * 10)) | {REAGENTS["k_mm"]["opt"]})
+    pep_v = sorted(set(range(0, 41, 2 * grid_step)) | {REAGENTS["pep_mm"]["opt"]})
+    tpl_v = sorted(set(range(2, 31, grid_step * 2)) | {REAGENTS["template_ng_ul"]["opt"]})
+    peg_v = sorted(set(range(0, 5, 1)) | {REAGENTS["peg_pct"]["opt"]})
     evaluated = 0
     for mg, k, pep, tpl, peg in itertools.product(mg_v, k_v, pep_v, tpl_v, peg_v):
         y = _yield_model(mg, k, pep, tpl, peg)
