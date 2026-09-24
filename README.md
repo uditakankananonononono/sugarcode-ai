@@ -598,7 +598,7 @@ from sugarcode.modules.chemgpt_engine import similarity_check
 
 interpret_variant_live("BRCA1", "c.5266dup", consequence="frameshift")
 structure_dynamics("1TUP", chain="B")        # ANM modes on real 2.2 A coordinates
-similarity_check("CC(=O)Oc1ccccc1C(=O)O")    # -> ASPIRIN, 100%, phase 4
+similarity_check("CC(=O)Oc1ccccc1C(=O)O")    # live ChEMBL neighbours (2026-09-24 top hit: CHEMBL2296002, phase 0)
 ```
 
 OpenClinVar now adds live ClinVar evidence to its ACMG-style weighing: a
@@ -608,8 +608,8 @@ matched c.5500dup), with honest sign handling (conflicting/uncertain = weight
 0, not positive). EvoFold 4D runs ANM normal modes on real RCSB coordinates
 and validates fluctuations against experimental B-factors (1TUP chain B:
 Pearson r = 0.05, honestly reported as weak agreement). ChemGPT designs are
-checked against live ChEMBL server-side Tanimoto similarity - live-verified:
-aspirin matches itself at 100% with approved neighbors; an invented molecule
+checked against live ChEMBL server-side Tanimoto similarity - a 2026-09-24 re-check
+returned CHEMBL2296002 (phase 0) as aspirin's top hit, not a 100% phase-4 self-match; an invented molecule
 correctly reports novel scaffold space. Failures raise/report, never fabricate.
 Ensembl REST remains unreachable from this network (final retry failed); the
 Ensembl-dependent route stays labeled Missing.
