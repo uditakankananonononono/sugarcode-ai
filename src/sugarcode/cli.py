@@ -2,13 +2,16 @@
 
 Subcommands (all offline except splice assess, all JSON on stdout):
   version                          print version
-  modules                          list the 88 registered modules
+  modules                          list the 89 registered modules
   splice assess GENE NOTATION      deepsplice live assessment [--transcript NM] [--offline]
   codon cai SEQ                    codon adaptation index vs a published table
   codon optimize PROTEIN           codon-optimized DNA (GC-window repair, motif avoidance)
   fasta stats FILE                 record count, lengths, GC
   genbank features FILE            locus feature summary (type counts, spans)
   pwm score SEQ --motif NAME       normalized log-odds score on a shipped splice matrix
+  report splice GENE NOTATION    render an assessment as HTML/Markdown/bundle (drop 62)
+  report notebook GENE NOTATION  executable .ipynb reproducing the assessment
+  report validate-notebook FILE  structural nbformat check
 
 Exit codes: 0 ok, 2 usage error.
 """
@@ -129,6 +132,47 @@ def _cmd_pwm_score(args) -> int:
     return _emit(out)
 
 
+def _cmd_report_splice(args) -> int:
+    from .modules.report_studio import splice_assessment_report, bundle_report
+    assessment = live_splice_assessment(args.gene, args.notation,
+                                        offline=args.offline,
+                                        transcript=args.transcript)
+    rep = splice_assessment_report(assessment)
+    if args.format == "json":
+        bundle = bundle_report("splice-assessment", rep)
+        return _emit({"name": bundle["name"], "created_utc": bundle["created_utc"],
+                      "files": {fn: {"sha256": a["sha256"], "bytes": a["bytes"]}
+                                for fn, a in bundle["artifacts"].items()},
+                      "metadata": bundle["metadata"]})
+    text = rep["html"] if args.format == "html" else rep["markdown"]
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_report_notebook(args) -> int:
+    from .modules.report_studio import splice_notebook
+    r = splice_notebook(args.gene, args.notation,
+                        transcript=args.transcript, offline=args.offline)
+    if args.out:
+        Path(args.out).write_text(r["json"], encoding="utf-8")
+        print(f"wrote {args.out} (valid={r['valid']})")
+        return 0
+    sys.stdout.write(r["json"])
+    return 0
+
+
+def _cmd_report_validate_notebook(args) -> int:
+    from .report import validate_notebook
+    nb = json.loads(Path(args.file).read_text())
+    problems = validate_notebook(nb)
+    return _emit({"file": args.file, "valid": not problems, "problems": problems})
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -182,9 +226,31 @@ def main(argv: list[str] | None = None) -> int:
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
 
+    r = sub.add_parser("report", help="lab reports, notebooks and evidence bundles")
+    rsub = r.add_subparsers(dest="sub", required=True)
+    rs = rsub.add_parser("splice", help="render a deepsplice assessment as a report")
+    rs.add_argument("gene")
+    rs.add_argument("notation")
+    rs.add_argument("--transcript", default=None)
+    rs.add_argument("--offline", action="store_true")
+    rs.add_argument("--format", default="html", choices=["html", "md", "json"],
+                    help="json emits a sha256-checksummed evidence bundle")
+    rs.add_argument("--out", default=None, help="write to a file instead of stdout")
+    rs.set_defaults(func=_cmd_report_splice)
+    rn = rsub.add_parser("notebook", help="generate an executable .ipynb for an assessment")
+    rn.add_argument("gene")
+    rn.add_argument("notation")
+    rn.add_argument("--transcript", default=None)
+    rn.add_argument("--offline", action="store_true")
+    rn.add_argument("--out", default=None, help="write the .ipynb to a file")
+    rn.set_defaults(func=_cmd_report_notebook)
+    rv = rsub.add_parser("validate-notebook", help="structurally validate an .ipynb file")
+    rv.add_argument("file")
+    rv.set_defaults(func=_cmd_report_validate_notebook)
+
     v = sub.add_parser("version", help="print version")
     v.set_defaults(func=_cmd_version)
-    m = sub.add_parser("modules", help="list the 88 registered modules")
+    m = sub.add_parser("modules", help="list the 89 registered modules")
     m.set_defaults(func=_cmd_modules)
     args = p.parse_args(argv)
     return args.func(args)
