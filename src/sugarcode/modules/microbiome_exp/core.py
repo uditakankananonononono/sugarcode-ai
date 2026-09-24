@@ -84,7 +84,8 @@ def cohort_analysis(table: dict[str,dict[str,int]], metadata: dict[str,dict]|Non
     bray=np.zeros((len(samples),len(samples)))
     for i in range(len(samples)):
         for j in range(len(samples)): bray[i,j]=np.sum(abs(P[i]-P[j]))/max(np.sum(P[i]+P[j]),1e-12)
-    centered=-.5*(bray**2-bray.mean(0)[None,:]-bray.mean(1)[:,None]+bray.mean() ); vals,vec=np.linalg.eigh(centered); order=np.argsort(vals)[::-1]; coords=vec[:,order[:2]]*np.sqrt(np.maximum(vals[order[:2]],0))
+    d2=bray**2; centered=-.5*(d2-d2.mean(0)[None,:]-d2.mean(1)[:,None]+d2.mean())  # Gower centering uses means of the squared distances;
+    vals,vec=np.linalg.eigh(centered); order=np.argsort(vals)[::-1]; coords=vec[:,order[:2]]*np.sqrt(np.maximum(vals[order[:2]],0))
     funcs={s:{f:sum(P[i,j] for j,t in enumerate(taxa) if f in FUNCTIONAL_POTENTIAL.get(t,[])) for f in {z for t in taxa for z in FUNCTIONAL_POTENTIAL.get(t,[])}} for i,s in enumerate(samples)}
     flags={s:analyze_16s(table[s],metadata.get(s))["disease_correlations"] for s in samples}
     return {"samples":samples,"taxa":taxa,"relative_abundance":{s:{t:float(P[i,j]) for j,t in enumerate(taxa)} for i,s in enumerate(samples)},"alpha_diversity":alpha,"bray_curtis":bray.tolist(),"ordination":{"method":"classical PCoA","coordinates":{s:coords[i].tolist() for i,s in enumerate(samples)},"eigenvalues":vals[order[:2]].tolist()},"functional_potential":funcs,"disease_correlations":flags,"model_status":"descriptive hermetic 16S statistics; associations are not diagnoses"}
