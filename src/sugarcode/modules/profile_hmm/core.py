@@ -439,3 +439,50 @@ def brute_force_expected_counts(model: ProfileHMM, sequences) -> dict:
                     counts["insert_emissions"][k][x[i]] += w; i += 1
                 prev = (kind, k)
     return counts
+
+
+def _dp_local(model: ProfileHMM, x: list[int]) -> float:
+    """Forward in log-odds space with unaligned N/C flanks (HMMER-style
+    'glocal': global to the model, local to the sequence). Flank residues
+    are emitted at background (log-odds 0); each flank carries a loop
+    probability n/(n+1) and an exit probability 1/(n+1), so a model match
+    embedded in a long unrelated sequence is not penalised by its flanks."""
+    L, n = model.length, len(x)
+    lq = np.log(model.background)
+    with np.errstate(divide="ignore"):
+        eM = np.log(model.match_emissions) - lq[None, :]
+        eI = np.log(model.insert_emissions) - lq[None, :]
+        tM, tI, tD = np.log(model.t_match), np.log(model.t_insert), np.log(model.t_delete)
+    loop, move = math.log(n / (n + 1.0)) if n else NEG_INF, math.log(1.0 / (n + 1.0))
+    VM = np.full((L + 1, n + 1), NEG_INF)
+    VI = np.full((L + 1, n + 1), NEG_INF)
+    VD = np.full((L + 1, n + 1), NEG_INF)
+    for i in range(n + 1):
+        VM[0][i] = i * loop + move if i else move        # N flank of length i, then Begin
+    ends = []
+    for i in range(n + 1):
+        for j in range(L + 1):
+            if j >= 1 and i >= 1:
+                best = _logsumexp([VM[j - 1][i - 1] + tM[j - 1][TO_M], VI[j - 1][i - 1] + tI[j - 1][TO_M],
+                                   (VD[j - 1][i - 1] + tD[j - 1][TO_M]) if j - 1 >= 1 else NEG_INF])
+                VM[j][i] = eM[j][x[i - 1]] + best if best != NEG_INF else NEG_INF
+            if i >= 1:
+                best = _logsumexp([VM[j][i - 1] + tM[j][TO_I], VI[j][i - 1] + tI[j][TO_I],
+                                   (VD[j][i - 1] + tD[j][TO_I]) if j >= 1 else NEG_INF])
+                VI[j][i] = eI[j][x[i - 1]] + best if best != NEG_INF else NEG_INF
+            if j >= 1:
+                VD[j][i] = _logsumexp([VM[j - 1][i] + tM[j - 1][TO_D], VI[j - 1][i] + tI[j - 1][TO_D],
+                                       (VD[j - 1][i] + tD[j - 1][TO_D]) if j - 1 >= 1 else NEG_INF])
+        e = _logsumexp([VM[L][i] + tM[L][TO_M], VI[L][i] + tI[L][TO_M], VD[L][i] + tD[L][TO_M]])
+        ends.append(e + ((n - i) * loop if n - i else 0.0) + move)   # C flank of length n-i
+    return _logsumexp(ends)
+
+
+def forward_local(model: ProfileHMM, sequence: str) -> dict:
+    """Glocal Forward log-odds (see _dp_local). Use this to score full-length
+    sequences that contain the modelled domain plus unrelated flanks; the
+    global ``forward`` charges every flank residue to insert states."""
+    x = model.encode(sequence)
+    lo = _dp_local(model, x)
+    return {"log_odds": lo, "log_odds_bits": lo / math.log(2) if lo != NEG_INF else NEG_INF,
+            "algorithm": "forward_local"}
