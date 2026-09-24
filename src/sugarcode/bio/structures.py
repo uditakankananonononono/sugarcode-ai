@@ -171,6 +171,8 @@ def parse_pdb_atoms(text: str) -> list[dict]:
     for line in text.splitlines():
         if not line.startswith("ATOM"):
             continue
+        if len(line) > 16 and line[16] not in (" ", "A"):
+            continue  # keep only the first alternate location (as FreeSASA/DSSP do)
         el = line[76:78].strip() or line[12:16].strip()[0]
         atoms.append({"element": el,
                       "xyz": (float(line[30:38]), float(line[38:46]), float(line[46:54])),
