@@ -377,3 +377,65 @@ def brute_force(model: ProfileHMM, sequence: str, *, max_paths: int = 2_000_000)
                 stack.append((nxt, j, q, path + [f"{kind}{k}"]))
     return {"viterbi_prob": best_p, "forward_prob": total, "best_path": best_path,
             "path_count": count}
+
+
+def brute_force_paths(model: ProfileHMM, sequence: str, *, max_paths: int = 200_000) -> list:
+    """Every Begin->End state path emitting ``sequence`` with its joint probability,
+    by plain enumeration (no DP). Returns [(["M1", "D2", ...], prob), ...]."""
+    x = model.encode(sequence)
+    n, L = len(x), model.length
+    out = []
+    stack = [(("B", 0), 0, 1.0, [])]
+    while stack:
+        state, i, p, path = stack.pop()
+        kind0, k0 = state
+        k0 = 0 if kind0 == "B" else k0
+        nexts = [("I", k0)] + ([("M", k0 + 1), ("D", k0 + 1)] if k0 < L else [("E", 0)])
+        for nxt in nexts:
+            t = model.transition(state, nxt)
+            if t == 0.0:
+                continue
+            q, j = p * t, i
+            kind, k = nxt
+            if kind == "E":
+                if i == n:
+                    out.append((path, q))
+                    if len(out) > max_paths:
+                        raise RuntimeError("too many paths for brute force")
+                continue
+            if kind in ("M", "I"):
+                if i == n:
+                    continue
+                q *= (model.match_emissions if kind == "M" else model.insert_emissions)[k][x[i]]
+                j = i + 1
+            if q > 0:
+                stack.append((nxt, j, q, path + [(kind, k)]))
+    return [([f"{kd}{kk}" for kd, kk in pth], q) for pth, q in out]
+
+
+def brute_force_expected_counts(model: ProfileHMM, sequences) -> dict:
+    """Exact posterior expected counts by weighting every enumerated path by
+    P(path | x) - an independent check of the forward-backward E-step."""
+    counts = {p: np.zeros_like(getattr(model, p)) for p in
+              ("match_emissions", "insert_emissions", "t_match", "t_insert", "t_delete")}
+    L = model.length
+    key = {"B": "t_match", "M": "t_match", "I": "t_insert", "D": "t_delete"}
+    col = {"M": TO_M, "I": TO_I, "D": TO_D}
+    for seq in sequences:
+        x = model.encode(seq)
+        paths = brute_force_paths(model, seq)
+        px = sum(q for _, q in paths)
+        for names, q in paths:
+            w = q / px
+            prev, i = ("B", 0), 0
+            for name in names + ["E0"]:
+                kind, k = name[0], int(name[1:])
+                pk, pkk = prev
+                target = TO_M if kind == "E" else col[kind]
+                counts[key[pk]][pkk][target] += w
+                if kind == "M":
+                    counts["match_emissions"][k][x[i]] += w; i += 1
+                elif kind == "I":
+                    counts["insert_emissions"][k][x[i]] += w; i += 1
+                prev = (kind, k)
+    return counts

@@ -209,7 +209,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("dti_bench", "DTI Bench", "therapeutics",
      "Target-conditioned drug-target interaction baselines (proteochemometric ridge) with cold-start validation on ChEMBL pairs."),
     ("profile_hmm", "Profile HMM", "protein-engineering",
-     "Profile HMMs from multiple alignments (Durbin et al. 1998 Ch. 5): match/insert/delete states, pseudocounts, Viterbi path, Forward score, brute-force verifier."),
+     "Profile HMMs from multiple alignments (Durbin et al. 1998 Ch. 5): match/insert/delete states, pseudocounts, Viterbi path, Forward score, Baum-Welch EM training with held-out likelihood, brute-force verifiers."),
     ("rna_nussinov", "RNA Nussinov", "synthetic-biology",
      "Nussinov-Jacobson 1980 maximum base-pair RNA secondary structure: DP with traceback, min loop, dot-bracket, exact optimal-structure count, brute-force verifier."),
     ("acmg_bayesian", "ACMG Bayesian", "therapeutics",
