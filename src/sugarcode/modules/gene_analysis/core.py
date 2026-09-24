@@ -6,13 +6,16 @@ from ..dark_genome.core import decode
 
 
 def gene_profile(symbol: str, genomic_seq: str, promoter_span: tuple[int, int] | None = None,
-                 variants: list[dict] | None = None, publications: list[int] | None = None) -> dict:
+                 variants: list[dict] | None = None, publications: list[int] | None = None,
+                 live: bool = False, offline: bool = False) -> dict:
     """High-fidelity biological profile of a gene locus.
 
     Integrates: sequence composition, ORF/protein stats, regulatory landscape,
     variant interpretations, CRISPR target designs and publication trend bins.
-    External NCBI/UniProt/ClinVar connectors are a later drop; this computes
-    everything derivable from the sequence itself.
+    With ``live=True`` each variant is also looked up in ClinVar (review-status
+    weighted, via ``openclinvar.interpret_variant_live``) and pathways come from
+    Reactome; a failed lookup falls back to the offline rules / built-in table and
+    says so in ``source``. The default computes everything from the sequence.
     """
     s = clean_dna(genomic_seq)
     found_orfs = orfs(s, min_aa=30)
@@ -22,10 +25,20 @@ def gene_profile(symbol: str, genomic_seq: str, promoter_span: tuple[int, int] |
     crispr = design_guides(s, background=s, top_n=5)
     var_results = []
     for v in (variants or []):
-        var_results.append(interpret_variant(symbol, v["variant"],
-                                             consequence=v.get("consequence"),
-                                             allele_frequency=v.get("allele_frequency"),
-                                             functional_score=v.get("functional_score")))
+        kwargs = {"consequence": v.get("consequence"), "allele_frequency": v.get("allele_frequency"),
+                  "functional_score": v.get("functional_score")}
+        if live:
+            from ..openclinvar.core import interpret_variant_live
+            try:
+                result = interpret_variant_live(symbol, v["variant"], offline=offline, **kwargs)
+                result["source"] = "ClinVar (live) + rules"
+            except Exception as e:  # reported, never hidden
+                result = interpret_variant(symbol, v["variant"], **kwargs)
+                result["source"] = f"offline rules (ClinVar lookup failed: {type(e).__name__})"
+        else:
+            result = interpret_variant(symbol, v["variant"], **kwargs)
+            result["source"] = "offline rules"
+        var_results.append(result)
     return {
         "symbol": symbol,
         "locus": {"length": len(s), "gc_content": round(gc_content(s), 4)},
@@ -41,7 +54,7 @@ def gene_profile(symbol: str, genomic_seq: str, promoter_span: tuple[int, int] |
         "variants": var_results,
         "crispr_targets": crispr["guides"],
         "publication_trend": _pub_trend(publications or []),
-        "pathway_links": _pathway_links(symbol),
+        "pathway_links": (live_pathways(symbol, offline=offline) if live else _pathway_links(symbol)),
     }
 
 
@@ -64,6 +77,24 @@ def _pathway_links(symbol: str) -> list[dict]:
     }
     return [{"pathway": p, "source": "built-in reference"} for p in known.get(symbol.upper(), [])]
 
+
+
+def live_pathways(symbol: str, organism: str = "human", offline: bool = False) -> list[dict]:
+    """Reactome pathways for any gene (symbol -> reviewed UniProt accession -> Reactome).
+
+    Falls back to the small built-in table only when the live lookup fails, and marks it.
+    """
+    from ...bio import reactome, uniprot
+    taxon = 9606 if organism == "human" else 10090
+    try:
+        record = uniprot.search(symbol, organism_id=taxon, offline=offline) or {}
+        accession = record.get("accession")
+        if not accession:
+            return [{"pathway": None, "source": "Reactome (live)", "note": "no reviewed UniProt entry"}]
+        return reactome.pathways_for_uniprot(accession, taxon, offline=offline)
+    except Exception as e:
+        return [{**p, "source": f"built-in reference (live lookup failed: {type(e).__name__})"}
+                for p in _pathway_links(symbol)]
 
 def live_gene_profile(symbol: str, organism: str = "human", offline: bool = False) -> dict:
     """Live multi-source gene profile: NCBI Gene + UniProt, merged.
@@ -94,6 +125,25 @@ def live_gene_profile(symbol: str, organism: str = "human", offline: bool = Fals
         out["sources"]["uniprot"] = rec or {"error": "no reviewed entry"}
     except Exception as e:
         out["sources"]["uniprot"] = {"error": f"{type(e).__name__}: {e}"}
+    try:
+        records = entrez.clinvar_variants(symbol, retmax=50, offline=offline)
+        counts: dict[str, int] = {}
+        for r in records:
+            counts[r["significance"]] = counts.get(r["significance"], 0) + 1
+        out["sources"]["clinvar"] = {"n_variants": len(records), "significance_counts": counts,
+                                     "examples": records[:5], "note": "first 50 ClinVar records for the gene"}
+    except Exception as e:
+        out["sources"]["clinvar"] = {"error": f"{type(e).__name__}: {e}"}
+    accession = (out["sources"].get("uniprot") or {}).get("accession")
+    if accession:
+        from ...bio import reactome
+        try:
+            out["sources"]["reactome"] = {"accession": accession, "pathways": reactome.pathways_for_uniprot(
+                accession, 9606 if organism == "human" else 10090, offline=offline)}
+        except Exception as e:
+            out["sources"]["reactome"] = {"error": f"{type(e).__name__}: {e}"}
+    else:
+        out["sources"]["reactome"] = {"error": "no UniProt accession to map"}
     # local analysis still runs on the fetched sequence when available
     seq = (out["sources"].get("uniprot") or {}).get("sequence", "")
     if seq:
@@ -106,23 +156,34 @@ def live_gene_profile(symbol: str, organism: str = "human", offline: bool = Fals
 
 
 def live_publication_trend(symbol: str, years: int = 5, offline: bool = False) -> dict:
-    """Real publication trend: per-year PubMed counts for the gene symbol."""
+    """Real publication trend: per-year PubMed counts for the gene symbol.
+
+    The trend uses the last ``years`` complete years only; the current, still-filling year is
+    reported separately under ``partial_current_year`` so it cannot drag the trend down.
+    """
     from ...bio import entrez
     from datetime import datetime
+    import json as _j
     now = datetime.now().year
-    counts = {}
-    for y in range(now - years + 1, now + 1):
+
+    def count(y: int) -> int:
         data = entrez._get("esearch.fcgi", {"db": "pubmed",
                                             "term": f"{symbol}[Title/Abstract] AND {y}[dp]",
                                             "retmode": "json", "retmax": 0},
                            offline=offline)
-        import json as _j
-        counts[y] = int(_j.loads(data)["esearchresult"]["count"])
+        return int(_j.loads(data)["esearchresult"]["count"])
+
+    counts = {y: count(y) for y in range(now - years, now)}
     vals = list(counts.values())
     trend = ("rising" if len(vals) >= 2 and vals[-1] > vals[0] * 1.2 else
              "falling" if len(vals) >= 2 and vals[-1] < vals[0] * 0.8 else "steady")
+    try:
+        partial = {"year": now, "count_so_far": count(now)}
+    except Exception as e:
+        partial = {"year": now, "error": f"{type(e).__name__}: {e}"}
     return {"symbol": symbol, "source": "PubMed (live)", "counts_by_year": counts,
-            "trend": trend, "note": "Title/Abstract mention counts per publication year"}
+            "trend": trend, "complete_years_only": True, "partial_current_year": partial,
+            "note": "Title/Abstract mention counts per publication year"}
 
 # Explicit probabilistic/mechanistic digital-twin models. No trained model is
 # bundled and these outputs are not clinically validated.
@@ -151,38 +212,13 @@ def variant_posterior(conservation=.5,structural=None,regulatory=.1,splicing=.1,
 def conformational_ensemble(ddg,states=None):
     states=states or {"active":0,"inactive":1.5,"misfolded":4}; energies={k:v+(ddg if k=='misfolded' else .2*ddg if k=='inactive' else 0) for k,v in states.items()}; w={k:math.exp(-v/.593) for k,v in energies.items()}; z=sum(w.values()); return {"energies":energies,"populations":{k:v/z for k,v in w.items()}}
 
-def pathway_dynamics(hours=24,expression=1,drug_inhibition=0,feedback=.2):
-    if hours<=0 or not 0<=drug_inhibition<=1: raise ValueError("invalid dynamics")
-    def rhs(_t,y): signal,target,phenotype=y; return [expression*(1-drug_inhibition)-.5*signal-feedback*target,.8*signal-.3*target,.4*target-.2*phenotype]
-    t=np.linspace(0,hours,121); sol=solve_ivp(rhs,(0,hours),[0,0,0],t_eval=t,rtol=1e-8,atol=1e-9); return {"time_h":sol.t.tolist(),"signal":sol.y[0].tolist(),"biomarker":sol.y[1].tolist(),"phenotype":sol.y[2].tolist()}
-
-def counterfactual_variant(conservation=.5,interface=False,regulatory=.1,splicing=.1,condition=None):
-    condition=condition or {}; structural=structure_perturbation(conservation,interface,condition.get('active_site',False),condition.get('buried',.5)); posterior=variant_posterior(conservation,structural,regulatory,splicing,condition.get('functional_prior',.5)); pathway=pathway_dynamics(expression=max(.05,1-posterior['pathogenic_probability']),drug_inhibition=condition.get('drug_inhibition',0)); return {"structural":structural,"posterior":posterior,"ensemble":conformational_ensemble(structural['ddg_kcal_mol']),"pathway":pathway,"phenotype_delta":pathway['phenotype'][-1]-pathway_dynamics()['phenotype'][-1]}
-
-def outcome_aware_crispr(seq,desired='knockout',chromatin=.5,allele=None):
-    design=design_guides(seq,background=seq,top_n=10); ranked=[]
-    for g in design['guides']:
-        specificity=1/(1+g['off_target_risk']); allele_score=1 if not allele else sum(a!=b for a,b in zip(g['guide'],allele))/20; phenotype=g['on_target']*(.5+.5*chromatin)*specificity; ranked.append({**g,"chromatin_score":chromatin,"allele_specificity":allele_score,"predicted_phenotype_score":phenotype,"desired_outcome":desired})
-    return sorted(ranked,key=lambda x:-x['predicted_phenotype_score'])
-
 def power_estimate(effect_size,variance=.25,power=.8):
     if effect_size<=0 or variance<=0 or not 0<power<1: raise ValueError("invalid power inputs")
     z=1.96+(.84 if power<=.8 else 1.28); return {"replicates_per_group":math.ceil(2*variance*z*z/effect_size**2),"effect_size":effect_size,"target_power":power}
 
-def experimental_plan(symbol,effect_size=.5):
-    return {"symbol":symbol,"controls":["unedited control","non-targeting guide","positive perturbation control"],"readouts":["qPCR","protein abundance assay","single-cell RNA-seq for network effects"],"power":power_estimate(effect_size),"status":"Study-design guidance requiring institutional review; not an executable protocol."}
-
 def feedback_update(prior_probability,successes,total):
     if not 0<=prior_probability<=1 or not 0<=successes<=total: raise ValueError("invalid feedback")
     a=1+prior_probability*8+successes; b=1+(1-prior_probability)*8+total-successes; return {"alpha":a,"beta":b,"mean":a/(a+b),"std":math.sqrt(a*b/((a+b)**2*(a+b+1)))}
-
-def gene_diagnostics(symbol,seq,variants=None):
-    p=gene_profile(symbol,seq,variants=variants); d={"locus_length":float(p['locus']['length']),"gc_fraction":p['locus']['gc_content'],"protein_present":float(p['protein'] is not None),"protein_aa_length":float(p['protein']['aa_length'] if p['protein'] else 0),"protein_mw":float(p['protein']['molecular_weight_da'] if p['protein'] else 0),"enhancer_cluster_count":float(len(p['regulatory_landscape']['enhancer_clusters'])),"cpg_island_count":float(len(p['regulatory_landscape']['cpg_islands'])),"tf_motif_count":float(p['regulatory_landscape']['tf_motif_count']),"variant_count":float(len(p['variants'])),"crispr_target_count":float(len(p['crispr_targets'])),"pathway_count":float(len(p['pathway_links']))}
-    for name,val in (("conservation",.5),("regulatory",.1),("splicing",.1)): d[f'baseline.{name}']=val
-    return d
-
-def digital_twin(symbol,seq,variants=None,condition=None):
-    profile=gene_profile(symbol,seq,variants=variants); graph=molecular_graph(symbol,variants=variants,isoforms=['canonical']); cf=counterfactual_variant(condition=condition); return {"profile":profile,"causal_graph":graph,"counterfactual":cf,"crispr":outcome_aware_crispr(seq),"experimental_plan":experimental_plan(symbol),"diagnostics":gene_diagnostics(symbol,seq,variants),"model_status":"Transparent mechanistic/probabilistic models; no trained model and not clinically validated."}
 
 # Variant-connected v2 overrides.
 def _variant_features(variant,seq=''):
