@@ -30,10 +30,11 @@ def anm_modes(coords: list[list[float]], n_modes: int = 6, cutoff: float = 10.0)
     n = len(C)
     K = _kirchhoff(C, cutoff)
     H = np.zeros((3 * n, 3 * n))
+    # Each contact once (j > i): visiting ordered pairs twice doubled every
+    # diagonal super-element, so rows no longer summed to zero, the six
+    # rigid-body zero modes vanished and all frequencies were wrong.
     for i in range(n):
-        for j in range(n):
-            if i == j:
-                continue
+        for j in range(i + 1, n):
             kij = K[i, j]
             if kij == 0:
                 continue
@@ -44,6 +45,7 @@ def anm_modes(coords: list[list[float]], n_modes: int = 6, cutoff: float = 10.0)
             e = rij / dist
             block = kij * np.outer(e, e)  # kij < 0: correct ANM off-diagonal
             H[3 * i:3 * i + 3, 3 * j:3 * j + 3] = block
+            H[3 * j:3 * j + 3, 3 * i:3 * i + 3] = block
             H[3 * i:3 * i + 3, 3 * i:3 * i + 3] -= block
             H[3 * j:3 * j + 3, 3 * j:3 * j + 3] -= block
     vals, vecs = np.linalg.eigh(H)
@@ -99,6 +101,7 @@ def transition_trace(coords: list[list[float]], mode_index: int = 0,
             e = rij / dist
             block = kij * np.outer(e, e)  # kij < 0: correct ANM off-diagonal
             H[3 * i:3 * i + 3, 3 * j:3 * j + 3] = block
+            H[3 * j:3 * j + 3, 3 * i:3 * i + 3] = block
             H[3 * i:3 * i + 3, 3 * i:3 * i + 3] -= block
             H[3 * j:3 * j + 3, 3 * j:3 * j + 3] -= block
     vals, vecs = np.linalg.eigh(H)
