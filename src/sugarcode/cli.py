@@ -34,6 +34,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   orf find|translate [--table N] [--starts atg|table]  (drop 79)
   rnaseq normalize|filter|sizefactors --counts F  (drop 80)
   gstats hwe|allelic|genotypic|or|adjust  (drop 81)
+  de run --counts F --groups A,A,B,B [--method welch|wilcoxon]  (drop 82)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -811,6 +812,27 @@ def _cmd_align_run(args) -> int:
     return _emit(r)
 
 
+def _cmd_de_run(args) -> int:
+    from .bio import de as demod
+    from .bio.rnaseq import parse_counts, write_counts
+    table = parse_counts(Path(args.counts).read_text())
+    groups = [g.strip() for g in args.groups.split(",") if g.strip()]
+    out = demod.de_analysis(table, groups, method=args.method,
+                            pseudocount=args.pseudocount)
+    if args.out:
+        lines = ["gene\tmean_a\tmean_b\tlog2fc\tstatistic\tpvalue\tpadj"]
+        for r in out["results"]:
+            lines.append("\t".join([r["gene"], f"{r['mean_a']:g}",
+                                     f"{r['mean_b']:g}", f"{r['log2fc']:g}",
+                                     f"{r['statistic']:g}", f"{r['pvalue']:g}",
+                                     f"{r['padj']:g}"]))
+        Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['results'])} genes, "
+              f"{out['method']}, {out['group_a']} vs {out['group_b']})")
+        return 0
+    return _emit(out)
+
+
 def _triple(text):
     parts = [int(x) for x in text.split(",")]
     if len(parts) != 3:
@@ -1152,6 +1174,18 @@ def main(argv: list[str] | None = None) -> int:
     ga.add_argument("--method", choices=["bonferroni", "bh"],
                     default="bh")
     ga.set_defaults(func=_cmd_gstats_adjust)
+
+    dep = sub.add_parser("de", help="differential expression (simple per-gene tests)")
+    desub = dep.add_subparsers(dest="sub", required=True)
+    der = desub.add_parser("run", help="Welch/Wilcoxon DE + BH, volcano-ready")
+    der.add_argument("--counts", required=True, help="CSV/TSV count table")
+    der.add_argument("--groups", required=True,
+                     help="comma-separated group label per sample, 2 groups")
+    der.add_argument("--method", choices=["welch", "wilcoxon"],
+                     default="welch")
+    der.add_argument("--pseudocount", type=float, default=1.0)
+    der.add_argument("--out", default=None)
+    der.set_defaults(func=_cmd_de_run)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
