@@ -44,7 +44,8 @@ def test_anm_modes_and_trace():
 
 def test_mutdock_scan():
     r = mutation_effect(POCKET, "CCO", 3, "W", drug_name="testdrug")
-    assert r["mutation"] == "S5W"
+    assert r["mutation"] == "S4W"            # POCKET[3] is residue 4 (1-based)
+    assert mutation_effect(POCKET, "CCO", 3, "S")["ddg_kcal_mol"] == 0.0  # no-change
     assert r["resistance_risk"] in ("low", "moderate", "high")
     scan = resistance_scan("GSCSTN", {"d1": "CCO", "d2": "c1ccccc1"})
     assert len(scan["per_drug"]) == 2
