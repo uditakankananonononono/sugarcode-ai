@@ -88,3 +88,19 @@ Search matches words in tool slugs only.
 - Inkling-Small: https://huggingface.co/thinkingmachines/Inkling-Small
 - Ornith: https://github.com/deepreinforce-ai/ornith-1, https://huggingface.co/ornith-ai
 - Needle: https://github.com/cactus-compute/needle
+
+## Shared model layer (instinct_models)
+
+SugarCode runs on the same model layer as Atlas and Meemee:
+https://github.com/uditakankananonononono/shared-models, vendored at `src/instinct_models/`
+(pinned commit in `src/instinct_models/VENDORED.md`, re-vendor with `scripts/vendor_instinct_models.sh <commit>`).
+
+- `sugarcode shared ask "question" [--private] [--no-execute]`: the trained module router picks
+  SugarCode tools. The shared Router then tries Needle (on-device), Ornith (local), Inkling local, and
+  the Inkling HF router in that order. The chosen call runs against the real module. `--private` never uses the hosted route.
+  Calls to tools that were not offered are refused.
+- `sugarcode shared dataset out.jsonl`: SugarCode's Needle LoRA dataset through the shared pipeline.
+  Synthetic queries, each answer verified by executing it, plus about 1 in 8 off-topic rows. No user data.
+- Env: `INSTINCT_PRODUCT=sugarcode` (default), `INSTINCT_INKLING_LOCAL_URL`, `INSTINCT_INKLING_LOCAL_MODEL`,
+  `INSTINCT_ORNITH_URL`, `INSTINCT_ORNITH_MODEL`, `INSTINCT_NEEDLE_WEIGHTS`, `INSTINCT_ALLOW_HOSTED`, `HF_TOKEN`.
+- Fugu (paid) is not in the shared layer. It stays in `sugarcode.llm.providers` behind `SUGARCODE_ALLOW_PAID`.

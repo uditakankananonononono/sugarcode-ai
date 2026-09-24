@@ -225,6 +225,19 @@ def _cmd_ask(args) -> int:
     return 0 if res.answer else 1
 
 
+def _cmd_shared(args) -> int:
+    from .llm import shared
+    if args.sub == "ask":
+        res = shared.shared_ask(args.question, private=args.private, execute=not args.no_execute)
+        _emit(res)
+        return 0 if res.get("ok") else 1
+    try:
+        return _emit(shared.build_shared_needle_dataset(args.out, per_tool=args.per_tool, max_tools=args.max_tools))
+    except ValueError as exc:  # e.g. no tool call in the slice executed successfully
+        _emit({"error": str(exc)})
+        return 1
+
+
 def _cmd_ailibrary(args) -> int:
     from .llm import ailibrary
     if args.sub == "search":
@@ -1559,6 +1572,19 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--model", default=None)
     k.add_argument("--allow-paid", action="store_true", help="permit hosted_paid profiles (Fugu)")
     k.set_defaults(func=_cmd_ask)
+
+    sh = sub.add_parser("shared", help="shared model layer (instinct_models): ask | dataset")
+    shsub = sh.add_subparsers(dest="sub", required=True)
+    sha = shsub.add_parser("ask", help="router-picked tools -> Needle/Ornith/Inkling chain -> run the call")
+    sha.add_argument("question")
+    sha.add_argument("--private", action="store_true", help="never use the hosted HF route")
+    sha.add_argument("--no-execute", action="store_true", help="return the tool call without running it")
+    sha.set_defaults(func=_cmd_shared)
+    shd = shsub.add_parser("dataset", help="SugarCode Needle LoRA dataset via the shared pipeline")
+    shd.add_argument("out")
+    shd.add_argument("--per-tool", type=int, default=120)
+    shd.add_argument("--max-tools", type=int, default=None)
+    shd.set_defaults(func=_cmd_shared)
 
     al = sub.add_parser("ailibrary", help="read-only AI Library (theailibrary.co) tool catalog")
     alsub = al.add_subparsers(dest="sub", required=True)
