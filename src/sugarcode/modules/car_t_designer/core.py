@@ -20,6 +20,11 @@ def design_car(antigen: str, indication: str | None = None) -> dict:
     if antigen not in ANTIGENS:
         raise KeyError(f"unknown antigen {antigen!r}; have {sorted(ANTIGENS)}")
     ag = ANTIGENS[antigen]
+    indication_note = None
+    if indication and indication.lower() not in ag["tumor"].lower():
+        indication_note = ("requested indication %r is outside the curated tumor types "
+                           "for %s (%s); the construct below is not indication-specific"
+                           % (indication, antigen, ag["tumor"]))
     scfv = next((k for k, v in SCFV.items() if v == antigen), "generic_high_affinity")
     # 4-1BB favored when normal-tissue expression requires persistence caution
     on_target_off_tumor = len(ag["normal_expression"]) > 0
@@ -32,6 +37,8 @@ def design_car(antigen: str, indication: str | None = None) -> dict:
             "scfv": scfv, "hinge": "CD8a" if costim == "4-1BB" else "IgG4_short",
             "costimulatory": costim, "activation": "CD3zeta",
             "architecture": f"{scfv}-scFv / hinge / TM / {costim} / CD3z",
+            **({"scfv_note": ("no curated scFv for this antigen; generic_high_affinity is a "
+                              "placeholder, not a validated binder")} if scfv == "generic_high_affinity" else {}),
         },
         "safety_switches": (["iCasp9 suicide switch", "truncated EGFR depletion marker"]
                             if on_target_off_tumor else ["truncated EGFR depletion marker"]),
@@ -42,6 +49,7 @@ def design_car(antigen: str, indication: str | None = None) -> dict:
         "rationale": (f"{costim} chosen for "
                       + ("persistence and lower exhaustion given on-target/off-tumor risk"
                          if on_target_off_tumor else "rapid expansion against low-risk target")),
+        **({"indication_note": indication_note} if indication_note else {}),
     }
 
 
@@ -52,7 +60,10 @@ def _toxicity(ag: dict, costim: str) -> dict:
     return {"crs_grade2plus_risk": round(min(crs, 0.9), 2),
             "on_target_off_tumor_risk": round(min(ot, 0.9), 2),
             "neurotoxicity_risk": neuro,
-            "monitoring": ["daily cytokines week 1", "tocilizumab on standby"]}
+            "monitoring": ["daily cytokines week 1", "tocilizumab on standby"],
+            "model": ("class-level heuristic from costim profile and normal-tissue expression "
+                      "count; identical across antigens with the same profile - NOT fitted to "
+                      "per-antigen clinical data")}
 
 
 def _trial(costim: dict, tox: dict) -> dict:
