@@ -138,7 +138,7 @@ continues drop by drop in order of scientific usefulness.
   decimals); scoring semantics re-verified against the reference R source
   (one-based motif starts, additive intercept + features, GG required at
   positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
-  note; clinical_evidence_fusion remains orphaned in history (b78b943).
+  note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
 - CRISPR on-target Rule Set 2 (Fusi/Doench 2016, Azimuth V3): RESOLVED (2026-09-24,
   branch pb6). The published sklearn-0.17 GBRT (100 depth-3 trees, 630 features)
   was extracted from Microsoft's BSD-3-Clause pickle into framework-free JSON and
@@ -151,6 +151,26 @@ continues drop by drop in order of scientific usefulness.
   one-hot columns from the original pandas label sort). New API:
   crispr_opt.score_on_target_rs2 (30mer context in, score out) and
   crispr_opt.rank_guides_rs2 (enumerate + rank NGG guides from a target region).
+
+- clinical_evidence_fusion orphaned package (b78b943): REVIEWED, NOT PROMOTED
+  (2026-09-24, branch pb6). Checked against the free full text of Tavtigian et al.
+  2018, Genet Med, PMID 29300386 / PMC6336098 (BioC JSON, SHA-256
+  6af181739e6d462e316b2489702974eca5f95990ebe25cef2baa505f0dab543d). What verifies:
+  prior 0.10; odds 350 / 18.7 / 4.3 / 2.08; benign reciprocals; the
+  >0.99 / 0.90-0.99 / 0.001-0.10 / <0.001 bands; pathogenic and likely-benign table
+  rows reproduce (e.g. PVS1+PS 0.999, 2 strong 0.975, 2 BS 0.00032). The NCBI
+  E-utilities ClinVar/PubMed client is real code against live endpoints. Why it
+  stays orphaned: (1) all five ACMG likely-pathogenic combining rules that the
+  paper's Table reports at posterior 0.900 (1 strong + 1 moderate, 1 strong + 2
+  supporting, 3 moderate, 2 moderate + 2 supporting, 1 moderate + 4 supporting)
+  come out 0.898-0.900 and are labeled "Uncertain significance" because the
+  rounded odds meet a hard >=0.90 cutoff - a clinically wrong downgrade of LP to
+  VUS; (2) it scores BA1 with an invented odds of 1/1000, while the paper
+  explicitly excludes BA1 as contrary to Bayesian reasoning, so BA1 + PVS1 returns
+  "Likely benign"; (3) it ships no tests or fixtures ("pytest unavailable" in its
+  own commit) and sits outside src/. Fixable (exact 350^(1/2^k) odds or
+  table-matched banding, BA1 as a stand-alone override, table-row fixtures), but
+  that is new work, not a promotion.
 
 ## Missing (labeled, not faked)
 
