@@ -13,10 +13,15 @@ import numpy as np
 # IUPAC standard atomic weights (conventional abridged values).
 MASS = {"H":1.008,"B":10.81,"C":12.011,"N":14.007,"O":15.999,"F":18.998403,
         "P":30.973762,"S":32.06,"Cl":35.45,"Br":79.904,"I":126.90447,
-        "Si":28.085,"Se":78.971}
+        "Si":28.085,"Se":78.971,
+        # counter-ions and metals seen in approved-drug salts (bracket atoms only)
+        "Li":6.94,"Na":22.98977,"K":39.0983,"Mg":24.305,"Ca":40.078,"Zn":65.38,
+        "Ag":107.8682,"Al":26.981538,"Fe":55.845,"Cu":63.546,"Co":58.933194,
+        "Pt":195.084,"Au":196.96657,"Bi":208.9804,"Gd":157.25,"Sr":87.62,
+        "Ba":137.327,"As":74.921595,"Hg":200.592,"Mn":54.938043,"Ti":47.867,"Sb":121.76}
 VALENCE = {"B":3,"C":4,"N":3,"O":2,"F":1,"P":3,"S":2,"Cl":1,"Br":1,"I":1,
            "Si":4,"Se":2}
-TOKEN = re.compile(r"Cl|Br|Si|Se|\[[^\]]+\]|[BCNOPSFIbcnops]|\(|\)|=|#|-|:|\.|%\d{2}|\d")
+TOKEN = re.compile(r"Cl|Br|Si|Se|\[[^\]]+\]|[BCNOPSFIbcnops]|\(|\)|=|#|-|:|/|\\|\.|%\d{2}|\d")
 
 @dataclass(frozen=True)
 class Atom:
@@ -24,6 +29,7 @@ class Atom:
     aromatic: bool = False
     charge: int = 0
     explicit_h: int = 0
+    bracket: bool = False
 
 @dataclass
 class Molecule:
@@ -43,7 +49,7 @@ def _atom(token: str) -> Atom:
     charge = 0
     for sign, n in re.findall(r"([+-])(\d*)", raw[m.end():]):
         charge += (1 if sign == "+" else -1) * (int(n) if n else 1)
-    return Atom(element, aromatic, charge, explicit_h)
+    return Atom(element, aromatic, charge, explicit_h, token.startswith("["))
 
 
 def parse_smiles(smiles: str) -> Molecule:
@@ -52,7 +58,7 @@ def parse_smiles(smiles: str) -> Molecule:
     toks = TOKEN.findall(smiles)
     if "".join(toks) != smiles: raise ValueError("unsupported or malformed SMILES syntax")
     atoms=[]; bonds=[]; stack=[]; rings={}; current=None; pending=None; components=1
-    bondmap={"-":1.0,"=":2.0,"#":3.0,":":1.5}
+    bondmap={"-":1.0,"=":2.0,"#":3.0,":":1.5,"/":1.0,"\\":1.0}  # / and \\ are directional single bonds
     for tok in toks:
         if tok in bondmap: pending=bondmap[tok]; continue
         if tok == "(":
@@ -89,6 +95,8 @@ def _adj(m: Molecule):
 
 
 def _implicit_h(atom: Atom, neighbors) -> int:
+    if atom.bracket:
+        return 0  # SMILES: bracket atoms carry exactly their written hydrogens
     if atom.aromatic:
         target = 3 if atom.element == "C" else (3 if atom.element == "N" and atom.charge > 0 else 2)
         used = len(neighbors) + atom.explicit_h
@@ -117,7 +125,19 @@ def descriptors(smiles: str) -> dict[str,float]:
             not (a.element=="N" and (a.explicit_h+implicit[i])>0 and len(adj[i])>=3)
             for i,a in enumerate(m.atoms))
     ring_rank=max(0,len(m.bonds)-len(m.atoms)+m.components)
-    rot=sum(o==1 and len(adj[i])>1 and len(adj[j])>1 for i,j,o in m.bonds)-ring_rank
+    def _in_ring(i,j):
+        seen={i}; q=deque([i])
+        while q:
+            u=q.popleft()
+            for v,_ in adj[u]:
+                if (u==i and v==j) or v in seen: continue
+                if v==j: return True
+                seen.add(v); q.append(v)
+        return False
+    triple={k for a,b,o in m.bonds if o==3 for k in (a,b)}
+    # rotatable: acyclic single bond between two non-terminal atoms, neither in a triple bond
+    rot=sum(o==1 and len(adj[i])>1 and len(adj[j])>1 and i not in triple and j not in triple
+            and not _in_ring(i,j) for i,j,o in m.bonds)
     # maximum finite shortest-path distance
     diameter=0
     for start in range(len(m.atoms)):
@@ -132,7 +152,7 @@ def descriptors(smiles: str) -> dict[str,float]:
       "hbd_heuristic":float(hbd),"hba_heuristic":float(hba),
       "rotatable_bonds_heuristic":float(max(0,rot)),"ring_rank":float(ring_rank),
       "aromatic_fraction":sum(a.aromatic for a in m.atoms)/len(m.atoms),
-      "graph_diameter":float(diameter),"fraction_csp3":sum(a.element=="C" and not a.aromatic for a in m.atoms)/max(1,counts["C"])}
+      "graph_diameter":float(diameter),"fraction_csp3":sum(a.element=="C" and not a.aromatic and all(o==1 for _,o in adj[i]) for i,a in enumerate(m.atoms))/max(1,counts["C"])}
 
 
 def morgan_fingerprint(smiles: str, radius: int=2, n_bits: int=2048) -> np.ndarray:
