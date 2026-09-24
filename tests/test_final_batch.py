@@ -226,4 +226,4 @@ def test_nexus_triage_custom_build_enterprise_sla():
 
 def test_nexus_module_map_covers_88():
     all_mods = [m for mods in SUBNETWORK_OWNERS.values() for m in mods]
-    assert len(set(all_mods)) == 88
+    assert len(set(all_mods)) == 89

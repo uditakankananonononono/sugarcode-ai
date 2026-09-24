@@ -106,4 +106,4 @@ def test_version_and_modules_unchanged(capsys):
     assert main(["version"]) == 0
     assert "0.2.0" in capsys.readouterr().out
     assert main(["modules"]) == 0
-    assert "88 modules" in capsys.readouterr().out
+    assert "89 modules" in capsys.readouterr().out
