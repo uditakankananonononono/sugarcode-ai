@@ -54,3 +54,11 @@ def test_hgvs_ranges_crossing_exon_boundaries():
     assert f("NM_000546.6(TP53):c.-19_*21del (p.Met1fs)") == "frameshift"
     assert f("NM_007294.4(BRCA1):c.5277+2916_5277+2946delinsGG") == "intronic"
     assert f("c.100+50_101-30del") == "intronic"
+
+
+def test_power_estimate_matches_normal_power_solver():
+    from sugarcode.modules.gene_analysis.core import power_estimate
+    # statsmodels NormalIndPower, d = 0.5/0.5 = 1: power 0.5 -> 8, 0.8 -> 16, 0.95 -> 26
+    assert power_estimate(0.5, 0.25, 0.5)["replicates_per_group"] == 8
+    assert power_estimate(0.5, 0.25, 0.8)["replicates_per_group"] == 16
+    assert power_estimate(0.5, 0.25, 0.95)["replicates_per_group"] == 26

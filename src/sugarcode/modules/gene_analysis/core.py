@@ -212,9 +212,15 @@ def variant_posterior(conservation=.5,structural=None,regulatory=.1,splicing=.1,
 def conformational_ensemble(ddg,states=None):
     states=states or {"active":0,"inactive":1.5,"misfolded":4}; energies={k:v+(ddg if k=='misfolded' else .2*ddg if k=='inactive' else 0) for k,v in states.items()}; w={k:math.exp(-v/.593) for k,v in energies.items()}; z=sum(w.values()); return {"energies":energies,"populations":{k:v/z for k,v in w.items()}}
 
-def power_estimate(effect_size,variance=.25,power=.8):
-    if effect_size<=0 or variance<=0 or not 0<power<1: raise ValueError("invalid power inputs")
-    z=1.96+(.84 if power<=.8 else 1.28); return {"replicates_per_group":math.ceil(2*variance*z*z/effect_size**2),"effect_size":effect_size,"target_power":power}
+def power_estimate(effect_size,variance=.25,power=.8,alpha=.05):
+    """Replicates per group for a two-sided two-sample comparison of means
+    (normal approximation): n = 2*sigma^2*(z_{1-alpha/2}+z_{power})^2/delta^2.
+    Quantiles are computed exactly; the old table (0.84 for power<=0.8, else
+    1.28) was right only at 0.8 and 0.9 and doubled n at power 0.5."""
+    from scipy.stats import norm
+    if effect_size<=0 or variance<=0 or not 0<power<1 or not 0<alpha<1: raise ValueError("invalid power inputs")
+    z=norm.ppf(1-alpha/2)+norm.ppf(power)
+    return {"replicates_per_group":math.ceil(2*variance*z*z/effect_size**2),"effect_size":effect_size,"target_power":power,"alpha":alpha,"method":"two-sample z (normal approximation)"}
 
 def feedback_update(prior_probability,successes,total):
     if not 0<=prior_probability<=1 or not 0<=successes<=total: raise ValueError("invalid feedback")
