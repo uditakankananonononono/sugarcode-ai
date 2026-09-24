@@ -322,3 +322,30 @@ def neoantigen_pipeline(reference,variants,hlas,max_peptides=5,seed=13):
     panel=optimize_vaccine_panel(cands,max_peptides=max_peptides); diag=_neo_diagnostics(cands,panel,escape)
     return {"translated_variants":contexts,"candidates":cands,"vaccine":panel,"immune_escape":escape,"diagnostics":diag,
             "enhancement_feature_count":len(diag),"model_status":"deterministic/mechanistic hermetic models; no trained deep model and no clinical validation"}
+
+
+# --- IEDB-trained position-specific scoring (real-data fix, 2026-09-24) ---
+# On IEDB 2013 measured affinities (9-mers, binder = IC50<500 nM) the anchor
+# heuristic above reaches AUROC 0.80-0.85; this one-hot logistic PSSM reaches
+# 0.90-0.96 under 5-fold CV (mega27-01 benchmarks/sweep_neohunter_iedb.json).
+_PSSM = None
+
+
+def hla_binding_iedb(peptide: str, hla: str) -> dict:
+    """Probability of IC50<500 nM from an IEDB-trained 9-mer logistic PSSM."""
+    import json as _j, math as _m
+    from pathlib import Path as _P
+    global _PSSM
+    if _PSSM is None:
+        _PSSM = _j.load(open(_P(__file__).with_name("iedb_pssm_9mer.json")))
+    if hla not in _PSSM["alleles"]:
+        raise KeyError(f"no IEDB PSSM for {hla!r}; have {sorted(_PSSM['alleles'])}")
+    p = peptide.upper()
+    if len(p) != 9 or any(c not in _PSSM["alphabet"] for c in p):
+        raise ValueError("IEDB PSSM scores standard-amino-acid 9-mers only")
+    m = _PSSM["alleles"][hla]; aa = _PSSM["alphabet"]
+    z = m["bias"] + sum(m["weights"][i][aa.index(c)] for i, c in enumerate(p))
+    prob = 1 / (1 + _m.exp(-z))
+    return {"peptide": p, "hla": hla, "p_binder_ic50_500nM": round(prob, 4),
+            "class": "binder" if prob >= 0.5 else "non-binder",
+            "model": "IEDB 2013 logistic PSSM", "n_train": m["n_train"]}
