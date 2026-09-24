@@ -17,6 +17,11 @@ def record(module: str, metric: str, value: float, kind: str = "accuracy") -> di
     return m
 
 
+def recorded_observations(kind: str | None = None) -> list[dict]:
+    """Copy of the live record() store, in the input shape performance_dashboard expects."""
+    return [dict(m) for m in _METRICS if kind is None or m["kind"] == kind]
+
+
 def stats(kind: str | None = None) -> dict:
     """Global precision view: per-metric aggregates across the platform."""
     rows = [m for m in _METRICS if kind is None or m["kind"] == kind]
@@ -73,11 +78,13 @@ def validate_observations(observations: list[dict]) -> list[dict]:
 
 
 def performance_dashboard(observations: list[dict], *, now: float | None=None,
-                          latency_target_ms: float=1000, throughput_target: float=1) -> dict:
+                          latency_target_ms: float=1000, throughput_target: float=1,
+                          accuracy_target: float=.9, efficiency_target: float=.9) -> dict:
     """Build a transparent performance dashboard with bootstrap uncertainty and drift."""
     import numpy as np
     rows=validate_observations(observations); now=float(time.time() if now is None else now)
-    if latency_target_ms<=0 or throughput_target<=0: raise ValueError("performance targets must be positive")
+    if latency_target_ms<=0 or throughput_target<=0 or accuracy_target<=0 or efficiency_target<=0: raise ValueError("performance targets must be positive")
+    targets={"latency":latency_target_ms,"throughput":throughput_target,"accuracy":accuracy_target,"efficiency":efficiency_target}
     groups={}
     for r in rows: groups.setdefault((r["module"],r["metric"],r["kind"]),[]).append(r)
     series=[]
@@ -86,7 +93,7 @@ def performance_dashboard(observations: list[dict], *, now: float | None=None,
         rng=np.random.default_rng(int(sum(map(ord,module+metric+kind))))
         boot=np.asarray([rng.choice(v,n,replace=True).mean() for _ in range(500)]) if n>1 else np.repeat(v[0],500)
         slope=float(np.polyfit((t-t[0])/3600,v,1)[0]) if n>1 and np.ptp(t)>0 else 0.
-        target=latency_target_ms if kind=="latency" else throughput_target if kind=="throughput" else 1.
+        target=targets[kind]
         pass_rate=float(np.mean(v<=target)) if kind=="latency" else float(np.mean(v>=target))
         series.append({"module":module,"subnetwork":REGISTRY[module].subnetwork,"metric":metric,"kind":kind,"n":n,"mean":float(v.mean()),"minimum":float(v.min()),"maximum":float(v.max()),
           "ci95":[float(np.quantile(boot,.025)),float(np.quantile(boot,.975))],"trend_per_hour":slope,"target":target,"pass_rate":pass_rate,"last_value":float(v[-1]),"age_seconds":max(0,now-float(t[-1]))})
@@ -97,7 +104,7 @@ def performance_dashboard(observations: list[dict], *, now: float | None=None,
     for x in series:
         if x["pass_rate"]<.8: alerts.append({"severity":"critical" if x["pass_rate"]<.5 else "warning","module":x["module"],"metric":x["metric"],"kind":x["kind"],"pass_rate":x["pass_rate"],"action":f"review recent {x['kind']} regression"})
     return {"generated_at":now,"observation_count":len(rows),"series":series,"subnetworks":subnet,"alerts":alerts,
-      "transparency":{"aggregation":"raw observations -> deterministic grouped metrics","uncertainty":"500-sample seeded bootstrap CI","drift":"least-squares slope per hour","targets":{"latency_ms":latency_target_ms,"throughput":throughput_target}},
+      "transparency":{"aggregation":"raw observations -> deterministic grouped metrics","uncertainty":"500-sample seeded bootstrap CI","drift":"least-squares slope per hour","targets":{"latency_ms":latency_target_ms,"throughput":throughput_target,"accuracy":accuracy_target,"efficiency":efficiency_target}},
       "model_status":"deterministic hermetic performance analytics"}
 
 

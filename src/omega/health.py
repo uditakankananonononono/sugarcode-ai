@@ -17,10 +17,16 @@ def module_health(slug: str) -> dict:
         ok, callables, detail = False, [], "implementation package not present"
     except Exception as exc:  # import-time error
         ok, callables, detail = False, [], f"import error: {exc}"
+    latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+    try:  # feed Omega Stats with every health probe
+        from sugarcode.modules.omega_stats import record
+        record(slug, "import_latency_ms", latency_ms, kind="latency")
+    except Exception:
+        pass  # metrics must never break a health check
     return {
         "slug": slug, "name": spec.name, "subnetwork": spec.subnetwork,
         "status": spec.status, "importable": ok, "detail": detail,
-        "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
+        "latency_ms": latency_ms,
     }
 
 
