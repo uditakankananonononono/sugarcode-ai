@@ -22,7 +22,8 @@ dependencies = ["numpy>=1.24", "scipy>=1.10", "fastapi>=0.100", "pydantic>=2"]
 sugarcode = "sugarcode.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "cryptography>=41"]
+vault = ["cryptography>=41"]
 local = ["transformers>=4.40", "torch>=2.1"]
 
 [tool.setuptools.packages.find]
