@@ -14,7 +14,7 @@ builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 ```
 pip install .
 sugarcode version
-sugarcode modules                       # the 88 registered modules (77 spec + 11 beyond-spec)
+sugarcode modules                       # the 89 registered modules (77 spec + 12 beyond-spec)
 sugarcode splice assess RB1 'c.2500-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 
@@ -30,7 +30,7 @@ sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
 
 ```
 src/omega/            Omega OS v7.0 framework
-  registry.py         All 88 registered modules (77 spec + 11 beyond-spec) + 9 sub-networks + lifecycle status
+  registry.py         All 89 registered modules (77 spec + 12 beyond-spec) + 9 sub-networks + lifecycle status
   health.py           Per-module import/self-test health, global compute flux
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
@@ -50,7 +50,7 @@ assignments are derived from module themes:
 | Sub-network | Modules |
 |---|---|
 | core-intelligence | 8 |
-| genome-editing | 16 |
+| genome-editing | 17 |
 | protein-engineering | 6 |
 | synthetic-biology | 13 |
 | cellular-systems | 11 |
@@ -59,7 +59,7 @@ assignments are derived from module themes:
 | fabrication-evolution | 8 |
 | platform | 4 |
 
-Counts include the 11 beyond-spec modules registered after the audit fix
+Counts include the 12 beyond-spec modules registered after the audit fix
 (see the build status ledger below).
 
 ## Build status ledger (honest counts)
@@ -69,11 +69,11 @@ Neuro-Hub's text says an "**84-node** neural stack". **77 modules are actually
 specified** in the document; all 77 are registered and spec-filed. We build and
 count against the 77 that exist, not the 78/84 claimed.
 
-Beyond the spec, 11 more real published-model/computational modules were built
-(cfd_offtarget, crisprater, mit_offtarget, structural_biophysics, syn_bio_studio,
-dti_bench, pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
-molecule_eval). Since the audit-fix drop every one of them is registered, so the
-canonical registry now holds **88 modules**, every registry slug equals its
+Beyond the spec, 12 more real published-model/computational modules were built
+(cfd_offtarget, crisprater, crisprscan_score, mit_offtarget, structural_biophysics,
+syn_bio_studio, dti_bench, pgx_guidelines, evidence_mining, neuro_hub_dashboard,
+qsar_bench, molecule_eval). Since the audit-fix drop every one of them is registered,
+so the canonical registry now holds **89 modules**, every registry slug equals its
 package directory name, and every package under `src/sugarcode/modules/` is
 registered. The spec corpus stays 77 files because the spec document has 77.
 
@@ -94,7 +94,8 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| audit-fix | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| crisprscan promotion (current, pb6) | **89 registered (77 spec + 12 beyond-spec)**; orphaned crisprscan_score (Moreno-Mateos 2015, byte-exact vendored coefficients) promoted + Rule Set 2 port in crispr_opt | 0 | 0 | 1371 passing, 1 skipped |
 
 ### Verified in this drop (real implementations, named tests)
 

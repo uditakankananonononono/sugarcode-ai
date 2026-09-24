@@ -1,6 +1,6 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
-88 modules: the 77 from the spec corpus plus 11 beyond-spec published-model
+89 modules: the 77 from the spec corpus plus 12 beyond-spec published-model
 implementations, all registered (slugs equal their package directory names).
 
 The nine sub-networks are assigned from the module themes in the spec doc
@@ -198,6 +198,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Published Doench 2016 Cutting Frequency Determination SpCas9 off-target scoring, vendored exactly with provenance."),
     ("crisprater", "CRISPRater", "genome-editing",
      "Published CRISPRater linear sgRNA efficacy model (Labuhn et al. 2018), vendored exactly with provenance."),
+    ("crisprscan_score", "CRISPRscan Score", "genome-editing",
+     "Published CRISPRscan/Moreno-Mateos 2015 linear sgRNA activity model (35 nt context, NGG PAM), vendored exactly with provenance."),
     ("mit_offtarget", "MIT Off-Target", "genome-editing",
      "Published MIT/Hsu 2013 SpCas9 pairwise off-target scoring and aggregate guide specificity."),
     ("structural_biophysics", "Structural Biophysics", "protein-engineering",

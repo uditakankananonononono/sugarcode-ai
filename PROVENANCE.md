@@ -1,4 +1,25 @@
 
+## crisprscan_score model data (2026-09-24, branch pb6)
+
+- `src/sugarcode/modules/crisprscan_score/data/coefficients.csv`: the 91
+  position-specific mono/di-nucleotide coefficients + intercept of the
+  published CRISPRscan / Moreno-Mateos 2015 linear sgRNA activity model
+  (Nature Methods 12:982-988, DOI 10.1038/nmeth.3543). Byte-identical to the
+  machine-readable artifact `inst/crisprscan/crisprscan_coefficients.csv` in
+  https://github.com/crisprVerse/crisprScore at pinned commit
+  `cbd6f9f60dc7fb50d14b90485b9561d582caf21e` (re-verified 2026-09-24: SHA-256
+  `6e3f1bbfd58e5426651a15cfd0db6ac2094e0a93158dc51639b5929fc9ced5a4`, 93
+  lines, diff-clean against the raw URL). No coefficient was refit or altered.
+- Parity fixtures in `tests/test_crisprscan_score.py` (5 sequences, expected
+  scores 0.531/0.531/0.450/0.712/0.618) are copied verbatim from the reference
+  repo's `tests/testthat/test-crisprscan.R` at the same pinned commit.
+- Scoring semantics re-verified against the reference implementation
+  `R/getCRISPRscanScores.R`: one-based motif start positions, additive
+  intercept + matched-feature sum, canonical GG required at 1-based positions
+  28-29, ambiguous bases score Missing (never fabricated).
+- Package recovered from orphaned commit 35e0995 (unpackaged top-level tree,
+  deleted in the audit-fix drop) and promoted into `src/` unchanged.
+
 ## crispr_opt Rule Set 2 model data (2026-09-24, branch pb6)
 
 - `src/sugarcode/modules/crispr_opt/data/rule_set_2_model.json`: trained
