@@ -13,3 +13,19 @@ def test_optimal_control_and_stochastic_validation_execute():
  c=optimal_reprogramming(SRC,TAR,hours=2,max_factors=2); v=stochastic_validate(SRC,TAR,c["interventions"],replicates=4); assert len(c["interventions"])<=2 and 0<=v["success_probability"]<=1
 def test_end_to_end_50_computed_diagnostics_disclaimer_separate():
  r=design_fate_transition(SRC,TAR,hours=2); assert len(r["diagnostics"])>=50 and r["enhancement_feature_count"]==len(r["diagnostics"]); assert "model_status" not in r["diagnostics"] and "not clinically validated" in r["model_status"]
+
+
+def test_sweep_no_basal_leak_and_gmt_control_direction():
+    from sugarcode.modules.cellfatenet import simulate_fate, optimal_reprogramming, grn_matrix
+    nodes, _ = grn_matrix()
+    quiet = simulate_fate({n: 0.05 for n in nodes}, hours=72)
+    assert quiet["final_state"]["TNNT2"] < 0.5  # no activator -> no 50% basal floor
+    src = {n: 0.05 for n in nodes}
+    tgt = {"TNNT2": 2.0, "MYH6": 2.0}  # above the basal-driven level: needs real driver activation
+    sel = {x["factor"]: x["control"] for x in optimal_reprogramming(src, tgt, hours=48)["interventions"]}
+    assert set(sel) <= set(nodes)  # controls only act on network nodes
+    assert all(x not in sel for x in ("TNNT2", "MYH6"))  # markers are not control levers
+    # the cardiac program must be driven through a GMT factor in the positive
+    # direction (pre-fix the recipe repressed all three with |u| up to 0.75)
+    assert any(sel.get(d, 0) > 0.05 for d in ("GATA4", "MEF2C", "TBX5"))
+    assert not any(sel.get(d, 0) < -0.3 for d in ("GATA4", "MEF2C", "TBX5"))
