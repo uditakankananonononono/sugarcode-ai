@@ -1,4 +1,24 @@
 
+## profile_hmm (2026-09-24, branch pb6)
+
+- Topology and algorithms: Durbin R, Eddy SR, Krogh A, Mitchison G, "Biological
+  Sequence Analysis: Probabilistic Models of Proteins and Nucleic Acids",
+  Cambridge University Press 1998, ISBN 978-0-521-62971-3, DOI
+  10.1017/CBO9780511790492 (bibliographic data checked on the publisher's page,
+  https://www.cambridge.org/core/books/biological-sequence-analysis/921BB7B78B745198829EF96BC7E0F29D,
+  2026-09-24). Chapter 5 "Profile HMMs for sequence families": Fig. 5.2
+  architecture (Begin, M/I/D states, End; nine transition types), model
+  construction from an alignment with match columns by gap fraction and
+  pseudocounts, Viterbi and Forward recurrences.
+- The book is not freely available, so unlike the Tavtigian module there is no
+  text hash. The recurrences are written from Chapter 5 and the original
+  Krogh A, Brown M, Mian IS, Sjolander K, Haussler D, J Mol Biol
+  1994;235:1501-1531, DOI 10.1006/jmbi.1994.1104, PMID 8107089 (checked on
+  PubMed). Correctness does not rest on the citation: every score is checked
+  against exhaustive path enumeration.
+- No vendored data or parameter tables. Fixtures are hand-computed exact
+  fractions (derivations in tests/test_profile_hmm.py).
+
 ## rna_nussinov (2026-09-24, branch pb6)
 
 - Algorithm: Nussinov R, Jacobson AB, "Fast algorithm for predicting the

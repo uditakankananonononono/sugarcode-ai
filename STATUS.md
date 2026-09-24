@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests (**1426 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 11 profile_hmm tests (**1437 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -139,6 +139,16 @@ continues drop by drop in order of scientific usefulness.
   (one-based motif starts, additive intercept + features, GG required at
   positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
   note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
+- profile_hmm: NEW MODULE (2026-09-24, branch pb6). Profile HMMs from multiple
+  alignments per Durbin et al. 1998 Chapter 5 (Fig. 5.2 topology) and Krogh et
+  al. 1994, at src/sugarcode/modules/profile_hmm/, registered under
+  protein-engineering (92 modules total). Match/insert/delete states, gap-
+  threshold or explicit match columns, Laplace-style pseudocounts, Viterbi
+  (most probable state path + alignment), Forward (total probability), bits and
+  log-odds. Verified on hand-computed exact-fraction fixtures and against an
+  independent brute-force enumeration of all state paths (max and sum agree to
+  1e-9 on 100+ random models). Limits: global Durbin model only - no Plan7
+  local mode, Dirichlet priors, sequence weighting or Baum-Welch training.
 - rna_nussinov: NEW MODULE (2026-09-24, branch pb6). Nussinov-Jacobson 1980 (PNAS
   77:6309, PMID 6161375) maximum base-pair RNA secondary structure at
   src/sugarcode/modules/rna_nussinov/, registered under synthetic-biology (91
