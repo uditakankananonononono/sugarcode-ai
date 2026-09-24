@@ -1,5 +1,6 @@
 """Live UniProt REST connector: protein records, sequences, features, GO terms."""
 from __future__ import annotations
+import hashlib
 import json
 import time
 import urllib.error
@@ -19,7 +20,7 @@ class UniProtError(RuntimeError):
 def _get(url: str, offline: bool = False, retries: int = 3) -> bytes:
     global _last_call
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / f"{abs(hash(url))}.json"
+    cache_file = CACHE_DIR / f"{hashlib.sha256(url.encode()).hexdigest()[:32]}.json"
     if cache_file.exists():
         return cache_file.read_bytes()
     if offline:
@@ -48,14 +49,21 @@ def _get(url: str, offline: bool = False, retries: int = 3) -> bytes:
 def search(gene: str, organism_id: int = 9606, reviewed: bool = True,
            offline: bool = False) -> dict | None:
     """Best UniProt entry for a gene symbol. Returns normalized record."""
-    q = urllib.parse.quote(f"gene:{gene} AND organism_id:{organism_id}"
+    # gene_exact + exact primary-name preference: plain gene:CDKN2A ranked
+    # CDKN2A-AS1 (Q9UH64) first; validated vs HGNC symbol->UniProt mapping
+    # on 60 genes (mega27-01 benchmarks/sweep_uniprot_hgnc.json).
+    q = urllib.parse.quote(f"gene_exact:{gene} AND organism_id:{organism_id}"
                            + (" AND reviewed:true" if reviewed else ""))
-    url = f"{BASE}/search?query={q}&size=1&format=json"
+    url = f"{BASE}/search?query={q}&size=5&format=json"
     data = json.loads(_get(url, offline=offline))
     results = data.get("results", [])
     if not results:
         return None
-    e = results[0]
+
+    def _primary(x):
+        g = x.get("genes") or [{}]
+        return (g[0].get("geneName", {}).get("value") or "").upper()
+    e = next((x for x in results if _primary(x) == gene.upper()), results[0])
     seq = e.get("sequence", {})
     feats = [{"type": f.get("type"), "description": f.get("description", ""),
               "begin": f.get("location", {}).get("start", {}).get("value"),

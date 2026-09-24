@@ -1,5 +1,6 @@
 """Live gnomAD GraphQL connector: population allele frequencies by variant ID."""
 from __future__ import annotations
+import hashlib
 import json
 import time
 import urllib.error
@@ -18,7 +19,7 @@ class GnomADError(RuntimeError):
 def _post(query: str, offline: bool = False, retries: int = 3) -> dict:
     global _last_call
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / f"{abs(hash(query))}.json"
+    cache_file = CACHE_DIR / f"{hashlib.sha256(query.encode()).hexdigest()[:32]}.json"
     if cache_file.exists():
         return json.loads(cache_file.read_bytes())
     if offline:

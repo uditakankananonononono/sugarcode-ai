@@ -1,6 +1,7 @@
 """Live structure connector: RCSB PDB + AlphaFold DB (EBI), with a real
 PDB/mmCIF-lite coordinate parser. Cached, offline-capable."""
 from __future__ import annotations
+import hashlib
 import json
 import time
 import urllib.error
@@ -21,7 +22,7 @@ class StructureError(RuntimeError):
 def _get(url: str, offline: bool = False, retries: int = 3) -> bytes:
     global _last_call
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / f"{abs(hash(url))}.raw"
+    cache_file = CACHE_DIR / f"{hashlib.sha256(url.encode()).hexdigest()[:32]}.raw"
     if cache_file.exists():
         return cache_file.read_bytes()
     if offline:

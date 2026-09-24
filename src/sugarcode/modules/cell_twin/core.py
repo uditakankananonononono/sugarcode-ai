@@ -1,5 +1,6 @@
 from __future__ import annotations
 import math
+import hashlib
 
 
 def create_twin(patient_omics: dict) -> dict:
@@ -20,7 +21,7 @@ def create_twin(patient_omics: dict) -> dict:
                                             key=lambda kv: -kv[1])[:20]),
         "metadata": patient_omics.get("metadata", {}),
     }
-    state["twin_id"] = f"twin-{abs(hash(str(sorted(expression.items()))) % 10**6)}"
+    state["twin_id"] = f"twin-{int(hashlib.sha256(str(sorted(expression.items())).encode()).hexdigest(), 16) % 10**6}"
     return state
 
 
