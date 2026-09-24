@@ -125,23 +125,53 @@ def contact_probability(distance_bp,ctcf_convergent=False,cohesin_residence_min=
     return min(1.0,base*extrusion*orientation*(1-insulation))
 
 def reconstruct_contact_map(seq,bin_size=1000):
+    """Distance-decay contact map with loop-extrusion enhancement between convergent CTCF sites
+    (forward-strand motif upstream of a reverse-strand motif), both strands scanned."""
     s=clean_dna(seq); n=math.ceil(len(s)/bin_size); matrix=np.zeros((n,n))
-    sites=set(p//bin_size for p in find_motif(s,"CCGCGNGGNGGCAG"))
+    fwd=set(p//bin_size for p in find_motif(s,CTCF_MOTIF))
+    rev=set((len(s)-p-len(CTCF_MOTIF))//bin_size for p in find_motif(reverse_complement(s),CTCF_MOTIF))
     for i in range(n):
-        for j in range(i,n): matrix[i,j]=matrix[j,i]=1.0 if i==j else contact_probability((j-i)*bin_size,i in sites and j in sites)
-    return {"bin_size":bin_size,"matrix":matrix.tolist(),"bins":n}
+        for j in range(i,n): matrix[i,j]=matrix[j,i]=1.0 if i==j else contact_probability((j-i)*bin_size,i in fwd and j in rev)
+    return {"bin_size":bin_size,"matrix":matrix.tolist(),"bins":n,"ctcf_forward_bins":sorted(fwd),"ctcf_reverse_bins":sorted(rev)}
 
-def tad_boundaries(seq,bin_size=1000):
-    cmap=np.asarray(reconstruct_contact_map(seq,bin_size)['matrix']); insulation=[]
-    for i in range(1,len(cmap)-1): insulation.append((i,float(cmap[max(0,i-2):i,i+1:min(len(cmap),i+3)].mean())))
-    threshold=np.quantile([x[1] for x in insulation],.25) if insulation else 0
-    return [{"position":i*bin_size,"insulation_score":v} for i,v in insulation if v<=threshold]
+def tad_boundaries(seq,bin_size=1000,min_drop=.05):
+    """Insulation-score boundaries: full-window bins whose insulation is a local minimum at least
+    ``min_drop`` (fractional) below the highest bin within two bins. Plain distance decay with no
+    CTCF structure gives a flat profile and therefore no boundaries."""
+    cmap=np.asarray(reconstruct_contact_map(seq,bin_size)['matrix']); n=len(cmap)
+    insulation={i:float(cmap[i-2:i,i+1:i+3].mean()) for i in range(2,n-2)}
+    out=[]
+    for i,v in insulation.items():
+        near=[insulation[j] for j in range(i-2,i+3) if j!=i and j in insulation]
+        if near and v<=min(near) and v<(1-min_drop)*max(near):
+            out.append({"position":i*bin_size,"insulation_score":v})
+    return out
+
+_IUPAC={"A":"A","C":"C","G":"G","T":"T","R":"AG","Y":"CT","S":"GC","W":"AT","K":"GT","M":"AC","B":"CGT","D":"AGT","H":"ACT","V":"ACG","N":"ACGT"}
+
+def _match_fraction(window,motif):
+    return sum(b in _IUPAC.get(m,m) for b,m in zip(window,motif))/len(motif)
 
 def motif_energy(seq,motif):
-    s=clean_dna(seq); motif=motif.upper(); best=0
+    """Best IUPAC-aware match of ``motif`` in ``seq`` (a degenerate code only matches its own bases)."""
+    s=clean_dna(seq); motif=motif.upper(); best=0.0
     for i in range(max(0,len(s)-len(motif)+1)):
-        matches=sum(a==b or b in 'NRWYKMSVHD' for a,b in zip(s[i:i+len(motif)],motif)); best=max(best,matches/len(motif))
+        best=max(best,_match_fraction(s[i:i+len(motif)],motif))
     return {"best_match_fraction":best,"binding_energy_kcal_mol":-7.5*best}
+
+CTCF_MOTIF="CCGCGNGGNGGCAG"
+
+def local_tf_binding(seq,pos,motifs=None):
+    """Per-factor best match over the windows that contain ``pos`` (both strands)."""
+    s=clean_dna(seq); motifs=motifs or {**TF_MOTIFS,"CTCF":CTCF_MOTIF}; out={}
+    for tf,motif in motifs.items():
+        m=motif.upper()
+        best=0.0
+        for i in range(max(0,pos-len(m)+1),min(pos,len(s)-len(m))+1):
+            w=s[i:i+len(m)]
+            best=max(best,_match_fraction(w,m),_match_fraction(reverse_complement(w),m))
+        out[tf]={"best_match_fraction":best,"binding_energy_kcal_mol":-7.5*best}
+    return out
 
 def nucleosome_occupancy(seq):
     s=clean_dna(seq); gc=gc_content(s); periodic=sum(s[i] in 'AT' and s[i+10] in 'AT' for i in range(max(0,len(s)-10)))/max(1,len(s)-10)
@@ -161,14 +191,22 @@ def variant_mechanistic_deltas(seq,pos,alt,cell_type="generic"):
     alt=clean_dna(alt)
     if len(alt)!=1: raise ValueError("alt must be one base")
     mutant=s[:pos]+alt+s[pos+1:]; ref_expr=expression_prediction(s,cell_type); alt_expr=expression_prediction(mutant,cell_type); emb=delta_embedding(s,mutant); ref_atac=epigenetic_fusion(s,cell_type=cell_type)['mean_activity']; alt_atac=epigenetic_fusion(mutant,cell_type=cell_type)['mean_activity']; ref_ctcf=motif_energy(s,"CCGCGNGGNGGCAG"); alt_ctcf=motif_energy(mutant,"CCGCGNGGNGGCAG")
+    ref_local=local_tf_binding(s,pos); alt_local=local_tf_binding(mutant,pos)
+    tf_deltas={tf:alt_local[tf]['binding_energy_kcal_mol']-ref_local[tf]['binding_energy_kcal_mol'] for tf in ref_local if max(ref_local[tf]['best_match_fraction'],alt_local[tf]['best_match_fraction'])==1.0 and alt_local[tf]['best_match_fraction']!=ref_local[tf]['best_match_fraction']}  # a full site destroyed or created at pos
     uncertainty=.05+1/math.sqrt(max(1,len(s)))
-    return {"ref":s[pos],"alt":alt,"delta_embedding_l2":emb['l2'],"delta_tf_binding_kcal_mol":alt_ctcf['binding_energy_kcal_mol']-ref_ctcf['binding_energy_kcal_mol'],"delta_atac":alt_atac-ref_atac,"delta_nucleosome":nucleosome_occupancy(mutant)-nucleosome_occupancy(s),"delta_contact":(alt_ctcf['best_match_fraction']-ref_ctcf['best_match_fraction'])*.1,"delta_rna_expression":alt_expr['log2_expression']-ref_expr['log2_expression'],"uncertainty_std":uncertainty}
+    return {"ref":s[pos],"alt":alt,"delta_embedding_l2":emb['l2'],"delta_tf_binding_kcal_mol":sum(tf_deltas.values()),"delta_tf_binding_by_factor":tf_deltas,"delta_ctcf_binding_kcal_mol":alt_ctcf['binding_energy_kcal_mol']-ref_ctcf['binding_energy_kcal_mol'],"delta_atac":alt_atac-ref_atac,"delta_nucleosome":nucleosome_occupancy(mutant)-nucleosome_occupancy(s),"delta_contact":(alt_ctcf['best_match_fraction']-ref_ctcf['best_match_fraction'])*.1,"delta_rna_expression":alt_expr['log2_expression']-ref_expr['log2_expression'],"uncertainty_std":uncertainty}
 
 def simulate_edit(seq,start,end,replacement,cell_type="generic"):
+    """Re-score a substitution, insertion (start==end) or deletion (empty replacement)."""
     s=clean_dna(seq)
     if not 0<=start<=end<=len(s): raise ValueError("invalid edit interval")
-    edited=s[:start]+clean_dna(replacement)+s[end:]; ref=expression_prediction(s,cell_type); alt=expression_prediction(edited,cell_type)
-    return {"edited_sequence":edited,"length_delta":len(edited)-len(s),"motifs_ref":analyze_sequence(s)['tf_motifs'],"motifs_edited":analyze_sequence(edited)['tf_motifs'],"expression_delta":alt['log2_expression']-ref['log2_expression'],"ctcf_boundary_delta":motif_energy(edited,"CCGCGNGGNGGCAG")['best_match_fraction']-motif_energy(s,"CCGCGNGGNGGCAG")['best_match_fraction'],"enhancer_hijack_risk":max(0,alt['relative_expression']-ref['relative_expression'])/(1+ref['relative_expression'])}
+    if replacement and any(c not in "ACGTNacgtn" for c in replacement): raise ValueError("replacement must be DNA")
+    insert=clean_dna(replacement) if replacement else ""
+    edited=s[:start]+insert+s[end:]
+    if not edited: raise ValueError("edit deletes the whole sequence")
+    ref=expression_prediction(s,cell_type); alt=expression_prediction(edited,cell_type)
+    kind="deletion" if not insert else "insertion" if start==end else "substitution"
+    return {"edit_type":kind,"edited_sequence":edited,"length_delta":len(edited)-len(s),"motifs_ref":analyze_sequence(s)['tf_motifs'],"motifs_edited":analyze_sequence(edited)['tf_motifs'],"expression_delta":alt['log2_expression']-ref['log2_expression'],"ctcf_boundary_delta":motif_energy(edited,CTCF_MOTIF)['best_match_fraction']-motif_energy(s,CTCF_MOTIF)['best_match_fraction'],"enhancer_hijack_risk":max(0,alt['relative_expression']-ref['relative_expression'])/(1+ref['relative_expression'])}
 
 def masked_sequence_objective(seq,mask_fraction=.15,seed=0):
     if not 0<mask_fraction<1: raise ValueError("mask_fraction must be in (0,1)")
@@ -187,8 +225,33 @@ def perturbation_calibration(predicted,observed):
     if p.shape!=o.shape or not p.size: raise ValueError("predicted/observed shape mismatch")
     return {"rmse":float(np.sqrt(np.mean((p-o)**2))),"mae":float(np.mean(np.abs(p-o))),"bias":float(np.mean(p-o)),"calibration_slope":float(np.dot(p,o)/max(np.dot(p,p),1e-12))}
 
+# Splice-site position frequency matrices (A,C,G,T), consensus after Shapiro & Senapathy 1987:
+# donor MAG|GURAGU (3 exonic + 6 intronic), acceptor (Y)10 N C A G | G.
+_DONOR=[(.35,.35,.18,.12),(.60,.13,.14,.13),(.08,.04,.81,.07),(0,0,1,0),(0,0,0,1),(.49,.03,.45,.03),(.71,.07,.12,.10),(.06,.05,.84,.05),(.15,.19,.19,.47)]
+_ACCEPTOR=[(.08,.40,.07,.45)]*10+[(.25,.25,.25,.25),(.04,.65,.03,.28),(1,0,0,0),(0,0,1,0),(.24,.14,.52,.10)]
+
+def _pwm_scores(s,pwm):
+    idx={"A":0,"C":1,"G":2,"T":3}; best=sum(math.log2(max(col)/.25) for col in pwm); scores=[]
+    for i in range(len(s)-len(pwm)+1):
+        total=0.0
+        for b,col in zip(s[i:i+len(pwm)],pwm):
+            p=col[idx[b]] if b in idx else .25
+            if p<=0: total=None; break
+            total+=math.log2(p/.25)
+        if total is not None: scores.append((i,total/best))
+    return scores
+
+def splice_sites(seq,threshold=.8):
+    """Donor/acceptor sites scoring at least ``threshold`` of the consensus log-odds maximum."""
+    s=clean_dna(seq)
+    donors=[{"position":i+3,"score":round(v,3)} for i,v in _pwm_scores(s,_DONOR) if v>=threshold]
+    acceptors=[{"position":i+14,"score":round(v,3)} for i,v in _pwm_scores(s,_ACCEPTOR) if v>=threshold]
+    return {"donors":donors,"acceptors":acceptors}
+
 def cryptic_splice_risk(seq):
-    s=clean_dna(seq); donors=sum(s[i:i+2]=='GT' for i in range(len(s)-1)); acceptors=sum(s[i:i+2]=='AG' for i in range(len(s)-1)); branch=sum(s[i:i+5].startswith('TACT') for i in range(len(s)-4)); return min(1,(donors+acceptors+branch)/max(1,len(s)/20))
+    """Risk from the strongest donor/acceptor match: ~0 for no consensus-like site, ->1 near consensus."""
+    s=clean_dna(seq); best=max([v for _,v in _pwm_scores(s,_DONOR)]+[v for _,v in _pwm_scores(s,_ACCEPTOR)]+[0.0])
+    return 1/(1+math.exp(-(best-.8)*20))
 
 def propose_regulatory_edits(seq,target_delta,cell_type="generic",max_edits=1):
     s=clean_dna(seq); baseline=expression_prediction(s,cell_type)['log2_expression']; candidates=[]
