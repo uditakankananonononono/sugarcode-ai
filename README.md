@@ -30,6 +30,11 @@ sugarcode report splice RB1 'c.2490-28T>G' --format html --out report.html
 sugarcode report splice RB1 'c.2490-28T>G' --format json   # sha256 evidence bundle
 sugarcode report notebook RB1 'c.2490-28T>G' --out assessment.ipynb
 sugarcode report validate-notebook assessment.ipynb
+
+# VCF toolkit (drop 63):
+sugarcode vcf stats calls.vcf                  # variant classes, Ti/Tv, genotype counts
+sugarcode vcf filter calls.vcf --pass-only --min-qual 50 --out clean.vcf
+sugarcode vcf csv calls.vcf --sample NA12878 --out calls.csv
 ```
 
 ## Architecture
@@ -41,8 +46,8 @@ src/omega/            Omega OS v7.0 framework
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
 src/sugarcode/
-  bio/                Shared scientific toolkit: sequence ops, FASTA, codon
-                      usage/CAI, position weight matrices
+  bio/                Shared scientific toolkit: sequence ops, FASTA, VCF,
+                      GenBank, codon usage/CAI, position weight matrices
   report/             Report & export engine: HTML/Markdown reports, CSV/TSV,
                       evidence bundles, .ipynb generation (drop 62)
   modules/<slug>/     One package per module
@@ -102,7 +107,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1387 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1399 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -531,7 +536,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1387 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1399 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

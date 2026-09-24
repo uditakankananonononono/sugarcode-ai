@@ -10,6 +10,9 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   genbank features FILE            locus feature summary (type counts, spans)
   pwm score SEQ --motif NAME       normalized log-odds score on a shipped splice matrix
   report splice GENE NOTATION    render an assessment as HTML/Markdown/bundle (drop 62)
+  vcf stats FILE                 variant classes, Ti/Tv, genotype counts (drop 63)
+  vcf filter FILE [--pass-only --min-qual N --chrom .. --type ..]
+  vcf csv FILE [--sample NAME]   flatten records to CSV
   report notebook GENE NOTATION  executable .ipynb reproducing the assessment
   report validate-notebook FILE  structural nbformat check
 
@@ -173,6 +176,42 @@ def _cmd_report_validate_notebook(args) -> int:
 
 
 
+def _cmd_vcf_stats(args) -> int:
+    from .bio.vcf import parse_vcf, stats
+    v = parse_vcf(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(v)})
+
+
+def _cmd_vcf_filter(args) -> int:
+    from .bio.vcf import parse_vcf, write_vcf, filter_records
+    v = parse_vcf(Path(args.file).read_text())
+    out = filter_records(
+        v, pass_only=args.pass_only, min_qual=args.min_qual,
+        chroms=[c for c in (args.chrom or "").split(",") if c] or None,
+        types=[x for x in (args.type or "").split(",") if x] or None)
+    text = write_vcf(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['records'])} of {len(v['records'])} records)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_vcf_csv(args) -> int:
+    from .bio.vcf import parse_vcf, records_to_rows
+    from .report import to_csv
+    v = parse_vcf(Path(args.file).read_text())
+    text = to_csv(records_to_rows(v, sample=args.sample))
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -225,6 +264,26 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    vc = sub.add_parser("vcf", help="VCF toolkit (stats, filter, csv)")
+    vcsub = vc.add_subparsers(dest="sub", required=True)
+    vst = vcsub.add_parser("stats", help="variant classes, Ti/Tv, genotype counts")
+    vst.add_argument("file")
+    vst.set_defaults(func=_cmd_vcf_stats)
+    vf = vcsub.add_parser("filter", help="filter records (PASS, qual, chrom, type)")
+    vf.add_argument("file")
+    vf.add_argument("--pass-only", action="store_true")
+    vf.add_argument("--min-qual", type=float, default=None)
+    vf.add_argument("--chrom", default=None, help="comma-separated chromosomes")
+    vf.add_argument("--type", default=None,
+                    help="comma-separated snp,mnp,insertion,deletion,indel,symbolic,breakend")
+    vf.add_argument("--out", default=None)
+    vf.set_defaults(func=_cmd_vcf_filter)
+    vx = vcsub.add_parser("csv", help="flatten records to CSV")
+    vx.add_argument("file")
+    vx.add_argument("--sample", default=None, help="include this sample's FORMAT columns")
+    vx.add_argument("--out", default=None)
+    vx.set_defaults(func=_cmd_vcf_csv)
 
     r = sub.add_parser("report", help="lab reports, notebooks and evidence bundles")
     rsub = r.add_subparsers(dest="sub", required=True)
