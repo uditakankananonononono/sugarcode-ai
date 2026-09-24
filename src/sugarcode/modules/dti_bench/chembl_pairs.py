@@ -27,6 +27,11 @@ class ChEMBLPairClient:
         seqs=[]
         for c in comps:
             seq=c.get("target_component_sequence") or c.get("sequence")
+            if not seq and c.get("component_id"):
+                # The target resource embeds components WITHOUT sequences; the
+                # sequence lives on the target_component/<component_id> resource.
+                comp=self._get(f"target_component/{c['component_id']}.json")
+                seq=comp.get("sequence") or comp.get("target_component_sequence")
             if seq: seqs.append(seq)
         if not seqs: raise ChEMBLPairUnavailable(f"target {target_id} has no protein sequence in ChEMBL")
         if len(seqs)>1: raise ChEMBLPairUnavailable(f"target {target_id} is multi-component; explicit component policy required")

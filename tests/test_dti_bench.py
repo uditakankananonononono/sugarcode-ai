@@ -29,3 +29,21 @@ class DTIBenchTests(unittest.TestCase):
    c=ChEMBLPairClient(d,offline=True)
    with self.assertRaisesRegex(ChEMBLPairUnavailable,"offline cache miss"): c.pairs(["CHEMBL203"])
 if __name__=="__main__": unittest.main()
+
+def test_target_sequence_falls_back_to_component_resource():
+    from sugarcode.modules.dti_bench.chembl_pairs import ChEMBLPairClient
+    c=ChEMBLPairClient(offline=True)
+    def fake_get(path,params=None):
+        assert path.endswith('.json')
+        if path.startswith('target_component/'):
+            return {'sequence':'MSEQ'}
+        return {'target_components':[{'component_id':147,'component_type':'PROTEIN'}]}
+    c._get=fake_get
+    assert c.target_sequence('CHEMBL203')=='MSEQ'
+def test_target_sequence_multi_component_fails_closed():
+    from sugarcode.modules.dti_bench.chembl_pairs import ChEMBLPairClient, ChEMBLPairUnavailable
+    c=ChEMBLPairClient(offline=True)
+    c._get=lambda path,params=None:{'target_components':[{'component_id':1},{'component_id':2}]} if not path.startswith('target_component/') else {'sequence':'M'}
+    try:
+        c.target_sequence('CHEMBL999'); assert False
+    except ChEMBLPairUnavailable: pass
