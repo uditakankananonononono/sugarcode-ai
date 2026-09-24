@@ -29,6 +29,14 @@ def test_pbs_comes_from_spacer_flap_not_edit_seq():
 def test_insertion_edit_with_empty_ref_does_not_crash():
     from sugarcode.modules.prime_design import design_edit
     region = "CCTGGGTCAATCCTTGGGGCCCAGACTGAGCACGTGATGGCAGAGGAAAGG"
-    r = design_edit(region, {"type": "insertion", "position": 32, "ref": "", "alt": "CTT"})
+    r = design_edit(region, {"type": "insertion", "position": 34, "ref": "", "alt": "CTT"})
     assert r["pegrna_designs"] and r["pegrna_designs"][0]["spacer"] == "GGCCCAGACTGAGCACGTGA"
-    assert r["pegrna_designs"][0]["pbs"] == "GTGCTCAGTCTG"  # published PBS
+    top = r["pegrna_designs"][0]
+    assert top["pbs"] == reverse_complement(top["spacer"][16 - top["pbs_length"]:16])
+    assert top["rt_template"].endswith("TCTGCCATCAAAGC")  # published RTT templates from the nick
+
+
+def test_rtt_truncation_keeps_nick_proximal_end():
+    # 20 nt of edited context, 14 nt RTT: must template the 14 nt at the nick
+    d = design_pegrna(SPACER, "GCTTTGATGGCAGAGGAAAG", pbs_len=12, rtt_len=14)
+    assert d["rt_template"] == RTT
