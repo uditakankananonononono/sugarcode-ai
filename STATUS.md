@@ -30,6 +30,14 @@ Audit-fix drop (third-party repo audit, 2026-09-22):
   deep-learning/RL/continual-learning wording for deterministic computations;
   the spec corpus in `spec/` is labeled as aspirational source text.
 
+Model layer (2026-09-24, branch model-layer): `src/sugarcode/llm/` - model profiles
+(Ollama local default, Inkling-Small on the HF router, Inkling on own hardware via llama.cpp
+or vLLM, Ornith-1.5-9B, Sakana Fugu paid-gated), 231 module functions as tools, a trained
+module router (ties an untrained centroid baseline; see docs/MODELS.md), the copilot loop,
+a verified Needle fine-tune dataset builder and a read-only AI Library connector. Tested
+against a local OpenAI-format server; no live model answer has been recorded yet because no
+model endpoint or HF token is configured here.
+
 ## Tier 1 - verified against live external data
 
 | Module | What is verified | Source (live this project) |
