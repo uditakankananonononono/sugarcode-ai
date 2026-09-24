@@ -56,7 +56,7 @@ sugarcode bed to-gff peaks.bed --feature-type peak --out peaks.gff3
 # SAM alignments (drop 67, text SAM):
 sugarcode sam stats aln.sam                    # mapping rate, MAPQ, per-reference
 sugarcode sam filter aln.sam --mapped-only --min-mapq 30 --out mapped.sam
-sugarcode sam to-bed aln.sam --out reads.bed
+sugarcode sam to-bed aln.sam --out reads.bedsugarcode sam pileup aln.sam --min-mapq 30           # per-position base counts (drop 70)
 
 # Newick trees (drop 68):
 sugarcode phylo stats tree.nwk                 # shape, total length, height
@@ -141,7 +141,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1477 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1487 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -570,7 +570,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1477 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1487 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

@@ -15,6 +15,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   gff stats FILE                 GFF3/GTF feature summary (drop 65)
   bed stats FILE                 BED interval summary (drop 66)
   sam stats FILE                 SAM mapping summary (drop 67)
+  sam pileup FILE [--min-mapq N] [--min-baseq N] [--rname X] [--format json|mpileup]  (drop 70)
   phylo stats FILE               Newick tree summary (drop 68)
   phylo mrca FILE --leaves a,b,c
   phylo distance FILE --a X --b Y
@@ -525,6 +526,20 @@ def _cmd_msa_a2m(args) -> int:
 
 
 
+def _cmd_sam_pileup(args) -> int:
+    from .bio.sam import parse_sam
+    from .bio.pileup import pileup, to_mpileup, variant_sites
+    sam = parse_sam(Path(args.file).read_text())
+    rows = pileup(sam, min_mapq=args.min_mapq, min_baseq=args.min_baseq,
+                  rname=args.rname)
+    if args.format == "mpileup":
+        sys.stdout.write(to_mpileup(rows))
+        return 0
+    return _emit({"file": args.file, "positions": rows,
+                  "variant_sites": variant_sites(rows)})
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -636,6 +651,13 @@ def main(argv: list[str] | None = None) -> int:
     sf.add_argument("--primary-only", action="store_true")
     sf.add_argument("--out", default=None)
     sf.set_defaults(func=_cmd_sam_filter)
+    sp = smsub.add_parser("pileup", help="mpileup-style per-position base counts")
+    sp.add_argument("file")
+    sp.add_argument("--min-mapq", type=int, default=0)
+    sp.add_argument("--min-baseq", type=int, default=0)
+    sp.add_argument("--rname", default=None)
+    sp.add_argument("--format", choices=["json", "mpileup"], default="json")
+    sp.set_defaults(func=_cmd_sam_pileup)
     sb = smsub.add_parser("to-bed", help="mapped reads to BED6 (coordinate math done)")
     sb.add_argument("file")
     sb.add_argument("--out", default=None)
