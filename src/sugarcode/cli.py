@@ -32,6 +32,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   align run --a S1 --b S2 [--mode global|local] [--matrix BLOSUM62]  (drop 76)
   kmer count|compare|sketch [--k K] [--w W]  (drop 77)
   orf find|translate [--table N] [--starts atg|table]  (drop 79)
+  rnaseq normalize|filter|sizefactors --counts F  (drop 80)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -809,6 +810,66 @@ def _cmd_align_run(args) -> int:
     return _emit(r)
 
 
+def _load_lengths(path):
+    lens = {}
+    for i, ln in enumerate(Path(path).read_text().splitlines()):
+        if not ln.strip():
+            continue
+        delim = "\t" if "\t" in ln else ","
+        parts = [c.strip() for c in ln.split(delim)]
+        if len(parts) < 2:
+            raise SystemExit(f"{path} line {i + 1}: expected gene,length")
+        try:
+            lens[parts[0]] = float(parts[1])
+        except ValueError:
+            if i == 0:
+                continue  # header row
+            raise SystemExit(f"{path} line {i + 1}: non-numeric length")
+    return lens
+
+
+def _emit_table(out, args, label):
+    from .bio.rnaseq import write_counts
+    if args.out:
+        Path(args.out).write_text(write_counts(out), encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['genes'])} genes x "
+              f"{len(out['samples'])} samples, {label})")
+        return 0
+    return _emit(out)
+
+
+def _cmd_rnaseq_normalize(args) -> int:
+    from .bio import rnaseq as rq
+    table = rq.parse_counts(Path(args.counts).read_text())
+    if args.method == "cpm":
+        out = rq.cpm(table)
+    elif args.method == "tpm":
+        if not args.lengths:
+            raise SystemExit("--lengths required for tpm")
+        out = rq.tpm(table, _load_lengths(args.lengths))
+    elif args.method == "rpkm":
+        if not args.lengths:
+            raise SystemExit("--lengths required for rpkm")
+        out = rq.rpkm(table, _load_lengths(args.lengths))
+    else:
+        out = rq.normalize_deseq(table)
+    return _emit_table(out, args, args.method)
+
+
+def _cmd_rnaseq_sizefactors(args) -> int:
+    from .bio import rnaseq as rq
+    table = rq.parse_counts(Path(args.counts).read_text())
+    return _emit({"samples": table["samples"],
+                  "size_factors": rq.size_factors(table["counts"])})
+
+
+def _cmd_rnaseq_filter(args) -> int:
+    from .bio import rnaseq as rq
+    table = rq.parse_counts(Path(args.counts).read_text())
+    out = rq.filter_genes(table, args.min_count, args.min_samples)
+    return _emit_table(out, args, "filtered")
+
+
 def _cmd_orf_translate(args) -> int:
     from .bio.orf import translate
     return _emit({"table": args.table, "cds": args.cds,
@@ -1006,6 +1067,26 @@ def main(argv: list[str] | None = None) -> int:
     ofn.add_argument("--forward-only", action="store_true")
     ofn.add_argument("--allow-truncated", action="store_true")
     ofn.set_defaults(func=_cmd_orf_find)
+
+    rq = sub.add_parser("rnaseq", help="RNA-seq count toolkit")
+    rqsub = rq.add_subparsers(dest="sub", required=True)
+    rn = rqsub.add_parser("normalize", help="CPM/RPKM/TPM/DESeq normalization")
+    rn.add_argument("--counts", required=True, help="CSV/TSV count table")
+    rn.add_argument("--method", choices=["cpm", "rpkm", "tpm", "deseq"],
+                    default="cpm")
+    rn.add_argument("--lengths", default=None,
+                    help="gene,length file (rpkm/tpm)")
+    rn.add_argument("--out", default=None)
+    rn.set_defaults(func=_cmd_rnaseq_normalize)
+    rs = rqsub.add_parser("sizefactors", help="DESeq median-of-ratios factors")
+    rs.add_argument("--counts", required=True)
+    rs.set_defaults(func=_cmd_rnaseq_sizefactors)
+    rf = rqsub.add_parser("filter", help="keep genes over an expression threshold")
+    rf.add_argument("--counts", required=True)
+    rf.add_argument("--min-count", type=float, default=10)
+    rf.add_argument("--min-samples", type=int, default=1)
+    rf.add_argument("--out", default=None)
+    rf.set_defaults(func=_cmd_rnaseq_filter)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
