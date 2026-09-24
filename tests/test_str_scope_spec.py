@@ -39,3 +39,12 @@ def test_architecture_trims_edge_mismatch():
 def test_diagnostics_track_interruptions_and_reads():
  d=str_diagnostics(str_report('TTT'+'CAG'*30+'CAA'+'CAG'*30+'TTT','CAG',['CAG'*55,'CAG'*70]))
  assert d['interruption_count']==1 and d['repeat_count']==61 and d['reads_expanded_fraction']==1.0 and d['longest_pure_run']==30
+
+def test_find_strs_phase_normalized():
+ h=find_strs('GGG'+'CAG'*10+'TTT',min_unit=3,max_unit=3); cag=[x for x in h if x['repeats']==10][0]
+ assert cag['unit']=='CAG' and cag['start']==3 and cag['canonical_unit']=='AGC'
+ h2=find_strs('CAG'*10+'CA',min_unit=3,max_unit=3); assert h2[0]['unit']=='CAG' and h2[0]['start']==0 and h2[0]['span_end']==32
+ h3=find_strs('TTGAA'+'GAA'*8,min_unit=3,max_unit=3); assert h3[0]['unit']=='GAA' and h3[0]['repeats']==9
+def test_find_strs_homopolymer_and_nonmotif_stable():
+ h=find_strs('C'+'A'*12+'C'); assert h[0]['unit']=='A' and h[0]['repeats']==12
+ h=find_strs('G'+'ATTC'*6+'G',min_unit=4,max_unit=4); assert h[0]['repeats']==6 and h[0]['canonical_unit']=='ATTC'

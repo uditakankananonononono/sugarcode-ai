@@ -315,15 +315,41 @@ def physical_energy(coords,charges=None,sigma=3.8,epsilon=.1):
             r=max(.5,float(np.linalg.norm(c[i]-c[j]))); sr=(sigma/r)**6; lj+=4*epsilon*(sr*sr-sr); elec+=.05*q[i]*q[j]/r
     return {'lennard_jones':lj,'electrostatic':elec,'total':lj+elec}
 
-def refine_coordinates(coords,charges=None,steps=20,learning_rate=.002):
-    x=np.asarray(coords,float).copy(); trajectory=[]
+def _bond_energy(x,bond_length=CA_CA,k_bond=10.0):
+    b=np.linalg.norm(np.diff(x,axis=0),axis=1) if len(x)>1 else np.zeros(0); return float(k_bond*np.sum((b-bond_length)**2))
+
+
+def _project_bonds(x,bond_length=CA_CA):
+    """SHAKE-style chain projection: keep each bond direction, reset its length."""
+    y=x.copy()
+    for i in range(1,len(y)):
+        v=x[i]-x[i-1]; nv=np.linalg.norm(v)
+        v=v/nv if nv>1e-9 else np.array([1.0,0.0,0.0])
+        y[i]=y[i-1]+bond_length*v
+    return y
+
+
+def refine_coordinates(coords,charges=None,steps=20,learning_rate=.002,restrain_bonds=True,bond_length=CA_CA,k_bond=10.0):
+    """Gradient descent over LJ + electrostatics with CA-CA bond restraint.
+
+    With restrain_bonds (default) the objective adds k_bond*(r-3.80)^2 per
+    consecutive pair and every step is projected back onto exact 3.80 A
+    bonds, so refinement cannot distort the backbone. restrain_bonds=False
+    restores the unrestrained nonbonded-only descent.
+    """
+    x=np.asarray(coords,float).copy()
+    def total(y): return physical_energy(y,charges)['total']+(_bond_energy(y,bond_length,k_bond) if restrain_bonds else 0.0)
+    trajectory=[]
     for _ in range(steps):
-        e=physical_energy(x,charges)['total']; trajectory.append(e); grad=np.zeros_like(x); h=1e-4
+        e=total(x); trajectory.append(e); grad=np.zeros_like(x); h=1e-4
         for i in range(len(x)):
             for j in range(3):
-                x[i,j]+=h; ep=physical_energy(x,charges)['total']; x[i,j]-=h; grad[i,j]=(ep-e)/h
+                x[i,j]+=h; ep=total(x); x[i,j]-=h; grad[i,j]=(ep-e)/h
         x-=learning_rate*np.clip(grad,-10,10)
-    trajectory.append(physical_energy(x,charges)['total']); return {'coordinates':x.tolist(),'energy_trajectory':trajectory,'converged':trajectory[-1]<=trajectory[0]}
+        if restrain_bonds: x=_project_bonds(x,bond_length)
+    trajectory.append(total(x)); b=np.linalg.norm(np.diff(x,axis=0),axis=1) if len(x)>1 else np.zeros(1)
+    return {'coordinates':x.tolist(),'energy_trajectory':trajectory,'converged':trajectory[-1]<=trajectory[0],
+            'bond_restraint':bool(restrain_bonds),'max_bond_deviation_A':float(np.max(np.abs(b-bond_length))) if len(x)>1 else 0.0}
 
 def mutation_stability(sequence,position,mutant):
     seq=''.join(a for a in sequence.upper() if a in CF); position=int(position); wild=seq[position]; p0=CF[wild]; p1=CF[mutant]; hyd=set('AILMFWVY'); propensity_shift=(max(p1)-max(p0))/100; hydro_shift=float((mutant in hyd)-(wild in hyd)); ddg=.8*propensity_shift-1.2*hydro_shift; return {'position':position,'wild_type':wild,'mutant':mutant,'ddg_relative':ddg,'destabilizing':ddg>0,'terms':{'propensity':.8*propensity_shift,'hydrophobicity':-1.2*hydro_shift},'scope':'composition/propensity heuristic; adjacent bonded pairs are excluded from nonbonded physical_energy'}

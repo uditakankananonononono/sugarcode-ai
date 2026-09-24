@@ -4,8 +4,49 @@ from collections import Counter
 from ...bio.sequence import clean_dna
 
 
+# Preferred reporting phases for known expansion motifs (either strand).
+_PREFERRED_PHASES = ("CAG", "CTG", "CGG", "CCG", "GAA", "TTC", "GCC", "GGC", "CCTG", "CAGG", "GGGGCC", "GGCCCC")
+
+
+def _canonical_unit(unit: str) -> str:
+    """Lexicographically smallest cyclic rotation (strand-specific), for comparison."""
+    return min(unit[i:] + unit[:i] for i in range(len(unit))) if unit else unit
+
+
+def _phase_normalize(s: str, start: int, u: int) -> dict:
+    """Resolve the reporting phase of a tandem repeat found at `start`.
+
+    A greedy left-to-right scan can begin inside the flank when the flank's
+    last bases match the unit's tail (GGG+CAGx10 is first seen as GCAx10).
+    Take the maximal period-u span (s[j]==s[j+u]) and, among start offsets
+    inside its first unit, keep those with the most whole units; prefer a
+    known disease-motif phase (CAG over GCA/AGC), otherwise the leftmost.
+    """
+    span_end = start + u
+    while span_end < len(s) and s[span_end] == s[span_end - u]:
+        span_end += 1
+    span_start = start
+    while span_start > 0 and s[span_start - 1] == s[span_start - 1 + u]:
+        span_start -= 1
+    cands = []
+    for k in range(u):
+        st = span_start + k
+        reps = (span_end - st) // u
+        if reps >= 1:
+            cands.append((reps, s[st:st + u] in _PREFERRED_PHASES, -st, st))
+    reps, _, _, st = max(cands)
+    unit = s[st:st + u]
+    return {"start": st, "unit": unit, "unit_len": u, "repeats": reps, "length": reps * u,
+            "canonical_unit": _canonical_unit(unit), "span_start": span_start, "span_end": span_end}
+
+
 def find_strs(seq: str, min_unit: int = 1, max_unit: int = 6, min_repeats: int = 4) -> list[dict]:
-    """Exact tandem-repeat detection over 1-6 bp units (suffix-comparison scan)."""
+    """Tandem-repeat detection over 1-6 bp units with phase normalization.
+
+    Each hit reports the unit in a stable phase (see _phase_normalize), a
+    rotation-invariant canonical_unit, and the full periodic span including
+    partial units at either edge.
+    """
     s = clean_dna(seq)
     n = len(s)
     hits = []
@@ -16,17 +57,18 @@ def find_strs(seq: str, min_unit: int = 1, max_unit: int = 6, min_repeats: int =
             if i + 2 * u > n:
                 continue
             unit = s[i:i + u]
+            if len(unit) > 1 and unit == unit[0] * len(unit):
+                continue  # homopolymer is reported at unit length 1
             reps = 1
             while s[i + reps * u:i + (reps + 1) * u] == unit:
                 reps += 1
             if reps >= min_repeats:
-                cand = {"start": i, "unit": unit, "unit_len": u,
-                        "repeats": reps, "length": reps * u}
-                if best is None or cand["length"] > best["length"]:
+                cand = _phase_normalize(s, i, u)
+                if cand["repeats"] >= min_repeats and (best is None or cand["length"] > best["length"]):
                     best = cand
         if best:
             hits.append(best)
-            i = best["start"] + best["length"]
+            i = max(i + 1, best["span_end"])
         else:
             i += 1
     return hits

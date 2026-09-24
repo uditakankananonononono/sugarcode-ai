@@ -39,3 +39,12 @@ def test_helix_geometry_is_ideal():
  assert abs(np.linalg.norm(X[4]-X[0])-6.2)<0.4
 def test_diagnostics_report_geometry():
  d=structure_diagnostics(LONG); assert abs(d['ca_ca_mean']-3.8)<1e-6 and d['clash_count']==0 and d['radius_of_gyration']>0
+
+def test_refinement_keeps_ca_ca_bonds():
+ X=_ca(predict_structure(LONG[:20])['pdb'])
+ r=refine_coordinates(X,[1 if a in 'KR' else -1 if a in 'DE' else 0 for a in LONG[:20]],steps=3,learning_rate=.05)
+ b=np.linalg.norm(np.diff(np.array(r['coordinates']),axis=0),axis=1)
+ assert r['bond_restraint'] and np.all(abs(b-3.80)<1e-6) and r['max_bond_deviation_A']<1e-6
+def test_refinement_repairs_bad_bonds_and_legacy_mode():
+ r=refine_coordinates([[0,0,0],[4,0,0],[5,0,0]],steps=2); assert r['max_bond_deviation_A']<1e-6 and r['converged']
+ u=refine_coordinates([[0,0,0],[4,0,0],[5,0,0]],steps=2,restrain_bonds=False); assert not u['bond_restraint'] and u['max_bond_deviation_A']>1
