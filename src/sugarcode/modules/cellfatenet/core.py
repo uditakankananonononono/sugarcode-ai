@@ -101,7 +101,7 @@ def simulate_fate(initial, *, hours=72, controls=None, accessibility=None,
     gate=access*(1-meth); t=np.linspace(0,hours,289); rng=np.random.default_rng(seed); ensemble=[]
     for rep in range(trajectories):
         def rhs(_,x):
-            signal=W@(x*x/(.25+x*x)); production=1/(1+np.exp(-2*signal)); return gate*production+u-.35*x
+            xp=np.maximum(x,0); signal=W@(xp*xp/(.25+xp*xp)); production=1/(1+np.exp(-6*(signal-.5))); return gate*production+u-.35*x
         y=solve_ivp(rhs,(0,hours),initial,t_eval=t,rtol=1e-7,atol=1e-9).y.T
         if noise:
             dt=t[1]-t[0]; z=np.empty_like(y); z[0]=y[0]
@@ -134,12 +134,20 @@ def graph_message_passing(expression, layers=3):
 
 
 def optimal_reprogramming(source_state,target_state, *, hours=48, max_factors=4):
-    """Optimal-control search minimizing terminal error, dose, toxicity and time."""
-    nodes,_=grn_matrix(); target=np.array([target_state.get(n,0) for n in nodes],float)
+    """Optimal-control search minimizing terminal error, dose, toxicity and time.
+
+    Controls are restricted to transcription-factor nodes (genes with outgoing
+    regulatory edges); forcing structural/lineage-marker genes directly is not
+    a reprogramming strategy and trivializes the search.
+    """
+    nodes,W=grn_matrix(); target=np.array([target_state.get(n,0) for n in nodes],float)
+    specified=np.array([n in target_state for n in nodes])  # error only over requested targets
+    tf_mask=(np.abs(W).sum(0)>0)
     def objective(u):
-        controls={n:v for n,v in zip(nodes,u) if abs(v)>1e-8}; r=simulate_fate(source_state,hours=hours,controls=controls)
-        final=np.array([r["final_state"][n] for n in nodes]); return np.sum((final-target)**2)+.08*np.sum(u*u)+.04*np.sum(np.abs(u))
-    res=minimize(objective,np.zeros(len(nodes)),method="L-BFGS-B",bounds=[(-1,1)]*len(nodes),options={"maxiter":80})
+        u=u*tf_mask; controls={n:v for n,v in zip(nodes,u) if abs(v)>1e-8}; r=simulate_fate(source_state,hours=hours,controls=controls)
+        final=np.array([r["final_state"][n] for n in nodes]); return np.sum((final-target)**2*specified)+.08*np.sum(u*u)+.04*np.sum(np.abs(u))
+    bounds=[(-1,1) if m else (0,0) for m in tf_mask]
+    res=minimize(objective,np.zeros(len(nodes)),method="L-BFGS-B",bounds=bounds,options={"maxiter":80,"eps":1e-3})
     order=np.argsort(-np.abs(res.x))[:max_factors]; selected=[{"factor":nodes[i],"control":float(res.x[i]),"action":"overexpress" if res.x[i]>0 else "repress"} for i in order if abs(res.x[i])>.01]
     return {"interventions":selected,"objective":float(res.fun),"converged":bool(res.success),"solver":"L-BFGS-B optimal control",
             "recipe":[{"order":i+1,**x,"start_hour":round(i*hours/max(len(selected),1),2)} for i,x in enumerate(selected)]}
@@ -147,7 +155,7 @@ def optimal_reprogramming(source_state,target_state, *, hours=48, max_factors=4)
 
 def stochastic_validate(source,target,interventions,replicates=64,noise=.04,seed=8):
     controls={x["factor"]:x["control"] for x in interventions}; r=simulate_fate(source,hours=72,controls=controls,noise=noise,seed=seed,trajectories=replicates)
-    nodes=r["nodes"]; tar=np.array([target.get(n,0) for n in nodes]); finals=np.asarray(r["trajectories"])[:,-1,:]; dist=np.linalg.norm(finals-tar,axis=1)
+    nodes=r["nodes"]; spec=np.array([n in target for n in nodes]); tar=np.array([target.get(n,0) for n in nodes]); finals=np.asarray(r["trajectories"])[:,-1,:]; dist=np.linalg.norm((finals-tar)*spec,axis=1)
     success=np.exp(-dist)
     return {"success_probability":float((success>.5).mean()),"mean_target_similarity":float(success.mean()),"similarity_variance":float(success.var()),
             "robustness_CI95":[float(np.quantile(success,.025)),float(np.quantile(success,.975))],"replicates":replicates}
