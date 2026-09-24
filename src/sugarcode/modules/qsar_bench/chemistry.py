@@ -164,8 +164,24 @@ def morgan_fingerprint(smiles: str, radius: int=2, n_bits: int=2048) -> np.ndarr
     if radius<0 or n_bits<8: raise ValueError("radius must be >=0 and n_bits >=8")
     m=parse_smiles(smiles); adj=_adj(m); fp=np.zeros(n_bits,dtype=np.float64)
     ids=[]
+    # ECFP-style invariants (Rogers & Hahn 2010): element, heavy degree, total
+    # H count (written + implicit), formal charge, ring membership (the RDKit
+    # default invariant set; aromaticity is not an invariant there).
+    # Using only the written H made CH3/CH2/CH and OH indistinguishable.
+    def _ring_atom(i):
+        for j,_ in adj[i]:
+            seen={i}; q=deque([i]); found=False
+            while q and not found:
+                u=q.popleft()
+                for v,_ in adj[u]:
+                    if (u==i and v==j) or v in seen: continue
+                    if v==j: found=True; break
+                    seen.add(v); q.append(v)
+            if found: return True
+        return False
     for i,a in enumerate(m.atoms):
-        s=f"{a.element}|{a.aromatic}|{a.charge}|{len(adj[i])}|{a.explicit_h}"
+        th=a.explicit_h+_implicit_h(a,adj[i])
+        s=f"{a.element}|{a.charge}|{len(adj[i])}|{th}|{_ring_atom(i)}"
         ids.append(hashlib.sha256(s.encode()).hexdigest())
     for r in range(radius+1):
         for value in ids: fp[int(value[:16],16)%n_bits]=1.0
