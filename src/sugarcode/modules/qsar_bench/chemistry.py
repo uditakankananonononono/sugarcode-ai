@@ -58,7 +58,7 @@ def parse_smiles(smiles: str) -> Molecule:
     toks = TOKEN.findall(smiles)
     if "".join(toks) != smiles: raise ValueError("unsupported or malformed SMILES syntax")
     atoms=[]; bonds=[]; stack=[]; rings={}; current=None; pending=None; components=1
-    bondmap={"-":1.0,"=":2.0,"#":3.0,":":1.5,"/":1.0,"\\":1.0}  # / and \\ are directional single bonds
+    bondmap={"-":1.0,"=":2.0,"#":3.0,":":1.5,"/":None,"\\":None}  # / and \\ only mark direction: order follows the implicit rule (aromatic between aromatic atoms, as RDKit reads c1/s...)
     for tok in toks:
         if tok in bondmap: pending=bondmap[tok]; continue
         if tok == "(":
