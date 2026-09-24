@@ -31,6 +31,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   digest run --fasta F --enzymes EcoRI,BamHI [--circular] [--cuts]  (drop 75)
   align run --a S1 --b S2 [--mode global|local] [--matrix BLOSUM62]  (drop 76)
   kmer count|compare|sketch [--k K] [--w W]  (drop 77)
+  orf find|translate [--table N] [--starts atg|table]  (drop 79)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -808,6 +809,33 @@ def _cmd_align_run(args) -> int:
     return _emit(r)
 
 
+def _cmd_orf_translate(args) -> int:
+    from .bio.orf import translate
+    return _emit({"table": args.table, "cds": args.cds,
+                  "protein": translate(args.sequence, args.table, args.cds)})
+
+
+def _cmd_orf_find(args) -> int:
+    from .bio.orf import find_orfs
+    if args.sequence:
+        sources = [(None, args.sequence)]
+    else:
+        from .bio.fasta import parse_fasta
+        sources = [(r["id"], r["sequence"])
+                   for r in parse_fasta(Path(args.fasta).read_text())]
+    orfs = []
+    for rid, s in sources:
+        for o in find_orfs(s, table=args.table, min_aa=args.min_aa,
+                           starts=args.starts,
+                           both_strands=not args.forward_only,
+                           nested=args.nested,
+                           allow_truncated=args.allow_truncated):
+            orfs.append({"record": rid, **o})
+    return _emit({"table": args.table, "starts": args.starts,
+                  "nested": args.nested, "min_aa": args.min_aa,
+                  "count": len(orfs), "orfs": orfs})
+
+
 def _cmd_kmer_count(args) -> int:
     from .bio.kmer import count_kmers, load_sequences
     canonical = not args.no_canonical
@@ -957,6 +985,27 @@ def main(argv: list[str] | None = None) -> int:
     ks.add_argument("--order", choices=["hash", "lex"], default="hash")
     ks.add_argument("--no-canonical", action="store_true")
     ks.set_defaults(func=_cmd_kmer_sketch)
+
+    of = sub.add_parser("orf", help="ORF finding + NCBI-table translation")
+    ofsub = of.add_subparsers(dest="sub", required=True)
+    ot = ofsub.add_parser("translate", help="translate with a vendored NCBI table")
+    ot.add_argument("sequence")
+    ot.add_argument("--table", type=int, default=1)
+    ot.add_argument("--cds", action="store_true",
+                    help="validate a complete CDS (start/stop/no internal stop)")
+    ot.set_defaults(func=_cmd_orf_translate)
+    ofn = ofsub.add_parser("find", help="six-frame ORF finding")
+    osrc = ofn.add_mutually_exclusive_group(required=True)
+    osrc.add_argument("--sequence", default=None)
+    osrc.add_argument("--fasta", default=None)
+    ofn.add_argument("--table", type=int, default=1)
+    ofn.add_argument("--min-aa", type=int, default=1)
+    ofn.add_argument("--starts", choices=["atg", "table"], default="atg",
+                     help="'table' uses the NCBI Starts row (alt starts)")
+    ofn.add_argument("--nested", choices=["longest", "all"], default="longest")
+    ofn.add_argument("--forward-only", action="store_true")
+    ofn.add_argument("--allow-truncated", action="store_true")
+    ofn.set_defaults(func=_cmd_orf_find)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
