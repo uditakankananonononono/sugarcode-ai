@@ -11,6 +11,10 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   pwm score SEQ --motif NAME       normalized log-odds score on a shipped splice matrix
   report splice GENE NOTATION    render an assessment as HTML/Markdown/bundle (drop 62)
   vcf stats FILE                 variant classes, Ti/Tv, genotype counts (drop 63)
+  fastq stats FILE               FastQC-style read/quality summary (drop 64)
+  fastq filter FILE [--min-mean-phred N --min-len N --max-n-frac F]
+  fastq trim FILE [--window N --min-phred N --min-len N]
+  fastq to-fasta FILE
   vcf filter FILE [--pass-only --min-qual N --chrom .. --type ..]
   vcf csv FILE [--sample NAME]   flatten records to CSV
   report notebook GENE NOTATION  executable .ipynb reproducing the assessment
@@ -212,6 +216,54 @@ def _cmd_vcf_csv(args) -> int:
 
 
 
+def _cmd_fastq_stats(args) -> int:
+    from .bio.fastq import parse_fastq, stats
+    recs = parse_fastq(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(recs, offset=args.offset)})
+
+
+def _cmd_fastq_filter(args) -> int:
+    from .bio.fastq import parse_fastq, write_fastq, filter_reads
+    recs = parse_fastq(Path(args.file).read_text())
+    out = filter_reads(recs, min_mean_phred=args.min_mean_phred,
+                       min_len=args.min_len, max_len=args.max_len,
+                       max_n_frac=args.max_n_frac, offset=args.offset)
+    text = write_fastq(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out)} of {len(recs)} reads)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_fastq_trim(args) -> int:
+    from .bio.fastq import parse_fastq, write_fastq, trim_reads
+    recs = parse_fastq(Path(args.file).read_text())
+    out = trim_reads(recs, window=args.window, min_phred=args.min_phred,
+                     min_len=args.min_len, offset=args.offset)
+    text = write_fastq(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out)} of {len(recs)} reads kept after trim)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_fastq_to_fasta(args) -> int:
+    from .bio.fastq import parse_fastq, to_fasta
+    recs = parse_fastq(Path(args.file).read_text())
+    text = to_fasta(recs)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -264,6 +316,35 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    q = sub.add_parser("fastq", help="FASTQ toolkit (stats, filter, trim, to-fasta)")
+    qsub = q.add_subparsers(dest="sub", required=True)
+    qs = qsub.add_parser("stats", help="FastQC-style read/quality summary")
+    qs.add_argument("file")
+    qs.add_argument("--offset", type=int, default=None, choices=[33, 64],
+                    help="Phred offset; default auto (33 unless forced)")
+    qs.set_defaults(func=_cmd_fastq_stats)
+    qf = qsub.add_parser("filter", help="keep reads passing quality/length/N gates")
+    qf.add_argument("file")
+    qf.add_argument("--min-mean-phred", type=float, default=None)
+    qf.add_argument("--min-len", type=int, default=None)
+    qf.add_argument("--max-len", type=int, default=None)
+    qf.add_argument("--max-n-frac", type=float, default=None)
+    qf.add_argument("--offset", type=int, default=33, choices=[33, 64])
+    qf.add_argument("--out", default=None)
+    qf.set_defaults(func=_cmd_fastq_filter)
+    qt = qsub.add_parser("trim", help="sliding-window 3' quality trim")
+    qt.add_argument("file")
+    qt.add_argument("--window", type=int, default=4)
+    qt.add_argument("--min-phred", type=float, default=15.0)
+    qt.add_argument("--min-len", type=int, default=36)
+    qt.add_argument("--offset", type=int, default=33, choices=[33, 64])
+    qt.add_argument("--out", default=None)
+    qt.set_defaults(func=_cmd_fastq_trim)
+    qa = qsub.add_parser("to-fasta", help="convert reads to FASTA")
+    qa.add_argument("file")
+    qa.add_argument("--out", default=None)
+    qa.set_defaults(func=_cmd_fastq_to_fasta)
 
     vc = sub.add_parser("vcf", help="VCF toolkit (stats, filter, csv)")
     vcsub = vc.add_subparsers(dest="sub", required=True)
