@@ -259,3 +259,20 @@ def pick_primers(template: str, region: tuple[int, int], *, n: int = 3,
                           "score": round(score, 4)})
     pairs.sort(key=lambda p: p["score"])
     return pairs[:n]
+
+
+def hairpin_dg(seq: str, *, na_mm: float = 50.0, mg_mm: float = 0.0,
+               dntp_mm: float = 0.0, oligo_nm: float = 50.0):
+    """Thermodynamic hairpin dG (kcal/mol) via primer3-py (Untergasser 2012).
+
+    Validation (mega27-01 benchmarks/sweep_primer_primer3.json): the stem-length
+    heuristic hairpin_max_stem has Spearman 0.04 with primer3 hairpin dG on
+    5,404 RefSeq 20-mers, so use this when primer3-py is installed.
+    Returns 0.0 when no hairpin is found and None if primer3-py is missing."""
+    try:
+        import primer3
+    except ImportError:
+        return None
+    r = primer3.calc_hairpin(_validate(seq), mv_conc=na_mm, dv_conc=mg_mm,
+                             dntp_conc=dntp_mm, dna_conc=oligo_nm)
+    return r.dg / 1000.0 if r.structure_found else 0.0
