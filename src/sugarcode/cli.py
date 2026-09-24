@@ -22,6 +22,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   phylo prune FILE --drop a,b [--out F]
   msa stats FILE                 Stockholm/A3M summary, auto-detect (drop 69)
   pdb stats FILE                 structure summary, PDB or mmCIF (drop 71)
+  protein props FILE|--sequence  pI, MW, extinction, instability, GRAVY (drop 72)
   pdb chains FILE [--residues [--chain X]]
   pdb contacts FILE --cutoff 5.0 [--chain-a A --chain-b B]
   pdb select FILE [--chain X] [--resname Y] [--names CA,CB] [--out F]
@@ -592,6 +593,19 @@ def _cmd_pdb_select(args) -> int:
 
 
 
+def _cmd_protein_props(args) -> int:
+    from .bio.proteinprops import protein_summary
+    if args.sequence:
+        seqs = [("cli", args.sequence)]
+    else:
+        from .bio.fasta import parse_fasta
+        seqs = [(r["id"], r["sequence"])
+                for r in parse_fasta(Path(args.file).read_text())]
+    return _emit({"proteins": [{"id": rid, **protein_summary(s)}
+                               for rid, s in seqs]})
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -644,6 +658,13 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    prot = sub.add_parser("protein", help="protein property tools")
+    protsub = prot.add_subparsers(dest="sub", required=True)
+    ppr = protsub.add_parser("props", help="ProtParam-style properties")
+    ppr.add_argument("file", nargs="?", default=None, help="protein FASTA")
+    ppr.add_argument("--sequence", default=None, help="raw amino-acid string")
+    ppr.set_defaults(func=_cmd_protein_props)
 
     pdbp = sub.add_parser("pdb", help="PDB/mmCIF structure toolkit")
     pdbsub = pdbp.add_subparsers(dest="sub", required=True)
