@@ -16,7 +16,6 @@ occupancy, bfactor, element, record (ATOM/HETATM), model}.
 from __future__ import annotations
 
 import math
-import shlex
 
 
 # ---------------------------------------------------------------- PDB ----
@@ -101,9 +100,40 @@ def _tokenize_cif(text: str) -> list[str]:
             tokens.append("\n".join(buf))
             i += 1
             continue
-        tokens.extend(shlex.split(line, comments=False, posix=True))
+        tokens.extend(_split_cif_line(line))
         i += 1
     return tokens
+
+
+def _split_cif_line(line: str) -> list[str]:
+    """CIF 1.1 whitespace tokenizer. A value opening with ' or " is quoted and
+    closes only at the same quote followed by whitespace or end of line, so
+    embedded primes survive (atom names like O5' or "C1'"); an unquoted value
+    runs to the next whitespace; '#' outside a value starts a comment. POSIX
+    shlex got this wrong on every real RCSB mmCIF (e.g. unquoted O5')."""
+    out, j, n = [], 0, len(line)
+    while j < n:
+        c = line[j]
+        if c in " \t":
+            j += 1
+            continue
+        if c == "#":
+            break
+        if c in "'\"":
+            k = j + 1
+            while k < n and not (line[k] == c and (k + 1 == n or line[k + 1] in " \t")):
+                k += 1
+            if k >= n:
+                raise ValueError(f"unterminated quoted CIF value: {line[j:j + 40]!r}")
+            out.append(line[j + 1:k])
+            j = k + 1
+            continue
+        k = j
+        while k < n and line[k] not in " \t":
+            k += 1
+        out.append(line[j:k])
+        j = k
+    return out
 
 
 def _parse_cif(tokens: list[str]) -> dict:
@@ -124,9 +154,12 @@ def _parse_cif(tokens: list[str]) -> dict:
                 cat, col = c.split(".", 1) if "." in c else (c, "")
                 cats.setdefault(cat, {}).setdefault(col, [])
             n = 0
+            # A reserved-looking token ends the loop only at a row boundary:
+            # RCSB files carry unquoted item names as values mid-row
+            # (e.g. _pdbx_audit_revision_item.item = _database_2.pdbx_DOI).
             while (i < len(tokens) and tokens[i] != "stop_"
-                   and not tokens[i].startswith(("_", "data_", "loop_",
-                                                 "save_"))):
+                   and not (n % len(cols) == 0 and tokens[i].startswith(
+                       ("_", "data_", "loop_", "save_")))):
                 cat, col = cols[n % len(cols)].split(".", 1)
                 cats[cat][col].append(tokens[i])
                 n += 1
