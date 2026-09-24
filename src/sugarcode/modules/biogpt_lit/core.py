@@ -129,6 +129,11 @@ _RELATION_WORDS = {"activates": "activates", "stimulates": "activates",
 
 
 _NEGATORS = {"not", "no", "neither", "nor", "never", "cannot", "without", "fails", "failed", "unable", "doesn't", "didn't", "don't"}
+_STOP_SUBJ = {"and", "or", "but", "nor", "yet", "so", "the", "a", "an", "of", "in", "on", "with",
+              "by", "to", "that", "which", "who", "it", "its", "this", "these", "those", "both",
+              "either", "also", "however", "moreover", "furthermore", "then", "thus", "hence",
+              "when", "where", "while", "although", "though", "if", "as", "at", "from", "into",
+              "via", "for", "we", "our", "their", "his", "her", "he", "she", "they"}
 _LOSS_WORDS = {"loss", "knockdown", "knockout", "deletion", "depletion", "inhibition", "silencing", "deficiency",
                "absence", "ablation", "blockade", "inactivation", "mutation", "mutant", "mutants", "lack"}
 
@@ -154,6 +159,10 @@ def extract_claims(text: str) -> list[dict]:
                 if any(x in _NEGATORS for x in before) or subj.lower() in _LOSS_WORDS:
                     continue
                 if i >= 3 and words[i - 2].lower() == "of" and words[i - 3].lower() in _LOSS_WORDS:
+                    continue
+                # Stopword subjects ("... and inhibits BDNF"): the token before the relation is
+                # a conjunction/function word, not an entity - the triple would be garbage.
+                if subj.lower() in _STOP_SUBJ:
                     continue
                 if subj[:1].isupper() or obj[:1].isupper() or subj.isupper() or obj.isupper():
                     claims.append({"subject": subj, "relation": rel, "object": obj})

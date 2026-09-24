@@ -54,3 +54,12 @@ def test_extract_claims_skips_negated_and_loss_of_function_sentences():
     assert extract_claims('We found no evidence that IL6 activates STAT3.') == []
     assert extract_claims('Metformin does not inhibit mTOR; AMPK inhibits mTOR.') == [
         {'subject': 'AMPK', 'relation': 'inhibits', 'object': 'mTOR'}]
+
+
+def test_extract_claims_skips_stopword_subjects():
+    # Real-data failure (PMID:42746974): "and inhibits Neuronal" - the word before the
+    # relation was a conjunction, producing the garbage triple (and, inhibits, Neuronal).
+    assert extract_claims('Survival improved and inhibits BDNF.') == []
+    assert extract_claims('The pathway, which activates SIRT1, is conserved.') == []
+    # entity subjects still extracted
+    assert extract_claims('Resveratrol activates SIRT1.') == [{'subject':'Resveratrol','relation':'activates','object':'SIRT1'}]
