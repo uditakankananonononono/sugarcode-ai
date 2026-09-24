@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 # Curated rare-disease HPO-style signatures
 RARE_DISEASES = {
     "cystic_fibrosis": {"symptoms": {"chronic_cough", "salty_skin", "poor_growth", "recurrent_lung_infection"},
@@ -99,7 +101,13 @@ def enrich_variants_live(variants: list[dict], retmax: int = 10,
                 # openclinvar): gene-page scans miss variants past the first page
                 entries = entrez.clinvar_exact(gene, notation, offline=offline)
                 needle = notation.split(":")[-1].replace(" ", "")
-                matched = [e for e in entries if needle and needle in e["title"].replace(" ", "")]
+                # HGVS: ClinVar titles drop deleted/duplicated bases
+                # (c.1521_1523delCTT -> c.1521_1523del). Normalize both sides.
+                _norm = lambda s: re.sub(r"(del|dup|ins)[ACGT]+$", r"\1", s)
+                nneedle = _norm(needle)
+                matched = [e for e in entries if needle and (
+                    needle in e["title"].replace(" ", "") or
+                    (nneedle != needle and nneedle in _norm(e["title"].replace(" ", ""))))]
             else:
                 entries = entrez.clinvar_variants(gene, retmax=retmax, offline=offline)
                 matched = []
