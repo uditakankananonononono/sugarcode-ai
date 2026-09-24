@@ -102,6 +102,11 @@ sugarcode align run --a GATTACA --b GATACA                       # global DNA, m
 sugarcode align run --a WWKNDE --b WWKE --mode local --matrix BLOSUM62
 sugarcode align run --fasta pair.fa --gap-open 11 --gap-extend 2
 
+# ORFs + translation (drop 79, NCBI tables 1/2/4/11 vendored):
+sugarcode orf translate ATGAAAGGCTAA --table 1
+sugarcode orf find --fasta contigs.fa --min-aa 100 --allow-truncated
+sugarcode orf find --sequence GTGAAATAA --table 11 --starts table
+
 # k-mers (drop 77, canonical counts + Mash-style minimizer sketches):
 sugarcode kmer count --file reads.fq --k 21 --top 5
 sugarcode kmer compare --file-a genome1.fa --file-b genome2.fa --k 21
@@ -179,7 +184,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1590 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1604 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -608,7 +613,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1590 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1604 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
