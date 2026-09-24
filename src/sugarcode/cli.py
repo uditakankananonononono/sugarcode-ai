@@ -26,6 +26,7 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   primer tm SEQ                  SantaLucia NN Tm (drop 73)
   motif scan --sites F|--iupac S|--jaspar F --sequence S|--fasta F  (drop 74)
   digest run --fasta F --enzymes EcoRI,BamHI [--circular] [--cuts]  (drop 75)
+  align run --a S1 --b S2 [--mode global|local] [--matrix BLOSUM62]  (drop 76)
   digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
@@ -748,6 +749,24 @@ def _cmd_digest_info(args) -> int:
 
 
 
+def _cmd_align_run(args) -> int:
+    from .bio.align import nw_align, sw_align
+    if args.a and args.b:
+        a, b = args.a, args.b
+    else:
+        from .bio.fasta import parse_fasta
+        recs = parse_fasta(Path(args.fasta).read_text())
+        if len(recs) < 2:
+            raise SystemExit("FASTA must contain at least 2 records")
+        a, b = recs[0]["sequence"], recs[1]["sequence"]
+    fn = sw_align if args.mode == "local" else nw_align
+    r = fn(a, b, match=args.match, mismatch=args.mismatch,
+           gap_open=args.gap_open, gap_extend=args.gap_extend,
+           matrix=args.matrix)
+    return _emit(r)
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -800,6 +819,21 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    aln = sub.add_parser("align", help="pairwise alignment (NW/SW, affine gaps)")
+    alnsub = aln.add_subparsers(dest="sub", required=True)
+    ar = alnsub.add_parser("run", help="align two sequences")
+    asrc = ar.add_mutually_exclusive_group(required=True)
+    asrc.add_argument("--a", default=None, help="first sequence (with --b)")
+    asrc.add_argument("--fasta", default=None, help="FASTA with 2 records")
+    ar.add_argument("--b", default=None)
+    ar.add_argument("--mode", choices=["global", "local"], default="global")
+    ar.add_argument("--matrix", choices=["BLOSUM62"], default=None)
+    ar.add_argument("--match", type=float, default=2.0)
+    ar.add_argument("--mismatch", type=float, default=-1.0)
+    ar.add_argument("--gap-open", type=float, default=-5.0)
+    ar.add_argument("--gap-extend", type=float, default=-1.0)
+    ar.set_defaults(func=_cmd_align_run)
 
     dg = sub.add_parser("digest", help="restriction digest toolkit")
     dgsub = dg.add_subparsers(dest="sub", required=True)
