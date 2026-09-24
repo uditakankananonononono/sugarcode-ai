@@ -25,6 +25,8 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   protein props FILE|--sequence  pI, MW, extinction, instability, GRAVY (drop 72)
   primer tm SEQ                  SantaLucia NN Tm (drop 73)
   motif scan --sites F|--iupac S|--jaspar F --sequence S|--fasta F  (drop 74)
+  digest run --fasta F --enzymes EcoRI,BamHI [--circular] [--cuts]  (drop 75)
+  digest list [--match X] | digest info ENZYME
   motif info <source>            consensus, score range, PWM
   motif to-jaspar <source>
   primer check SEQ               GC/homopolymer/hairpin/dimer heuristics
@@ -715,6 +717,37 @@ def _cmd_motif_jaspar_convert(args) -> int:
 
 
 
+def _cmd_digest_run(args) -> int:
+    from .bio.restriction import digest, gel_bands
+    if args.sequence:
+        seq = args.sequence
+    else:
+        from .bio.fasta import parse_fasta
+        seq = parse_fasta(Path(args.fasta).read_text())[0]["sequence"]
+    enzymes = [e.strip() for e in args.enzymes.split(",") if e.strip()]
+    d = digest(seq, enzymes, circular=args.circular)
+    out = {"enzymes": enzymes, "circular": d["circular"],
+           "length": d["length"], "n_sites": d["n_sites"],
+           "fragments": d["fragments"], "gel": gel_bands(d["fragments"])}
+    if args.cuts:
+        out["cuts"] = d["cuts"]
+    return _emit(out)
+
+
+def _cmd_digest_list(args) -> int:
+    from .bio.restriction import list_enzymes
+    names = list_enzymes()
+    if args.match:
+        names = [n for n in names if args.match.lower() in n.lower()]
+    return _emit({"count": len(names), "enzymes": names})
+
+
+def _cmd_digest_info(args) -> int:
+    from .bio.restriction import enzyme_info
+    return _emit(enzyme_info(args.enzyme))
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -767,6 +800,23 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    dg = sub.add_parser("digest", help="restriction digest toolkit")
+    dgsub = dg.add_subparsers(dest="sub", required=True)
+    dr = dgsub.add_parser("run", help="digest a sequence, list fragments + gel")
+    dsrc = dr.add_mutually_exclusive_group(required=True)
+    dsrc.add_argument("--sequence", default=None)
+    dsrc.add_argument("--fasta", default=None)
+    dr.add_argument("--enzymes", required=True, help="comma-separated names")
+    dr.add_argument("--circular", action="store_true")
+    dr.add_argument("--cuts", action="store_true", help="include per-cut detail")
+    dr.set_defaults(func=_cmd_digest_run)
+    dl = dgsub.add_parser("list", help="list vendored enzymes")
+    dl.add_argument("--match", default=None)
+    dl.set_defaults(func=_cmd_digest_list)
+    di = dgsub.add_parser("info", help="enzyme cut details")
+    di.add_argument("enzyme")
+    di.set_defaults(func=_cmd_digest_info)
 
     mot = sub.add_parser("motif", help="PWM motif toolkit")
     motsub = mot.add_subparsers(dest="sub", required=True)
