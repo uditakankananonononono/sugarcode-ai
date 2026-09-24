@@ -128,6 +128,11 @@ _RELATION_WORDS = {"activates": "activates", "stimulates": "activates",
                    "causes": "associated_with", "associated with": "associated_with"}
 
 
+_NEGATORS = {"not", "no", "neither", "nor", "never", "cannot", "without", "fails", "failed", "unable", "doesn't", "didn't", "don't"}
+_LOSS_WORDS = {"loss", "knockdown", "knockout", "deletion", "depletion", "inhibition", "silencing", "deficiency",
+               "absence", "ablation", "blockade", "inactivation", "mutation", "mutant", "mutants", "lack"}
+
+
 def extract_claims(text: str) -> list[dict]:
     """Simple, honest relation extractor: <GENE-ish token> <relation word> <token>.
 
@@ -136,12 +141,20 @@ def extract_claims(text: str) -> list[dict]:
     """
     import re
     claims = []
-    for sent in re.split(r"[.!?]", text):
+    for sent in re.split(r"[.!?;]", text):
         words = re.findall(r"[A-Za-z0-9'-]+", sent)
         for i, w in enumerate(words):
             rel = _RELATION_WORDS.get(w.lower())
             if rel and 0 < i < len(words) - 1:
                 subj, obj = words[i - 1], words[i + 1]
+                # Negated ("Neither drug inhibits X", "not", "no") or about the subject's loss
+                # ("Loss of PTEN activates AKT", "PTEN knockdown ..."): the literal triple would
+                # state the opposite of the sentence, so leave it out.
+                before = [x.lower() for x in words[max(0, i - 4):i]]
+                if any(x in _NEGATORS for x in before) or subj.lower() in _LOSS_WORDS:
+                    continue
+                if i >= 3 and words[i - 2].lower() == "of" and words[i - 3].lower() in _LOSS_WORDS:
+                    continue
                 if subj[:1].isupper() or obj[:1].isupper() or subj.isupper() or obj.isupper():
                     claims.append({"subject": subj, "relation": rel, "object": obj})
     return claims

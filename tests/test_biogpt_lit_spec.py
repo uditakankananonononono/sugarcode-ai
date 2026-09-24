@@ -46,3 +46,11 @@ def test_report_complete_honest_auditable():
 
 def test_invalid_meta_analysis_rejected():
  with pytest.raises(ValueError): meta_analysis([1],[0])
+
+
+def test_extract_claims_skips_negated_and_loss_of_function_sentences():
+    assert extract_claims('Neither drug inhibits EGFR.') == []
+    assert extract_claims('Loss of PTEN activates AKT. PTEN knockdown activates AKT.') == []
+    assert extract_claims('We found no evidence that IL6 activates STAT3.') == []
+    assert extract_claims('Metformin does not inhibit mTOR; AMPK inhibits mTOR.') == [
+        {'subject': 'AMPK', 'relation': 'inhibits', 'object': 'mTOR'}]
