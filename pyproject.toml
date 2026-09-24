@@ -25,6 +25,7 @@ sugarcode = "sugarcode.cli:main"
 dev = ["pytest>=7", "cryptography>=41", "ViennaRNA>=2.6"]
 rna = ["ViennaRNA>=2.6"]
 vault = ["cryptography>=41"]
+docking = ["vina>=1.2", "openbabel-wheel>=3.1", "rdkit"]
 local = ["transformers>=4.40", "torch>=2.1"]
 
 [tool.setuptools.packages.find]
