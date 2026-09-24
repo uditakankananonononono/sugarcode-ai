@@ -32,9 +32,11 @@ def test_gjb2_5utr_map_unchanged():
 
 
 def test_kcnq1_fails_loud():
-    # KCNQ1's record carries a CDS feature with no spans: honest status, no crash
+    # KCNQ1's NG_016178.2 CDS is partial (complement(<42918..>43038)); the
+    # old parser dropped '<'/'>' spans ("no CDS spans"), the fixed parser
+    # reads them, and the map still fails loud rather than returning empty.
     jm = utr_junction_map("KCNQ1")
-    assert jm["status"] == "no CDS spans in record"
+    assert jm["status"] == "partial CDS in record"
 
 
 def test_assess_3utr_donor():
