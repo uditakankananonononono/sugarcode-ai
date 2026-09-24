@@ -60,6 +60,34 @@ def normalize_hgvs(variant: str) -> dict:
     return out
 
 
+_CPOS = r"(-|\*)?(\d+)(?:([+-])(\d+))?"
+
+
+def _span_class(body: str) -> str | None:
+    """Ranges whose ends sit in different exon/intron segments.
+
+    c.453+625_545+920del removes the exon between the two introns, and
+    c.5468-64_5480dup crosses an intron/exon boundary; judging only the start
+    (as intronic) misses the splice effect. A range from the 5' UTR into the
+    CDS or 3' UTR removes the start codon. Returns None for ranges inside one
+    segment so the ordinary rules apply."""
+    m = re.match(r"^" + _CPOS + "_" + _CPOS + r"(del|dup|ins|delins|inv)", body)
+    if not m:
+        return None
+    r1, a1, s1, o1, r2, a2, s2, o2 = m.groups()[:8]
+    a1, a2 = int(a1), int(a2)
+    in1, in2 = s1 is not None, s2 is not None
+    if r1 == "-" and not in1 and r2 != "-":
+        return "frameshift"  # start codon removed (initiator loss, loss of function)
+    if not in1 and not in2:
+        return None
+    if in1 and in2:
+        same = (a1 == a2 and s1 == s2 and r1 == r2) or \
+               (s1 == "+" and s2 == "-" and r1 == r2 and a2 == a1 + 1)
+        return None if same else "splice_disruption"
+    return "splice_disruption"  # one end intronic, the other exonic: boundary crossed
+
+
 def _consequence_from_hgvs(variant: str) -> str | None:
     """Infer the molecular consequence from HGVS notation when it is unambiguous.
 
@@ -96,6 +124,9 @@ def _consequence_from_hgvs(variant: str) -> str | None:
         return None
     if v.startswith("c."):
         body = v[2:]
+        span = _span_class(body)
+        if span is not None:
+            return span
         m = re.match(r"^-?\*?\d+([+-])(\d+)", body)
         if m:
             k = int(m.group(2))
@@ -267,7 +298,9 @@ def clinvar_stars(review_status: str | None) -> int:
         return 4
     if "expert panel" in rs:
         return 3
-    if "multiple submitters" in rs and "no conflicts" in rs:
+    if "multiple submitters" in rs and "conflicting" not in rs:
+        # "..., no conflicts" (germline) and plain "..., multiple submitters"
+        # (somatic clinical impact / oncogenicity) are both two stars.
         return 2
     if "criteria provided" in rs:  # single submitter or conflicting
         return 1

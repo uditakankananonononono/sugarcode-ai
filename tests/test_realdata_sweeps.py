@@ -33,3 +33,24 @@ def test_acmg_clingen_suffix_notation():
     assert a["points"] == b["points"] == 9 and not a["rejected_evidence"]
     assert bayesian_acmg(["PM3_Very Strong", "PP4_Moderate"])["points"] == 10
     assert bayesian_acmg(["BS1_Stand Alone"])["classification"] == "Benign"
+
+
+def test_clinvar_stars_official_table():
+    from sugarcode.modules.openclinvar.core import clinvar_stars
+    table = {"no assertion criteria provided": 0, "no classification provided": 0,
+             "no classification for the individual variant": 0,
+             "criteria provided, conflicting classifications": 1,
+             "criteria provided, single submitter": 1,
+             "criteria provided, multiple submitters": 2,
+             "criteria provided, multiple submitters, no conflicts": 2,
+             "reviewed by expert panel": 3, "practice guideline": 4}
+    assert {k: clinvar_stars(k) for k in table} == table
+
+
+def test_hgvs_ranges_crossing_exon_boundaries():
+    from sugarcode.modules.openclinvar.core import _consequence_from_hgvs as f
+    assert f("NM_007294.4(BRCA1):c.5468-64_5480dup") == "splice_disruption"
+    assert f("NM_000249.4(MLH1):c.453+625_545+920delinsT") == "splice_disruption"
+    assert f("NM_000546.6(TP53):c.-19_*21del (p.Met1fs)") == "frameshift"
+    assert f("NM_007294.4(BRCA1):c.5277+2916_5277+2946delinsGG") == "intronic"
+    assert f("c.100+50_101-30del") == "intronic"
