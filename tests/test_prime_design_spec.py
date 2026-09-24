@@ -57,7 +57,7 @@ def test_diagnostics_honest_default_and_background():
  d=pegrna_diagnostics(peg()); b=pegrna_diagnostics(peg(),EDIT*3); assert len(d)==27 and len(b)==31 and all(math.isfinite(v) for v in b.values()) and not any('background' in k for k in d)
 
 def test_diagnostics_change_with_architecture():
- a=design_pegrna(SPACER,EDIT,10,10); b=design_pegrna(SPACER,EDIT,17,20); da=pegrna_diagnostics(a); db=pegrna_diagnostics(b); assert sum(da[k]!=db[k] for k in da)>=10
+ a=design_pegrna(SPACER,EDIT,10,10); b=design_pegrna(SPACER,EDIT,16,20); da=pegrna_diagnostics(a); db=pegrna_diagnostics(b); assert sum(da[k]!=db[k] for k in da)>=10
 
 def test_export_stable_json():
  r={'spacer':SPACER}; assert json.loads(export_design(r))==r and export_design(r)==export_design(r)
