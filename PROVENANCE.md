@@ -1,4 +1,16 @@
 
+## rna_nussinov (2026-09-24, branch pb6)
+
+- Algorithm: Nussinov R, Jacobson AB, "Fast algorithm for predicting the
+  secondary structure of single-stranded RNA", Proc Natl Acad Sci USA
+  1980;77(11):6309-6313, DOI 10.1073/pnas.77.11.6309, PMID 6161375, PMC350273
+  (citation checked against NCBI PubMed esummary, 2026-09-24).
+- No vendored data or parameter tables. Allowed pairs are the Watson-Crick set
+  plus optional G-U wobble; min_loop is a caller parameter (default 3).
+- Fixtures are hand-computed (derivations in tests/test_rna_nussinov.py) and
+  cross-checked by an in-module brute-force enumerator that shares no code
+  with the DP.
+
 ## acmg_bayesian model constants and fixtures (2026-09-24, branch pb6)
 
 - Source: Tavtigian SV, Greenblatt MS, Harrison SM, et al. "Modeling the ACMG/AMP

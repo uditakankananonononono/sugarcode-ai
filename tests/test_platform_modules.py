@@ -6,7 +6,7 @@ from sugarcode.modules.dna_to_code import translate_concept
 
 def test_dashboard_global_view():
     d = dashboard()
-    assert d["compute_flux"]["modules_total"] == 90
+    assert d["compute_flux"]["modules_total"] == 91
     assert len(d["subnetworks"]) == 9
 
 
@@ -27,7 +27,7 @@ def test_omega_stats_pipeline():
 def test_ecosystem_snippets():
     assert "from sugarcode.modules import crispr_opt" in sdk_snippet("crispr_opt")
     assert plugin_manifest("x", ["y"])["api_version"] == "omega/v7"
-    assert api_reference()["modules"] == 90
+    assert api_reference()["modules"] == 91
 
 
 def test_dna_to_code():

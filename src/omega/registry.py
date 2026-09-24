@@ -1,6 +1,6 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
-90 modules: the 77 from the spec corpus plus 13 beyond-spec published-model
+91 modules: the 77 from the spec corpus plus 14 beyond-spec published-model
 implementations, all registered (slugs equal their package directory names).
 
 The nine sub-networks are assigned from the module themes in the spec doc
@@ -208,6 +208,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Circuit architecture compiler with Hill logic, toggle/oscillator ODE simulation and seeded Gillespie expression; no synthesis claims."),
     ("dti_bench", "DTI Bench", "therapeutics",
      "Target-conditioned drug-target interaction baselines (proteochemometric ridge) with cold-start validation on ChEMBL pairs."),
+    ("rna_nussinov", "RNA Nussinov", "synthetic-biology",
+     "Nussinov-Jacobson 1980 maximum base-pair RNA secondary structure: DP with traceback, min loop, dot-bracket, exact optimal-structure count, brute-force verifier."),
     ("acmg_bayesian", "ACMG Bayesian", "therapeutics",
      "Tavtigian 2018 Bayesian ACMG/AMP variant classification (exact 350^(1/2^k) odds, BA1 stand-alone override) with optional live ClinVar/PubMed context."),
     ("pgx_guidelines", "PGx Guidelines", "therapeutics",

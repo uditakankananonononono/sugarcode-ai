@@ -3,10 +3,10 @@ from omega.health import module_health, compute_flux
 from omega.search import biological_search
 
 
-def test_registry_90_modules_9_subnetworks():
-    assert len(REGISTRY) == 90
+def test_registry_91_modules_9_subnetworks():
+    assert len(REGISTRY) == 91
     assert len(SUBNETWORKS) == 9
-    assert sum(len(module_slugs(s)) for s in SUBNETWORKS) == 90
+    assert sum(len(module_slugs(s)) for s in SUBNETWORKS) == 91
 
 
 def test_every_module_has_summary():
@@ -25,7 +25,7 @@ def test_health_online_for_built_modules():
 
 def test_compute_flux_shape():
     flux = compute_flux()
-    assert flux["modules_total"] == 90
+    assert flux["modules_total"] == 91
     assert flux["modules_online"] >= 16
     assert len(flux["subnetworks"]) == 9
 
