@@ -19,3 +19,10 @@ def test_dbtl_assay_observations_drive_quality():
  poor=dbtl_report('gibson',assay_signal=[2,2.1,1.9],assay_background=[1.6,1.8,2.0])
  assert good['assay_quality']['z_prime'] > poor['assay_quality']['z_prime']
  assert good['assay_quality']['signal_background'] > poor['assay_quality']['signal_background']
+def test_schedule_respects_step_order():
+    from sugarcode.modules.biofactory_1_a.core import generate_protocol, schedule_resources, _step_minutes
+    p=generate_protocol('golden_gate',8)
+    sch=schedule_resources(p)['schedule']
+    for a,b in zip(sch,sch[1:]):
+        assert b['start_min']>=a['end_min']-1e-9
+    assert schedule_resources(p)['makespan_min']==sum(_step_minutes(x) for x in p['steps'])
