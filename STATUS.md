@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; the Rule Set 2 port (branch pb6) adds 6 fixture-fidelity tests (1361 total) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests (**1371 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -126,6 +126,19 @@ continues drop by drop in order of scientific usefulness.
 
 ## Resolved since the audit-fix drop
 
+- crisprscan_score orphaned package: PROMOTED (2026-09-24, branch pb6). The exact
+  published CRISPRscan / Moreno-Mateos 2015 linear sgRNA activity model (91
+  position-specific mono/di-nucleotide coefficients + intercept over the 35 nt
+  [6 upstream][20 spacer][NGG][6 downstream] context) is now a registered module
+  at src/sugarcode/modules/crisprscan_score/ (89 modules total). The vendored
+  coefficients.csv is byte-identical to the published machine-readable artifact
+  (crisprVerse/crisprScore inst/crisprscan/crisprscan_coefficients.csv, pinned
+  commit cbd6f9f, SHA-256 verified); the 5 parity fixtures match the reference
+  repo's own test-crisprscan.R (scores 0.531/0.531/0.450/0.712/0.618 at 3
+  decimals); scoring semantics re-verified against the reference R source
+  (one-based motif starts, additive intercept + features, GG required at
+  positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
+  note; clinical_evidence_fusion remains orphaned in history (b78b943).
 - CRISPR on-target Rule Set 2 (Fusi/Doench 2016, Azimuth V3): RESOLVED (2026-09-24,
   branch pb6). The published sklearn-0.17 GBRT (100 depth-3 trees, 630 features)
   was extracted from Microsoft's BSD-3-Clause pickle into framework-free JSON and
