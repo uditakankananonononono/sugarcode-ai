@@ -146,6 +146,32 @@ def enhancement_features(ranking: dict, simulation: dict, risk: dict) -> dict:
 
 
 def design_living_therapy(payload: str, *, dose_cfu: float=1e9, days: float=56) -> dict:
-    """Return a lab-ready engineered probiotic program with community and containment evidence."""
-    ranking=rank_designs(payload,dose_cfu=dose_cfu); chassis=ranking["selected"]["chassis"]; sim=simulate_gut_community(chassis,payload,dose_cfu=dose_cfu,days=days); risk=containment_risk(chassis,payload,sim); diag=enhancement_features(ranking,sim,risk)
-    return {"ranking":ranking,"simulation":sim,"containment":risk,"diagnostics":diag,"diagnostic_count":50,"genetic_program":{"payload":payload,"expression":"environment-responsive inducible circuit","secretion":"validated export signal","containment":risk["required_controls"]},"development_plan":["verify construct sequence and stability","measure secretion kinetics","test community impact in defined consortia","run shedding and kill-switch escape assays"]}
+    """Engineered probiotic program with community and containment evidence.
+
+    Ready only when the selected chassis persists in the community simulation;
+    washout or resident takeover is reported as a failure, with any chassis that
+    do persist at this dose."""
+    ranking=rank_designs(payload,dose_cfu=dose_cfu); chassis=ranking["selected"]["chassis"]; sim=simulate_gut_community(chassis,payload,dose_cfu=dose_cfu,days=days); risk=containment_risk(chassis,payload,sim);     diag=enhancement_features(ranking,sim,risk)
+    verdict=simulation_verdict(sim)
+    if verdict["status"]!="persists":
+        verdict["persisting_alternatives"]=[r["chassis"] for r in ranking["ranking"] if r["chassis"]!=chassis and simulation_verdict(simulate_gut_community(r["chassis"],payload,dose_cfu=dose_cfu,days=days,sample_hours=24))["status"]=="persists"]
+    return {"ranking":ranking,"simulation":sim,"containment":risk,"diagnostics":diag,"diagnostic_count":50,"verdict":verdict,"readiness":"ready_for_lab" if verdict["status"]=="persists" else "not_ready","genetic_program":{"payload":payload,"expression":"environment-responsive inducible circuit","secretion":"validated export signal","containment":risk["required_controls"]},"development_plan":["verify construct sequence and stability","measure secretion kinetics","test community impact in defined consortia","run shedding and kill-switch escape assays"]}
+
+
+WASHOUT_FRACTION = 1e-4   # final engineered fraction below this: washed out
+TAKEOVER_FRACTION = 0.9   # final engineered fraction above this: residents displaced
+
+
+
+def simulation_verdict(simulation: dict) -> dict:
+    """Classify a community simulation from its terminal engineered fraction.
+
+    washed_out: the engineered strain is effectively gone (below
+    WASHOUT_FRACTION) - it cannot deliver payload at this dose.
+    resident_takeover: it dominates (above TAKEOVER_FRACTION), displacing the
+    resident community - a safety concern, not a success.
+    persists: in between.
+    """
+    f=simulation["terminal_engraftment_fraction"]
+    status="washed_out" if f<WASHOUT_FRACTION else "resident_takeover" if f>TAKEOVER_FRACTION else "persists"
+    return {"status":status,"terminal_engraftment_fraction":f,"terminal_compound":simulation["terminal_compound"],"thresholds":{"washout_fraction":WASHOUT_FRACTION,"takeover_fraction":TAKEOVER_FRACTION},"basis":"final engineered fraction of community biomass at simulation end"}
