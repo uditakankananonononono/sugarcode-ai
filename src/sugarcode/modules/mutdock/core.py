@@ -21,9 +21,12 @@ def _cls(aa: str) -> str:
 
 
 def mutation_effect(pocket_residues: str, smiles: str, position: int,
-                    mutant_aa: str, pocket_start: int = 1,
+                    mutant_aa: str, pocket_start: int = 0,
                     drug_name: str = "drug", resnums: list[int] | None = None) -> dict:
     """Delta-delta-G of a point mutation on drug binding.
+
+    position is a 0-based pocket index; pocket_start is the 0-based offset of
+    the pocket's first residue (reported number = pocket_start + position + 1).
 
     Combines class-change contact penalty with pocket-complementarity shift
     recomputed through the docking scorer.
@@ -35,7 +38,8 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
     wt = dock(pocket_residues, smiles, pocket_start)
     mt = dock(mutant, smiles, pocket_start)
     ddg_score = mt["binding_dg_kcal_mol"] - wt["binding_dg_kcal_mol"]
-    class_pen = DDG_CLASS_CHANGE.get((_cls(wt_aa), _cls(mutant_aa)), 0.5)
+    class_pen = (0.0 if mutant_aa == wt_aa
+                 else DDG_CLASS_CHANGE.get((_cls(wt_aa), _cls(mutant_aa)), 0.5))
     ddg = round(0.6 * ddg_score + 0.4 * class_pen, 3)
     resistance = ("high" if ddg > 0.6 else "moderate" if ddg > 0.35 else "low")
     true_num = resnums[position] if resnums else pocket_start + position + 1
@@ -51,7 +55,7 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
 
 
 def resistance_scan(pocket_residues: str, drugs: dict[str, str],
-                    pocket_start: int = 1, resnums: list[int] | None = None) -> dict:
+                    pocket_start: int = 0, resnums: list[int] | None = None) -> dict:
     """resnums: true structure numbering per pocket index (non-contiguous
     pockets MUST pass this - pocket_start assumes contiguity)."""
     """Forecast cross-drug resistance: scan all pocket positions x 20 AAs.
