@@ -1,5 +1,6 @@
 """Live ChEMBL REST connector: targets, measured bioactivities, molecules."""
 from __future__ import annotations
+import hashlib
 import json
 import time
 import urllib.error
@@ -19,7 +20,7 @@ class ChEMBLError(RuntimeError):
 def _get(url: str, offline: bool = False, retries: int = 3) -> dict:
     global _last_call
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file = CACHE_DIR / f"{abs(hash(url))}.json"
+    cache_file = CACHE_DIR / f"{hashlib.sha256(url.encode()).hexdigest()[:32]}.json"
     if cache_file.exists():
         return json.loads(cache_file.read_bytes())
     if offline:
