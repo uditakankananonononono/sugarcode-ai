@@ -1,0 +1,50 @@
+{
+ "source": "cv_pred.npy from cnn_cv.py (gene-grouped 5-fold)",
+ "thresholds": {
+  "0.5": {
+   "tp": 1794,
+   "fp": 453,
+   "sensitivity": 0.77,
+   "fpr": 0.0656,
+   "ppv_cv_mix": 0.7984,
+   "ppv_prior_0.03": 0.2663,
+   "ppv_prior_0.20": 0.7458
+  },
+  "0.8": {
+   "tp": 1298,
+   "fp": 146,
+   "sensitivity": 0.5571,
+   "fpr": 0.02114,
+   "ppv_cv_mix": 0.8989,
+   "ppv_prior_0.03": 0.449,
+   "ppv_prior_0.20": 0.8682
+  },
+  "0.9": {
+   "tp": 996,
+   "fp": 68,
+   "sensitivity": 0.4275,
+   "fpr": 0.00985,
+   "ppv_cv_mix": 0.9361,
+   "ppv_prior_0.03": 0.5731,
+   "ppv_prior_0.20": 0.9156
+  },
+  "0.95": {
+   "tp": 729,
+   "fp": 33,
+   "sensitivity": 0.3129,
+   "fpr": 0.00478,
+   "ppv_cv_mix": 0.9567,
+   "ppv_prior_0.03": 0.6694,
+   "ppv_prior_0.20": 0.9424
+  },
+  "0.98": {
+   "tp": 435,
+   "fp": 11,
+   "sensitivity": 0.1867,
+   "fpr": 0.00159,
+   "ppv_cv_mix": 0.9753,
+   "ppv_prior_0.03": 0.7838,
+   "ppv_prior_0.20": 0.967
+  }
+ }
+}
