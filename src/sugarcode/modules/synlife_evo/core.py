@@ -163,3 +163,113 @@ def optimize_stability(genes:list[str], *, generations:int=500, population:int=2
     res=differential_evolution(objective,[(.005,.15),(.05,1)],seed=seed,popsize=4,maxiter=4,polish=False)
     final=simulate_evolution_experiment(genes,generations=generations,population=population,burden=res.x[0],yield_selection=res.x[1],seed=seed,sample_every=50)
     return {"recommended_burden_per_gene":float(res.x[0]),"recommended_product_selection":float(res.x[1]),"predicted_experiment":final,"objective":float(-res.fun),"solver":"seeded differential evolution"}
+
+
+# --- per-gene genotypes with a competing strain --------------------------------
+_GENE_STATES = ("intact", "down", "ko")
+_GENE_EXPR = np.array([1.0, 0.45, 0.0])
+
+
+def simulate_competition(genes, *, generations=2000, population=5000, burden=.08,
+                         yield_selection=.5, mutation_rate=1e-4,
+                         competitor_name="wild-type competitor", competitor_fraction=.01,
+                         competitor_fitness=1.0, environment_schedule=None,
+                         sample_every=50, seed=42):
+    """Wright-Fisher competition of an engineered strain against a non-producing strain.
+
+    Each engineered genotype carries one state per named gene (intact, down-
+    regulated, knockout). Pathway flux is limited by the weakest gene, burden
+    scales with total expression, and product coupling (yield_selection x the
+    environment's product_selection) rewards flux. The competitor carries no
+    pathway: fixed fitness, no burden, no mutation. Mechanistic model, not trained.
+    """
+    _validate_experiment(genes, generations, population, mutation_rate, sample_every)
+    if len(genes) > 6:
+        raise ValueError("simulate_competition supports at most 6 genes (3^n genotypes)")
+    if burden < 0 or yield_selection < 0:
+        raise ValueError("burden and yield_selection must be non-negative")
+    if not 0 <= competitor_fraction < 1:
+        raise ValueError("competitor_fraction must be in [0, 1)")
+    if competitor_fitness <= 0:
+        raise ValueError("competitor_fitness must be positive")
+    schedule = environment_schedule or [{"start": 0, "end": generations, "product_selection": 1.0, "stress": 0.0, "name": "production"}]
+    for e in schedule:
+        if not {"start", "end"} <= set(e):
+            raise ValueError("each environment requires start and end generations")
+        if e["start"] < 0 or e["end"] <= e["start"]:
+            raise ValueError("environment intervals require 0 <= start < end")
+    n = len(genes); G = 3 ** n
+    states = np.array(np.unravel_index(np.arange(G), (3,) * n)).T   # G x n, 0/1/2 per gene
+    expr = _GENE_EXPR[states]                                       # G x n
+    flux = expr.min(axis=1); load = expr.sum(axis=1)
+    m = mutation_rate
+    T = np.array([[1 - m, .6 * m, .4 * m], [.1 * m, 1 - .4 * m, .3 * m], [0, 0, 1]])  # per gene per generation
+    M = T
+    for _ in range(n - 1):
+        M = np.kron(M, T)
+    counts = np.zeros(G + 1, dtype=np.int64)
+    counts[G] = int(round(competitor_fraction * population))
+    counts[0] = population - counts[G]
+    rng = np.random.default_rng(seed); history = []; takeover = None
+    first_fail = {g: None for g in genes}
+    for gen in range(generations + 1):
+        env = next((e for e in schedule if e["start"] <= gen < e["end"]), schedule[-1])
+        prod = float(env.get("product_selection", 1)); stress = float(env.get("stress", 0))
+        fit = np.maximum(.01, 1 - burden * load + yield_selection * prod * flux - stress)
+        fit_all = np.append(fit, max(.01, competitor_fitness - stress))
+        f = counts / population
+        if gen % sample_every == 0 or gen == generations:
+            eng = f[:G]; per_gene = {}
+            for j, g in enumerate(genes):
+                per_gene[g] = {s: float(eng[states[:, j] == k].sum()) for k, s in enumerate(_GENE_STATES)}
+            history.append({"generation": gen, "environment": env.get("name", "unnamed"),
+                            "competitor_fraction": float(f[G]), "engineered_fraction": float(eng.sum()),
+                            "per_gene": per_gene, "productivity": float(eng @ flux * prod),
+                            "mean_fitness": float(f @ fit_all)})
+            if takeover is None and f[G] > .5:
+                takeover = gen
+            for g in genes:
+                if first_fail[g] is None and per_gene[g]["ko"] + per_gene[g]["down"] > .1:
+                    first_fail[g] = gen
+        if gen == generations:
+            break
+        w = counts * fit_all; w = w / w.sum()
+        q = np.append(w[:G] @ M, w[G]); q = np.maximum(q, 0); q /= q.sum()
+        counts = rng.multinomial(population, q)
+    f = counts / population; eng = f[:G]
+    top = np.argsort(-eng)[:5]
+    top_genotypes = [{"genotype": {g: _GENE_STATES[states[i, j]] for j, g in enumerate(genes)},
+                      "frequency": float(eng[i])} for i in top if eng[i] > 0]
+    winner = competitor_name if f[G] > eng.max() else "engineered"
+    final_gene = history[-1]["per_gene"]
+    adaptations = []
+    if takeover is not None:
+        adaptations.append(f"{competitor_name} overtakes the engineered strain at generation {takeover} (final {f[G]:.1%})")
+    elif f[G] > competitor_fraction:
+        adaptations.append(f"{competitor_name} rises from {competitor_fraction:.1%} to {f[G]:.1%} but does not take over")
+    else:
+        adaptations.append(f"engineered strain outcompetes {competitor_name} ({competitor_fraction:.1%} -> {f[G]:.1%})")
+    failing = sorted((x for x in genes if first_fail[x] is not None), key=lambda x: first_fail[x])
+    for g in failing:
+        s = final_gene[g]
+        adaptations.append(f"{g}: loss of function in {s['ko']:.1%}, downregulation in {s['down']:.1%} of engineered cells (escape >10% from generation {first_fail[g]})")
+    if not failing:
+        adaptations.append("no gene reaches 10% escape - pathway genetically stable over the run")
+    recs = []
+    if failing:
+        recs.append(f"stabilize {failing[0]} first (earliest-failing gene): lower its expression or couple it to an essential function")
+    if takeover is not None or f[G] > competitor_fraction:
+        recs.append("tighten contamination control or add a selective marker the competitor lacks")
+    recs.append("run at least 3 biological replicate lines and sequence endpoint populations")
+    return {"experiment": {"genes": genes, "generations": generations, "population": population,
+                           "mutation_rate_per_gene_generation": mutation_rate, "burden_per_gene": burden,
+                           "yield_selection": yield_selection,
+                           "competitor": {"name": competitor_name, "initial_fraction": competitor_fraction, "fitness": competitor_fitness},
+                           "seed": seed, "environment_schedule": schedule},
+            "trajectory": history, "winner": winner, "competitor_takeover_generation": takeover,
+            "final_competitor_fraction": float(f[G]), "final_per_gene_states": final_gene,
+            "dominant_genotype": top_genotypes[0]["genotype"] if top_genotypes else None,
+            "top_genotypes": top_genotypes, "gene_failure_order": failing,
+            "gene_first_escape_generation": first_fail, "predicted_adaptations": adaptations,
+            "recommended_next_steps": recs,
+            "model_status": "mechanistic population-genetics simulation; not trained or clinically validated"}
