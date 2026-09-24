@@ -12,6 +12,10 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   report splice GENE NOTATION    render an assessment as HTML/Markdown/bundle (drop 62)
   vcf stats FILE                 variant classes, Ti/Tv, genotype counts (drop 63)
   fastq stats FILE               FastQC-style read/quality summary (drop 64)
+  gff stats FILE                 GFF3/GTF feature summary (drop 65)
+  gff query FILE --chrom X --start A --end B [--type ..]
+  gff filter FILE [--type .. --seqid .. --no-children --out F]
+  gff csv FILE
   fastq filter FILE [--min-mean-phred N --min-len N --max-n-frac F]
   fastq trim FILE [--window N --min-phred N --min-len N]
   fastq to-fasta FILE
@@ -264,6 +268,57 @@ def _cmd_fastq_to_fasta(args) -> int:
 
 
 
+def _cmd_gff_stats(args) -> int:
+    from .bio.gff import parse_gff, stats
+    g = parse_gff(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(g)})
+
+
+def _cmd_gff_query(args) -> int:
+    from .bio.gff import parse_gff, query_region
+    g = parse_gff(Path(args.file).read_text())
+    types = [x for x in (args.type or "").split(",") if x] or None
+    hits = query_region(g, args.chrom, args.start, args.end, types=types)
+    return _emit({"file": args.file,
+                  "region": {"seqid": args.chrom, "start": args.start, "end": args.end},
+                  "hits": len(hits),
+                  "records": [{"seqid": r["seqid"], "type": r["type"],
+                               "start": r["start"], "end": r["end"],
+                               "strand": r["strand"],
+                               "attributes": r["attributes"]} for r in hits]})
+
+
+def _cmd_gff_filter(args) -> int:
+    from .bio.gff import parse_gff, write_gff, filter_records
+    g = parse_gff(Path(args.file).read_text())
+    out = filter_records(
+        g,
+        types=[x for x in (args.type or "").split(",") if x] or None,
+        seqids=[x for x in (args.seqid or "").split(",") if x] or None,
+        keep_children=not args.no_children)
+    text = write_gff(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['records'])} of {len(g['records'])} records)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_gff_csv(args) -> int:
+    from .bio.gff import parse_gff, records_to_rows
+    from .report import to_csv
+    g = parse_gff(Path(args.file).read_text())
+    text = to_csv(records_to_rows(g))
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -316,6 +371,30 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    gf = sub.add_parser("gff", help="GFF3/GTF annotation toolkit")
+    gfsub = gf.add_subparsers(dest="sub", required=True)
+    gst = gfsub.add_parser("stats", help="feature/seqid/strand summary")
+    gst.add_argument("file")
+    gst.set_defaults(func=_cmd_gff_stats)
+    gq = gfsub.add_parser("query", help="features overlapping a region (1-based closed)")
+    gq.add_argument("file")
+    gq.add_argument("--chrom", required=True)
+    gq.add_argument("--start", type=int, required=True)
+    gq.add_argument("--end", type=int, required=True)
+    gq.add_argument("--type", default=None, help="comma-separated feature types")
+    gq.set_defaults(func=_cmd_gff_query)
+    gz = gfsub.add_parser("filter", help="filter by type/seqid (children kept by default)")
+    gz.add_argument("file")
+    gz.add_argument("--type", default=None)
+    gz.add_argument("--seqid", default=None)
+    gz.add_argument("--no-children", action="store_true")
+    gz.add_argument("--out", default=None)
+    gz.set_defaults(func=_cmd_gff_filter)
+    gx = gfsub.add_parser("csv", help="flatten features to CSV")
+    gx.add_argument("file")
+    gx.add_argument("--out", default=None)
+    gx.set_defaults(func=_cmd_gff_csv)
 
     q = sub.add_parser("fastq", help="FASTQ toolkit (stats, filter, trim, to-fasta)")
     qsub = q.add_subparsers(dest="sub", required=True)
