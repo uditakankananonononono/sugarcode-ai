@@ -70,6 +70,15 @@ def variant_frequency(variant_id: str, dataset: str = "gnomad_r4",
                           (v.get("genome") or {}).get("af") or 0.0)}
 
 
+# gnomAD v4 guidance (https://gnomad.broadinstitute.org/help/constraint,
+# read 2026-09-25): v4 o/e and LOEUF run higher than v2, so v2 cutoffs do not
+# transfer; for Mendelian interpretation gnomAD suggests LOEUF < 0.45 (the
+# most constrained 15% of 17,063 MANE Select transcripts). The previous 0.35
+# was a v2-era value applied to r4 data (TP53 LOEUF 0.418 was called
+# "not strongly constrained").
+LOEUF_CONSTRAINED_V4 = 0.45
+
+
 def gene_constraint(gene: str, dataset: str = "gnomad_r4", offline: bool = False) -> dict:
     """gnomAD gene constraint scores: pLI, LOF Z, o/e LOF + upper (LOEUF), missense Z.
 
@@ -89,8 +98,9 @@ def gene_constraint(gene: str, dataset: str = "gnomad_r4", offline: bool = False
     return {"gene": gene, "dataset": dataset, "pli": c.get("pli"),
             "lof_z": c.get("lof_z"), "oe_lof": c.get("oe_lof"),
             "loeuf": loeuf, "mis_z": c.get("mis_z"), "oe_mis": c.get("oe_mis"),
-            "lof_constrained": bool(loeuf is not None and loeuf < 0.35),
-            "interpretation": ("strongly LOF-constrained (LOEUF < 0.35): heterozygous LOF "
+            "lof_constrained": bool(loeuf is not None and loeuf < LOEUF_CONSTRAINED_V4),
+            "loeuf_threshold": LOEUF_CONSTRAINED_V4,
+            "interpretation": ("strongly LOF-constrained (LOEUF < 0.45, gnomAD v4 guidance): heterozygous LOF "
                                "variants are strongly selected against"
-                               if loeuf is not None and loeuf < 0.35
-                               else "not strongly LOF-constrained (LOEUF >= 0.35 or unknown)")}
+                               if loeuf is not None and loeuf < LOEUF_CONSTRAINED_V4
+                               else "not strongly LOF-constrained (LOEUF >= 0.45 or unknown)")}
