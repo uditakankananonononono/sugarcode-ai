@@ -65,3 +65,29 @@ def test_discovery_package_complete_and_honest():
 
 def test_unknown_fragment_rejected():
  with pytest.raises(KeyError): molecule_diagnostics(['unobtainium'])
+
+
+def test_generated_molecules_are_real_structures():
+    import itertools
+    from sugarcode.modules.chemgpt_engine import assemble_smiles, generate
+    g = generate(n=12, seed=42)
+    assert all(c['smiles'] for c in g['pareto_front'])
+    # benzene is a closed 6-bond aromatic ring, not a chain
+    b = molecular_graph(['benzene'])
+    assert len(b['edges']) == 6 and all(e['bond_order'] == 1.5 for e in b['edges'])
+    # heteroatoms land where the fragment SMILES puts them
+    assert [n['element'] for n in molecular_graph(['carboxyl'])['nodes']] == ['C', 'O', 'O']
+    # methyl benzoate C8H8O2 = 136.15 g/mol
+    assert score_molecule(['benzene', 'carboxyl', 'methyl'])['mw'] == pytest.approx(136.15, abs=0.1)
+    rdkit = pytest.importorskip('rdkit.Chem')
+    from rdkit.Chem.Descriptors import MolWt
+    for fr in itertools.product(sorted(FRAGMENTS), repeat=3):
+        try:
+            smi = assemble_smiles(list(fr))
+        except ValueError:
+            continue
+        mol = rdkit.MolFromSmiles(smi)
+        assert mol is not None, (fr, smi)
+        assert MolWt(mol) == pytest.approx(score_molecule(list(fr))['mw'], abs=0.15)
+        g = molecular_graph(list(fr))
+        assert (len(g['nodes']), len(g['edges'])) == (mol.GetNumAtoms(), mol.GetNumBonds())

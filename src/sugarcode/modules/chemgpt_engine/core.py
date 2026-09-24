@@ -1,6 +1,7 @@
 from __future__ import annotations
 import math
 import random
+import re
 
 # fragment library: (smiles, heavy_atoms, logp_contrib, hbd, hba, rotatable)
 FRAGMENTS = {
@@ -13,10 +14,87 @@ FRAGMENTS = {
     "methyl": ("C", 1, 0.5, 0, 0, 0),
     "ethyl_link": ("CC", 2, 1.0, 0, 0, 1),
     "fluorine": ("F", 1, 0.3, 0, 0, 0),
-    "sulfonamide": ("S(=O)(=O)N", 5, -0.5, 1, 3, 1),
-    "imidazole": ("c1c[nH]cn1", 5, 0.1, 1, 2, 0),
+    "sulfonamide": ("S(=O)(=O)N", 4, -0.5, 1, 3, 1),
+    "imidazole": ("c1nc[nH]c1", 5, 0.1, 1, 2, 0),  # written so entry and exit atoms are carbons
     "piperazine": ("C1CNCCN1", 6, -0.2, 2, 2, 0),
 }
+# Molecular weight of each fragment as a standalone molecule (hydrogens filled in).
+# Joining two fragments with a single bond removes one H from each side.
+FRAGMENT_MW = {"benzene": 78.114, "pyridine": 79.102, "hydroxyl": 18.015, "amine": 17.031,
+               "carboxyl": 46.025, "amide": 45.041, "methyl": 16.043, "ethyl_link": 30.070,
+               "fluorine": 20.006, "sulfonamide": 81.093, "imidazole": 68.079, "piperazine": 86.138}
+# Ring atoms (token index in the fragment SMILES) that can carry a fluorine: carbons that are
+# neither the entry atom (index 0) nor the exit atom (last), so valence always stays legal.
+_F_SLOTS = {"benzene": [1, 2, 3, 4], "pyridine": [1, 2, 4], "imidazole": [2], "piperazine": [1, 3, 4]}
+
+
+def _tokens(smiles: str) -> list[str]:
+    return re.findall(r"\[nH\]|[CNOSFcn]\d?|[()=]", smiles)
+
+
+def assemble_smiles(fragments: list[str]) -> str:
+    """Connect fragments into one valid SMILES: the first ring (or first fragment) is the core,
+    the other fragments are chained in order, fluorines sit on free ring carbons."""
+    for f in fragments:
+        if f not in FRAGMENTS:
+            raise KeyError(f"unknown fragment {f!r}; have {sorted(FRAGMENTS)}")
+    if not fragments:
+        raise ValueError("no fragments")
+    ring = next((f for f in fragments if f in _F_SLOTS), None)
+    rest = list(fragments)
+    core = rest.pop(rest.index(ring)) if ring else rest.pop(0)
+    n_f = sum(f == "fluorine" for f in rest)
+    chain = [f for f in rest if f != "fluorine"]
+    slots = list(_F_SLOTS.get(core, []))
+    on_ring, tail_f = min(n_f, len(slots)), n_f - min(n_f, len(slots))
+    if core == "fluorine" and (chain or n_f):
+        raise ValueError("fluorine cannot be the core of a larger molecule")
+    if tail_f > 1 or (tail_f and not chain and core == "fluorine"):
+        raise ValueError(f"too many fluorines ({n_f}) for the free positions on {core}")
+    toks = _tokens(FRAGMENTS[core][0])
+    atom_idx = [i for i, t in enumerate(toks) if t not in "()="]
+    for k in sorted(slots[:on_ring], reverse=True):
+        toks.insert(atom_idx[k] + 1, "(F)")
+    smiles = "".join(toks)
+    for f in chain:
+        smiles += FRAGMENTS[f][0]
+    if tail_f:
+        smiles += "F"
+    return smiles
+
+
+def _parse_smiles(smiles: str) -> tuple[list[dict], list[dict]]:
+    """Atoms and bonds for the small SMILES subset used here (no charges, one-digit rings)."""
+    nodes, edges, stack, rings = [], [], [], {}
+    prev, order = None, 1.0
+    for t in re.findall(r"\[nH\]|[CNOSFcn]|\d|[()=]", smiles):
+        if t == "(":
+            stack.append(prev)
+        elif t == ")":
+            prev = stack.pop()
+        elif t == "=":
+            order = 2.0
+        elif t.isdigit():
+            if t in rings:
+                a, o = rings.pop(t)
+                edges.append({"source": a, "target": prev,
+                              "bond_order": 1.5 if nodes[a]["aromatic"] and nodes[prev]["aromatic"] else max(o, order)})
+            else:
+                rings[t] = (prev, order)
+            order = 1.0
+        else:
+            aromatic = t[0] in "cn" or t == "[nH]"
+            el = {"[nH]": "N", "c": "C", "n": "N"}.get(t, t)
+            nodes.append({"id": len(nodes), "element": el, "aromatic": aromatic})
+            if prev is not None:
+                edges.append({"source": prev, "target": len(nodes) - 1,
+                              "bond_order": 1.5 if aromatic and nodes[prev]["aromatic"] and order == 1.0 else order})
+            prev, order = len(nodes) - 1, 1.0
+    if rings or stack:
+        raise ValueError(f"unbalanced SMILES {smiles!r}")
+    return nodes, edges
+
+
 CYP_RISK_FRAGMENTS = {"aniline": 0.4, "benzene": 0.2, "imidazole": 0.5}
 HERG_RISK = lambda logp, hbd: min(1.0, max(0.0, 0.15 * logp - 0.1 * hbd))  # lipophilic bases
 
@@ -31,13 +109,14 @@ def score_molecule(fragments: list[str]) -> dict:
     hbd = sum(FRAGMENTS[f][3] for f in fragments)
     hba = sum(FRAGMENTS[f][4] for f in fragments)
     rot = sum(FRAGMENTS[f][5] for f in fragments)
-    mw = round(atoms * 13.5 + hbd * 8, 1)
+    smiles = assemble_smiles(fragments)
+    mw = round(sum(FRAGMENT_MW[f] for f in fragments) - 2.016 * (len(fragments) - 1), 1)
     # aqueous solubility logS (Yalkowsky-style general solubility estimate)
     logS = round(0.5 - logp * 1.0 - 0.01 * (mw - 200) / 50, 2)
     lipinski = sum([mw <= 500, logp <= 5, hbd <= 5, hba <= 10])
     sa = round(max(1.0, 10.0 - rot * 0.4 - len(set(fragments)) * 0.5), 1)  # synthetic accessibility proxy
     return {
-        "fragments": fragments, "mw": mw, "logP": logp, "logS": logS,
+        "fragments": fragments, "smiles": smiles, "mw": mw, "logP": logp, "logS": logS,
         "hbd": hbd, "hba": hba, "rotatable": rot,
         "lipinski_violations": 4 - lipinski,
         "cyp_risk": round(sum(CYP_RISK_FRAGMENTS.get(f, 0.05) for f in fragments) / len(fragments), 2),
@@ -72,8 +151,13 @@ def generate(n: int = 12, target_logp: float = 2.5, seed: int = 42) -> dict:
     groups = [f for f in FRAGMENTS if f not in rings]
     cands = []
     for _ in range(n):
-        frag = [rng.choice(rings)] + [rng.choice(groups) for _ in range(rng.randint(1, 3))]
-        m = score_molecule(frag)
+        while True:
+            frag = [rng.choice(rings)] + [rng.choice(groups) for _ in range(rng.randint(1, 3))]
+            try:
+                m = score_molecule(frag)
+                break
+            except ValueError:  # no legal position for every fluorine: draw again
+                continue
         m["objectives"] = _objectives(m, target_logp)
         m["composite"] = round(sum(m["objectives"].values()) / 5, 3)
         cands.append(m)
@@ -133,15 +217,10 @@ import json
 import numpy as np
 
 def molecular_graph(fragments):
-    for f in fragments:
-        if f not in FRAGMENTS: raise KeyError(f"unknown fragment {f!r}")
-    nodes=[]; edges=[]; atom=0
-    for index,f in enumerate(fragments):
-        count=FRAGMENTS[f][1]; start=atom
-        for i in range(count): nodes.append({"id":atom,"fragment":f,"element":"N" if 'N' in FRAGMENTS[f][0] and i==0 else "O" if 'O' in FRAGMENTS[f][0] and i==0 else "C"}); atom+=1
-        for i in range(start,atom-1): edges.append({"source":i,"target":i+1,"bond_order":1})
-        if index and start>0: edges.append({"source":start-1,"target":start,"bond_order":1})
-    return {"nodes":nodes,"edges":edges}
+    """Atom/bond graph of the assembled molecule (rings closed, heteroatoms placed)."""
+    smiles = assemble_smiles(fragments)
+    nodes, edges = _parse_smiles(smiles)
+    return {"smiles": smiles, "nodes": nodes, "edges": edges}
 
 def conformer_ensemble(fragments,n=20,seed=0):
     if n<1: raise ValueError("n must be >=1")
