@@ -32,6 +32,7 @@ Audit-fix drop (third-party repo audit, 2026-09-22):
   the spec corpus in `spec/` is labeled as aspirational source text.
 
 Model layer (2026-09-24, branch model-layer): `src/sugarcode/llm/` - model profiles
+Shared layer (2026-09-24): instinct_models vendored at shared-models f8840ff; `sugarcode.llm.shared` adapter (Router + SugarcodeDataset), CLI `shared ask|dataset`, tests/test_shared_layer.py.
 (Ollama local default, Inkling-Small on the HF router, Inkling on own hardware via llama.cpp
 or vLLM, Ornith-1.5-9B, Sakana Fugu paid-gated), 231 module functions as tools, a trained
 module router (ties an untrained centroid baseline; see docs/MODELS.md), the copilot loop,

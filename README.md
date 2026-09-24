@@ -652,6 +652,8 @@ uvicorn omega.api:app --reload      # API surface
 
 ## Model layer (copilot)
 
+Shared layer: SugarCode also runs on `instinct_models` from shared-models (vendored at `src/instinct_models/`, pin in `VENDORED.md`): `sugarcode shared ask` and `sugarcode shared dataset`. See docs/MODELS.md.
+
 SugarCode can answer questions in plain language by routing them to the right modules and
 letting a chat model call those modules as tools. Default models are free: a local
 open-weight model through Ollama, then Thinking Machines Inkling-Small on Hugging Face with
