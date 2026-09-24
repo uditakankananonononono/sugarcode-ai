@@ -63,7 +63,8 @@ def test_circular_digest():
 
 
 def test_non_palindromic_both_strands():
-    hits = find_sites("AAGAGACGAAAAAA", "BsmBI")          # revcomp(CGTCTC)
+    # padded upstream: on the - strand BsmBI cuts 1-5 nt 5' of GAGACG, which must lie inside a linear molecule
+    hits = find_sites("AAAAAAAAGAGACGAAAAAA", "BsmBI")    # revcomp(CGTCTC)
     assert len(hits) == 1 and hits[0]["strand"] == "-"
     assert enzyme_info("BsmBI")["palindromic"] is False
 

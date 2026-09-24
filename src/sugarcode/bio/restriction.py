@@ -26,7 +26,14 @@ import math
 import re
 from importlib import resources
 
-from .primer import revcomp
+_IUPAC_COMP = str.maketrans("ACGTRYSWKMBDHVN", "TGCAYRSWMKVHDBN")
+
+
+def revcomp(seq: str) -> str:
+    """IUPAC-aware reverse complement (R<->Y, K<->M, B<->V, D<->H; S, W, N self).
+    The plain DNA revcomp left degenerate codes uncomplemented, so degenerate
+    sites such as AccI GTMKAC were searched with a wrong reverse pattern."""
+    return seq.upper().translate(_IUPAC_COMP)[::-1]
 
 _IUPAC_RE = {"A": "A", "C": "C", "G": "G", "T": "T", "R": "[AG]", "Y": "[CT]",
              "S": "[GC]", "W": "[AT]", "K": "[GT]", "M": "[AC]", "B": "[CGT]",
@@ -92,6 +99,8 @@ def find_sites(seq: str, enzyme: str, *, circular: bool = False) -> list[dict]:
             if circular:
                 cut_top %= n
                 cut_bottom %= n
+            elif not (0 < cut_top < n and 0 < cut_bottom < n):
+                continue  # linear DNA: a cut outside the molecule does not happen (Type IIS near the ends)
             hits.append({"enzyme": enzyme, "start": p, "end": p + L,
                          "strand": strand, "cut_top": cut_top,
                          "cut_bottom": cut_bottom,
