@@ -532,3 +532,16 @@ print(design_guides("ATG" + "CG"*40 + "GG" + "A"*40)["guides"][0])
 PY
 uvicorn omega.api:app --reload      # API surface
 ```
+
+## Model layer (copilot)
+
+SugarCode can answer questions in plain language by routing them to the right modules and
+letting a chat model call those modules as tools. Default models are free: a local
+open-weight model through Ollama, then Thinking Machines Inkling-Small on Hugging Face with
+a free token. Real Inkling-Small can also run on your own hardware, plus Ornith-1.5-9B and
+optional paid Sakana Fugu. See [docs/MODELS.md](docs/MODELS.md).
+
+```bash
+sugarcode models list
+sugarcode ask "codon optimize MKTAYIAKQRQ for E. coli"
+```
