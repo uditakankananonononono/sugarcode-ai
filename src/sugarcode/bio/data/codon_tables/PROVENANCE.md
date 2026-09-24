@@ -16,3 +16,11 @@ Cross-validation against the previous in-memory "Kazusa-style" tables:
   the tie toward AGA (12.2 vs 12.0 per-thousand). Immaterial to optimization;
   memory-built tables are kept only as named legacy fallbacks.
 
+
+## e_coli_highexpr_ribo.csv (derived, 2026-09-24)
+Relative synonymous codon frequencies (pseudocount 0.5) over the 36 ribosomal-protein
+CDS (gene names rpl*/rps*/rpm*) in NCBI RefSeq GCF_000005845.2 (E. coli K-12 MG1655)
+cds_from_genomic.fna. This is the Sharp & Li (1987) highly-expressed reference set idea.
+Validation: Spearman(CAI, log10 PaxDb 511145 integrated abundance) over 3453
+non-ribosomal genes = 0.580, vs 0.496 with e_coli_316407 (genome-wide).
+Script and JSON: mega27-01 sweep/codon_cai_bench.py, benchmarks/sweep_codon_cai.json.
