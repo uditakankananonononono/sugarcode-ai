@@ -14,7 +14,7 @@ builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 ```
 pip install .
 sugarcode version
-sugarcode modules                       # the 88 registered modules (77 spec + 11 beyond-spec)
+sugarcode modules                       # the 89 registered modules (77 spec + 12 beyond-spec)
 sugarcode splice assess RB1 'c.2500-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 
@@ -24,19 +24,27 @@ sugarcode codon optimize MAAKRF --gc-min 0.4 --gc-max 0.6
 sugarcode fasta stats sequences.fa               # records, lengths, GC
 sugarcode genbank features plasmid.gb            # feature counts + spans
 sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
+
+# lab reports + notebooks (drop 62):
+sugarcode report splice RB1 'c.2490-28T>G' --format html --out report.html
+sugarcode report splice RB1 'c.2490-28T>G' --format json   # sha256 evidence bundle
+sugarcode report notebook RB1 'c.2490-28T>G' --out assessment.ipynb
+sugarcode report validate-notebook assessment.ipynb
 ```
 
 ## Architecture
 
 ```
 src/omega/            Omega OS v7.0 framework
-  registry.py         All 88 registered modules (77 spec + 11 beyond-spec) + 9 sub-networks + lifecycle status
+  registry.py         All 89 registered modules (77 spec + 12 beyond-spec) + 9 sub-networks + lifecycle status
   health.py           Per-module import/self-test health, global compute flux
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
 src/sugarcode/
   bio/                Shared scientific toolkit: sequence ops, FASTA, codon
                       usage/CAI, position weight matrices
+  report/             Report & export engine: HTML/Markdown reports, CSV/TSV,
+                      evidence bundles, .ipynb generation (drop 62)
   modules/<slug>/     One package per module
 tests/                pytest suite - one named test per public behavior
 spec/                 The spec doc split into 77 module spec files + index
@@ -73,7 +81,7 @@ Beyond the spec, 11 more real published-model/computational modules were built
 (cfd_offtarget, crisprater, mit_offtarget, structural_biophysics, syn_bio_studio,
 dti_bench, pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
 molecule_eval). Since the audit-fix drop every one of them is registered, so the
-canonical registry now holds **88 modules**, every registry slug equals its
+canonical registry now holds **89 modules**, every registry slug equals its
 package directory name, and every package under `src/sugarcode/modules/` is
 registered. The spec corpus stays 77 files because the spec document has 77.
 
@@ -94,7 +102,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1387 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -523,7 +531,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1355 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1387 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
