@@ -42,7 +42,9 @@ def _degradation(material: str, site: str) -> dict:
     site_factor = {"soft_tissue": 1.2, "bone": 0.8, "blood": 1.5, "skin": 1.0}
     k = rates[material] * site_factor.get(site, 1.0)
     days = list(range(0, 181, 15))
-    remaining = [round(100 * (0.5 ** (d * k)), 1) for d in days]
+    # first-order decay M(t)=M0*exp(-k t); half-life ln2/k (0.5**(d*k) alone
+    # would give half-life 1/k and contradict half_life_days)
+    remaining = [round(100 * (0.5 ** (d * k / 0.693)), 1) for d in days]
     half_life = round(0.693 / k, 1)
     return {"model": "first-order", "k_per_day": round(k, 4),
             "half_life_days": half_life, "site": site,
