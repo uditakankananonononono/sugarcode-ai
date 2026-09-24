@@ -13,7 +13,8 @@ RARE_DISEASES = {
     "phenylketonuria": {"symptoms": {"intellectual_disability", "musty_odor", "eczema", "seizures"},
                         "genes": ["PAH"], "prevalence": 0.00008},
     "gaucher": {"symptoms": {"hepatosplenomegaly", "bone_pain", "anemia", "fatigue"},
-                "genes": ["GBA"], "prevalence": 0.00006},
+                # HGNC current symbol is GBA1 (formerly GBA); current annotation resources key on GBA1
+               "genes": ["GBA1"], "prevalence": 0.00006},
     "duchenne_md": {"symptoms": {"muscle_weakness", "gower_sign", "calf_hypertrophy", "childhood_onset"},
                     "genes": ["DMD"], "prevalence": 0.0001},
 }
