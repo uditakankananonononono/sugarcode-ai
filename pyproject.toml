@@ -23,6 +23,7 @@ sugarcode = "sugarcode.cli:main"
 splice-vus-triage = "sugarcode.tools.splice_vus_triage:main"
 
 [project.optional-dependencies]
+de = ["pydeseq2>=0.4"]
 primer = ["primer3-py>=2.0"]
 dev = ["pytest>=7", "cryptography>=41", "ViennaRNA>=2.6"]
 rna = ["ViennaRNA>=2.6"]

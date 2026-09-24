@@ -175,3 +175,44 @@ def de_analysis(table: dict, groups: list, method: str = "welch",
             "n_a": len(idx_a), "n_b": len(idx_b),
             "size_factors": norm["size_factors"],
             "scope": SCOPE, "results": rows}
+
+
+def de_analysis_deseq2(table: dict, groups: list, blocks: list | None = None) -> dict:
+    """Negative-binomial DE via PyDESeq2 (Muzellec et al. 2023; Love et al. 2014),
+    with an optional blocking factor (e.g. donor / cell line) for paired designs.
+
+    Why: on GEO GSE52778 (airway, dex vs untreated, 4 vs 4) the Welch path
+    found 351 genes at padj<0.05 and Wilcoxon 0, versus 4,451 for PyDESeq2
+    with ~cell + dex; all 7 canonical dex-response genes (FKBP5, TSC22D3,
+    PER1, DUSP1, KLF15, ZBTB16, CRISPLD2) were missed by the simple tests
+    (mega27-01 benchmarks/sweep_de_pydeseq2.json). Requires pydeseq2."""
+    try:
+        import pandas as pd
+        from pydeseq2.dds import DeseqDataSet
+        from pydeseq2.ds import DeseqStats
+    except ImportError as e:  # pragma: no cover
+        raise ImportError("de_analysis_deseq2 needs pydeseq2 (pip install sugarcode-ai[de])") from e
+    samples = list(table["samples"])
+    if len(groups) != len(samples):
+        raise ValueError("groups length must match samples")
+    labels = list(dict.fromkeys(groups))
+    if len(labels) != 2:
+        raise ValueError(f"need exactly 2 groups, got {len(labels)}")
+    counts = pd.DataFrame(table["counts"], index=[str(g) for g in table["genes"]], columns=samples).T
+    meta = pd.DataFrame({"group": [str(g) for g in groups]}, index=samples)
+    design = "~group"
+    if blocks is not None:
+        if len(blocks) != len(samples):
+            raise ValueError("blocks length must match samples")
+        meta["block"] = [str(b) for b in blocks]
+        design = "~block + group"
+    dds = DeseqDataSet(counts=counts.round().astype(int), metadata=meta, design=design, quiet=True, n_cpus=1)
+    dds.deseq2()
+    st = DeseqStats(dds, contrast=["group", str(labels[1]), str(labels[0])], quiet=True, n_cpus=1)
+    st.summary()
+    R = st.results_df
+    rows = [{"gene": g, "base_mean": float(R.loc[g, "baseMean"]), "log2fc": float(R.loc[g, "log2FoldChange"]),
+             "pvalue": None if pd.isna(R.loc[g, "pvalue"]) else float(R.loc[g, "pvalue"]),
+             "padj": None if pd.isna(R.loc[g, "padj"]) else float(R.loc[g, "padj"])} for g in R.index]
+    return {"method": "pydeseq2_wald", "design": design, "group_a": labels[0], "group_b": labels[1],
+            "results": rows}
