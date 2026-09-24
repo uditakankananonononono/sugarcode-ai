@@ -56,9 +56,9 @@ def guide_similarity(a,b):
  if len(a)!=len(b): raise ValueError("guide sequences must have equal length")
  return sum(x==y for x,y in zip(a,b))/len(a)
 
-def rna_folding_score(guide):
+def rna_folding_score(guide,length=20):
  """RNA availability proxy: penalizes longest inverted repeat and poly-T."""
- g=_guide(guide); rc=reverse_complement(g); longest=0
+ g=_guide(guide,length); rc=reverse_complement(g); longest=0
  for shift in range(-16,17):
   run=0
   for i,b in enumerate(g):
@@ -132,12 +132,17 @@ def functional_impact(frameshift,exonic=True,essentiality=0.5):
  frameshift=_unit(frameshift,"frameshift"); essentiality=_unit(essentiality,"essentiality")
  return frameshift*(1.0 if exonic else .15)*(.5+.5*essentiality)
 
-def reward_decomposition(guide,background=None,chromatin=0.5,repair=None,desired="HDR",weights=None):
- g=_guide(guide); repair=repair or {"NHEJ":.7,"MMEJ":.2,"HDR":.1}; weights=weights or {"on_target":.3,"specificity":.2,"chromatin":.15,"repair":.2,"folding":.1,"functional":.05}
+def reward_decomposition(guide,background=None,chromatin=0.5,repair=None,desired="HDR",weights=None,length=20):
+ g=_guide(guide,length); repair=repair or {"NHEJ":.7,"MMEJ":.2,"HDR":.1}; weights=weights or {"on_target":.3,"specificity":.2,"chromatin":.15,"repair":.2,"folding":.1,"functional":.05}
  if any(v<0 for v in weights.values()) or sum(weights.values())<=0: raise ValueError("reward weights must be non-negative with positive sum")
  off=score_off_targets(g,background,max_mismatches=3) if background else []; risk=min(1.0,sum(float(h["risk"]) for h in off if h["mismatches"]>0))
- components={"on_target":score_on_target(g),"specificity":1-risk,"chromatin":_unit(chromatin,"chromatin"),"repair":edit_precision(repair,desired),"folding":rna_folding_score(g),"functional":1-functional_impact(repair.get("frameshift",0),True,.5)}
- norm=sum(weights.values()); contributions={k:components[k]*weights.get(k,0)/norm for k in components}; return {"components":components,"contributions":contributions,"total":sum(contributions.values()),"off_target_hits":len(off)}
+ # The vendored on-target heuristic is 20 nt only; other nuclease spacer
+ # lengths get on_target=None and the reward renormalizes over the rest.
+ components={"on_target":score_on_target(g) if len(g)==20 else None,"specificity":1-risk,"chromatin":_unit(chromatin,"chromatin"),"repair":edit_precision(repair,desired),"folding":rna_folding_score(g,len(g)),"functional":1-functional_impact(repair.get("frameshift",0),True,.5)}
+ available={k:v for k,v in components.items() if v is not None}
+ norm=sum(weights.values()) if len(available)==len(components) else sum(weights.get(k,0) for k in available)
+ contributions={k:(v*weights.get(k,0)/norm if v is not None else None) for k,v in components.items()}
+ return {"components":components,"contributions":contributions,"total":sum(v for v in contributions.values() if v is not None),"off_target_hits":len(off)}
 
 def simulate_digital_lab(guide,contexts=None,replicates=96,seed=0,delivery_mean=.7,sequencing_error=.005):
  """Stochastic editing simulator with delivery, outcome, and read noise."""
@@ -187,8 +192,9 @@ def enumerate_configurations(target,nucleases=None):
 def rank_strategies(configurations,background=None,chromatin=0.5,repair_context=None,top_n=10):
  ranked=[]
  for config in configurations:
-  ro=repair_outcomes(repair_context or config["guide"]*2,chromatin=chromatin); reward=reward_decomposition(config["guide"],background,chromatin,ro)
-  ranked.append({**config,"reward":reward["total"],"reward_decomposition":reward["components"],"repair_outcomes":ro,"folding_score":rna_folding_score(config["guide"])})
+  length=NUCLEASES[config["nuclease"]]["guide_length"]
+  ro=repair_outcomes(repair_context or config["guide"]*2,chromatin=chromatin); reward=reward_decomposition(config["guide"],background,chromatin,ro,length=length)
+  ranked.append({**config,"reward":reward["total"],"reward_decomposition":reward["components"],"repair_outcomes":ro,"folding_score":rna_folding_score(config["guide"],length)})
  ranked.sort(key=lambda x:(-x["reward"],x.get("start",0),x["guide"]))
  return ranked[:top_n]
 
