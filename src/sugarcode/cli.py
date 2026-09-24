@@ -2,7 +2,7 @@
 
 Subcommands (all offline except splice assess, all JSON on stdout):
   version                          print version
-  modules                          list the 91 registered modules
+  modules                          list the 92 registered modules
   splice assess GENE NOTATION      deepsplice live assessment [--transcript NM] [--offline]
   codon cai SEQ                    codon adaptation index vs a published table
   codon optimize PROTEIN           codon-optimized DNA (GC-window repair, motif avoidance)
@@ -184,7 +184,7 @@ def main(argv: list[str] | None = None) -> int:
 
     v = sub.add_parser("version", help="print version")
     v.set_defaults(func=_cmd_version)
-    m = sub.add_parser("modules", help="list the 91 registered modules")
+    m = sub.add_parser("modules", help="list the 92 registered modules")
     m.set_defaults(func=_cmd_modules)
     args = p.parse_args(argv)
     return args.func(args)
