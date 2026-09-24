@@ -5,17 +5,18 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1642 passed, 0 failed, 1 skipped** (hermetic fixtures; live calls
+Test suite: **1709 passed, 0 failed, 7 skipped** on the pb3 + pb6 integration merge (95 modules), run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
 
 Audit-fix drop (third-party repo audit, 2026-09-22):
-- Registry reconciled: **89 modules registered** - the 77 spec modules plus 12
-  beyond-spec implementations (cfd_offtarget, crisprater,
+- Registry reconciled: **95 modules registered** - the 77 spec modules plus 18
+  beyond-spec implementations (cfd_offtarget, crisprater, crisprscan_score,
   mit_offtarget, structural_biophysics, syn_bio_studio, dti_bench,
   pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
-  molecule_eval). Every registry slug equals its package directory name; every
+  molecule_eval, report_studio, acmg_bayesian, rna_nussinov, profile_hmm,
+  chem_descriptors, chem_similarity). Every registry slug equals its package directory name; every
   package under `src/sugarcode/modules/` is registered.
 - Stale duplicate tree removed: the unpackaged top-level `sugarcode/modules/`
   (one outdated copy of structural_biophysics plus two orphaned packages,
@@ -145,10 +146,135 @@ calibration is ours, not fitted to published data. Each module's docstring
 states its method; none of them pretends to be a trained model. Deepening
 continues drop by drop in order of scientific usefulness.
 
+## Resolved since the audit-fix drop
+
+- crisprscan_score orphaned package: PROMOTED (2026-09-24, branch pb6). The exact
+  published CRISPRscan / Moreno-Mateos 2015 linear sgRNA activity model (91
+  position-specific mono/di-nucleotide coefficients + intercept over the 35 nt
+  [6 upstream][20 spacer][NGG][6 downstream] context) is now a registered module
+  at src/sugarcode/modules/crisprscan_score/ (89 modules total on pb6, before the pb3 merge). The vendored
+  coefficients.csv is byte-identical to the published machine-readable artifact
+  (crisprVerse/crisprScore inst/crisprscan/crisprscan_coefficients.csv, pinned
+  commit cbd6f9f, SHA-256 verified); the 5 parity fixtures match the reference
+  repo's own test-crisprscan.R (scores 0.531/0.531/0.450/0.712/0.618 at 3
+  decimals); scoring semantics re-verified against the reference R source
+  (one-based motif starts, additive intercept + features, GG required at
+  positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
+  note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
+- chem_similarity: NEW MODULE (2026-09-24, branch pb6). Morgan/ECFP circular
+  fingerprints (Rogers & Hahn 2010) re-implemented from RDKit's MorganGenerator
+  with RDKit's 32-bit hash, at src/sugarcode/modules/chem_similarity/,
+  registered under fabrication-evolution (94 modules total on pb6, before the pb3 merge). Unfolded counts,
+  folded bits, bit info, Tanimoto/Jaccard and Dice (bits or counts),
+  nearest-neighbour search with threshold and reported invalid SMILES,
+  similarity matrices. Verified: for PubChem CIDs 1-400 every count
+  fingerprint at radius 1, 2 and 3 and every 2048-bit ECFP4 equals RDKit
+  2024.09.6 exactly; bulk Tanimoto/Dice for 10 queries x 400 equal RDKit to
+  1e-12; methane/ethane codes hand-hashed. The same 400 compounds also check
+  chem_descriptors (all descriptors equal RDKit except carbon-free Hill
+  formula order). Getting there tightened chem_descriptors aromaticity
+  (exocyclic C=C gives 1 electron, pyrrolide [N-] gives 2, a fused pair
+  aromatic only as a whole gets an aromatic envelope with a non-aromatic
+  fusion bond, as RDKit does). Limits: no FCFP, chirality, path-based or
+  MACCS fingerprints; linear-scan search.
+- chem_descriptors: NEW MODULE (2026-09-24, branch pb6). Cheminformatics-lite at
+  src/sugarcode/modules/chem_descriptors/, registered under fabrication-evolution
+  (93 modules total on pb6, before the pb3 merge). Pure-Python SMILES parser (organic subset + bracket atoms,
+  all bond symbols, branches, single-digit and %nn ring closures, salts; Kekule
+  rings re-aromatised by 4n+2 over single rings and fused pairs) and
+  descriptors: average/exact MW from the vendored RDKit periodic table, Hill
+  formula, RDKit-definition HBD/HBA, Lipinski NHOH/NO counts, Strict rotatable
+  bonds, minimum-cycle-basis ring counts, Ertl TPSA (RDKit MolSurf fragment
+  rules, optional S/P), Fsp3; Lipinski Rule-of-5 and Veber filters. Verified:
+  on a 66-molecule drug ladder every descriptor equals RDKit 2024.09.6 from
+  both RDKit aromatic and PubChem Kekule SMILES, formulas equal PubChem, MW
+  within PubChem rounding; 60-SMILES stress set equals RDKit except 3
+  documented cases (carbon-free Hill order, explicit [2H] atoms). RDKit is an
+  offline oracle only (values frozen in tests/fixtures/chem_descriptors_oracle.json;
+  regeneration scripts in scripts/). Limits: no stereochemistry, no logP model
+  (Lipinski logP is Missing unless supplied; a single other violation then
+  reads Undetermined), ring count is cycle rank (RDKit's symmetrized SSSR adds
+  one ring for adamantane/cubane), aromaticity needing 3+ fused rings as a whole
+  is not perceived, no wildcards/reactions/SMARTS. PubChem's Cactvs TPSA uses
+  different fragments and differs from Ertl/RDKit on several drugs.
+- profile_hmm: NEW MODULE (2026-09-24, branch pb6). Profile HMMs from multiple
+  alignments per Durbin et al. 1998 Chapter 5 (Fig. 5.2 topology) and Krogh et
+  al. 1994, at src/sugarcode/modules/profile_hmm/, registered under
+  protein-engineering (92 modules total on pb6, before the pb3 merge). Match/insert/delete states, gap-
+  threshold or explicit match columns, Laplace-style pseudocounts, Viterbi
+  (most probable state path + alignment), Forward (total probability), bits and
+  log-odds. Verified on hand-computed exact-fraction fixtures and against an
+  independent brute-force enumeration of all state paths (max and sum agree to
+  1e-9 on 100+ random models). Baum-Welch training added (same day): forward-
+  backward EM on unaligned sequences from an alignment-built or random-seeded
+  model, ML (pseudocount 0; log-likelihood verified non-decreasing) or
+  Dirichlet MAP (objective verified non-decreasing), stop on |delta LL| < tol,
+  per-iteration held-out log-likelihood. E/M steps hand-computed on a
+  1-position model; forward-backward expected counts equal exact posterior
+  counts from brute-force path enumeration to 1e-12. Limits: global Durbin
+  model only - no Plan7 local mode, Dirichlet mixtures or sequence weighting;
+  EM reaches a local optimum that depends on the starting model.
+- rna_nussinov: NEW MODULE (2026-09-24, branch pb6). Nussinov-Jacobson 1980 (PNAS
+  77:6309, PMID 6161375) maximum base-pair RNA secondary structure at
+  src/sugarcode/modules/rna_nussinov/, registered under synthetic-biology (91
+  modules total). DP + traceback with min_loop and optional G-U, dot-bracket and
+  0/1-based pair lists, exact count and full list of optimal structures, pair
+  statistics (GC/AU/GU, stems, hairpins, depth). Pure algorithm, no parameter
+  tables. Verified on hand-computed small-RNA fixtures and against an
+  exhaustive brute-force enumerator on 250 random short sequences (max pairs,
+  optimum count, optimum set all identical). Limit: maximizes pair count only -
+  not an energy (MFE) predictor; no pseudoknots.
+- acmg_bayesian: NEW MODULE (2026-09-24, branch pb6), the fixed rebuild of the
+  unpromoted clinical_evidence_fusion orphan (entry below). Tavtigian et al. 2018
+  Bayesian ACMG/AMP classifier at src/sugarcode/modules/acmg_bayesian/,
+  registered under therapeutics (90 modules total on pb6, before the pb3 merge). Exact odds 350^(1/2^k)
+  carried as integer points; bands at prior 0.10 on the point total, so all five
+  likely-pathogenic combining rules the paper prints at 0.900 are Likely
+  pathogenic; BA1 is a stand-alone Benign override outside the Bayesian math.
+  Fidelity: all 17 combining-rule rows of the paper's Table 2 and the 4
+  mixed-evidence rows of Table 3 reproduce (combined odds + posterior within one
+  unit of the printed last digit). Source text hash in PROVENANCE.md. The NCBI
+  ClinVar/PubMed client is kept as an optional context layer, never fed into the
+  score; its search was fixed to use ClinVar-style HGVS (c.68_69delAG ->
+  c.68_69del) and to summarize only records whose title carries the exact
+  variant (the orphan fell back to unrelated gene hits and reported BRCA1
+  c.68_69delAG as "Conflicting"; it now reports ClinVar 17662, Pathogenic,
+  expert panel). Offline tests use recorded live E-utilities responses.
+- CRISPR on-target Rule Set 2 (Fusi/Doench 2016, Azimuth V3): RESOLVED (2026-09-24,
+  branch pb6). The published sklearn-0.17 GBRT (100 depth-3 trees, 630 features)
+  was extracted from Microsoft's BSD-3-Clause pickle into framework-free JSON and
+  is evaluated by a pure-NumPy engine in crispr_opt/rule_set_2.py - no sklearn, no
+  Biopython (SantaLucia Tm reimplemented). Fidelity: reproduces Microsoft's own
+  saved-model fixture (azimuth/tests/1000guides.csv) with max abs error 5e-10 on
+  all 947 guides for BOTH the full and nopos models (Microsoft's tolerance: 1e-3).
+  The two pipeline quirks that make scores bit-faithful are documented in the
+  module docstring (CPython 2.7 dict-ordered feature blocks; lexicographic NGGX
+  one-hot columns from the original pandas label sort). New API:
+  crispr_opt.score_on_target_rs2 (30mer context in, score out) and
+  crispr_opt.rank_guides_rs2 (enumerate + rank NGG guides from a target region).
+
+- clinical_evidence_fusion orphaned package (b78b943): REVIEWED, NOT PROMOTED
+  (2026-09-24, branch pb6). Checked against the free full text of Tavtigian et al.
+  2018, Genet Med, PMID 29300386 / PMC6336098 (BioC JSON, SHA-256
+  6af181739e6d462e316b2489702974eca5f95990ebe25cef2baa505f0dab543d). What verifies:
+  prior 0.10; odds 350 / 18.7 / 4.3 / 2.08; benign reciprocals; the
+  >0.99 / 0.90-0.99 / 0.001-0.10 / <0.001 bands; pathogenic and likely-benign table
+  rows reproduce (e.g. PVS1+PS 0.999, 2 strong 0.975, 2 BS 0.00032). The NCBI
+  E-utilities ClinVar/PubMed client is real code against live endpoints. Why it
+  stays orphaned: (1) all five ACMG likely-pathogenic combining rules that the
+  paper's Table reports at posterior 0.900 (1 strong + 1 moderate, 1 strong + 2
+  supporting, 3 moderate, 2 moderate + 2 supporting, 1 moderate + 4 supporting)
+  come out 0.898-0.900 and are labeled "Uncertain significance" because the
+  rounded odds meet a hard >=0.90 cutoff - a clinically wrong downgrade of LP to
+  VUS; (2) it scores BA1 with an invented odds of 1/1000, while the paper
+  explicitly excludes BA1 as contrary to Bayesian reasoning, so BA1 + PVS1 returns
+  "Likely benign"; (3) it ships no tests or fixtures ("pytest unavailable" in its
+  own commit) and sits outside src/. Fixed as new work, not a promotion:
+  see acmg_bayesian above (exact odds, point-total banding, BA1 stand-alone
+  override, table-row fixtures).
+
 ## Missing (labeled, not faked)
 
-- CRISPR on-target Rule Set 2 (Fusi/Azimuth): pickled sklearn model not
-  portably loadable on modern stacks - crispr_opt says Missing.
 - Ribo-seq-calibrated codon dwell times: no verifiable machine-readable source
   found; TASEP dwells are the tRNA-abundance approximation, labeled as such.
 - Ensembl REST: unreachable from the build environment (HTTP 500, then

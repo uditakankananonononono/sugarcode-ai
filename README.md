@@ -14,7 +14,7 @@ builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 ```
 pip install .
 sugarcode version
-sugarcode modules                       # the 89 registered modules (77 spec + 12 beyond-spec)
+sugarcode modules                       # the 95 registered modules (77 spec + 18 beyond-spec)
 sugarcode splice assess RB1 'c.2500-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 
@@ -133,7 +133,7 @@ sugarcode kmer sketch --file genome.fa --k 21 --w 20
 
 ```
 src/omega/            Omega OS v7.0 framework
-  registry.py         All 89 registered modules (77 spec + 12 beyond-spec) + 9 sub-networks + lifecycle status
+  registry.py         All 95 registered modules (77 spec + 18 beyond-spec) + 9 sub-networks + lifecycle status
   health.py           Per-module import/self-test health, global compute flux
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
@@ -155,16 +155,16 @@ assignments are derived from module themes:
 | Sub-network | Modules |
 |---|---|
 | core-intelligence | 8 |
-| genome-editing | 16 |
-| protein-engineering | 6 |
-| synthetic-biology | 13 |
+| genome-editing | 17 |
+| protein-engineering | 7 |
+| synthetic-biology | 14 |
 | cellular-systems | 11 |
-| therapeutics | 15 |
+| therapeutics | 16 |
 | microbiome-phage | 7 |
-| fabrication-evolution | 8 |
+| fabrication-evolution | 10 |
 | platform | 4 |
 
-Counts include the 11 beyond-spec modules registered after the audit fix
+Counts include the 17 beyond-spec modules registered after the audit fix
 (see the build status ledger below).
 
 ## Build status ledger (honest counts)
@@ -174,11 +174,11 @@ Neuro-Hub's text says an "**84-node** neural stack". **77 modules are actually
 specified** in the document; all 77 are registered and spec-filed. We build and
 count against the 77 that exist, not the 78/84 claimed.
 
-Beyond the spec, 11 more real published-model/computational modules were built
-(cfd_offtarget, crisprater, mit_offtarget, structural_biophysics, syn_bio_studio,
-dti_bench, pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
-molecule_eval). Since the audit-fix drop every one of them is registered, so the
-canonical registry now holds **89 modules**, every registry slug equals its
+Beyond the spec, 18 more modules (17 real published-model/computational modules were built
+(cfd_offtarget, crisprater, crisprscan_score, mit_offtarget, structural_biophysics,
+syn_bio_studio, rna_nussinov, profile_hmm, dti_bench, acmg_bayesian, pgx_guidelines, evidence_mining, neuro_hub_dashboard,
+qsar_bench, molecule_eval, chem_descriptors, chem_similarity), plus report_studio (lab report/export engine, pb3). Since the audit-fix drop every one of them is registered,
+so the canonical registry now holds **95 modules**, every registry slug equals its
 package directory name, and every package under `src/sugarcode/modules/` is
 registered. The spec corpus stays 77 files because the spec document has 77.
 
@@ -199,7 +199,16 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1642 passing |
+| audit-fix | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| report_studio + 21 bio toolkits (pb3) | **89 registered (77 spec + 12 beyond-spec)**; report_studio lab report/export engine plus sugarcode.bio toolkits (VCF, FASTQ, GFF, BED, SAM, Newick, Stockholm, pileup, PDB, protein props, primers, motifs, restriction, alignment, k-mers, phylo, ORFs, RNA-seq, genome stats, DE) | 0 | 0 | 1642 passing |
+| crisprscan promotion (pb6) | **89 registered (77 spec + 12 beyond-spec)**; orphaned crisprscan_score (Moreno-Mateos 2015, byte-exact vendored coefficients) promoted + Rule Set 2 port in crispr_opt | 0 | 0 | 1371 passing, 1 skipped |
+| acmg_bayesian (pb6) | **90 registered (77 spec + 13 beyond-spec)**; Tavtigian 2018 Bayesian ACMG/AMP classifier (exact 350^(1/2^k) odds, BA1 stand-alone override, all Table 2/3 rows as fixtures) + optional ClinVar/PubMed context; replaces the unpromoted clinical_evidence_fusion orphan | 0 | 0 | 1404 passing, 1 skipped |
+| rna_nussinov (pb6) | **91 registered (77 spec + 14 beyond-spec)**; Nussinov-Jacobson 1980 max base-pair RNA folding (traceback, min loop, dot-bracket, exact optimal-structure count, stats), hand fixtures + brute-force verifier | 0 | 0 | 1426 passing, 1 skipped |
+| profile_hmm (pb6) | **92 registered (77 spec + 15 beyond-spec)**; Durbin Ch. 5 profile HMM from alignments (M/I/D states, pseudocounts), Viterbi path, Forward score, log-odds; hand fixtures + brute-force path enumerator | 0 | 0 | 1437 passing, 1 skipped |
+| profile_hmm Baum-Welch (pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | 1450 passing, 1 skipped |
+| chem_descriptors (pb6) | **93 registered (77 spec + 16 beyond-spec)**; pure-Python SMILES parser + MW/exact MW, formula, HBD/HBA, rotatable bonds, rings, Ertl TPSA, Fsp3, Lipinski Ro5 + Veber; every descriptor equals RDKit 2024.09.6 on a 66-drug ladder (aromatic and Kekule SMILES) and a 60-SMILES stress set bar 3 documented cases | 0 | 0 | 1458 passing, 1 skipped |
+| chem_similarity (pb6) | **94 registered (77 spec + 17 beyond-spec)**; Morgan/ECFP count + folded-bit fingerprints with codes identical to RDKit, Tanimoto/Jaccard/Dice, nearest-neighbour search; RDKit oracle on PubChem CIDs 1-400 (radius 1-3 exact, bulk similarities to 1e-12); aromaticity perception extended (exocyclic C=C, pyrrolide N-, fused-pair envelope) | 0 | 0 | 1466 passing, 1 skipped |
+| pb3 + pb6 integration (current) | **95 registered (77 spec + 18 beyond-spec)**; pb3 and pb6 merged to main; pb6 rows above were counted on its own branch before report_studio | 0 | 0 | 1709 passing, 7 skipped |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -301,8 +310,11 @@ Status per module: **verified** = implemented with passing named tests;
   against the reference implementations. `design_guides` now scores with the
   published models end-to-end; guides at sequence edges (no 30-mer context)
   are labeled `heuristic_edge_fallback`, never silently. Rule Set 2
-  (Fusi/Azimuth) is **Missing**: its pickled sklearn model is not portably
-  loadable on modern stacks - labeled, not faked.
+  (Fusi/Doench 2016, Azimuth V3) now RUNS in crispr_opt (rule_set_2.py,
+  branch pb6): the published gradient-boosted model was ported out of its
+  unloadable sklearn-0.17 pickle into JSON + a pure-NumPy evaluator and is
+  bit-faithful to Microsoft's own 947-guide saved-model fixture
+  (max abs error 5e-10 vs Microsoft's 1e-3 test tolerance).
 - Ensembl REST is unreachable from the build environment (HTTP 500 on all
   endpoints, later connection timeout on final retry - treated as unusable);
   OpenClinVar uses live ClinVar + curated exemplars instead.

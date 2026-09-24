@@ -224,6 +224,6 @@ def test_nexus_triage_custom_build_enterprise_sla():
     assert r["sla_hours"] == 120  # 240 * 0.5 enterprise
 
 
-def test_nexus_module_map_covers_88():
+def test_nexus_module_map_covers_95():
     all_mods = [m for mods in SUBNETWORK_OWNERS.values() for m in mods]
-    assert len(set(all_mods)) == 89
+    assert len(set(all_mods)) == 95

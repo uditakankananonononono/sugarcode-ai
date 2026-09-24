@@ -1,0 +1,4 @@
+{
+  "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&term=BRCA1%5Bgene%5D+AND+%22c.68_69del%22&retmode=json&retmax=20&tool=sugarcode-acmg-bayesian",
+  "fetched_at_epoch": 1790229740.2513971
+}
