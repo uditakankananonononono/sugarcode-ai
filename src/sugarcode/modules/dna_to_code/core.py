@@ -6,9 +6,11 @@ CONCEPTS: dict[str, dict] = {
         "code": (
             "def transcribe(dna_template: str) -> str:\n"
             "    # RNA polymerase = a streaming reader with a writable handle\n"
-            "    with open_readonly(dna_template) as src:\n"
-            "        mrna = src.read().replace('T', 'U')  # swap alphabet\n"
-            "    return mrna\n"
+            "    # it walks the template 3'->5' and writes the complement 5'->3'\n"
+            "    pair = {'A': 'U', 'T': 'A', 'G': 'C', 'C': 'G'}\n"
+            "    with open_readonly(dna_template) as src:   # template given 5'->3'\n"
+            "        mrna = ''.join(pair[b] for b in reversed(src.read()))\n"
+            "    return mrna  # = coding strand with T->U\n"
         ),
         "detail": "The template strand is read 3'->5'; the product is a disposable copy (mRNA) that leaves the nucleus while the master copy (DNA) stays protected.",
     },
@@ -97,8 +99,27 @@ def execute_translation(rna):
  from ...bio.sequence import translate
  return translate(rna.replace('U','T'),to_stop=True)
 def execute_mutation(dna,pos,base):
+ """Point substitution in a coding sequence read from position 0 (frame 0).
+
+ ``consequence`` uses Sequence Ontology / Ensembl VEP terms: start_lost,
+ stop_lost, stop_retained_variant, stop_gained, synonymous_variant,
+ missense_variant. ``silent``/``nonsense`` are kept for backward compatibility.
+ """
+ from ...bio.sequence import STANDARD_CODE
+ dna=dna.upper()
  if not 0<=pos<len(dna) or base not in 'ACGT': raise ValueError('invalid mutation')
- before=execute_translation(dna); mutant=dna[:pos]+base+dna[pos+1:]; after=execute_translation(mutant); return {'mutant_dna':mutant,'before_protein':before,'after_protein':after,'silent':before==after,'nonsense':len(after)<len(before)}
+ before=execute_translation(dna); mutant=dna[:pos]+base+dna[pos+1:]; after=execute_translation(mutant)
+ ci=pos//3; ref=dna[ci*3:ci*3+3]; alt=mutant[ci*3:ci*3+3]
+ if len(ref)<3: cons='incomplete_terminal_codon_variant'
+ else:
+  ra=STANDARD_CODE.get(ref,'X'); aa=STANDARD_CODE.get(alt,'X')
+  if ci==0 and ref=='ATG' and alt!='ATG': cons='start_lost'
+  elif ra=='*' and aa!='*': cons='stop_lost'
+  elif ra=='*': cons='stop_retained_variant'
+  elif aa=='*': cons='stop_gained'
+  elif ra==aa: cons='synonymous_variant'
+  else: cons='missense_variant'
+ return {'mutant_dna':mutant,'before_protein':before,'after_protein':after,'silent':before==after,'nonsense':len(after)<len(before),'consequence':cons}
 def analogy_limits(concept):
  limits={'transcription':['RNA processing and chromatin are omitted'],'translation':['ribosome kinetics and folding are omitted'],'crispr':['off-target search and DNA repair outcomes are simplified'],'mutation':['cell context and regulation are omitted']}; return {'concept':concept,'limits':limits.get(concept,['analogy is educational, not a mechanistic simulator']),'status':'educational analogy'}
 def concept_report(concept,sequence=None):
