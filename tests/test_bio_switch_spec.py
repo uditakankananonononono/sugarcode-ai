@@ -39,3 +39,21 @@ def test_validation_errors_are_informative():
  with pytest.raises(ValueError,match="points"): reaction_diffusion_profile("lactose",points=1)
  with pytest.raises(ValueError,match="logic"): multi_input_gate({"lactose":1},"XOR")
  with pytest.raises(ValueError,match="strictly increasing"): temporal_filter([[1,1],[1,0]])
+
+
+def test_sweep_lipinski_counts_and_classes():
+    from sugarcode.modules.bio_switch import cheminformatics_descriptors
+    lac = cheminformatics_descriptors("lactose")
+    assert lac["lipinski_violations"] == 2 and lac["bioavailability_class"] == "low"
+    tet = cheminformatics_descriptors("tetracycline")
+    assert tet["lipinski_violations"] == 1 and tet["bioavailability_class"] == "moderate"
+    ara = cheminformatics_descriptors("arabinose")
+    assert ara["lipinski_violations"] == 0 and ara["bioavailability_class"] == "high"
+
+
+def test_sweep_tetracycline_kd_matches_literature():
+    # Takahashi 1991 (PMID 1812784): TetR-tetracycline Ka = 3 +/- 2 x 10^9 M-1
+    # -> Kd in the 0.2-1 nM range; curated value must sit in that range.
+    from sugarcode.modules.bio_switch import BINDING_DOMAINS
+    kd = BINDING_DOMAINS["tetracycline"]["kd_uM"]
+    assert 2e-4 <= kd <= 1e-3
