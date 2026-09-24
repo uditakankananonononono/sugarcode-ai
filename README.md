@@ -93,6 +93,11 @@ sugarcode motif to-jaspar --sites aligned_sites.fa
 sugarcode digest run --fasta plasmid.fa --enzymes EcoRI,BamHI --circular
 sugarcode digest info EcoRI
 sugarcode digest list --match hind
+
+# Pairwise alignment (drop 76, Needleman-Wunsch + Smith-Waterman, affine gaps):
+sugarcode align run --a GATTACA --b GATACA                       # global DNA, match/mismatch
+sugarcode align run --a WWKNDE --b WWKE --mode local --matrix BLOSUM62
+sugarcode align run --fasta pair.fa --gap-open 11 --gap-extend 2
 ```
 
 ## Architecture
@@ -165,7 +170,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1548 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1558 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -594,7 +599,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1548 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1558 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
