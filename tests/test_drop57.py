@@ -19,7 +19,7 @@ def test_cli_version_and_modules(capsys):
     assert "0.2.0" in capsys.readouterr().out
     assert main(["modules"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("90 modules")
+    assert out.startswith("91 modules")
     assert "deepsplice" in out
 
 
