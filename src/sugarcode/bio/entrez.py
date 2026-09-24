@@ -96,8 +96,18 @@ def efetch_xml(db: str, ids: list[str], offline: bool = False) -> ET.Element:
 
 def gene_id(symbol: str, organism: str = "human", offline: bool = False) -> str | None:
     """Resolve a gene symbol to its NCBI Gene UID."""
-    ids = esearch("gene", f"{symbol}[sym] AND {organism}[orgn]", retmax=1, offline=offline)
-    return ids[0] if ids else None
+    # [sym] also matches aliases and esearch ranks them first for some
+    # symbols: HTT[sym] -> 6532 (SLC6A4, alias HTT), TTN[sym] -> 7276 (TTR).
+    # Pick the UID whose official symbol equals the query; validated vs
+    # HGNC entrez_id on 60 genes (mega27-01 benchmarks/sweep_entrez_hgnc.json).
+    ids = esearch("gene", f"{symbol}[sym] AND {organism}[orgn]", retmax=10, offline=offline)
+    if not ids:
+        return None
+    summ = esummary("gene", ids, offline=offline)
+    for u in ids:
+        if (summ.get(u, {}).get("name") or "").upper() == symbol.upper():
+            return u
+    return ids[0]
 
 
 def pubmed_ids(query: str, retmax: int = 10, offline: bool = False) -> list[str]:
