@@ -14,6 +14,9 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   fastq stats FILE               FastQC-style read/quality summary (drop 64)
   gff stats FILE                 GFF3/GTF feature summary (drop 65)
   bed stats FILE                 BED interval summary (drop 66)
+  sam stats FILE                 SAM mapping summary (drop 67)
+  sam filter FILE [--mapped-only --min-mapq N --rname .. --primary-only]
+  sam to-bed FILE                mapped reads to BED6
   bed merge FILE [--out F]       merge overlapping intervals
   bed filter FILE [--chrom .. --min-width N --min-score N]
   bed to-gff FILE [--feature-type T]
@@ -375,6 +378,43 @@ def _cmd_bed_to_gff(args) -> int:
 
 
 
+def _cmd_sam_stats(args) -> int:
+    from .bio.sam import parse_sam, stats
+    s = parse_sam(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(s)})
+
+
+def _cmd_sam_filter(args) -> int:
+    from .bio.sam import parse_sam, write_sam, filter_records
+    s = parse_sam(Path(args.file).read_text())
+    out = filter_records(
+        s, mapped_only=args.mapped_only, min_mapq=args.min_mapq,
+        rnames=[x for x in (args.rname or "").split(",") if x] or None,
+        primary_only=args.primary_only)
+    text = write_sam(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['records'])} of {len(s['records'])} alignments)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_sam_to_bed(args) -> int:
+    from .bio.sam import parse_sam, to_bed
+    from .bio.bed import write_bed
+    s = parse_sam(Path(args.file).read_text())
+    records = to_bed(s)
+    text = write_bed({"header": [], "records": records})
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(records)} mapped reads)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -427,6 +467,24 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    sm = sub.add_parser("sam", help="SAM alignment toolkit (text SAM)")
+    smsub = sm.add_subparsers(dest="sub", required=True)
+    ss = smsub.add_parser("stats", help="mapping summary (rates, MAPQ, per-ref)")
+    ss.add_argument("file")
+    ss.set_defaults(func=_cmd_sam_stats)
+    sf = smsub.add_parser("filter", help="filter alignments (mapped/mapq/ref/primary)")
+    sf.add_argument("file")
+    sf.add_argument("--mapped-only", action="store_true")
+    sf.add_argument("--min-mapq", type=int, default=None)
+    sf.add_argument("--rname", default=None)
+    sf.add_argument("--primary-only", action="store_true")
+    sf.add_argument("--out", default=None)
+    sf.set_defaults(func=_cmd_sam_filter)
+    sb = smsub.add_parser("to-bed", help="mapped reads to BED6 (coordinate math done)")
+    sb.add_argument("file")
+    sb.add_argument("--out", default=None)
+    sb.set_defaults(func=_cmd_sam_to_bed)
 
     bd = sub.add_parser("bed", help="BED interval toolkit (0-based half-open)")
     bdsub = bd.add_subparsers(dest="sub", required=True)

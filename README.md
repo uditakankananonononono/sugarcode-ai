@@ -52,6 +52,11 @@ sugarcode gff csv anno.gff3 --out anno.csv
 sugarcode bed stats peaks.bed                  # interval/width/coverage summary
 sugarcode bed merge peaks.bed --out merged.bed
 sugarcode bed to-gff peaks.bed --feature-type peak --out peaks.gff3
+
+# SAM alignments (drop 67, text SAM):
+sugarcode sam stats aln.sam                    # mapping rate, MAPQ, per-reference
+sugarcode sam filter aln.sam --mapped-only --min-mapq 30 --out mapped.sam
+sugarcode sam to-bed aln.sam --out reads.bed
 ```
 
 ## Architecture
@@ -64,7 +69,7 @@ src/omega/            Omega OS v7.0 framework
   api.py              FastAPI surface (/modules /subnetworks /health /search)
 src/sugarcode/
   bio/                Shared scientific toolkit: sequence ops, FASTA, FASTQ,
-                      VCF, GFF3/GTF, BED, GenBank, codon usage/CAI, PWMs
+                      VCF, GFF3/GTF, BED, SAM, GenBank, codon usage/CAI, PWMs
   report/             Report & export engine: HTML/Markdown reports, CSV/TSV,
                       evidence bundles, .ipynb generation (drop 62)
   modules/<slug>/     One package per module
@@ -124,7 +129,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1440 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1451 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -553,7 +558,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1440 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1451 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
