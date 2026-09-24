@@ -196,8 +196,11 @@ Status per module: **verified** = implemented with passing named tests;
   against the reference implementations. `design_guides` now scores with the
   published models end-to-end; guides at sequence edges (no 30-mer context)
   are labeled `heuristic_edge_fallback`, never silently. Rule Set 2
-  (Fusi/Azimuth) is **Missing**: its pickled sklearn model is not portably
-  loadable on modern stacks - labeled, not faked.
+  (Fusi/Doench 2016, Azimuth V3) now RUNS in crispr_opt (rule_set_2.py,
+  branch pb6): the published gradient-boosted model was ported out of its
+  unloadable sklearn-0.17 pickle into JSON + a pure-NumPy evaluator and is
+  bit-faithful to Microsoft's own 947-guide saved-model fixture
+  (max abs error 5e-10 vs Microsoft's 1e-3 test tolerance).
 - Ensembl REST is unreachable from the build environment (HTTP 500 on all
   endpoints, later connection timeout on final retry - treated as unusable);
   OpenClinVar uses live ClinVar + curated exemplars instead.

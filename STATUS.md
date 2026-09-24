@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; the Rule Set 2 port (branch pb6) adds 6 fixture-fidelity tests (1361 total) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -124,10 +124,23 @@ calibration is ours, not fitted to published data. Each module's docstring
 states its method; none of them pretends to be a trained model. Deepening
 continues drop by drop in order of scientific usefulness.
 
+## Resolved since the audit-fix drop
+
+- CRISPR on-target Rule Set 2 (Fusi/Doench 2016, Azimuth V3): RESOLVED (2026-09-24,
+  branch pb6). The published sklearn-0.17 GBRT (100 depth-3 trees, 630 features)
+  was extracted from Microsoft's BSD-3-Clause pickle into framework-free JSON and
+  is evaluated by a pure-NumPy engine in crispr_opt/rule_set_2.py - no sklearn, no
+  Biopython (SantaLucia Tm reimplemented). Fidelity: reproduces Microsoft's own
+  saved-model fixture (azimuth/tests/1000guides.csv) with max abs error 5e-10 on
+  all 947 guides for BOTH the full and nopos models (Microsoft's tolerance: 1e-3).
+  The two pipeline quirks that make scores bit-faithful are documented in the
+  module docstring (CPython 2.7 dict-ordered feature blocks; lexicographic NGGX
+  one-hot columns from the original pandas label sort). New API:
+  crispr_opt.score_on_target_rs2 (30mer context in, score out) and
+  crispr_opt.rank_guides_rs2 (enumerate + rank NGG guides from a target region).
+
 ## Missing (labeled, not faked)
 
-- CRISPR on-target Rule Set 2 (Fusi/Azimuth): pickled sklearn model not
-  portably loadable on modern stacks - crispr_opt says Missing.
 - Ribo-seq-calibrated codon dwell times: no verifiable machine-readable source
   found; TASEP dwells are the tRNA-abundance approximation, labeled as such.
 - Ensembl REST: unreachable from the build environment (HTTP 500, then

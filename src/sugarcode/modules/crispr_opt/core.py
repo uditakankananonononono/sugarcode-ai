@@ -354,3 +354,50 @@ def design_report(seq,pam='NGG',background=None,tracks=None,top_n=5):
 def guide_diagnostics(guide,target=None,chromatin=None):
     g=clean_dna(guide); target=clean_dna(target or guide); mm=mismatch_profile(g,target); thermo=hybrid_thermodynamics(g,target); kinetics=binding_kinetics(g,target); context=chromatin_adjustment(score_on_target(g),**(chromatin or {})); base=base_editor_window(g); prime=prime_editor_architecture(g,g[:13],g[:15]); d={"gc":gc_content(g),"on_target":score_on_target(g),"hairpin":_hairpin_score(g),"mismatch_count":float(mm['mismatch_count']),"seed_mismatch_count":float(mm['pam_proximal_mismatches']),"binding_probability":mm['binding_probability'],"hybrid_delta_g":thermo['delta_g_kcal_mol'],"thermo_binding_probability":thermo['binding_probability'],"on_rate":kinetics['on_rate'],"off_rate":kinetics['off_rate'],"cleavage_probability":kinetics['cleavage_probability'],"residence_time":kinetics['residence_time'],"accessibility":context['accessibility'],"context_efficiency":context['context_score'],"base_edit_site_count":float(len(base['sites'])),"base_edit_bystander_count":float(base['bystander_count']),"base_edit_activity":base['total_activity'],"prime_pbs_tm":prime['pbs_tm_c'],"prime_structure_penalty":prime['structure_penalty'],"prime_processivity":prime['rt_processivity'],"prime_flap_resolution":prime['flap_resolution'],"prime_mmr_retention":prime['mmr_retention'],"prime_efficiency":prime['efficiency'],"poly_t":float('TTTT' in g),"seed_gc":gc_content(g[-12:]),"distal_gc":gc_content(g[:-12])}
     return d
+
+
+def score_on_target_rs2(mer30: str, percent_peptide=None, aa_cut=None) -> float:
+    """Published Rule Set 2 (Azimuth V3, Fusi/Doench 2016) on-target score.
+
+    Takes the 30 nt context (4 nt + 20 nt guide + NGG + 3 nt). This is the
+    real trained gradient-boosted model ported from Microsoft's BSD-3-Clause
+    release - not a heuristic; see rule_set_2.py for provenance and the
+    fixture-level validation (max error 5e-10 on Microsoft's 947-guide
+    reference set). With percent_peptide/aa_cut omitted, the V3-nopos model
+    (no gene-position features) is used, as in the original library.
+    """
+    from .rule_set_2 import score_guide
+    return score_guide(mer30, percent_peptide=percent_peptide, aa_cut=aa_cut)
+
+
+def rank_guides_rs2(seq: str, pam: str = "NGG", guide_len: int = 20) -> list[dict]:
+    """Enumerate NGG candidate guides from a target region and score each with
+    Rule Set 2 (nopos), returning candidates sorted by the published model's
+    score. Requires 4 nt of context upstream and 3 nt downstream of each
+    guide+PAM window; candidates too close to the sequence ends are skipped
+    (their 30mer context is unavailable, and padding would fabricate data)."""
+    from .rule_set_2 import score_guides
+    s = clean_dna(seq)
+    if pam != "NGG":
+        raise ValueError("Rule Set 2 is trained for SpCas9 NGG guides only")
+    cands = _extract_guides(s, pam, guide_len)
+    usable = []
+    for c in cands:
+        if c["strand"] == "+":
+            a = c["start"] - 4
+            b = c["end"] + 3 + 3  # guide end + 3 PAM + 3 flank
+            if a >= 0 and b <= len(s):
+                c = dict(c)
+                c["mer30"] = s[a:b]
+                usable.append(c)
+        else:
+            a = c["start"] - 3 - 3  # 3 flank + 3 PAM upstream on + strand
+            b = c["end"] + 4
+            if a >= 0 and b <= len(s):
+                c = dict(c)
+                c["mer30"] = reverse_complement(s[a:b])
+                usable.append(c)
+    scores = score_guides([c["mer30"] for c in usable]) if usable else []
+    for c, sc in zip(usable, scores):
+        c["rule_set_2"] = float(sc)
+    return sorted(usable, key=lambda x: -x["rule_set_2"])
