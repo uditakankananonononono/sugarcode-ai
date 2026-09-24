@@ -1,6 +1,6 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
-88 modules: the 77 from the spec corpus plus 11 beyond-spec published-model
+89 modules: the 77 from the spec corpus plus 12 beyond-spec
 implementations, all registered (slugs equal their package directory names).
 
 The nine sub-networks are assigned from the module themes in the spec doc
@@ -216,6 +216,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Reproducible, dependency-light QSAR benchmarking against ChEMBL reference data."),
     ("molecule_eval", "Molecule Eval", "fabrication-evolution",
      "Auditable evaluation of generated molecular libraries: validity, novelty and Pareto fronts vs ChEMBL reference."),
+    ("report_studio", "Report Studio", "platform",
+     "Lab-grade export engine: HTML/Markdown reports with provenance, CSV/TSV exporters, executable Jupyter notebooks and sha256-checksummed evidence bundles."),
 ]
 
 _VERIFIED = {slug for slug, _, _, _ in _MODULES}
