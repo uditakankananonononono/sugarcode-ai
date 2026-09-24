@@ -181,3 +181,15 @@ def test_ailibrary_parsers_offline():
                     "url": "https://www.theailibrary.co/tool/magicshot"}
     with pytest.raises(ValueError):
         ailibrary.tool("../admin")
+
+
+def test_needle_dataset_answers_execute():
+    from sugarcode.llm.dataset import build
+    rows, rep = build(per_tool=2, max_tools=40)
+    assert rows and rep["tools_covered"] >= 5
+    for r in rows[:20]:
+        tools = json.loads(r["tools"])
+        ans = json.loads(r["answers"])
+        assert len(tools) == 4 and ans[0]["name"] in {t["name"] for t in tools}
+        assert "error" not in call_tool(ans[0]["name"], ans[0]["arguments"])
+        assert r["query"]

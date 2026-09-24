@@ -16,3 +16,4 @@ venv/
 # Local caches
 .sugarcode_cache/
 
+data/needle/
