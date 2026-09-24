@@ -16,6 +16,10 @@ class GnomADError(RuntimeError):
     pass
 
 
+class GnomADRateLimited(GnomADError):
+    """gnomAD API quota exhausted; retry after a few minutes."""
+
+
 def _post(query: str, offline: bool = False, retries: int = 3) -> dict:
     global _last_call
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -39,7 +43,19 @@ def _post(query: str, offline: bool = False, retries: int = 3) -> dict:
                 data = json.loads(r.read())
             cache_file.write_bytes(json.dumps(data).encode())
             return data
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace") if hasattr(e, "read") else ""
+            if "rate limit" in body.lower():
+                # gnomAD answers HTTP 400 "Query rate limit exceeded. Please try
+                # again in a few minutes." - retrying within seconds only burns
+                # quota, so fail fast with an actionable, distinct error.
+                raise GnomADRateLimited("gnomAD API rate limit exceeded; retry in a few minutes "
+                                        "(cached results remain usable with offline=True)") from e
+            if attempt == retries - 1:
+                raise GnomADError(f"gnomAD request failed: {e}") from e
+            time.sleep(delay)
+            delay *= 2
+        except (urllib.error.URLError, TimeoutError) as e:
             if attempt == retries - 1:
                 raise GnomADError(f"gnomAD request failed: {e}") from e
             time.sleep(delay)

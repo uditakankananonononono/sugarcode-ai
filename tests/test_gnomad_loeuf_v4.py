@@ -13,3 +13,17 @@ def test_v4_threshold_is_045(monkeypatch):
     assert c["lof_constrained"] is True and c["loeuf_threshold"] == 0.45
     monkeypatch.setattr(G, "_post", _fake(0.45))
     assert G.gene_constraint("X")["lof_constrained"] is False
+
+
+def test_rate_limit_fails_fast(monkeypatch, tmp_path):
+    import io, urllib.error, pytest
+    calls = []
+    def boom(req, timeout=20):
+        calls.append(1)
+        raise urllib.error.HTTPError(req.full_url, 400, "Bad Request", {},
+            io.BytesIO(b'{"errors":[{"message":"Query rate limit exceeded. Please try again in a few minutes."}]}'))
+    monkeypatch.setattr(G, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(G.urllib.request, "urlopen", boom)
+    with pytest.raises(G.GnomADRateLimited):
+        G._post("{ gene(gene_symbol: \"ZZZ\") { symbol } }")
+    assert len(calls) == 1
