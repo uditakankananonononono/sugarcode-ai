@@ -10,8 +10,12 @@ GENES = {
     "KRAS": {"protein_len": 189, "domains": {"G-domain": (1, 166)},
              "hotspots": [12, 13, 61], "pathway": "MAPK signaling"},
 }
-CODON_TABLE = {"R": "CGN", "H": "CAY", "G": "GGN", "D": "GAY", "C": "TGY", "W": "TGG",
-               "L": "CTN", "P": "CCN", "A": "GCN", "S": "TCN", "T": "ACN", "V": "GTN"}
+CODON_TABLE = {"A": "GCN", "R": "CGN/AGR", "N": "AAY", "D": "GAY", "C": "TGY", "Q": "CAR", "E": "GAR",
+               "G": "GGN", "H": "CAY", "I": "ATH", "L": "CTN/TTR", "K": "AAR", "M": "ATG", "F": "TTY",
+               "P": "CCN", "S": "TCN/AGY", "T": "ACN", "W": "TGG", "Y": "TAY", "V": "GTN", "*": "TAR/TGA"}
+THREE = {"A": "ALA", "R": "ARG", "N": "ASN", "D": "ASP", "C": "CYS", "Q": "GLN", "E": "GLU", "G": "GLY", "H": "HIS",
+         "I": "ILE", "L": "LEU", "K": "LYS", "M": "MET", "F": "PHE", "P": "PRO", "S": "SER", "T": "THR", "W": "TRP",
+         "Y": "TYR", "V": "VAL"}
 HYDROPHOB = set("AILMFWVYV")
 
 
@@ -24,6 +28,12 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
     if gene not in GENES:
         raise KeyError(f"gene {gene!r} not grounded; have {sorted(GENES)}")
     g = GENES[gene]
+    ref_aa, alt_aa = ref_aa.upper(), alt_aa.upper()
+    if ref_aa not in THREE or alt_aa not in CODON_TABLE:
+        raise ValueError("ref_aa must be one of the 20 amino acids; alt_aa may also be '*' (stop)")
+    if ref_aa == alt_aa:
+        raise ValueError(f"{ref_aa}{pos}{alt_aa} is synonymous: no amino-acid change to score")
+    nonsense = alt_aa == "*"
     if not (1 <= pos <= g["protein_len"]):
         raise ValueError(f"{gene} is {g['protein_len']} aa")
     nodes = []
@@ -31,17 +41,20 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
     domain = next((d for d, (a, b) in g["domains"].items() if a <= pos <= b), None)
     hotspot = pos in g["hotspots"]
     nodes.append({"node": "variant_annotation",
-                  "consequence": "missense", "domain": domain, "hotspot": hotspot,
+                  "consequence": "nonsense (premature stop)" if nonsense else "missense", "domain": domain, "hotspot": hotspot,
                   "codon_change": f"{CODON_TABLE.get(ref_aa, '???')}->{CODON_TABLE.get(alt_aa, '???')}"})
     # node 2: structural perturbation (ddG proxy)
     d_hydro = (alt_aa in HYDROPHOB) - (ref_aa in HYDROPHOB)
     ddg = round(0.8 * abs(d_hydro) + (1.2 if hotspot else 0.3) + (0.5 if domain else 0.0), 2)
     destabilizing = ddg > 1.0
-    nodes.append({"node": "structural_perturbation", "ddG_estimate_kcal": ddg,
+    if nonsense:
+        destabilizing = True
+    nodes.append({"node": "structural_perturbation", "ddG_estimate_kcal": None if nonsense else ddg,
                   "destabilizing": destabilizing,
-                  "mechanism": "hydrophobic core swap" if d_hydro else "surface/charge change"})
-    # node 3: pathway flux effect
-    flux_impact = round(min(1.0, ddg / 3 * (1.5 if hotspot else 0.8)), 2)
+                  "mechanism": ("truncated protein (everything after the stop is lost)" if nonsense else
+                                "hydrophobic core swap" if d_hydro else "surface/charge change")})
+    # node 3: pathway flux effect (a premature stop removes the downstream protein: full disruption)
+    flux_impact = 1.0 if nonsense else round(min(1.0, ddg / 3 * (1.5 if hotspot else 0.8)), 2)
     nodes.append({"node": "pathway_effect", "pathway": g["pathway"],
                   "flux_disruption": flux_impact})
     # node 4: phenotype with uncertainty
@@ -74,14 +87,21 @@ def to_fasta(seq_id: str, protein: str) -> str:
 
 
 def to_pdb(protein: str, chain: str = "A") -> str:
-    """Minimal valid PDB ATOM records (CA-only trace along a helix)."""
+    """Valid PDB ATOM records: a CA-only ideal alpha-helix trace (radius 2.3 A, 100 deg and
+    1.5 A rise per residue, so consecutive CA-CA = 3.8 A), one record per residue with its
+    real residue name. A geometric model for file exchange, not a predicted structure."""
     import math
+    protein = protein.upper()
+    bad = set(protein) - set(THREE)
+    if not protein or bad:
+        raise ValueError(f"protein must be one-letter amino acids; bad: {sorted(bad)}")
+    if len(protein) > 6000:
+        raise ValueError("to_pdb supports up to 6000 residues (PDB coordinate field width)")
     rows = []
-    for i, aa in enumerate(protein[:60], 1):
-        x = 3.8 * i * math.cos(i * 1.745)
-        y = 3.8 * i * math.sin(i * 1.745)
-        z = 1.5 * i
-        rows.append(f"ATOM  {i:5d}  CA  ALA {chain}{i:4d}    "
+    for i, aa in enumerate(protein, 1):
+        t = math.radians(100.0 * i)
+        x, y, z = 2.3 * math.cos(t), 2.3 * math.sin(t), 1.5 * i
+        rows.append(f"ATOM  {i:5d}  CA  {THREE[aa]} {chain}{i:4d}    "
                     f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00 20.00           C  ")
     rows.append("END")
     return "\n".join(rows) + "\n"
@@ -147,16 +167,20 @@ def design_crispr_guides(sequence, pam="NGG", max_guides=20):
     if pam != "NGG":
         raise ValueError("only NGG PAM is currently supported")
     rows=[]
-    for i in range(20,len(seq)-2):
-        if seq[i+1:i+3] != "GG": continue
-        guide=seq[i-20:i]; gc=(guide.count("G")+guide.count("C"))/20
-        seed=guide[-12:]
-        homopolymer=max(len(x) for base in "ACGT" for x in guide.split(base) if x) if guide else 0
-        efficiency=max(0,1-abs(gc-.5)*2-.05*guide.count("TTTT"))
-        risk=min(1,.08*max(seed.count("G"),seed.count("C"))+.2*guide.count("TTTT"))
-        rows.append({"guide":guide,"start":i-20,"pam":seq[i:i+3],"gc_fraction":round(gc,3),
-                     "on_target_score":round(efficiency,3),"off_target_risk":round(risk,3),
-                     "composite_score":round(.7*efficiency-.3*risk,3)})
+    comp=str.maketrans("ACGT","TGCA")
+    for strand,s2 in (("+",seq),("-",seq.translate(comp)[::-1])):
+        n=len(s2)
+        for i in range(20,n-2):
+            if s2[i+1:i+3] != "GG": continue
+            guide=s2[i-20:i]; gc=(guide.count("G")+guide.count("C"))/20
+            seed=guide[-12:]
+            efficiency=max(0,1-abs(gc-.5)*2-.05*guide.count("TTTT"))
+            risk=min(1,.08*max(seed.count("G"),seed.count("C"))+.2*guide.count("TTTT"))
+            # start is always the forward-strand coordinate of the protospacer's leftmost base
+            start=i-20 if strand=="+" else n-i
+            rows.append({"guide":guide,"strand":strand,"start":start,"pam":s2[i:i+3],"gc_fraction":round(gc,3),
+                         "on_target_score":round(efficiency,3),"off_target_risk":round(risk,3),
+                         "composite_score":round(.7*efficiency-.3*risk,3)})
     rows.sort(key=lambda x:(-x["composite_score"],x["start"]))
     return {"pam":pam,"candidates":rows[:max_guides],"candidate_count":len(rows),
             "limitations":["off-target risk is a sequence proxy, not a genome-wide alignment","experimental validation required"]}

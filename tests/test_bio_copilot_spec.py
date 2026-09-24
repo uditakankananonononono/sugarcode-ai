@@ -28,3 +28,22 @@ def test_validation_errors_are_informative():
  with pytest.raises(ValueError,match="A/C/G/T"): design_crispr_guides("BAD")
  with pytest.raises(ValueError,match="distinct DNA bases"): select_editing_strategy("A","A")
  with pytest.raises(ValueError,match="samples"): propagate_uncertainty({"x":(1,.1)},10)
+
+
+def test_audit_fixes_codons_synonymous_nonsense_pdb_and_both_strands():
+    import math
+    import pytest as _pt
+    from sugarcode.modules.bio_copilot import mutation_to_phenotype, to_pdb, design_crispr_guides
+    assert mutation_to_phenotype("TP53", "E", 286, "K")["computation_graph"][0]["codon_change"] == "GAR->AAR"
+    with _pt.raises(ValueError, match="synonymous"):
+        mutation_to_phenotype("TP53", "R", 175, "R")
+    n = mutation_to_phenotype("TP53", "R", 175, "*")
+    assert n["computation_graph"][0]["consequence"].startswith("nonsense") and n["computation_graph"][2]["flux_disruption"] == 1.0
+    atoms = [l for l in to_pdb("MKTE" * 20).splitlines() if l.startswith("ATOM")]
+    assert len(atoms) == 80 and [a[17:20] for a in atoms[:4]] == ["MET", "LYS", "THR", "GLU"]
+    xyz = [(float(a[30:38]), float(a[38:46]), float(a[46:54])) for a in atoms]
+    assert all(abs(math.dist(xyz[i], xyz[i + 1]) - 3.8) < 0.1 for i in range(len(xyz) - 1))
+    s = "CCTAGCTAGCTACGATCGATCGTAACGTC" + "T" * 5
+    g = design_crispr_guides(s)["candidates"][0]
+    rc = s[g["start"]:g["start"] + 20].translate(str.maketrans("ACGT", "TGCA"))[::-1]
+    assert g["strand"] == "-" and rc == g["guide"]
