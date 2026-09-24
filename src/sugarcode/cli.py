@@ -172,6 +172,13 @@ def _cmd_ask(args) -> int:
     return 0 if res.answer else 1
 
 
+def _cmd_ailibrary(args) -> int:
+    from .llm import ailibrary
+    if args.sub == "search":
+        return _emit(ailibrary.search(args.query, limit=args.limit))
+    return _emit(ailibrary.tool(args.slug))
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -257,6 +264,16 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--model", default=None)
     k.add_argument("--allow-paid", action="store_true", help="permit hosted_paid profiles (Fugu)")
     k.set_defaults(func=_cmd_ask)
+
+    al = sub.add_parser("ailibrary", help="read-only AI Library (theailibrary.co) tool catalog")
+    alsub = al.add_subparsers(dest="sub", required=True)
+    als = alsub.add_parser("search", help="find tools by keywords")
+    als.add_argument("query")
+    als.add_argument("--limit", type=int, default=5)
+    als.set_defaults(func=_cmd_ailibrary)
+    alt = alsub.add_parser("tool", help="details for one tool slug")
+    alt.add_argument("slug")
+    alt.set_defaults(func=_cmd_ailibrary)
 
     args = p.parse_args(argv)
     return args.func(args)
