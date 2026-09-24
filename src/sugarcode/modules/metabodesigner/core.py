@@ -1,5 +1,4 @@
 from __future__ import annotations
-from collections import deque
 from ..virtual_cell.core import MetabolicModel, fba
 
 # Built-in reaction knowledge base (curated core metabolism subset)
@@ -31,34 +30,47 @@ def design_pathway(target: str, source: str = "glucose", max_steps: int = 10) ->
     """
     target = target.lower()
     source = source.lower()
-    # BFS over metabolite graph
-    prev: dict[str, tuple[str, dict]] = {}
+    # Fixpoint reachability in waves: a reaction fires only when ALL its substrates
+    # are reachable (single-substrate BFS stranded multi-substrate reactions like
+    # malate synthase without their co-substrate branch).
+    prev: dict[str, dict] = {}
+    fire_round: dict[str, int] = {}
     seen = {source}
-    q = deque([source])
-    found = False
-    while q and not found:
-        met = q.popleft()
+    changed = True
+    round_ = 0
+    while changed and target not in seen:
+        changed = False
+        new_seen: set[str] = set()
         for rxn in REACTION_DB:
-            if met in [x.lower() for x in rxn["substrates"]]:
+            if all(x.lower() in seen for x in rxn["substrates"]):
+                if rxn["id"] not in fire_round:
+                    fire_round[rxn["id"]] = round_
                 for prod in rxn["products"]:
                     pl = prod.lower()
-                    if pl not in seen:
-                        seen.add(pl)
-                        prev[pl] = (met, rxn)
-                        if pl == target:
-                            found = True
-                        q.append(pl)
+                    if pl not in seen and pl not in new_seen:
+                        new_seen.add(pl)
+                        prev[pl] = rxn
+                        changed = True
+        seen |= new_seen
+        round_ += 1
     if target not in seen:
         return {"target": target, "found": False,
                 "note": f"no route in built-in reaction DB ({len(REACTION_DB)} reactions)",
                 "suggestion": "extend REACTION_DB with heterologous steps for this target"}
-    path = []
-    node = target
-    while node != source:
-        m, rxn = prev[node]
+    # Back-walk every substrate so branched routes include each co-substrate's supply.
+    path: list[dict] = []
+    needed = [target]
+    while needed:
+        node = needed.pop()
+        if node == source or node not in prev:
+            continue
+        rxn = prev[node]
+        if any(r["id"] == rxn["id"] for r in path):
+            continue
         path.append(rxn)
-        node = m
-    path.reverse()
+        needed.extend(x.lower() for x in rxn["substrates"] if x.lower() != source)
+    # Topological order: by the wave in which each reaction first became fireable.
+    path.sort(key=lambda r: fire_round[r["id"]])
     cofactors: dict[str, int] = {}
     for r in path:
         for c in r["cofactors"]:
@@ -128,7 +140,7 @@ def stoichiometric_matrix(route):
   for m in r['products']:S[mets.index(m),j]+=1
  return {'metabolites':mets,'reactions':[r.get('reaction',r.get('id')) for r in route],'matrix':S.tolist()}
 def pathway_flux(route,target,source,upper=10):
- sm=stoichiometric_matrix(route); S=np.asarray(sm['matrix']); internal=[i for i,m in enumerate(sm['metabolites']) if m not in (source,target)]; c=np.zeros(len(route)); c[-1]=-1; res=linprog(c,A_eq=S[internal] if internal else None,b_eq=np.zeros(len(internal)) if internal else None,bounds=[(0,upper)]*len(route),method='highs'); return {'success':bool(res.success),'fluxes':res.x.tolist() if res.success else [],'objective_flux':float(-res.fun) if res.success else 0,'stoichiometry':sm}
+ sm=stoichiometric_matrix(route); S=np.asarray(sm['matrix']); internal=[i for i,m in enumerate(sm['metabolites']) if m not in (source,target) and np.any(S[i]<0)]; c=np.zeros(len(route)); c[-1]=-1; res=linprog(c,A_eq=S[internal] if internal else None,b_eq=np.zeros(len(internal)) if internal else None,bounds=[(0,upper)]*len(route),method='highs'); return {'success':bool(res.success),'fluxes':res.x.tolist() if res.success else [],'objective_flux':float(-res.fun) if res.success else 0,'stoichiometry':sm}
 def thermodynamics(route,dg_by_reaction=None):
  dg_by_reaction=dg_by_reaction or {}; vals=[float(dg_by_reaction.get(r.get('reaction',r.get('id')),-5+len(r.get('cofactors',[])))) for r in route]; return {'step_dg':vals,'total_dg':sum(vals),'uphill_steps':[i+1 for i,v in enumerate(vals) if v>0],'feasible':sum(vals)<0}
 def carbon_redox(route):
