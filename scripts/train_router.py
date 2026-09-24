@@ -82,7 +82,10 @@ def main() -> None:
     W, b = train_softmax(Xtr, y[tr], len(labels), seed=SEED)
     model = Router(vec, W, b, labels)
 
-    queries = json.loads((ROOT / "tests/fixtures/router_queries.json").read_text())["queries"]
+    qpath = ROOT / "tests/fixtures/router_queries.json"
+    queries = json.loads(qpath.read_text())["queries"] if qpath.exists() else []
+    if not queries:  # module display names as short queries (not in the held-out split)
+        queries = [{"q": REGISTRY[s].name, "modules": [s]} for s in labels]
     q_text = [q["q"] for q in queries]
     q_gold = [{lid[m] for m in q["modules"]} for q in queries]
 
