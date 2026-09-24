@@ -74,6 +74,10 @@ sugarcode msa a2m aln.a3m --out aligned.fa     # strip inserts -> match states
 sugarcode pdb stats mol.pdb                    # chains, residues, atoms, hetatms
 sugarcode pdb contacts mol.pdb --cutoff 4.5 --chain-a A --chain-b B
 sugarcode pdb select mol.pdb --chain A --names CA,CB --out trace.pdb
+
+# Protein properties (drop 72, ProtParam-style):
+sugarcode protein props proteins.fasta
+sugarcode protein props --sequence FVNQHLCGSHLVEALYLVCGERGFFYTPKT
 ```
 
 ## Architecture
@@ -146,7 +150,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1498 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1511 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -575,7 +579,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1498 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1511 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
