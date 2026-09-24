@@ -40,50 +40,109 @@ def _phase_normalize(s: str, start: int, u: int) -> dict:
             "canonical_unit": _canonical_unit(unit), "span_start": span_start, "span_end": span_end}
 
 
+def _min_period(unit: str) -> int:
+    n = len(unit)
+    for p in range(1, n):
+        if n % p == 0 and unit == unit[:p] * (n // p):
+            return p
+    return n
+
+
 def find_strs(seq: str, min_unit: int = 1, max_unit: int = 6, min_repeats: int = 4) -> list[dict]:
     """Tandem-repeat detection over 1-6 bp units with phase normalization.
 
-    Each hit reports the unit in a stable phase (see _phase_normalize), a
-    rotation-invariant canonical_unit, and the full periodic span including
-    partial units at either edge.
+    Every maximal period-u run (s[j] == s[j+u]) is a candidate for each unit
+    length; overlapping candidates are resolved longest-first (ties: shorter
+    unit, then leftmost), so a short homopolymer inside the flank can no
+    longer hide a longer compound repeat (GGGGTTx4 after a G-run was lost by
+    the earlier greedy left-to-right scan). Each hit reports the unit in a
+    stable phase (see _phase_normalize), a rotation-invariant canonical_unit,
+    and the full periodic span including partial units at either edge.
     """
+    import numpy as np
     s = clean_dna(seq)
     n = len(s)
+    if n == 0:
+        return []
+    arr = np.frombuffer(s.encode("ascii"), dtype=np.uint8)
+    cands = []
+    for u in range(min_unit, max_unit + 1):
+        if n < 2 * u:
+            continue
+        eq = (arr[:-u] == arr[u:]).astype(np.int8)
+        d = np.diff(np.concatenate(([0], eq, [0])))
+        starts = np.flatnonzero(d == 1)
+        ends = np.flatnonzero(d == -1)  # exclusive end of the eq run
+        keep = (ends - starts + u) >= min_repeats * u
+        for j0, j1 in zip(starts[keep].tolist(), ends[keep].tolist()):
+            unit = s[j0:j0 + u]
+            if _min_period(unit) < u:
+                continue  # homopolymers / lower-period runs are reported at their own period
+            cand = _phase_normalize(s, j0, u)
+            if cand["repeats"] >= min_repeats:
+                cands.append(cand)
+    cands.sort(key=lambda c: (-c["length"], c["unit_len"], c["start"]))
+    taken = []
     hits = []
-    i = 0
-    while i < n:
-        best = None
-        for u in range(min_unit, max_unit + 1):
-            if i + 2 * u > n:
+    def _free(lo, hi):
+        return not any(lo < t_hi and t_lo < hi for t_lo, t_hi in taken)
+
+    for c in cands:
+        lo, hi = c["start"], c["start"] + c["length"]
+        if not _free(lo, hi):
+            # Try the other reporting phases inside the same periodic span
+            # (TAx7 followed by CACAx7: the CA phase does not touch the TA run).
+            u = c["unit_len"]
+            alt = None
+            for st in range(c["span_start"], c["span_start"] + u):
+                reps = (c["span_end"] - st) // u
+                if reps >= min_repeats and _free(st, st + reps * u) and (alt is None or reps > alt[0]):
+                    alt = (reps, st)
+            if alt is None:
                 continue
-            unit = s[i:i + u]
-            if len(unit) > 1 and unit == unit[0] * len(unit):
-                continue  # homopolymer is reported at unit length 1
-            reps = 1
-            while s[i + reps * u:i + (reps + 1) * u] == unit:
-                reps += 1
-            if reps >= min_repeats:
-                cand = _phase_normalize(s, i, u)
-                if cand["repeats"] >= min_repeats and (best is None or cand["length"] > best["length"]):
-                    best = cand
-        if best:
-            hits.append(best)
-            i = max(i + 1, best["span_end"])
-        else:
-            i += 1
+            reps, st = alt
+            unit = s[st:st + u]
+            c = dict(c, start=st, unit=unit, repeats=reps, length=reps * u,
+                     canonical_unit=_canonical_unit(unit))
+            lo, hi = st, st + reps * u
+        taken.append((lo, hi))
+        hits.append(c)
+    hits.sort(key=lambda c: c["start"])
     return hits
 
 
-def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "") -> dict:
-    """Classify an STR genotype vs reference (normal/intermediate/expanded)."""
+# Published allele bands (repeat units, inclusive upper bounds), GeneReviews:
+# HTT CAG - NBK1305 table "methods to characterize HTT": normal <=26,
+#   intermediate 27-35, reduced penetrance 36-39, full penetrance >=40.
+# FMR1 CGG - NBK1384 table "types of FMR1 repeat expansion": premutation
+#   ~55-200, full mutation >200 (alleles below 55 are not premutations).
+LOCUS_BANDS = {
+    "HTT": [(26, "normal range"), (35, "intermediate range"),
+            (39, "reduced-penetrance pathogenic range"), (None, "full-penetrance pathogenic range")],
+    "FMR1": [(54, "below premutation range"), (200, "premutation range"),
+             (None, "full mutation range")],
+}
+
+
+def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "",
+                   locus: str | None = None) -> dict:
+    """Classify an STR genotype vs reference (normal/intermediate/expanded).
+
+    With a locus that has published bands (LOCUS_BANDS), the class comes from
+    those bands; the generic delta rule otherwise mislabels e.g. HTT 27-28 as
+    normal and FMR1 premutations (55-200) as pathogenic full expansions.
+    """
     delta = sample_repeats - reference_repeats
-    if delta <= 2:
+    bands = LOCUS_BANDS.get((locus or "").upper())
+    if bands:
+        cls = next(lbl for hi, lbl in bands if hi is None or sample_repeats <= hi)
+    elif delta <= 2:
         cls = "normal range"
     elif delta <= 10:
         cls = "intermediate / premutation range"
     else:
         cls = "expanded - pathogenic-range candidate"
-    return {
+    out = {
         "unit": unit,
         "reference_repeats": reference_repeats,
         "sample_repeats": sample_repeats,
@@ -91,6 +150,9 @@ def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "") 
         "classification": cls,
         "instability_risk": round(1 - math.exp(-max(delta, 0) / 12.0), 3),
     }
+    if bands:
+        out["locus"] = locus.upper()
+    return out
 
 
 # Normal-range upper bounds (repeat units) at canonical disease loci, used only
