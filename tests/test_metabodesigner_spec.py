@@ -26,3 +26,21 @@ def test_audit_lactate_flux_positive_and_malate_route_topological():
         avail |= {p.lower() for p in step["products"]}
     ids = [s["reaction"] for s in r["route"]]
     assert ids.index("R_PDH") < ids.index("R_CS") < ids.index("R_ICL") < ids.index("R_MLS")
+
+
+def _yield(target):
+    import numpy as np
+    from sugarcode.modules.metabodesigner import design_pathway, pathway_flux
+    fl = pathway_flux(design_pathway(target)["route"], target, "glucose", upper=1.0)
+    S = np.asarray(fl["stoichiometry"]["matrix"]); mets = fl["stoichiometry"]["metabolites"]
+    net = S @ np.asarray(fl["fluxes"])
+    return net[mets.index(target)] / -net[mets.index("glucose")]
+
+
+def test_sweep_glucose_yields_match_textbook():
+    # glucose -> 2 lactate, 2 ethanol (TPI recycles DHAP); 2 acetyl-CoA -> 1 3-HB
+    assert abs(_yield("lactate") - 2.0) < 1e-9
+    assert abs(_yield("ethanol") - 2.0) < 1e-9
+    assert abs(_yield("3-hydroxybutyrate") - 1.0) < 1e-9
+    ids = [s["reaction"] for s in design_pathway("lactate")["route"]]
+    assert ids.index("R_ALD") < ids.index("R_TPI") < ids.index("R_GAPDH")
