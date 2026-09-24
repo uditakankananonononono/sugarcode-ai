@@ -155,6 +155,15 @@ def shrake_rupley(atoms: Sequence[Atom], *, probe_radius: float = 1.4,
             "method": "Shrake-Rupley numerical surface sampling"}
 
 
+# AutoDock Vina X-Score radii (src/lib/atom_constants.h, xs_vdw_radii) used for
+# the Vina surface distance; they differ from the Bondi radii used for SASA.
+XS_RADII = {"C": 1.9, "N": 1.8, "O": 1.7, "S": 2.0, "P": 2.1, "F": 1.5,
+            "CL": 1.8, "BR": 2.0, "I": 2.2, "SI": 2.2,
+            "MG": 1.2, "ZN": 1.2, "FE": 1.2, "CA": 1.2, "MN": 1.2}
+# Vina hydrophobic types (xs_is_hydrophobic): C_H, F, Cl, Br, I. Sulfur is S_P
+# (not hydrophobic); carbon bonded to N/O (C_P) cannot be told apart at the
+# element level and is still counted, as the docstring states.
+VINA_HYDROPHOBIC = {"C", "F", "CL", "BR", "I"}
 VINA_WEIGHTS = {"gauss1": -0.035579, "gauss2": -0.005156,
                 "repulsion": 0.840245, "hydrophobic": -0.035069,
                 "hydrogen_bond": -0.587439, "rotors": 0.05846}
@@ -181,11 +190,11 @@ def vina_score(receptor: Sequence[Atom], ligand: Sequence[Atom], *,
         ds = np.linalg.norm(lc - rc[i], axis=1)
         for b, d in zip(ligand, ds):
             if d > cutoff_A: continue
-            s = _surface_distance(a, b, float(d)); contacts += 1
+            s = float(d) - XS_RADII.get(a.element, 1.9) - XS_RADII.get(b.element, 1.9); contacts += 1
             terms["gauss1"] += np.exp(-(s / 0.5)**2)
             terms["gauss2"] += np.exp(-((s - 3.0) / 2.0)**2)
             terms["repulsion"] += max(0.0, -s)**2
-            if a.element in HYDROPHOBIC_ELEMENTS and b.element in HYDROPHOBIC_ELEMENTS:
+            if a.element in VINA_HYDROPHOBIC and b.element in VINA_HYDROPHOBIC:
                 terms["hydrophobic"] += 1.0 if s <= 0.5 else max(0.0, 1.5 - s)
             donor_acceptor = ((a.element in DONOR_ELEMENTS and b.element in ACCEPTOR_ELEMENTS) or
                               (b.element in DONOR_ELEMENTS and a.element in ACCEPTOR_ELEMENTS))
@@ -195,8 +204,14 @@ def vina_score(receptor: Sequence[Atom], ligand: Sequence[Atom], *,
                 hbonds += int(h > 0)
             clashes += int(s < -0.5)
     terms["rotors"] = float(rotatable_bonds)
-    weighted = {k: terms[k] * VINA_WEIGHTS[k] for k in terms}
-    return {"score_kcal_mol": round(sum(weighted.values()), 4),
+    weighted = {k: terms[k] * VINA_WEIGHTS[k] for k in terms if k != "rotors"}
+    inter = sum(weighted.values())
+    # Vina divides the intermolecular energy by 1 + w_rot * N_rot
+    # (conf_independent.cpp, num_tors_div); it is not an additive penalty.
+    rot_factor = 1.0 + VINA_WEIGHTS["rotors"] * rotatable_bonds
+    weighted["rotors"] = inter / rot_factor - inter
+    return {"score_kcal_mol": round(inter / rot_factor, 4),
+            "intermolecular_kcal_mol": round(inter, 4), "rotor_divisor": round(rot_factor, 5),
             "raw_terms": {k: round(v, 5) for k, v in terms.items()},
             "weighted_terms_kcal_mol": {k: round(v, 5) for k, v in weighted.items()},
             "pair_contacts_within_cutoff": contacts, "steric_clashes": clashes,
@@ -318,10 +333,10 @@ def vina_atom_contributions(receptor: Sequence[Atom], ligand: Sequence[Atom], *,
         for j, b in enumerate(ligand):
             d = float(np.linalg.norm(rc[i]-lc[j]))
             if d > cutoff_A: continue
-            s = _surface_distance(a, b, d)
+            s = d - XS_RADII.get(a.element, 1.9) - XS_RADII.get(b.element, 1.9)
             raw = {"gauss1": np.exp(-(s/.5)**2), "gauss2": np.exp(-((s-3)/2)**2),
                    "repulsion": max(0.,-s)**2, "hydrophobic": 0., "hydrogen_bond": 0.}
-            if a.element in HYDROPHOBIC_ELEMENTS and b.element in HYDROPHOBIC_ELEMENTS:
+            if a.element in VINA_HYDROPHOBIC and b.element in VINA_HYDROPHOBIC:
                 raw["hydrophobic"] = 1. if s <= .5 else max(0.,1.5-s)
             if ((a.element in DONOR_ELEMENTS and b.element in ACCEPTOR_ELEMENTS) or
                 (b.element in DONOR_ELEMENTS and a.element in ACCEPTOR_ELEMENTS)):
@@ -335,11 +350,12 @@ def vina_atom_contributions(receptor: Sequence[Atom], ligand: Sequence[Atom], *,
                 "residue_id": a.residue_id, "contribution_kcal_mol": round(float(v),5)}
                for i,(a,v) in enumerate(zip(atoms,values))]
         return sorted(out,key=lambda x: abs(x["contribution_kcal_mol"]),reverse=True)
-    rotor = rotatable_bonds*VINA_WEIGHTS["rotors"]
     pair_sum = float(rvalues.sum()+lvalues.sum())
+    total = pair_sum/(1.0+VINA_WEIGHTS["rotors"]*rotatable_bonds)  # Vina num_tors_div
+    rotor = total-pair_sum
     pair_rows.sort(key=lambda x:x[0],reverse=True)
     return {"pair_score_kcal_mol": round(pair_sum,5), "global_rotor_penalty_kcal_mol": round(rotor,5),
-            "total_score_kcal_mol": round(pair_sum+rotor,5),
+            "total_score_kcal_mol": round(total,5),
             "receptor_atoms": rows(receptor,rvalues), "ligand_atoms": rows(ligand,lvalues),
             "strongest_pairs": [row for _,row in pair_rows[:50]],
             "accounting": "each pair contribution split equally across its two atoms; rotor penalty remains global"}
