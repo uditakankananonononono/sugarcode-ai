@@ -86,3 +86,17 @@ def test_anm_hessian_rows_sum_to_zero_six_zero_modes():
     C = np.cumsum(rng.normal(0, 2.2, (40, 3)), axis=0) * 0.5
     out = anm_modes(C.tolist(), 6, 10.0)
     assert out["modes"][0]["index"] == 6
+
+
+def test_vina_score_matches_autodock_vina_carbon_stack():
+    # AutoDock Vina 1.2.7 score_only (carbon-only rings, all C_H): -2.310, -1.650, -0.634 kcal/mol
+    import math
+    from sugarcode.modules.structural_biophysics.core import Atom, vina_score
+    ring = [(1.39 * math.cos(k * math.pi / 3), 1.39 * math.sin(k * math.pi / 3), 0.0) for k in range(6)]
+    rec = [Atom(i, "C", "BEN", "A", 1, "", "C", c) for i, c in enumerate(ring + [(x + 4.2, y, z) for x, y, z in ring])]
+    for dz, ref in ((3.6, -2.310), (4.0, -1.650), (4.6, -0.634)):
+        lig = [Atom(i, "C", "LIG", "L", 1, "", "C", (x + 2.1, y + 1.2, z + dz)) for i, (x, y, z) in enumerate(ring)]
+        assert abs(vina_score(rec, lig)["score_kcal_mol"] - ref) < 2e-3
+    lig = [Atom(i, "C", "LIG", "L", 1, "", "C", (x + 2.1, y + 1.2, z + 4.0)) for i, (x, y, z) in enumerate(ring)]
+    o = vina_score(rec, lig, rotatable_bonds=3)
+    assert abs(o["score_kcal_mol"] - o["intermolecular_kcal_mol"] / (1 + 0.05846 * 3)) < 1e-3
