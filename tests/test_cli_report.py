@@ -58,4 +58,4 @@ def test_cli_report_validate_notebook(capsys, tmp_path):
 
 def test_cli_modules_now_89(capsys):
     assert main(["modules"]) == 0
-    assert capsys.readouterr().out.startswith("89 modules")
+    assert capsys.readouterr().out.startswith("95 modules")
