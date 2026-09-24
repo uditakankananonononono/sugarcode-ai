@@ -1,6 +1,6 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
-88 modules: the 77 from the spec corpus plus 11 beyond-spec published-model
+95 modules: the 77 from the spec corpus plus 18 beyond-spec
 implementations, all registered (slugs equal their package directory names).
 
 The nine sub-networks are assigned from the module themes in the spec doc
@@ -198,6 +198,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Published Doench 2016 Cutting Frequency Determination SpCas9 off-target scoring, vendored exactly with provenance."),
     ("crisprater", "CRISPRater", "genome-editing",
      "Published CRISPRater linear sgRNA efficacy model (Labuhn et al. 2018), vendored exactly with provenance."),
+    ("crisprscan_score", "CRISPRscan Score", "genome-editing",
+     "Published CRISPRscan/Moreno-Mateos 2015 linear sgRNA activity model (35 nt context, NGG PAM), vendored exactly with provenance."),
     ("mit_offtarget", "MIT Off-Target", "genome-editing",
      "Published MIT/Hsu 2013 SpCas9 pairwise off-target scoring and aggregate guide specificity."),
     ("structural_biophysics", "Structural Biophysics", "protein-engineering",
@@ -206,6 +208,16 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Circuit architecture compiler with Hill logic, toggle/oscillator ODE simulation and seeded Gillespie expression; no synthesis claims."),
     ("dti_bench", "DTI Bench", "therapeutics",
      "Target-conditioned drug-target interaction baselines (proteochemometric ridge) with cold-start validation on ChEMBL pairs."),
+    ("chem_similarity", "Chem Similarity", "fabrication-evolution",
+     "Morgan/ECFP circular fingerprints (counts and folded bits, codes identical to RDKit), Tanimoto/Jaccard and Dice, nearest-neighbour search and similarity matrices over SMILES lists."),
+    ("chem_descriptors", "Chem Descriptors", "fabrication-evolution",
+     "Cheminformatics-lite: SMILES parser (branches, ring closures, brackets, Kekule re-aromatisation) and descriptors (average/exact MW, Hill formula, HBD/HBA, rotatable bonds, SSSR rings, Ertl TPSA, Fsp3) with Lipinski Rule-of-5 and Veber filters, oracle-tested against RDKit and PubChem."),
+    ("profile_hmm", "Profile HMM", "protein-engineering",
+     "Profile HMMs from multiple alignments (Durbin et al. 1998 Ch. 5): match/insert/delete states, pseudocounts, Viterbi path, Forward score, Baum-Welch EM training with held-out likelihood, brute-force verifiers."),
+    ("rna_nussinov", "RNA Nussinov", "synthetic-biology",
+     "Nussinov-Jacobson 1980 maximum base-pair RNA secondary structure: DP with traceback, min loop, dot-bracket, exact optimal-structure count, brute-force verifier."),
+    ("acmg_bayesian", "ACMG Bayesian", "therapeutics",
+     "Tavtigian 2018 Bayesian ACMG/AMP variant classification (exact 350^(1/2^k) odds, BA1 stand-alone override) with optional live ClinVar/PubMed context."),
     ("pgx_guidelines", "PGx Guidelines", "therapeutics",
      "CPIC-aligned pharmacogenomic decision support with provenance-preserved guideline translation."),
     ("evidence_mining", "Evidence Mining", "core-intelligence",
@@ -216,6 +228,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Reproducible, dependency-light QSAR benchmarking against ChEMBL reference data."),
     ("molecule_eval", "Molecule Eval", "fabrication-evolution",
      "Auditable evaluation of generated molecular libraries: validity, novelty and Pareto fronts vs ChEMBL reference."),
+    ("report_studio", "Report Studio", "platform",
+     "Lab-grade export engine: HTML/Markdown reports with provenance, CSV/TSV exporters, executable Jupyter notebooks and sha256-checksummed evidence bundles."),
 ]
 
 _VERIFIED = {slug for slug, _, _, _ in _MODULES}

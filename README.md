@@ -14,7 +14,7 @@ builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 ```
 pip install .
 sugarcode version
-sugarcode modules                       # the 88 registered modules (77 spec + 11 beyond-spec)
+sugarcode modules                       # the 95 registered modules (77 spec + 18 beyond-spec)
 sugarcode splice assess RB1 'c.2500-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 
@@ -24,19 +24,124 @@ sugarcode codon optimize MAAKRF --gc-min 0.4 --gc-max 0.6
 sugarcode fasta stats sequences.fa               # records, lengths, GC
 sugarcode genbank features plasmid.gb            # feature counts + spans
 sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
+
+# lab reports + notebooks (drop 62):
+sugarcode report splice RB1 'c.2490-28T>G' --format html --out report.html
+sugarcode report splice RB1 'c.2490-28T>G' --format json   # sha256 evidence bundle
+sugarcode report notebook RB1 'c.2490-28T>G' --out assessment.ipynb
+sugarcode report validate-notebook assessment.ipynb
+
+# VCF toolkit (drop 63):
+sugarcode vcf stats calls.vcf                  # variant classes, Ti/Tv, genotype counts
+sugarcode vcf filter calls.vcf --pass-only --min-qual 50 --out clean.vcf
+sugarcode vcf csv calls.vcf --sample NA12878 --out calls.csv
+
+# FASTQ toolkit (drop 64):
+sugarcode fastq stats reads.fq                 # FastQC-style summary, per-position quality
+sugarcode fastq filter reads.fq --min-mean-phred 20 --out clean.fq
+sugarcode fastq trim reads.fq --window 4 --min-phred 15 --min-len 36 --out trimmed.fq
+sugarcode fastq to-fasta reads.fq --out reads.fa
+
+# GFF3/GTF annotations (drop 65):
+sugarcode gff stats anno.gff3                  # feature/seqid/strand summary
+sugarcode gff query anno.gff3 --chrom chr1 --start 180 --end 850 --type CDS
+sugarcode gff filter anno.gff3 --type gene --seqid chr1 --out genes.gff3
+sugarcode gff csv anno.gff3 --out anno.csv
+
+# BED intervals (drop 66):
+sugarcode bed stats peaks.bed                  # interval/width/coverage summary
+sugarcode bed merge peaks.bed --out merged.bed
+sugarcode bed to-gff peaks.bed --feature-type peak --out peaks.gff3
+
+# SAM alignments (drop 67, text SAM):
+sugarcode sam stats aln.sam                    # mapping rate, MAPQ, per-reference
+sugarcode sam filter aln.sam --mapped-only --min-mapq 30 --out mapped.sam
+sugarcode sam to-bed aln.sam --out reads.bedsugarcode sam pileup aln.sam --min-mapq 30           # per-position base counts (drop 70)
+
+# Newick trees (drop 68):
+sugarcode phylo stats tree.nwk                 # shape, total length, height
+sugarcode phylo mrca tree.nwk --leaves A,B
+sugarcode phylo distance tree.nwk --a A --b D
+sugarcode phylo prune tree.nwk --drop B,D --out pruned.nwk
+sugarcode phylo dist --fasta aln.fa --model jc69   # distance matrix (drop 78)
+sugarcode phylo build --fasta aln.fa --method nj --model k80
+sugarcode phylo cophenetic tree.nwk
+
+# Alignments (drop 69, Stockholm or A3M - auto-detected):
+sugarcode msa stats aln.sto                    # nseq, width, gaps, mean identity
+sugarcode msa consensus aln.sto --threshold 0.6
+sugarcode msa pid aln.sto --a seq1 --b seq2
+sugarcode msa a2m aln.a3m --out aligned.fa     # strip inserts -> match states
+
+# Structures (drop 71, PDB or mmCIF - auto-detected):
+sugarcode pdb stats mol.pdb                    # chains, residues, atoms, hetatms
+sugarcode pdb contacts mol.pdb --cutoff 4.5 --chain-a A --chain-b B
+sugarcode pdb select mol.pdb --chain A --names CA,CB --out trace.pdb
+
+# Protein properties (drop 72, ProtParam-style):
+sugarcode protein props proteins.fasta
+sugarcode protein props --sequence FVNQHLCGSHLVEALYLVCGERGFFYTPKT
+
+# Primers (drop 73):
+sugarcode primer tm CGTTCCAAAGATGTGGGCATGAGCTTAC   # SantaLucia NN Tm + GC%
+sugarcode primer check GGGGAAACCCC                # hairpin/dimer heuristics
+sugarcode primer pick template.fa --region 250:350 --n 3
+
+# Motifs (drop 74):
+sugarcode motif scan --jaspar MA0001.jaspar --fasta promoters.fa --fraction 0.8
+sugarcode motif info --iupac RGYWRC
+sugarcode motif to-jaspar --sites aligned_sites.fa
+
+# Restriction digests (drop 75, 610 enzymes from REBASE via Biopython):
+sugarcode digest run --fasta plasmid.fa --enzymes EcoRI,BamHI --circular
+sugarcode digest info EcoRI
+sugarcode digest list --match hind
+
+# Pairwise alignment (drop 76, Needleman-Wunsch + Smith-Waterman, affine gaps):
+sugarcode align run --a GATTACA --b GATACA                       # global DNA, match/mismatch
+sugarcode align run --a WWKNDE --b WWKE --mode local --matrix BLOSUM62
+sugarcode align run --fasta pair.fa --gap-open 11 --gap-extend 2
+
+# Differential expression (drop 82, simple per-gene tests - not an NB model):
+sugarcode de run --counts counts.tsv --groups ctrl,ctrl,ko,ko --method welch
+sugarcode de run --counts counts.tsv --groups ctrl,ctrl,ko,ko --out de.tsv
+
+# Genetics stats (drop 81, HWE exact / association / FDR):
+sugarcode gstats hwe --aa 30 --ab 45 --bb 25           # Wigginton 2005 exact
+sugarcode gstats allelic --cases 10,20,30 --controls 30,20,10 --yates
+sugarcode gstats or --a 40 --b 60 --c 50 --d 50      # OR + Woolf 95% CI
+sugarcode gstats adjust --pvalues 0.001,0.02,0.4 --method bh
+
+# RNA-seq counts (drop 80, CPM/RPKM/TPM + DESeq median-of-ratios):
+sugarcode rnaseq normalize --counts counts.tsv --method tpm --lengths lens.tsv
+sugarcode rnaseq sizefactors --counts counts.tsv        # Anders & Huber 2010
+sugarcode rnaseq filter --counts counts.tsv --min-count 10 --min-samples 2
+
+# ORFs + translation (drop 79, NCBI tables 1/2/4/11 vendored):
+sugarcode orf translate ATGAAAGGCTAA --table 1
+sugarcode orf find --fasta contigs.fa --min-aa 100 --allow-truncated
+sugarcode orf find --sequence GTGAAATAA --table 11 --starts table
+
+# k-mers (drop 77, canonical counts + Mash-style minimizer sketches):
+sugarcode kmer count --file reads.fq --k 21 --top 5
+sugarcode kmer compare --file-a genome1.fa --file-b genome2.fa --k 21
+sugarcode kmer compare --a ACGTACGT --b ACGTACGA --k 5 --w 3    # sketch estimate
+sugarcode kmer sketch --file genome.fa --k 21 --w 20
 ```
 
 ## Architecture
 
 ```
 src/omega/            Omega OS v7.0 framework
-  registry.py         All 88 registered modules (77 spec + 11 beyond-spec) + 9 sub-networks + lifecycle status
+  registry.py         All 95 registered modules (77 spec + 18 beyond-spec) + 9 sub-networks + lifecycle status
   health.py           Per-module import/self-test health, global compute flux
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
 src/sugarcode/
-  bio/                Shared scientific toolkit: sequence ops, FASTA, codon
-                      usage/CAI, position weight matrices
+  bio/                Shared scientific toolkit: sequence ops, FASTA, FASTQ,
+                      VCF, GFF3/GTF, BED, SAM, GenBank, codon usage/CAI, PWMs
+  report/             Report & export engine: HTML/Markdown reports, CSV/TSV,
+                      evidence bundles, .ipynb generation (drop 62)
   modules/<slug>/     One package per module
 tests/                pytest suite - one named test per public behavior
 spec/                 The spec doc split into 77 module spec files + index
@@ -50,16 +155,16 @@ assignments are derived from module themes:
 | Sub-network | Modules |
 |---|---|
 | core-intelligence | 8 |
-| genome-editing | 16 |
-| protein-engineering | 6 |
-| synthetic-biology | 13 |
+| genome-editing | 17 |
+| protein-engineering | 7 |
+| synthetic-biology | 14 |
 | cellular-systems | 11 |
-| therapeutics | 15 |
+| therapeutics | 16 |
 | microbiome-phage | 7 |
-| fabrication-evolution | 8 |
+| fabrication-evolution | 10 |
 | platform | 4 |
 
-Counts include the 11 beyond-spec modules registered after the audit fix
+Counts include the 17 beyond-spec modules registered after the audit fix
 (see the build status ledger below).
 
 ## Build status ledger (honest counts)
@@ -69,11 +174,11 @@ Neuro-Hub's text says an "**84-node** neural stack". **77 modules are actually
 specified** in the document; all 77 are registered and spec-filed. We build and
 count against the 77 that exist, not the 78/84 claimed.
 
-Beyond the spec, 11 more real published-model/computational modules were built
-(cfd_offtarget, crisprater, mit_offtarget, structural_biophysics, syn_bio_studio,
-dti_bench, pgx_guidelines, evidence_mining, neuro_hub_dashboard, qsar_bench,
-molecule_eval). Since the audit-fix drop every one of them is registered, so the
-canonical registry now holds **88 modules**, every registry slug equals its
+Beyond the spec, 18 more modules (17 real published-model/computational modules were built
+(cfd_offtarget, crisprater, crisprscan_score, mit_offtarget, structural_biophysics,
+syn_bio_studio, rna_nussinov, profile_hmm, dti_bench, acmg_bayesian, pgx_guidelines, evidence_mining, neuro_hub_dashboard,
+qsar_bench, molecule_eval, chem_descriptors, chem_similarity), plus report_studio (lab report/export engine, pb3). Since the audit-fix drop every one of them is registered,
+so the canonical registry now holds **95 modules**, every registry slug equals its
 package directory name, and every package under `src/sugarcode/modules/` is
 registered. The spec corpus stays 77 files because the spec document has 77.
 
@@ -94,7 +199,16 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| audit-fix | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
+| report_studio + 21 bio toolkits (pb3) | **89 registered (77 spec + 12 beyond-spec)**; report_studio lab report/export engine plus sugarcode.bio toolkits (VCF, FASTQ, GFF, BED, SAM, Newick, Stockholm, pileup, PDB, protein props, primers, motifs, restriction, alignment, k-mers, phylo, ORFs, RNA-seq, genome stats, DE) | 0 | 0 | 1642 passing |
+| crisprscan promotion (pb6) | **89 registered (77 spec + 12 beyond-spec)**; orphaned crisprscan_score (Moreno-Mateos 2015, byte-exact vendored coefficients) promoted + Rule Set 2 port in crispr_opt | 0 | 0 | 1371 passing, 1 skipped |
+| acmg_bayesian (pb6) | **90 registered (77 spec + 13 beyond-spec)**; Tavtigian 2018 Bayesian ACMG/AMP classifier (exact 350^(1/2^k) odds, BA1 stand-alone override, all Table 2/3 rows as fixtures) + optional ClinVar/PubMed context; replaces the unpromoted clinical_evidence_fusion orphan | 0 | 0 | 1404 passing, 1 skipped |
+| rna_nussinov (pb6) | **91 registered (77 spec + 14 beyond-spec)**; Nussinov-Jacobson 1980 max base-pair RNA folding (traceback, min loop, dot-bracket, exact optimal-structure count, stats), hand fixtures + brute-force verifier | 0 | 0 | 1426 passing, 1 skipped |
+| profile_hmm (pb6) | **92 registered (77 spec + 15 beyond-spec)**; Durbin Ch. 5 profile HMM from alignments (M/I/D states, pseudocounts), Viterbi path, Forward score, log-odds; hand fixtures + brute-force path enumerator | 0 | 0 | 1437 passing, 1 skipped |
+| profile_hmm Baum-Welch (pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | 1450 passing, 1 skipped |
+| chem_descriptors (pb6) | **93 registered (77 spec + 16 beyond-spec)**; pure-Python SMILES parser + MW/exact MW, formula, HBD/HBA, rotatable bonds, rings, Ertl TPSA, Fsp3, Lipinski Ro5 + Veber; every descriptor equals RDKit 2024.09.6 on a 66-drug ladder (aromatic and Kekule SMILES) and a 60-SMILES stress set bar 3 documented cases | 0 | 0 | 1458 passing, 1 skipped |
+| chem_similarity (pb6) | **94 registered (77 spec + 17 beyond-spec)**; Morgan/ECFP count + folded-bit fingerprints with codes identical to RDKit, Tanimoto/Jaccard/Dice, nearest-neighbour search; RDKit oracle on PubChem CIDs 1-400 (radius 1-3 exact, bulk similarities to 1e-12); aromaticity perception extended (exocyclic C=C, pyrrolide N-, fused-pair envelope) | 0 | 0 | 1466 passing, 1 skipped |
+| pb3 + pb6 integration (current) | **95 registered (77 spec + 18 beyond-spec)**; pb3 and pb6 merged to main; pb6 rows above were counted on its own branch before report_studio | 0 | 0 | 1709 passing, 7 skipped |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -196,8 +310,11 @@ Status per module: **verified** = implemented with passing named tests;
   against the reference implementations. `design_guides` now scores with the
   published models end-to-end; guides at sequence edges (no 30-mer context)
   are labeled `heuristic_edge_fallback`, never silently. Rule Set 2
-  (Fusi/Azimuth) is **Missing**: its pickled sklearn model is not portably
-  loadable on modern stacks - labeled, not faked.
+  (Fusi/Doench 2016, Azimuth V3) now RUNS in crispr_opt (rule_set_2.py,
+  branch pb6): the published gradient-boosted model was ported out of its
+  unloadable sklearn-0.17 pickle into JSON + a pure-NumPy evaluator and is
+  bit-faithful to Microsoft's own 947-guide saved-model fixture
+  (max abs error 5e-10 vs Microsoft's 1e-3 test tolerance).
 - Ensembl REST is unreachable from the build environment (HTTP 500 on all
   endpoints, later connection timeout on final retry - treated as unusable);
   OpenClinVar uses live ClinVar + curated exemplars instead.
@@ -523,7 +640,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1355 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1642 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
