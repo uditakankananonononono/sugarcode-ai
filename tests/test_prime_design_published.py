@@ -24,3 +24,11 @@ def test_pbs_comes_from_spacer_flap_not_edit_seq():
     d1 = design_pegrna(SPACER, "AAAAAAAAAAAAAA", pbs_len=12, rtt_len=14)
     d2 = design_pegrna(SPACER, "CCCCCCCCCCCCCC", pbs_len=12, rtt_len=14)
     assert d1["pbs"] == d2["pbs"] == PBS
+
+
+def test_insertion_edit_with_empty_ref_does_not_crash():
+    from sugarcode.modules.prime_design import design_edit
+    region = "CCTGGGTCAATCCTTGGGGCCCAGACTGAGCACGTGATGGCAGAGGAAAGG"
+    r = design_edit(region, {"type": "insertion", "position": 32, "ref": "", "alt": "CTT"})
+    assert r["pegrna_designs"] and r["pegrna_designs"][0]["spacer"] == "GGCCCAGACTGAGCACGTGA"
+    assert r["pegrna_designs"][0]["pbs"] == "GTGCTCAGTCTG"  # published PBS
