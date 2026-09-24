@@ -13,6 +13,10 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   vcf stats FILE                 variant classes, Ti/Tv, genotype counts (drop 63)
   fastq stats FILE               FastQC-style read/quality summary (drop 64)
   gff stats FILE                 GFF3/GTF feature summary (drop 65)
+  bed stats FILE                 BED interval summary (drop 66)
+  bed merge FILE [--out F]       merge overlapping intervals
+  bed filter FILE [--chrom .. --min-width N --min-score N]
+  bed to-gff FILE [--feature-type T]
   gff query FILE --chrom X --start A --end B [--type ..]
   gff filter FILE [--type .. --seqid .. --no-children --out F]
   gff csv FILE
@@ -319,6 +323,58 @@ def _cmd_gff_csv(args) -> int:
 
 
 
+def _cmd_bed_stats(args) -> int:
+    from .bio.bed import parse_bed, stats
+    b = parse_bed(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(b)})
+
+
+def _cmd_bed_merge(args) -> int:
+    from .bio.bed import parse_bed, write_bed, merge_intervals
+    b = parse_bed(Path(args.file).read_text())
+    merged = merge_intervals(b["records"])
+    text = write_bed({"header": b["header"], "records": merged})
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(merged)} merged of {len(b['records'])} intervals)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_bed_filter(args) -> int:
+    from .bio.bed import parse_bed, write_bed, filter_records
+    b = parse_bed(Path(args.file).read_text())
+    out = filter_records(
+        b,
+        chroms=[x for x in (args.chrom or "").split(",") if x] or None,
+        min_width=args.min_width, min_score=args.min_score)
+    text = write_bed(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out} ({len(out['records'])} of {len(b['records'])} records)")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+def _cmd_bed_to_gff(args) -> int:
+    from .bio.bed import parse_bed, to_gff
+    from .bio.gff import write_gff
+    b = parse_bed(Path(args.file).read_text())
+    records = to_gff(b["records"], source=args.source,
+                     feature_type=args.feature_type)
+    text = write_gff({"directives": ["##gff-version 3"], "comments": [],
+                      "format": "gff3", "records": records})
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -371,6 +427,29 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    bd = sub.add_parser("bed", help="BED interval toolkit (0-based half-open)")
+    bdsub = bd.add_subparsers(dest="sub", required=True)
+    bs = bdsub.add_parser("stats", help="interval count/width/coverage summary")
+    bs.add_argument("file")
+    bs.set_defaults(func=_cmd_bed_stats)
+    bm = bdsub.add_parser("merge", help="merge overlapping intervals per chrom")
+    bm.add_argument("file")
+    bm.add_argument("--out", default=None)
+    bm.set_defaults(func=_cmd_bed_merge)
+    bf = bdsub.add_parser("filter", help="filter by chrom/width/score")
+    bf.add_argument("file")
+    bf.add_argument("--chrom", default=None)
+    bf.add_argument("--min-width", type=int, default=None)
+    bf.add_argument("--min-score", type=float, default=None)
+    bf.add_argument("--out", default=None)
+    bf.set_defaults(func=_cmd_bed_filter)
+    bg = bdsub.add_parser("to-gff", help="convert to GFF3 (coordinate math done)")
+    bg.add_argument("file")
+    bg.add_argument("--source", default="bed")
+    bg.add_argument("--feature-type", default="region")
+    bg.add_argument("--out", default=None)
+    bg.set_defaults(func=_cmd_bed_to_gff)
 
     gf = sub.add_parser("gff", help="GFF3/GTF annotation toolkit")
     gfsub = gf.add_subparsers(dest="sub", required=True)
