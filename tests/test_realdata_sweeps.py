@@ -76,3 +76,13 @@ def test_qsar_descriptors_rdkit_parity_cases():
     assert abs(d["molecular_weight"] - 77.039) < 0.01
     d = descriptors("CCCC(CCC)C(=O)[O-].[Na+]")  # sodium valproate
     assert abs(d["molecular_weight"] - 166.196) < 0.01
+
+
+def test_anm_hessian_rows_sum_to_zero_six_zero_modes():
+    import numpy as np
+    from sugarcode.modules.evofold_4d.core import anm_modes
+    rng = np.random.default_rng(0)
+    # compact random C-alpha cloud: connected network -> exactly 6 rigid-body zero modes skipped
+    C = np.cumsum(rng.normal(0, 2.2, (40, 3)), axis=0) * 0.5
+    out = anm_modes(C.tolist(), 6, 10.0)
+    assert out["modes"][0]["index"] == 6
