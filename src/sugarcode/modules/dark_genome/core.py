@@ -92,6 +92,11 @@ import math
 import numpy as np
 from collections import Counter
 
+_IUPAC_BASES = {k: set(v) for k, v in {
+    'A': 'A', 'C': 'C', 'G': 'G', 'T': 'T', 'R': 'AG', 'Y': 'CT', 'W': 'AT',
+    'S': 'GC', 'K': 'GT', 'M': 'AC', 'N': 'ACGT', 'V': 'ACG', 'H': 'ACT',
+    'D': 'AGT', 'B': 'CGT'}.items()}
+
 def coordinate_field(seq,cell_state=None,bin_size=50):
     """Continuous per-bin regulatory embedding from sequence and cell state."""
     s=clean_dna(seq); state={"atac":.5,"h3k27ac":.5,"methylation":.5,**(cell_state or {})}; bins=[]
@@ -127,7 +132,7 @@ def graph_propagate(graph,perturbations=None,steps=3,damping=.6):
 def motif_binding_energy(sequence,motif):
     s=clean_dna(sequence); motif=motif.upper(); scores=[]
     for i in range(max(0,len(s)-len(motif)+1)):
-        match=sum(a==b or b in 'NRWYKMSVHD' for a,b in zip(s[i:i+len(motif)],motif))/len(motif); shape=.5*(s[i:i+len(motif)].count('A')+s[i:i+len(motif)].count('T'))/len(motif); scores.append({"position":i,"match":match,"minor_groove_proxy":shape,"energy_kcal_mol":-8*match+.8*shape})
+        match=sum(a in _IUPAC_BASES[b] for a,b in zip(s[i:i+len(motif)],motif))/len(motif); shape=.5*(s[i:i+len(motif)].count('A')+s[i:i+len(motif)].count('T'))/len(motif); scores.append({"position":i,"match":match,"minor_groove_proxy":shape,"energy_kcal_mol":-8*match+.8*shape})
     return min(scores,key=lambda x:x['energy_kcal_mol']) if scores else {"position":None,"match":0,"minor_groove_proxy":0,"energy_kcal_mol":0}
 
 def nucleosome_positioning(seq,window=147,step=25):
