@@ -76,24 +76,73 @@ def _pae_matrix(ss: list[str]) -> list[list[float]]:
     return pae
 
 
+# Virtual C-alpha geometry (Oldfield & Hubbard 1994; Levitt 1976): consecutive
+# trans CA-CA = 3.80 A; virtual bond angle / dihedral per secondary state.
+CA_CA = 3.80
+_CA_GEOM = {"H": (91.0, 50.0), "E": (123.0, -170.0), "C": (110.0, -120.0)}
+_DIHEDRAL_FALLBACK = (-120.0, 60.0, -60.0, 180.0, 120.0, -170.0, 0.0, 90.0, -90.0)
+MIN_NONBONDED_CA = 4.0
+
+
+def _place(a, b, c, bond, angle_deg, torsion_deg):
+    """NeRF: place atom d with |cd|=bond, angle(b,c,d)=angle, dihedral(a,b,c,d)=torsion."""
+    ang, tor = math.radians(angle_deg), math.radians(torsion_deg)
+    bc = c - b; bc /= np.linalg.norm(bc)
+    n = np.cross(b - a, bc); n /= np.linalg.norm(n)
+    m = np.cross(n, bc)
+    d2 = np.array([-bond * math.cos(ang), bond * math.sin(ang) * math.cos(tor), bond * math.sin(ang) * math.sin(tor)])
+    return c + d2[0] * bc + d2[1] * m + d2[2] * n
+
+
 def _backbone(seq: str, ss: list[str]) -> np.ndarray:
-    """Idealized C-alpha trace: helix (100 deg, 1.5 A rise), strand (extended), coil."""
-    coords = np.zeros((len(seq), 3))
-    pos = np.array([0.0, 0.0, 0.0])
-    direction = np.array([1.0, 0.0, 0.0])
-    helix_angle = math.radians(100.0)
-    for i, s in enumerate(ss):
-        coords[i] = pos
-        if s == "H":
-            theta = helix_angle * i
-            step = np.array([0.0, 3.8 * math.cos(theta) * 0.4, 3.8 * math.sin(theta) * 0.4])
-            step[0] = 1.5
-        elif s == "E":
-            step = direction * 3.4
-        else:
-            step = direction * 3.0 + np.array([0, 0.6 * math.sin(i * 1.7), 0.4 * math.cos(i * 2.3)])
-        pos = pos + step
+    """Physically consistent C-alpha trace built by NeRF from ideal virtual geometry.
+
+    Every consecutive CA-CA distance is 3.80 A; angles/dihedrals follow the
+    predicted state (helix 91/50, strand 123/-170, coil 110/-120). Coil and
+    junction residues try fallback dihedrals greedily so no non-adjacent pair
+    (|i-j|>=3) sits closer than 4.0 A when avoidable. Idealized, not a fold prediction.
+    """
+    n = len(seq)
+    coords = np.zeros((n, 3))
+    if n == 0:
+        return coords
+    first = _CA_GEOM[ss[0]][0]
+    seeds = [np.zeros(3), np.array([CA_CA, 0.0, 0.0])]
+    t = math.radians(180.0 - first)
+    seeds.append(seeds[1] + CA_CA * np.array([math.cos(t), math.sin(t), 0.0]))
+    for i in range(min(n, 3)):
+        coords[i] = seeds[i]
+    for i in range(3, n):
+        angle, pref = _CA_GEOM[ss[i - 1]]
+        options = [pref] + [pref + d for d in (15, -15, 30, -30)] + list(_DIHEDRAL_FALLBACK)
+        best, best_gap = None, -1.0
+        for tor in options:
+            x = _place(coords[i - 3], coords[i - 2], coords[i - 1], CA_CA, angle, tor)
+            gap = float(np.min(np.linalg.norm(coords[: i - 2] - x, axis=1))) if i >= 3 else 99.0
+            if gap >= MIN_NONBONDED_CA:
+                best = x
+                break
+            if gap > best_gap:
+                best, best_gap = x, gap
+        coords[i] = best
     return coords
+
+
+def backbone_geometry(coords) -> dict:
+    """Geometry audit for a CA trace: bond lengths, virtual angles, clashes."""
+    c = np.asarray(coords, float)
+    if len(c) < 2:
+        return {"n": len(c), "ca_ca_min": 0.0, "ca_ca_max": 0.0, "ca_ca_mean": 0.0, "min_nonadjacent": 0.0, "clash_count": 0, "angles_deg": []}
+    bonds = np.linalg.norm(np.diff(c, axis=0), axis=1)
+    ang = []
+    for i in range(1, len(c) - 1):
+        u, v = c[i - 1] - c[i], c[i + 1] - c[i]
+        ang.append(math.degrees(math.acos(max(-1, min(1, float(u @ v / (np.linalg.norm(u) * np.linalg.norm(v))))))))
+    d = np.linalg.norm(c[:, None] - c[None], axis=2)
+    iu = np.triu_indices(len(c), 3)
+    nb = d[iu] if len(iu[0]) else np.array([99.0])
+    return {"n": len(c), "ca_ca_min": float(bonds.min()), "ca_ca_max": float(bonds.max()), "ca_ca_mean": float(bonds.mean()),
+            "min_nonadjacent": float(nb.min()), "clash_count": int(np.sum(nb < 3.5)), "angles_deg": ang}
 
 
 def write_pdb(seq: str, coords: np.ndarray, confidence: list[float]) -> str:
@@ -283,4 +332,43 @@ def folding_workspace(sequence,msa=None):
     base=predict_structure(sequence); seq=''.join(a for a in sequence.upper() if a in CF); ss=list(base['secondary_structure']); coords=_backbone(seq,ss); charge=[1 if a in 'KR' else -1 if a in 'DE' else 0 for a in seq]; graph=residue_graph(coords); energy=physical_energy(coords,charge); couplings=msa_couplings(msa) if msa else None; return {**base,'coordinates':coords.tolist(),'residue_graph':graph,'energy':energy,'msa':couplings,'pair_representation':couplings['mutual_information'] if couplings else None,'model_status':'Chou-Fasman, MSA mutual information and explicit geometry/energy; no AlphaFold neural weights and pLDDT/PAE are analogs, not calibrated predictions.'}
 
 def structure_diagnostics(sequence,msa=None):
-    r=folding_workspace(sequence,msa); p=np.asarray(r['pae']); c=np.asarray(r['plddt_per_residue']); e=r['energy']; g=r['residue_graph']; return {'length':float(r['length']),'mean_plddt_analog':r['mean_plddt'],'plddt_std':float(c.std()),'plddt_min':float(c.min()),'pae_mean':float(p.mean()),'pae_max':float(p.max()),'helix_count':float(r['composition']['helix']),'strand_count':float(r['composition']['strand']),'coil_count':float(r['composition']['coil']),'graph_edges':float(len(g['edges'])),'lj_energy':e['lennard_jones'],'electrostatic_energy':e['electrostatic'],'total_energy':e['total'],'msa_effective_depth':float(r['msa']['effective_depth'] if r['msa'] else 0)}
+    """Flat numeric diagnostic panel (>=50 features) from folding_workspace()."""
+    r=folding_workspace(sequence,msa); p=np.asarray(r['pae'],float); c=np.asarray(r['plddt_per_residue'],float); e=r['energy']; g=r['residue_graph']
+    seq=''.join(a for a in sequence.upper() if a in CF); X=np.asarray(r['coordinates'],float); geo=backbone_geometry(X); n=len(seq); ss=r['secondary_structure']
+    D=np.linalg.norm(X[:,None]-X[None],axis=2); ii,jj=np.triu_indices(n,3); contacts=D[ii,jj]<8.0 if len(ii) else np.zeros(0,bool)
+    sep=(jj-ii)[contacts] if len(ii) else np.zeros(0)
+    rg=float(np.sqrt(((X-X.mean(0))**2).sum(1).mean())); ang=np.asarray(geo['angles_deg'] or [0.0])
+    segs=[]; k=0
+    while k<n:
+        j=k
+        while j<n and ss[j]==ss[k]: j+=1
+        segs.append((ss[k],j-k)); k=j
+    seg_len=lambda t:[L for s_,L in segs if s_==t]
+    hl,el,cl=seg_len('H'),seg_len('E'),seg_len('C')
+    same=np.array([[ss[i]==ss[j] for j in range(n)] for i in range(n)])
+    hyd=set('AILMFWVC'); pos=set('KR'); neg=set('DE'); arom=set('FWY')
+    comp=r['composition']; msa_=r['msa']
+    d={'length':float(n),'mean_plddt_analog':float(r['mean_plddt']),'plddt_std':float(c.std()),'plddt_min':float(c.min()),'plddt_max':float(c.max()),
+       'plddt_median':float(np.median(c)),'plddt_p10':float(np.percentile(c,10)),'plddt_p90':float(np.percentile(c,90)),
+       'frac_plddt_ge_90':float(np.mean(c>=90)),'frac_plddt_ge_70':float(np.mean(c>=70)),'frac_plddt_lt_50':float(np.mean(c<50)),
+       'pae_mean':float(p.mean()),'pae_max':float(p.max()),'pae_median':float(np.median(p)),'pae_intra_element_mean':float(p[same].mean()),
+       'pae_inter_element_mean':float(p[~same].mean()) if (~same).any() else 0.0,
+       'helix_count':float(comp['helix']),'strand_count':float(comp['strand']),'coil_count':float(comp['coil']),
+       'helix_fraction':comp['helix']/n,'strand_fraction':comp['strand']/n,'coil_fraction':comp['coil']/n,
+       'helix_segments':float(len(hl)),'strand_segments':float(len(el)),'coil_segments':float(len(cl)),
+       'mean_helix_length':float(np.mean(hl)) if hl else 0.0,'mean_strand_length':float(np.mean(el)) if el else 0.0,
+       'longest_helix':float(max(hl,default=0)),'longest_strand':float(max(el,default=0)),'longest_coil':float(max(cl,default=0)),
+       'ca_ca_mean':geo['ca_ca_mean'],'ca_ca_min':geo['ca_ca_min'],'ca_ca_max':geo['ca_ca_max'],
+       'virtual_angle_mean':float(ang.mean()),'virtual_angle_std':float(ang.std()),
+       'min_nonadjacent_ca':geo['min_nonadjacent'],'clash_count':float(geo['clash_count']),
+       'radius_of_gyration':rg,'rg_per_residue_scaling':rg/(n**(1/3)) if n else 0.0,'end_to_end_distance':float(D[0,-1]) if n>1 else 0.0,
+       'max_dimension':float(D.max()),'contact_count_8A':float(contacts.sum()),'contacts_per_residue':float(contacts.sum())/n,
+       'long_range_contacts':float(np.sum(sep>=12)),'relative_contact_order':float(sep.mean()/n) if len(sep) else 0.0,
+       'graph_edges':float(len(g['edges'])),'lj_energy':float(e['lennard_jones']),'electrostatic_energy':float(e['electrostatic']),
+       'total_energy':float(e['total']),'energy_per_residue':float(e['total'])/n,
+       'hydrophobic_fraction':sum(a in hyd for a in seq)/n,'aromatic_fraction':sum(a in arom for a in seq)/n,
+       'net_charge':float(sum(a in pos for a in seq)-sum(a in neg for a in seq)),'glycine_proline_fraction':sum(a in 'GP' for a in seq)/n,
+       'candidate_site_count':float(len(r['candidate_binding_sites'])),
+       'msa_depth':float(msa_['depth'] if msa_ else 0),'msa_effective_depth':float(msa_['effective_depth'] if msa_ else 0),
+       'msa_mean_entropy':float(np.mean(msa_['entropy'])) if msa_ else 0.0,'msa_max_coupling':float(np.max(msa_['mutual_information'])) if msa_ else 0.0}
+    return d
