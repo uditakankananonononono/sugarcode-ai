@@ -25,7 +25,7 @@ def module_health(slug: str) -> dict:
 
 
 def compute_flux() -> dict:
-    """Global compute flux: health across all 92 registered modules, grouped by sub-network."""
+    """Global compute flux: health across all 93 registered modules, grouped by sub-network."""
     results = [module_health(s) for s in REGISTRY]
     by_sn: dict[str, dict] = {}
     for r in results:

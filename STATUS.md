@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 24 profile_hmm tests incl. Baum-Welch (**1450 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 24 profile_hmm tests incl. Baum-Welch and 8 chem_descriptors oracle tests (**1458 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -139,6 +139,26 @@ continues drop by drop in order of scientific usefulness.
   (one-based motif starts, additive intercept + features, GG required at
   positions 28-29). Recovered from orphaned commit 35e0995 per the audit-fix
   note; clinical_evidence_fusion stays orphaned in history (b78b943) - see below.
+- chem_descriptors: NEW MODULE (2026-09-24, branch pb6). Cheminformatics-lite at
+  src/sugarcode/modules/chem_descriptors/, registered under fabrication-evolution
+  (93 modules total). Pure-Python SMILES parser (organic subset + bracket atoms,
+  all bond symbols, branches, single-digit and %nn ring closures, salts; Kekule
+  rings re-aromatised by 4n+2 over single rings and fused pairs) and
+  descriptors: average/exact MW from the vendored RDKit periodic table, Hill
+  formula, RDKit-definition HBD/HBA, Lipinski NHOH/NO counts, Strict rotatable
+  bonds, minimum-cycle-basis ring counts, Ertl TPSA (RDKit MolSurf fragment
+  rules, optional S/P), Fsp3; Lipinski Rule-of-5 and Veber filters. Verified:
+  on a 66-molecule drug ladder every descriptor equals RDKit 2024.09.6 from
+  both RDKit aromatic and PubChem Kekule SMILES, formulas equal PubChem, MW
+  within PubChem rounding; 60-SMILES stress set equals RDKit except 3
+  documented cases (carbon-free Hill order, explicit [2H] atoms). RDKit is an
+  offline oracle only (values frozen in tests/fixtures/chem_descriptors_oracle.json;
+  regeneration scripts in scripts/). Limits: no stereochemistry, no logP model
+  (Lipinski logP is Missing unless supplied; a single other violation then
+  reads Undetermined), ring count is cycle rank (RDKit's symmetrized SSSR adds
+  one ring for adamantane/cubane), aromaticity needing 3+ fused rings as a whole
+  is not perceived, no wildcards/reactions/SMARTS. PubChem's Cactvs TPSA uses
+  different fragments and differs from Ertl/RDKit on several drugs.
 - profile_hmm: NEW MODULE (2026-09-24, branch pb6). Profile HMMs from multiple
   alignments per Durbin et al. 1998 Chapter 5 (Fig. 5.2 topology) and Krogh et
   al. 1994, at src/sugarcode/modules/profile_hmm/, registered under

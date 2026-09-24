@@ -14,7 +14,7 @@ builds - drop 58 root cause). Upgrade with `pip install -U pip` if unsure.
 ```
 pip install .
 sugarcode version
-sugarcode modules                       # the 92 registered modules (77 spec + 15 beyond-spec)
+sugarcode modules                       # the 93 registered modules (77 spec + 16 beyond-spec)
 sugarcode splice assess RB1 'c.2500-28T>G'   # deepsplice live assessment, JSON out
 sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 
@@ -30,7 +30,7 @@ sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
 
 ```
 src/omega/            Omega OS v7.0 framework
-  registry.py         All 92 registered modules (77 spec + 15 beyond-spec) + 9 sub-networks + lifecycle status
+  registry.py         All 93 registered modules (77 spec + 16 beyond-spec) + 9 sub-networks + lifecycle status
   health.py           Per-module import/self-test health, global compute flux
   search.py           Unified BM25-style biological search over the module corpus
   api.py              FastAPI surface (/modules /subnetworks /health /search)
@@ -56,10 +56,10 @@ assignments are derived from module themes:
 | cellular-systems | 11 |
 | therapeutics | 16 |
 | microbiome-phage | 7 |
-| fabrication-evolution | 8 |
+| fabrication-evolution | 9 |
 | platform | 4 |
 
-Counts include the 15 beyond-spec modules registered after the audit fix
+Counts include the 16 beyond-spec modules registered after the audit fix
 (see the build status ledger below).
 
 ## Build status ledger (honest counts)
@@ -69,11 +69,11 @@ Neuro-Hub's text says an "**84-node** neural stack". **77 modules are actually
 specified** in the document; all 77 are registered and spec-filed. We build and
 count against the 77 that exist, not the 78/84 claimed.
 
-Beyond the spec, 15 more real published-model/computational modules were built
+Beyond the spec, 16 more real published-model/computational modules were built
 (cfd_offtarget, crisprater, crisprscan_score, mit_offtarget, structural_biophysics,
 syn_bio_studio, rna_nussinov, profile_hmm, dti_bench, acmg_bayesian, pgx_guidelines, evidence_mining, neuro_hub_dashboard,
-qsar_bench, molecule_eval). Since the audit-fix drop every one of them is registered,
-so the canonical registry now holds **92 modules**, every registry slug equals its
+qsar_bench, molecule_eval, chem_descriptors). Since the audit-fix drop every one of them is registered,
+so the canonical registry now holds **93 modules**, every registry slug equals its
 package directory name, and every package under `src/sugarcode/modules/` is
 registered. The spec corpus stays 77 files because the spec document has 77.
 
@@ -99,7 +99,8 @@ Status per module: **verified** = implemented with passing named tests;
 | acmg_bayesian (pb6) | **90 registered (77 spec + 13 beyond-spec)**; Tavtigian 2018 Bayesian ACMG/AMP classifier (exact 350^(1/2^k) odds, BA1 stand-alone override, all Table 2/3 rows as fixtures) + optional ClinVar/PubMed context; replaces the unpromoted clinical_evidence_fusion orphan | 0 | 0 | 1404 passing, 1 skipped |
 | rna_nussinov (pb6) | **91 registered (77 spec + 14 beyond-spec)**; Nussinov-Jacobson 1980 max base-pair RNA folding (traceback, min loop, dot-bracket, exact optimal-structure count, stats), hand fixtures + brute-force verifier | 0 | 0 | 1426 passing, 1 skipped |
 | profile_hmm (pb6) | **92 registered (77 spec + 15 beyond-spec)**; Durbin Ch. 5 profile HMM from alignments (M/I/D states, pseudocounts), Viterbi path, Forward score, log-odds; hand fixtures + brute-force path enumerator | 0 | 0 | 1437 passing, 1 skipped |
-| profile_hmm Baum-Welch (current, pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | 1450 passing, 1 skipped |
+| profile_hmm Baum-Welch (pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | 1450 passing, 1 skipped |
+| chem_descriptors (current, pb6) | **93 registered (77 spec + 16 beyond-spec)**; pure-Python SMILES parser + MW/exact MW, formula, HBD/HBA, rotatable bonds, rings, Ertl TPSA, Fsp3, Lipinski Ro5 + Veber; every descriptor equals RDKit 2024.09.6 on a 66-drug ladder (aromatic and Kekule SMILES) and a 60-SMILES stress set bar 3 documented cases | 0 | 0 | 1458 passing, 1 skipped |
 
 ### Verified in this drop (real implementations, named tests)
 
