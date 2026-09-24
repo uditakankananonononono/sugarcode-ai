@@ -75,9 +75,17 @@ def target_search(name: str, organism: str | None = "Homo sapiens",
 
 def activities_for_target(chembl_id: str, max_n: int = 50,
                           offline: bool = False) -> list[dict]:
-    """Measured activities (IC50/Ki/Kd in nM) against a target, best first."""
+    """Measured activities (IC50/Ki/Kd in nM) against a target, best first.
+
+    'Best' is global: ChEMBL sorts server-side by pChEMBL (descending) over
+    all activities with a pChEMBL value (exact '=' relations, sane units).
+    Previously the first `max_n` rows in ChEMBL's default order were sorted
+    locally, so 'best' was best-of-an-arbitrary-page: ABL1 (CHEMBL1862,
+    6,290 activities) came back with 1,200 nM as its best. Validated on 12
+    targets in mega27-01 benchmarks/sweep_chembl_order.json."""
     url = (f"{BASE}/activity.json?target_chembl_id={chembl_id}"
-           f"&standard_type__in=IC50,Ki,Kd&standard_units=nM&limit={max_n}")
+           f"&standard_type__in=IC50,Ki,Kd&standard_units=nM"
+           f"&pchembl_value__isnull=false&order_by=-pchembl_value&limit={max_n}")
     d = _get(url, offline=offline)
     out = []
     for a in d.get("activities", []):
