@@ -44,7 +44,10 @@ r["lipinski"]["passes"], r["veber"]["passes"]   # True, True
   Ertl/RDKit on several drugs (e.g. caffeine 58.4 vs 61.82); we follow Ertl/RDKit.
 - Stereochemistry (@, @@, /, \) is parsed and ignored (listed in `ignored_features`).
 - Aromaticity: lowercase input is trusted; Kekule rings are perceived by 4n+2
-  over single rings and fused pairs only. Aromatic systems needing 3+ fused
+  over single rings and fused pairs only (a pair aromatic only as a whole gets
+  an aromatic envelope and a non-aromatic fusion bond, as RDKit does for
+  azulene). Exocyclic C=O/C=N/C=S give 0 electrons, exocyclic C=C gives 1,
+  pyrrolide [N-] gives 2. Aromatic systems needing 3+ fused
   rings as a whole, and B/Se/Te/As donors in Kekule form, are not perceived.
 - Not supported (raises `SmilesError`): `*` wildcard, reaction SMILES, SMARTS.
 - No logP model. Crippen logP was not vendored.

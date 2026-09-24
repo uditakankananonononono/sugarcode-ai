@@ -326,6 +326,8 @@ def _pi_electrons(mol: Molecule, i: int):
             return 1
         if at.symbol == "C" and mol.atoms[j].symbol in _EN_EXO:
             return 0            # exocyclic C=O / C=N / C=S (e.g. 2-pyridone)
+        if at.symbol == "C" and mol.atoms[j].symbol == "C":
+            return 1            # exocyclic C=C keeps its electron (RDKit: o-xylylene aromatic)
         return None
     if at.symbol == "C":
         if at.charge == -1 and heavy_deg + at.total_h == 3:
@@ -335,6 +337,8 @@ def _pi_electrons(mol: Molecule, i: int):
         return None
     if at.symbol in ("N", "P") and at.charge == 0 and heavy_deg + at.total_h == 3:
         return 2
+    if at.symbol == "N" and at.charge == -1 and heavy_deg + at.total_h == 2:
+        return 2            # pyrrolide-type anion
     if at.symbol in ("O", "S") and at.charge == 0 and heavy_deg == 2:
         return 2
     return None
@@ -375,7 +379,9 @@ def _perceive_aromaticity(mol: Molecule):
             if not (rings[x][0] & rings[y][0]):
                 continue
             if huckel(rings[x][1] | rings[y][1]):
-                aromatic_bonds |= rings[x][0] | rings[y][0]
+                # only the envelope is aromatic; the shared fusion bond is not
+                # (RDKit, e.g. Cc1cc(O)oc2cc(=O)ccc1-2)
+                aromatic_bonds |= rings[x][0] ^ rings[y][0]
     for k in aromatic_bonds:
         bd = mol.bonds[k]
         bd.aromatic, bd.order = True, 1.5

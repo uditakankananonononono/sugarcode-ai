@@ -1,6 +1,6 @@
 """Module registry: every SugarCode AI module, its sub-network and lifecycle state.
 
-93 modules: the 77 from the spec corpus plus 16 beyond-spec published-model
+94 modules: the 77 from the spec corpus plus 17 beyond-spec published-model
 implementations, all registered (slugs equal their package directory names).
 
 The nine sub-networks are assigned from the module themes in the spec doc
@@ -208,6 +208,8 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Circuit architecture compiler with Hill logic, toggle/oscillator ODE simulation and seeded Gillespie expression; no synthesis claims."),
     ("dti_bench", "DTI Bench", "therapeutics",
      "Target-conditioned drug-target interaction baselines (proteochemometric ridge) with cold-start validation on ChEMBL pairs."),
+    ("chem_similarity", "Chem Similarity", "fabrication-evolution",
+     "Morgan/ECFP circular fingerprints (counts and folded bits, codes identical to RDKit), Tanimoto/Jaccard and Dice, nearest-neighbour search and similarity matrices over SMILES lists."),
     ("chem_descriptors", "Chem Descriptors", "fabrication-evolution",
      "Cheminformatics-lite: SMILES parser (branches, ring closures, brackets, Kekule re-aromatisation) and descriptors (average/exact MW, Hill formula, HBD/HBA, rotatable bonds, SSSR rings, Ertl TPSA, Fsp3) with Lipinski Rule-of-5 and Veber filters, oracle-tested against RDKit and PubChem."),
     ("profile_hmm", "Profile HMM", "protein-engineering",

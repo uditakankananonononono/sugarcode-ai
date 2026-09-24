@@ -1,4 +1,20 @@
 
+## chem_similarity (2026-09-24, branch pb6)
+- Algorithm: Rogers & Hahn 2010, Extended-connectivity fingerprints, J Chem Inf
+  Model 50:742-754 (PMID 20426451, doi 10.1021/ci100050t).
+- Re-implemented (not copied) from RDKit Release_2024_09_6 (BSD-3, license in
+  LICENSES/RDKIT-BSD-3-CLAUSE.txt): Code/GraphMol/Fingerprints/MorganGenerator.cpp
+  (sha256 0d1988dec575f678f8ddae6d5f5b5dc1486e257440b754b17dc613da69db8978),
+  FingerprintUtil.cpp getConnectivityInvariants (sha256
+  c14bdc4526965160dfd6ab48f3200dcdda8f2749670bdee3b8f520e3fec556ad),
+  Code/RDGeneral/hash/hash.hpp (sha256
+  b8cb7548b93a1c8728bd1c2582b137308f72440801f77e0295c6a6f2b9f96029).
+- `tests/fixtures/chem_similarity_oracle.json` (sha256
+  85544cd4c8130b4750b258cf2709f3c8ea48d3a71db44668821b816005bf5814): RDKit
+  2024.09.6 Morgan counts (r=1,2,3), ECFP4 2048 bits, descriptors, and
+  BulkTanimoto/BulkDice rows for PubChem CIDs 1-400 (SMILES from PUG-REST,
+  fetched 2026-09-24). Regenerate with scripts/chem_similarity_oracle.py.
+
 ## chem_descriptors (2026-09-24, branch pb6)
 - `src/sugarcode/modules/chem_descriptors/data/periodic_table.json` (sha256
   459ca66f1511a5e584c061982ab6f5f51e950d8d3687270324cdbce15ab3e644): element
