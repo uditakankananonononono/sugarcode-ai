@@ -258,6 +258,12 @@ def utr_junction_map(gene: str, offline: bool = False,
     cds_spans = _texons(cds)
     if not cds_spans:
         return {"status": "no CDS spans in record", "gene": gene, "accession": acc}
+    if "<" in cds["loc"] or ">" in cds["loc"]:
+        # partial CDS (e.g. KCNQ1 on NG_016178.2: complement(<42918..>43038))
+        # - the record does not contain the full coding structure, so an
+        # exon/junction map would be silently empty. Fail loud instead.
+        return {"status": "partial CDS in record", "gene": gene, "accession": acc,
+                "cds_location": cds["loc"]}
     cds_start = cds_spans[0][0] if strand == 1 else cds_spans[0][1]
     cds_end = cds_spans[-1][1] if strand == 1 else cds_spans[-1][0]
 
