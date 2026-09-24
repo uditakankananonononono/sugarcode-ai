@@ -47,8 +47,14 @@ AA_MASS = {
 }
 
 
+_AMBIG = set("RYSWKMBDHV")
+
+
 def clean_dna(seq: str) -> str:
-    s = "".join(c for c in seq.upper() if c in "ACGTN")
+    """Upper-case DNA; IUPAC ambiguity letters become N (never dropped, so
+    reading frames and coordinates cannot shift); other characters
+    (whitespace, digits, gaps) are removed."""
+    s = "".join("N" if c in _AMBIG else c for c in seq.upper() if c in "ACGTN" or c in _AMBIG)
     if not s:
         raise ValueError("sequence contains no valid DNA bases")
     return s
