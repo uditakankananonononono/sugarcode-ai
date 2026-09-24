@@ -41,7 +41,10 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
         raise ValueError(f"RTT length must be {RTT_RANGE[0]}-{RTT_RANGE[1]} nt")
 
     pbs = reverse_complement(spacer[16 - pbs_len:16])
-    rtt = rc_edit[:rtt_len]
+    # the RTT templates from the nick: its 3' end pairs with the nick-proximal
+    # base, so truncation must keep the LAST rtt_len bases of the reverse
+    # complement, not the first (bug found against the published HEK3 pegRNA)
+    rtt = rc_edit[-rtt_len:] if rtt_len <= len(rc_edit) else rc_edit
     ext = rtt + pbs  # 3' extension, 5'->3'
     # first base of RTT should not be C (pairs with scaffold G -> mispriming)
     warns = []
@@ -99,8 +102,8 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
             # RT template = edited strand 3' of the nick; the PBS/RTT
             # boundary is 4 nt upstream of the PAM per the published convention
             nick = site["position"] - 4
-            if pos < nick or pos - nick >= 20:
-                continue  # edit outside the reverse-transcribed window
+            if nick < 0 or edited[nick:nick + 20] == region[nick:nick + 20]:
+                continue  # RT template would not encode the edit
             rtt_source = edited[nick:nick + 20]
         else:
             g_start = site["position"] + 3
@@ -108,8 +111,8 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
                 continue
             spacer = reverse_complement(region[g_start:g_start + 20])
             nick = site["position"] + 4
-            if pos >= nick or nick - pos > 20:
-                continue  # edit outside the reverse-transcribed window
+            if nick > len(region) or edited[max(0, nick - 20):nick] == region[max(0, nick - 20):nick]:
+                continue  # RT template would not encode the edit
             rtt_source = reverse_complement(edited[max(0, nick - 20):nick])
         try:
             peg = design_pegrna(spacer, rtt_source[:20] if len(rtt_source) >= 10 else rtt_source)
