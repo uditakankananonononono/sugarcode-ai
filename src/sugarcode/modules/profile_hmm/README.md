@@ -11,7 +11,7 @@ from sugarcode.modules.profile_hmm import build_profile_hmm, viterbi, forward
 m = build_profile_hmm(["HEAGAWGHEE", "HEAGAW-HEE", "HDAGAWGHEE", "HEAG-WGHEE"])
 m.consensus()                        # 'HEAGAWGHEE'
 v = viterbi(m, "HEAGAWHEE")
-v["state_path"]                      # most probable path, e.g. ['M1', ..., 'D7', ...]
+v["state_path"]  # ['M1','M2','M3','M4','M5','M6','D7','M8','M9','M10']
 v["log_prob"], v["bits"], v["log_odds"]
 forward(m, "HEAGAWHEE")["log_prob"]  # sum over all paths
 ```
