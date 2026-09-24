@@ -26,7 +26,7 @@ _C19 = {"*1": 1.0, "*2": 0.0, "*3": 0.0, "*4": 0.0, "*5": 0.0, "*6": 0.0,
         "*7": 0.0, "*8": 0.0, "*17": 1.5}
 # CYP2D6 activity values used by CPIC/DPWG consensus. Copy-number syntax: *1x2.
 _D6 = {"*1": 1.0, "*2": 1.0, "*3": 0.0, "*4": 0.0, "*5": 0.0, "*6": 0.0,
-       "*9": 0.5, "*10": 0.25, "*17": 0.5, "*29": 0.5, "*41": 0.5}
+       "*9": 0.25, "*10": 0.25, "*17": 0.5, "*29": 0.5, "*41": 0.25}  # CPIC 2024 values
 
 
 def _split(diplotype: str) -> list[str]:
@@ -47,9 +47,50 @@ def _allele_value(allele: str, table: dict[str, float]) -> tuple[float | None, s
     return ((value * copies, None) if value is not None else (None, "allele function Missing"))
 
 
+import json as _json
+from pathlib import Path as _Path
+_DATA = _Path(__file__).with_name("data")
+_CPIC_D6 = _json.load(open(_DATA / "cpic_cyp2d6_alleles.json", encoding="utf-8"))["alleles"]
+_CPIC_C19 = _json.load(open(_DATA / "cpic_cyp2c19_diplotypes.json", encoding="utf-8"))["diplotypes"]
+_PROV = "CPIC API allele/diplotype tables vendored 2026-09-24; caller must verify phased star-allele call"
+
+
+def _norm_copy(allele: str) -> str:
+    return allele.replace(">=", "\u2265").replace("X", "x")
+
+
+def _translate_cpic(gene: str, alleles: list[str]) -> dict | None:
+    """Current CPIC translation. Returns None when CPIC tables do not cover the input."""
+    alleles = [_norm_copy(a) for a in alleles]
+    if gene == "CYP2C19":
+        res = _CPIC_C19.get("/".join(sorted(alleles)))
+        if res is None:
+            return None
+        return {"gene": gene, "diplotype": "/".join(alleles), "phenotype": res[0] + res[1:].lower(),
+                "activity_score": "n/a", "status": "translated", "provenance": _PROV}
+    recs = [_CPIC_D6.get(a) for a in alleles]
+    if any(r is None for r in recs):
+        return None
+    if any(r["activity"] is None for r in recs):
+        return {"gene": gene, "diplotype": "/".join(alleles), "phenotype": "Indeterminate",
+                "activity_score": "n/a", "status": "CPIC activity value unassigned for an allele",
+                "allele_functions": {a: r["function"] for a, r in zip(alleles, recs)}, "provenance": _PROV}
+    score = round(sum(r["activity"] for r in recs), 2)
+    lower_bound = any(r["min_bound"] for r in recs)
+    phenotype = ("Poor metabolizer" if score == 0 else "Intermediate metabolizer" if score < 1.25
+                 else "Normal metabolizer" if score <= 2.25 else "Ultrarapid metabolizer")
+    return {"gene": gene, "diplotype": "/".join(alleles), "phenotype": phenotype,
+            "activity_score": (f"\u2265{score}" if lower_bound else score), "status": "translated",
+            "allele_values": {a: r["activity"] for a, r in zip(alleles, recs)}, "provenance": _PROV}
+
+
 def translate_phenotype(gene: str, diplotype: str) -> dict:
-    """Translate a known star diplotype via published CPIC activity conventions."""
+    """Translate a star diplotype via current CPIC tables (legacy table as fallback)."""
     gene = gene.upper(); alleles = _split(diplotype)
+    if gene in ("CYP2C19", "CYP2D6"):
+        cpic = _translate_cpic(gene, alleles)
+        if cpic is not None:
+            return cpic
     table = _C19 if gene == "CYP2C19" else _D6 if gene == "CYP2D6" else None
     if table is None:
         return {"gene": gene, "diplotype": diplotype, "phenotype": "Missing", "activity_score": "Missing",
@@ -79,7 +120,7 @@ def translate_phenotype(gene: str, diplotype: str) -> dict:
 def _recommend(gene: str, drug: str, phenotype: str, indication: str | None) -> dict:
     key = f"{gene}:{drug}"
     if key == "CYP2C19:CLOPIDOGREL":
-        if phenotype in {"Intermediate metabolizer", "Poor metabolizer"}:
+        if phenotype in {"Intermediate metabolizer", "Poor metabolizer", "Likely intermediate metabolizer", "Likely poor metabolizer"}:
             action = "Consider an alternative P2Y12 inhibitor not affected by CYP2C19 loss of function."
             strength = "Strong for acute coronary syndrome/PCI; moderate for other cardiovascular indications"
         elif phenotype in {"Normal metabolizer", "Rapid metabolizer", "Ultrarapid metabolizer"}:
