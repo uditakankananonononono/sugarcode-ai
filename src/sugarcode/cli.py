@@ -15,6 +15,10 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   gff stats FILE                 GFF3/GTF feature summary (drop 65)
   bed stats FILE                 BED interval summary (drop 66)
   sam stats FILE                 SAM mapping summary (drop 67)
+  phylo stats FILE               Newick tree summary (drop 68)
+  phylo mrca FILE --leaves a,b,c
+  phylo distance FILE --a X --b Y
+  phylo prune FILE --drop a,b [--out F]
   sam filter FILE [--mapped-only --min-mapq N --rname .. --primary-only]
   sam to-bed FILE                mapped reads to BED6
   bed merge FILE [--out F]       merge overlapping intervals
@@ -415,6 +419,44 @@ def _cmd_sam_to_bed(args) -> int:
 
 
 
+def _cmd_phylo_stats(args) -> int:
+    from .bio.newick import parse_newick, stats
+    t = parse_newick(Path(args.file).read_text())
+    return _emit({"file": args.file, **stats(t)})
+
+
+def _cmd_phylo_mrca(args) -> int:
+    from .bio.newick import parse_newick, mrca, preorder
+    t = parse_newick(Path(args.file).read_text())
+    names = [x for x in args.leaves.split(",") if x]
+    node = mrca(t, names)
+    desc = len(preorder(node)) - 1
+    return _emit({"file": args.file, "query": names,
+                  "mrca": {"name": node["name"], "length": node["length"],
+                           "subtree_nodes": desc}})
+
+
+def _cmd_phylo_distance(args) -> int:
+    from .bio.newick import parse_newick, distance
+    t = parse_newick(Path(args.file).read_text())
+    return _emit({"file": args.file, "a": args.a, "b": args.b,
+                  "distance": distance(t, args.a, args.b)})
+
+
+def _cmd_phylo_prune(args) -> int:
+    from .bio.newick import parse_newick, write_newick, prune
+    t = parse_newick(Path(args.file).read_text())
+    out = prune(t, [x for x in args.drop.split(",") if x])
+    text = write_newick(out)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -467,6 +509,26 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    ph = sub.add_parser("phylo", help="Newick tree toolkit")
+    phsub = ph.add_subparsers(dest="sub", required=True)
+    ps = phsub.add_parser("stats", help="tree shape/length summary")
+    ps.add_argument("file")
+    ps.set_defaults(func=_cmd_phylo_stats)
+    pm = phsub.add_parser("mrca", help="most recent common ancestor of leaves")
+    pm.add_argument("file")
+    pm.add_argument("--leaves", required=True, help="comma-separated leaf names")
+    pm.set_defaults(func=_cmd_phylo_mrca)
+    pd = phsub.add_parser("distance", help="path length between two leaves")
+    pd.add_argument("file")
+    pd.add_argument("--a", required=True)
+    pd.add_argument("--b", required=True)
+    pd.set_defaults(func=_cmd_phylo_distance)
+    pp = phsub.add_parser("prune", help="remove leaves, collapsing lone-child nodes")
+    pp.add_argument("file")
+    pp.add_argument("--drop", required=True, help="comma-separated leaf names")
+    pp.add_argument("--out", default=None)
+    pp.set_defaults(func=_cmd_phylo_prune)
 
     sm = sub.add_parser("sam", help="SAM alignment toolkit (text SAM)")
     smsub = sm.add_subparsers(dest="sub", required=True)
