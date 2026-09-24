@@ -77,8 +77,11 @@ def workflow_dag(steps):
  nodes=[{'id':i,**s} for i,s in enumerate(steps)]; edges=[{'source':i,'target':i+1,'material_flow':True} for i in range(len(steps)-1)]; return {'nodes':nodes,'edges':edges,'topological_order':list(range(len(steps)))}
 def schedule_resources(protocol,equipment_capacity=None):
  cap=equipment_capacity or {}; available=defaultdict(float); schedule=[]
+ prev_end=0.0
  for i,s in enumerate(protocol['steps']):
-  eq=s.get('equipment',s['op']); start=available[eq]; duration=_step_minutes(s); schedule.append({'step':i,'operation':s['op'],'resource':eq,'start_min':start,'end_min':start+duration}); available[eq]=start+duration
+  eq=s.get('equipment',s['op']); duration=_step_minutes(s)
+  # a step needs both its resource free and its DAG predecessor finished
+  start=max(available[eq],prev_end); schedule.append({'step':i,'operation':s['op'],'resource':eq,'start_min':start,'end_min':start+duration}); available[eq]=start+duration; prev_end=start+duration
  return {'schedule':schedule,'makespan_min':max((x['end_min'] for x in schedule),default=0),'utilization':{k:v/max(1,max(available.values())) for k,v in available.items()}}
 def bayesian_condition(prior_mean,prior_variance,observations,noise_variance):
  precision=1/prior_variance+len(observations)/noise_variance; mean=(prior_mean/prior_variance+sum(observations)/noise_variance)/precision; return {'posterior_mean':mean,'posterior_variance':1/precision,'n_observations':len(observations)}
