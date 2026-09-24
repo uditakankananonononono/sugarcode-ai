@@ -1,7 +1,9 @@
-"""Virtual Cell: constraint-based metabolic simulation + GRN coupling."""
-from .core import (MetabolicModel, couple_grn_metabolism, demo_model, environment_response,
-                   fba, gene_knockout, perturbation_screen, regulatory_state,
+"""Virtual Cell: constraint-based metabolism + gene regulation + protein expression."""
+from .core import (DEMO_GRN, MetabolicModel, central_carbon_model, couple_grn_metabolism, demo_model, environment_response,
+                   expression_perturbation_screen, expression_to_bounds, fba, gene_knockout,
+                   perturbation_screen, pfba, regulatory_state, simulate_cell, simulate_expression,
                    simulate_growth, virtual_cell_report)
-__all__ = ["MetabolicModel", "couple_grn_metabolism", "demo_model", "environment_response",
-           "fba", "gene_knockout", "perturbation_screen", "regulatory_state",
+__all__ = ["DEMO_GRN", "MetabolicModel", "central_carbon_model", "couple_grn_metabolism", "demo_model", "environment_response",
+           "expression_perturbation_screen", "expression_to_bounds", "fba", "gene_knockout",
+           "perturbation_screen", "pfba", "regulatory_state", "simulate_cell", "simulate_expression",
            "simulate_growth", "virtual_cell_report"]
