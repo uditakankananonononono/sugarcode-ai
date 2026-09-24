@@ -98,7 +98,9 @@ def nanopore_modification(signal,expected,noise_sd=.2):
  a=np.asarray(signal,float); e=np.asarray(expected,float); z=(a-e)/(noise_sd+1e-9); p=1/(1+np.exp(-(np.abs(z)-2))); return {'z_scores':z.tolist(),'modification_probability':p.tolist(),'mean_probability':float(p.mean()),'status':'signal-deviation heuristic, not a trained nanopore basecaller'}
 def multi_modification_map(rna):
  s=clean_dna(rna.replace('U','T')); out={}
- for name,motif in MOD_MOTIFS.items(): out[name]=[{'position':p,'motif':s[p:p+len(motif)]} for p in find_motif(s,motif)]
+ for name,motif in MOD_MOTIFS.items():
+  if name=='m6A': out[name]=[{'position':x['position'],'motif':x['motif'],'m6a_probability':x['m6a_probability']} for x in sorted(predict_m6a(s),key=lambda x:x['position'])]; continue  # same sites/positions as predict_m6a (modified A, thresholded)
+  out[name]=[{'position':p,'motif':s[p:p+len(motif)]} for p in find_motif(s,motif)]
  return {'length':len(s),'modifications':out,'site_count':sum(map(len,out.values()))}
 def structure_ensemble(rna,window=20):
  s=clean_dna(rna.replace('U','T')); rows=[]
