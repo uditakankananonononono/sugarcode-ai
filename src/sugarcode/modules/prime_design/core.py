@@ -72,7 +72,8 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
     if not 0 <= pos < len(region):
         raise ValueError("edit position outside target region")
     etype = edit["type"]
-    ref, alt = clean_dna(edit.get("ref", "")), clean_dna(edit.get("alt", ""))
+    ref = clean_dna(edit["ref"]) if edit.get("ref") else ""
+    alt = clean_dna(edit["alt"]) if edit.get("alt") else ""
     if etype == "substitution" and region[pos:pos + len(ref)] != ref:
         raise ValueError("ref does not match target region at position")
 
