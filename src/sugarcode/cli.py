@@ -20,6 +20,9 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   phylo mrca FILE --leaves a,b,c
   phylo distance FILE --a X --b Y
   phylo prune FILE --drop a,b [--out F]
+  phylo dist --fasta ALN [--model pdistance|jc69|k80]           (drop 78)
+  phylo build --fasta ALN [--method upgma|nj] [--model ...]
+  phylo cophenetic FILE
   msa stats FILE                 Stockholm/A3M summary, auto-detect (drop 69)
   pdb stats FILE                 structure summary, PDB or mmCIF (drop 71)
   protein props FILE|--sequence  pI, MW, extinction, instability, GRAVY (drop 72)
@@ -462,6 +465,44 @@ def _cmd_phylo_distance(args) -> int:
     t = parse_newick(Path(args.file).read_text())
     return _emit({"file": args.file, "a": args.a, "b": args.b,
                   "distance": distance(t, args.a, args.b)})
+
+
+def _cmd_phylo_dist(args) -> int:
+    from .bio.fasta import parse_fasta
+    from .bio.phylo import distance_matrix
+    seqs = _alignment_seqs(args.fasta)
+    return _emit({"file": args.fasta, **distance_matrix(seqs, args.model)})
+
+
+def _alignment_seqs(path):
+    from .bio.fasta import parse_fasta
+    seqs = {}
+    for r in parse_fasta(Path(path).read_text()):
+        if r["id"] in seqs:
+            raise SystemExit(f"duplicate FASTA id {r['id']!r}")
+        seqs[r["id"]] = r["sequence"]
+    if len(seqs) < 2:
+        raise SystemExit("alignment needs at least 2 records")
+    return seqs
+
+
+def _cmd_phylo_build(args) -> int:
+    from .bio.phylo import distance_matrix, build_tree, total_branch_length
+    from .bio.newick import write_newick
+    seqs = _alignment_seqs(args.fasta)
+    dm = distance_matrix(seqs, args.model)
+    root = build_tree(dm["names"], dm["matrix"], args.method)
+    return _emit({"method": args.method, "model": args.model,
+                  "rooted": args.method == "upgma",
+                  "newick": write_newick(root),
+                  "total_branch_length": total_branch_length(root)})
+
+
+def _cmd_phylo_cophenetic(args) -> int:
+    from .bio.newick import parse_newick
+    from .bio.phylo import cophenetic
+    t = parse_newick(Path(args.file).read_text())
+    return _emit({"file": args.file, **cophenetic(t)})
 
 
 def _cmd_phylo_prune(args) -> int:
@@ -1049,6 +1090,20 @@ def main(argv: list[str] | None = None) -> int:
     pp.add_argument("--drop", required=True, help="comma-separated leaf names")
     pp.add_argument("--out", default=None)
     pp.set_defaults(func=_cmd_phylo_prune)
+    pdi = phsub.add_parser("dist", help="pairwise distances from an alignment")
+    pdi.add_argument("--fasta", required=True, help="aligned FASTA")
+    pdi.add_argument("--model", choices=["pdistance", "jc69", "k80"],
+                     default="pdistance")
+    pdi.set_defaults(func=_cmd_phylo_dist)
+    pb = phsub.add_parser("build", help="UPGMA/NJ tree from an alignment")
+    pb.add_argument("--fasta", required=True, help="aligned FASTA")
+    pb.add_argument("--model", choices=["pdistance", "jc69", "k80"],
+                    default="k80")
+    pb.add_argument("--method", choices=["upgma", "nj"], default="nj")
+    pb.set_defaults(func=_cmd_phylo_build)
+    pco = phsub.add_parser("cophenetic", help="all-pairs leaf distances")
+    pco.add_argument("file")
+    pco.set_defaults(func=_cmd_phylo_cophenetic)
 
     sm = sub.add_parser("sam", help="SAM alignment toolkit (text SAM)")
     smsub = sm.add_subparsers(dest="sub", required=True)

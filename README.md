@@ -63,6 +63,9 @@ sugarcode phylo stats tree.nwk                 # shape, total length, height
 sugarcode phylo mrca tree.nwk --leaves A,B
 sugarcode phylo distance tree.nwk --a A --b D
 sugarcode phylo prune tree.nwk --drop B,D --out pruned.nwk
+sugarcode phylo dist --fasta aln.fa --model jc69   # distance matrix (drop 78)
+sugarcode phylo build --fasta aln.fa --method nj --model k80
+sugarcode phylo cophenetic tree.nwk
 
 # Alignments (drop 69, Stockholm or A3M - auto-detected):
 sugarcode msa stats aln.sto                    # nseq, width, gaps, mean identity
@@ -176,7 +179,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1576 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1590 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -605,7 +608,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1576 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1590 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
