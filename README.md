@@ -78,6 +78,11 @@ sugarcode pdb select mol.pdb --chain A --names CA,CB --out trace.pdb
 # Protein properties (drop 72, ProtParam-style):
 sugarcode protein props proteins.fasta
 sugarcode protein props --sequence FVNQHLCGSHLVEALYLVCGERGFFYTPKT
+
+# Primers (drop 73):
+sugarcode primer tm CGTTCCAAAGATGTGGGCATGAGCTTAC   # SantaLucia NN Tm + GC%
+sugarcode primer check GGGGAAACCCC                # hairpin/dimer heuristics
+sugarcode primer pick template.fa --region 250:350 --n 3
 ```
 
 ## Architecture
@@ -150,7 +155,7 @@ Status per module: **verified** = implemented with passing named tests;
 | 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
 | 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1511 passing |
+| audit-fix (current) | **89 registered (77 spec + 12 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1529 passing |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -579,7 +584,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1511 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # 1529 tests, also run by GitHub Actions CI on every push
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])

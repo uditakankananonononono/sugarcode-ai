@@ -23,6 +23,9 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   msa stats FILE                 Stockholm/A3M summary, auto-detect (drop 69)
   pdb stats FILE                 structure summary, PDB or mmCIF (drop 71)
   protein props FILE|--sequence  pI, MW, extinction, instability, GRAVY (drop 72)
+  primer tm SEQ                  SantaLucia NN Tm (drop 73)
+  primer check SEQ               GC/homopolymer/hairpin/dimer heuristics
+  primer pick FILE --region S:E  primer pairs flanking a region
   pdb chains FILE [--residues [--chain X]]
   pdb contacts FILE --cutoff 5.0 [--chain-a A --chain-b B]
   pdb select FILE [--chain X] [--resname Y] [--names CA,CB] [--out F]
@@ -606,6 +609,51 @@ def _cmd_protein_props(args) -> int:
 
 
 
+def _cmd_primer_tm(args) -> int:
+    from .bio.primer import tm_nn, gc_percent
+    return _emit({"sequence": args.sequence.upper(),
+                  "tm": round(tm_nn(args.sequence, primer_nm=args.primer_nm,
+                                    na_mm=args.na_mm), 3),
+                  "gc_percent": round(gc_percent(args.sequence), 2),
+                  "primer_nm": args.primer_nm, "na_mm": args.na_mm})
+
+
+def _cmd_primer_check(args) -> int:
+    from .bio.primer import (gc_percent, max_homopolymer, hairpin_max_stem,
+                             self_dimer_max_run)
+    seq = args.sequence
+    return _emit({"sequence": seq.upper(),
+                  "length": len(seq),
+                  "gc_percent": round(gc_percent(seq), 2),
+                  "max_homopolymer": max_homopolymer(seq),
+                  "hairpin_max_stem": hairpin_max_stem(seq),
+                  "self_dimer": self_dimer_max_run(seq),
+                  "note": "hairpin/dimer are max-contiguous-complement "
+                          "heuristics, not folding thermodynamics"})
+
+
+def _cmd_primer_pick(args) -> int:
+    from .bio.fasta import parse_fasta
+    from .bio.primer import pick_primers
+    try:
+        start_s, end_s = args.region.split(":")
+        region = (int(start_s), int(end_s))
+    except ValueError:
+        raise SystemExit("--region must be START:END (0-based half-open)")
+    template = parse_fasta(Path(args.file).read_text())[0]["sequence"]
+    pairs = pick_primers(template, region, n=args.n,
+                         max_product=args.max_product,
+                         primer_nm=args.primer_nm, na_mm=args.na_mm)
+    out = [{"product_size": p["product_size"], "score": p["score"],
+            "forward": {k: (round(v, 3) if isinstance(v, float) else v)
+                        for k, v in p["forward"].items()},
+            "reverse": {k: (round(v, 3) if isinstance(v, float) else v)
+                        for k, v in p["reverse"].items()}}
+           for p in pairs]
+    return _emit({"region": region, "pairs": out, "count": len(out)})
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -658,6 +706,25 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    prm = sub.add_parser("primer", help="PCR primer toolkit")
+    prmsub = prm.add_subparsers(dest="sub", required=True)
+    ptm = prmsub.add_parser("tm", help="SantaLucia NN melting temperature")
+    ptm.add_argument("sequence")
+    ptm.add_argument("--primer-nm", type=float, default=25.0)
+    ptm.add_argument("--na-mm", type=float, default=50.0)
+    ptm.set_defaults(func=_cmd_primer_tm)
+    pck = prmsub.add_parser("check", help="GC/homopolymer/hairpin/dimer heuristics")
+    pck.add_argument("sequence")
+    pck.set_defaults(func=_cmd_primer_check)
+    ppk = prmsub.add_parser("pick", help="pick primer pairs around a region")
+    ppk.add_argument("file", help="template DNA FASTA (first record used)")
+    ppk.add_argument("--region", required=True, help="START:END 0-based half-open")
+    ppk.add_argument("--n", type=int, default=3)
+    ppk.add_argument("--max-product", type=int, default=1000)
+    ppk.add_argument("--primer-nm", type=float, default=25.0)
+    ppk.add_argument("--na-mm", type=float, default=50.0)
+    ppk.set_defaults(func=_cmd_primer_pick)
 
     prot = sub.add_parser("protein", help="protein property tools")
     protsub = prot.add_subparsers(dest="sub", required=True)
