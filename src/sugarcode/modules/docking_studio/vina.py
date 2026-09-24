@@ -85,8 +85,16 @@ def dock_vina_grid(pocket_coords: list[dict], smiles: str, grid_step: float = 2.
                                         if smiles[i].isupper() and smiles[i + 1].isupper())
     n_heavy = len(lig)
     final = best["score"] / (1 + W["torsion"] * rotatable)
+    pose = [{"element": a["element"], "xyz": [round(v, 3) for v in a["xyz"]]}
+            for a in best["placed"]]
     return {
         "smiles": smiles,
+        "ligand_pose": pose,
+        "complex_pdb": complex_pdb(pocket_coords, pose, remarks=[
+            f"SUGARCODE VINA-FORM SCORE {final:.3f} (Trott & Olson 2010 weights)",
+            "TERMS " + " ".join(f"{k}={v:.3f}" for k, v in best["terms"].items()),
+            f"LIGAND {smiles}",
+            "RIGID LINEAR LIGAND EMBEDDING, TRANSLATION GRID ONLY - SCREENING POSE"]),
         "vina_score": round(final, 3),
         "estimated_dg_kcal_mol": round(final, 3),  # Vina score is already kcal-ish affinity
         "raw_pairwise_sum": round(best["score"], 3),
@@ -99,6 +107,34 @@ def dock_vina_grid(pocket_coords: list[dict], smiles: str, grid_step: float = 2.
                    "translation grid only - no rotational or torsional sampling",
                    "pocket atoms treated as rigid"],
     }
+
+
+def complex_pdb(pocket_atoms: list[dict], ligand_atoms: list[dict],
+                remarks: list[str] | None = None) -> str:
+    """Annotated protein-ligand complex as PDB text (opens in PyMOL, Mol*,
+    ChimeraX). Pocket atoms -> ATOM records (resname/resnum/chain/atom name
+    used when present, else CA/UNK); ligand -> HETATM LIG, chain L; score and
+    terms -> REMARK 999 lines."""
+    lines = [f"REMARK 999 {r}"[:80] for r in (remarks or [])]
+    serial = 1
+    for i, a in enumerate(pocket_atoms, 1):
+        x, y, z = a["xyz"]
+        name = str(a.get("name", "CA"))[:4]
+        el = str(a.get("element", "C"))[:2]
+        lines.append(f"ATOM  {serial:5d} {name:<4s} {str(a.get('resname', 'UNK'))[:3]:>3s} "
+                     f"{str(a.get('chain') or 'A')[:1]}{int(a.get('resnum', i)) % 10000:4d}    "
+                     f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00          {el:>2s}")
+        serial += 1
+    lines.append("TER")
+    for i, a in enumerate(ligand_atoms, 1):
+        x, y, z = a["xyz"]
+        el = str(a["element"])[:2]
+        name = f"{el}{i}"[:4]
+        lines.append(f"HETATM{serial:5d} {name:<4s} LIG L   1    "
+                     f"{x:8.3f}{y:8.3f}{z:8.3f}  1.00  0.00          {el.upper():>2s}")
+        serial += 1
+    lines.append("END")
+    return "\n".join(lines) + "\n"
 
 
 def dock_vina_structure(identifier: str, smiles: str, chain: str | None = None,
@@ -123,7 +159,9 @@ def dock_vina_structure(identifier: str, smiles: str, chain: str | None = None,
         c0 = ctr[0]["ca"]
         residues = [r for r in residues
                     if sum((r["ca"][k] - c0[k]) ** 2 for k in range(3)) <= radius ** 2]
-    pocket_atoms = [{"element": "C", "xyz": r["ca"], "resnum": r["resnum"]} for r in residues]
+    pocket_atoms = [{"element": "C", "xyz": r["ca"], "resnum": r["resnum"],
+                     "resname": r.get("resname", "UNK"), "chain": r.get("chain")}
+                    for r in residues]
     out = dock_vina_grid(pocket_atoms, smiles)
     out["structure"] = {"identifier": identifier, "source": s["source"],
                         "chain": chain, "pocket_residues": len(residues)}

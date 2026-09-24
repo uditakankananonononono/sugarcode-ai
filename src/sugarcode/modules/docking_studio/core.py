@@ -17,6 +17,36 @@ ATOM_PROPS = {
 }
 
 
+_SMILES_CHARS = re.compile(r"^[A-Za-z0-9@+\-\[\]()=#$/\\%.:*]+$")
+_ORGANIC = re.compile(r"Cl|Br|[BCNOPSFI]|[bcnops]")
+
+
+def validate_smiles(smiles: str) -> None:
+    """Reject empty or malformed SMILES instead of scoring it as an empty
+    ligand. Syntax-level check (alphabet, organic-subset atoms, brackets,
+    parentheses, ring-closure pairing) - not a full valence check."""
+    if not isinstance(smiles, str) or not smiles.strip():
+        raise ValueError("empty SMILES")
+    s = smiles.strip()
+    if not _SMILES_CHARS.match(s):
+        raise ValueError(f"invalid characters in SMILES: {smiles!r}")
+    depth = 0
+    for ch in s:
+        depth += (ch == "(") - (ch == ")")
+        if depth < 0:
+            break
+    if depth != 0 or s.count("[") != s.count("]"):
+        raise ValueError(f"unbalanced parentheses/brackets in SMILES: {smiles!r}")
+    bare = re.sub(r"\[[^\]]*\]", "", s)  # bracket atoms may hold any element
+    if re.search(r"[A-Za-z]", _ORGANIC.sub("", bare)):
+        raise ValueError(f"unknown atom symbol in SMILES: {smiles!r}")
+    if not _ORGANIC.search(bare) and bare == s:
+        raise ValueError(f"no atoms in SMILES: {smiles!r}")
+    rings = re.findall(r"%\d\d|\d", re.sub(r"\[[^\]]*\]", "", s))
+    if any(rings.count(r) % 2 for r in set(rings)):
+        raise ValueError(f"unclosed ring bond in SMILES: {smiles!r}")
+
+
 def parse_smiles_features(smiles: str) -> dict:
     """Feature extraction from a SMILES string: atom counts, ring/aromatic flags,
     rough LogP (fragment heuristic), H-bond capacity, rotatable bonds."""
@@ -72,8 +102,12 @@ def _score(pocket: dict, lig: dict) -> dict:
             "aromatic": round(-aromatic_bonus, 2), "dg_kcal_mol": round(dg, 2)}
 
 
-def dock(pocket_residues: str, smiles: str, pocket_start: int = 1) -> dict:
-    """Dock one ligand into a pocket defined by its residue sequence."""
+def dock(pocket_residues: str, smiles: str, pocket_start: int = 0) -> dict:
+    """Dock one ligand into a pocket defined by its residue sequence.
+
+    pocket_start is the 0-based offset of the first pocket residue (labels =
+    pocket_start + index + 1). Raises ValueError on empty/malformed SMILES."""
+    validate_smiles(smiles)
     pocket = _pocket_profile(pocket_residues)
     lig = parse_smiles_features(smiles)
     terms = _score(pocket, lig)
