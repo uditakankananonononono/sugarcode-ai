@@ -137,8 +137,10 @@ def parse_sam(text: str) -> dict:
 
 def alignment_end(record: dict) -> int | None:
     """1-based inclusive end on the reference (POS + ref-consuming - 1),
-    None for unmapped reads."""
-    if record["rname"] is None or not record["cigar_ops"]:
+    None for unmapped reads. An unmapped read (flag 0x4) placed at its mate's
+    position can still carry RNAME/POS/CIGAR (bwa does this); per the SAM spec
+    those fields are then not an alignment, so it has no end (matches htslib)."""
+    if record["rname"] is None or not record["cigar_ops"] or record["flag"] & 0x4:
         return None
     return record["pos"] + cigar_reference_length(record["cigar_ops"]) - 1
 
