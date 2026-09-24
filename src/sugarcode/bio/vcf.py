@@ -10,6 +10,7 @@ from __future__ import annotations
 _ENCODINGS = {"%": "%25", ";": "%3B", "=": "%3D", ",": "%2C",
               " ": "%20", "\t": "%09", "\n": "%0A", "\r": "%0D"}
 _DECODINGS = {v: k for k, v in _ENCODINGS.items()}
+_DECODINGS["%3A"] = ":"  # VCF 4.3 sec 1.2 lists %3A; decode-only so writes stay unchanged
 
 
 def escape_value(s: str) -> str:
