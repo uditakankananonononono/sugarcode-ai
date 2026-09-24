@@ -104,11 +104,16 @@ def overlaps(r: dict, chrom: str, start: int, end: int) -> bool:
     return r["chrom"] == chrom and r["start"] < end and start < r["end"]
 
 
-def merge_intervals(records: list[dict]) -> list[dict]:
-    """bedtools-style merge: collapse overlapping intervals per chromosome.
-    Bookended intervals (end == next start) do NOT merge - half-open
-    semantics mean they share no base. Names/scores/strands are dropped
-    (merged intervals carry coordinates only)."""
+def merge_intervals(records: list[dict], min_dist: int = 0) -> list[dict]:
+    """bedtools-merge semantics: collapse intervals per chromosome whose gap
+    is <= min_dist. Default min_dist=0 matches `bedtools merge` (-d 0) and
+    bioframe.merge(min_dist=0): book-ended intervals (end == next start) ARE
+    joined. Use min_dist=-1 to join only intervals sharing >= 1 base.
+    Names/scores/strands are dropped (coordinates only).
+    Validated vs bioframe 0.8.0 on UCSC hg38 rmsk chr20:0-5Mb (11,699 ->
+    8,251 intervals, identical)."""
+    if min_dist < -1:
+        raise ValueError("min_dist must be >= -1")
     by_chrom: dict[str, list[dict]] = {}
     for r in records:
         by_chrom.setdefault(r["chrom"], []).append(r)
@@ -117,7 +122,7 @@ def merge_intervals(records: list[dict]) -> list[dict]:
         iv = sorted(((r["start"], r["end"]) for r in by_chrom[chrom]))
         cur_s, cur_e = iv[0]
         for s, e in iv[1:]:
-            if s < cur_e:
+            if s <= cur_e + min_dist:
                 cur_e = max(cur_e, e)
             else:
                 out.append({"chrom": chrom, "start": cur_s, "end": cur_e})

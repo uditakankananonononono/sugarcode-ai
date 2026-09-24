@@ -20,6 +20,12 @@ def test_cli_bed_stats(capsys, tmp_path):
 def test_cli_bed_merge(capsys, tmp_path):
     assert main(["bed", "merge", _write(tmp_path)]) == 0
     out = capsys.readouterr().out
+    assert "chr1\t0\t200\n" in out and out.count("\nchr") == 2
+
+
+def test_cli_bed_merge_strict(capsys, tmp_path):
+    assert main(["bed", "merge", _write(tmp_path), "-d", "-1"]) == 0
+    out = capsys.readouterr().out
     assert "chr1\t0\t150\n" in out and out.count("\nchr") == 3
 
 
