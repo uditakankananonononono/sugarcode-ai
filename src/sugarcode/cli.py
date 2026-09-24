@@ -21,6 +21,10 @@ Subcommands (all offline except splice assess, all JSON on stdout):
   phylo distance FILE --a X --b Y
   phylo prune FILE --drop a,b [--out F]
   msa stats FILE                 Stockholm/A3M summary, auto-detect (drop 69)
+  pdb stats FILE                 structure summary, PDB or mmCIF (drop 71)
+  pdb chains FILE [--residues [--chain X]]
+  pdb contacts FILE --cutoff 5.0 [--chain-a A --chain-b B]
+  pdb select FILE [--chain X] [--resname Y] [--names CA,CB] [--out F]
   msa consensus FILE [--threshold 0.5]
   msa pid FILE --a id1 --b id2
   msa filter FILE [--min-occupancy F] [--min-coverage F] [--out F]
@@ -540,6 +544,54 @@ def _cmd_sam_pileup(args) -> int:
 
 
 
+def _load_structure(path):
+    from .bio.pdb import parse_pdb, parse_mmcif
+    text = Path(path).read_text()
+    if text.lstrip().startswith(("data_", "#")):
+        return parse_mmcif(text)
+    return parse_pdb(text)
+
+
+def _cmd_pdb_stats(args) -> int:
+    from .bio.pdb import stats
+    return _emit({"file": args.file, **stats(_load_structure(args.file))})
+
+
+def _cmd_pdb_chains(args) -> int:
+    from .bio.pdb import chains, residues
+    s = _load_structure(args.file)
+    out = {"file": args.file, "chains": chains(s)}
+    if args.residues:
+        out["residues"] = residues(s, chain=args.chain)
+    return _emit(out)
+
+
+def _cmd_pdb_contacts(args) -> int:
+    from .bio.pdb import contacts
+    s = _load_structure(args.file)
+    return _emit({"file": args.file, "cutoff": args.cutoff,
+                  "contacts": contacts(s, args.cutoff, chain_a=args.chain_a,
+                                       chain_b=args.chain_b)})
+
+
+def _cmd_pdb_select(args) -> int:
+    from .bio.pdb import select, write_pdb
+    s = _load_structure(args.file)
+    atoms = select(s, chain=args.chain, resname=args.resname,
+                   names=(args.names.split(",") if args.names else None),
+                   record=args.record,
+                   model=(None if args.all_models else 1),
+                   min_bfactor=args.min_bfactor)
+    text = write_pdb({"format": "pdb", "header": {}, "atoms": atoms})
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"wrote {args.out}")
+        return 0
+    sys.stdout.write(text)
+    return 0
+
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
@@ -592,6 +644,33 @@ def main(argv: list[str] | None = None) -> int:
                     help="scan hit threshold (log-odds bits)")
     ws.add_argument("--max-hits", type=int, default=20)
     ws.set_defaults(func=_cmd_pwm_score)
+
+    pdbp = sub.add_parser("pdb", help="PDB/mmCIF structure toolkit")
+    pdbsub = pdbp.add_subparsers(dest="sub", required=True)
+    pst = pdbsub.add_parser("stats", help="structure summary")
+    pst.add_argument("file")
+    pst.set_defaults(func=_cmd_pdb_stats)
+    pch = pdbsub.add_parser("chains", help="list chains (optionally residues)")
+    pch.add_argument("file")
+    pch.add_argument("--residues", action="store_true")
+    pch.add_argument("--chain", default=None)
+    pch.set_defaults(func=_cmd_pdb_chains)
+    pco = pdbsub.add_parser("contacts", help="atom pairs within cutoff")
+    pco.add_argument("file")
+    pco.add_argument("--cutoff", type=float, required=True)
+    pco.add_argument("--chain-a", default=None)
+    pco.add_argument("--chain-b", default=None)
+    pco.set_defaults(func=_cmd_pdb_contacts)
+    pse = pdbsub.add_parser("select", help="filter atoms, write PDB")
+    pse.add_argument("file")
+    pse.add_argument("--chain", default=None)
+    pse.add_argument("--resname", default=None)
+    pse.add_argument("--names", default=None, help="comma-separated atom names")
+    pse.add_argument("--record", choices=["ATOM", "HETATM"], default=None)
+    pse.add_argument("--all-models", action="store_true")
+    pse.add_argument("--min-bfactor", type=float, default=None)
+    pse.add_argument("--out", default=None)
+    pse.set_defaults(func=_cmd_pdb_select)
 
     msa = sub.add_parser("msa", help="Stockholm/A3M alignment toolkit")
     msasub = msa.add_subparsers(dest="sub", required=True)
