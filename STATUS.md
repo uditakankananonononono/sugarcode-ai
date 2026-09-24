@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 11 profile_hmm tests (**1437 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
+Test suite: **1355 passed, 0 failed, 1 skipped** at the audit-fix drop; branch pb6 adds 6 Rule Set 2 fixture-fidelity tests plus 10 crisprscan_score promotion tests and 33 acmg_bayesian tests and 22 rna_nussinov tests and 24 profile_hmm tests incl. Baum-Welch (**1450 passed, 1 skipped** reproduced locally on pb6, 2026-09-24) - full-suite reproduction happens in CI on merge (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -147,8 +147,15 @@ continues drop by drop in order of scientific usefulness.
   (most probable state path + alignment), Forward (total probability), bits and
   log-odds. Verified on hand-computed exact-fraction fixtures and against an
   independent brute-force enumeration of all state paths (max and sum agree to
-  1e-9 on 100+ random models). Limits: global Durbin model only - no Plan7
-  local mode, Dirichlet priors, sequence weighting or Baum-Welch training.
+  1e-9 on 100+ random models). Baum-Welch training added (same day): forward-
+  backward EM on unaligned sequences from an alignment-built or random-seeded
+  model, ML (pseudocount 0; log-likelihood verified non-decreasing) or
+  Dirichlet MAP (objective verified non-decreasing), stop on |delta LL| < tol,
+  per-iteration held-out log-likelihood. E/M steps hand-computed on a
+  1-position model; forward-backward expected counts equal exact posterior
+  counts from brute-force path enumeration to 1e-12. Limits: global Durbin
+  model only - no Plan7 local mode, Dirichlet mixtures or sequence weighting;
+  EM reaches a local optimum that depends on the starting model.
 - rna_nussinov: NEW MODULE (2026-09-24, branch pb6). Nussinov-Jacobson 1980 (PNAS
   77:6309, PMID 6161375) maximum base-pair RNA secondary structure at
   src/sugarcode/modules/rna_nussinov/, registered under synthetic-biology (91

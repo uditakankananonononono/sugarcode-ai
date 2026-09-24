@@ -18,6 +18,12 @@
   against exhaustive path enumeration.
 - No vendored data or parameter tables. Fixtures are hand-computed exact
   fractions (derivations in tests/test_profile_hmm.py).
+- Baum-Welch training (training.py): Durbin et al. Chapter 3.3 expected-count
+  equations (forward-backward, with the silent-state variant for delete
+  states) applied to the Chapter 5 profile HMM. Pseudocounts act as a symmetric
+  Dirichlet prior (MAP-EM). Hand-computed E/M fixtures are in
+  tests/test_profile_hmm_training.py; exact posterior counts come from
+  brute-force path enumeration.
 
 ## rna_nussinov (2026-09-24, branch pb6)
 

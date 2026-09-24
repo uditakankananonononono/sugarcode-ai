@@ -28,8 +28,32 @@ forward(m, "HEAGAWHEE")["log_prob"]  # sum over all paths
 - Scores are natural-log probabilities, plus bits and log-odds against an
   i.i.d. background.
 - No local/glocal (HMMER Plan7-style) mode, no Dirichlet mixture priors, no
-  sequence weighting, no Baum-Welch training. This is the Durbin Chapter 5
-  global model built from an alignment.
+  sequence weighting. This is the Durbin Chapter 5 global model.
+
+## Baum-Welch training (unaligned sequences)
+
+```python
+from sugarcode.modules.profile_hmm import baum_welch, random_profile_hmm
+
+m0 = random_profile_hmm(6, "ACGT", seed=7)          # or build_profile_hmm(alignment)
+m, report = baum_welch(m0, train_seqs, heldout=test_seqs,
+                       pseudocount=1.0, tol=1e-6, max_iter=100)
+report["converged"], report["iterations"], report["reason"]
+report["history"]      # per iteration: train LL, objective, held-out LL (+ per residue)
+```
+
+- E-step: forward-backward expected emission and transition counts (Durbin
+  3.3), including silent delete states. The M-step renormalizes
+  counts + pseudocount over the transitions that exist.
+- `pseudocount=0` is classic maximum-likelihood Baum-Welch: the training
+  log-likelihood never decreases. With `pseudocount > 0` it is MAP-EM under a
+  symmetric Dirichlet(alpha + 1) prior. In that case the objective
+  (log-likelihood + alpha * sum log theta) never decreases, and it is reported too.
+- Stops when |delta training log-likelihood| < `tol`, or at `max_iter`.
+- Held-out log-likelihood (total and per residue) is recorded at every
+  iteration. With `pseudocount=0` it can be -inf for residues the model never saw.
+- `update_insert_emissions=False` keeps insert emissions fixed (e.g. background).
+- Like any EM, it finds a local optimum that depends on the starting model.
 
 Verification: tiny-model fixtures computed by hand as exact fractions
 (construction, Viterbi 64/735, a 5-path Forward sum, insert and delete paths).
