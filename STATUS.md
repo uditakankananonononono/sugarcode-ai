@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1709 passed, 0 failed, 7 skipped** on the pb3 + pb6 integration merge (95 modules), run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
+Test suite: **1807 passed, 0 failed, 8 skipped** after the 2026-09-24 audit fix wave (earlier: 1709 passed / 7 skipped on the pb3 + pb6 integration merge), 95 modules, run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
 verified outside pytest and recorded below). The suite now runs in GitHub
 Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
 count is independently reproduced, not developer-reported.
@@ -131,7 +131,7 @@ model endpoint or HF token is configured here.
 | neodti_engine | Live ChEMBL measured potency: sirolimus IC50 0.1 nM/mTOR, simvastatin Ki 2.6 nM/HMGCR, aspirin IC50 62.5 uM/COX2 | ChEMBL REST |
 | gene_analysis | Live PubMed yearly literature counts + trend call | NCBI PubMed |
 | bio_copilot | Gene route grounded in live UniProt, sources named | UniProt |
-| chemgpt_engine | Live ChEMBL similarity: aspirin 100% self-match (phase 4); novel molecules correctly report no neighbors | ChEMBL similarity endpoint |
+| chemgpt_engine | Live ChEMBL similarity endpoint wired; 2026-09-24 audit re-check: aspirin's top hit was CHEMBL2296002 (phase 0), so the earlier '100% self-match, phase 4' result did not reproduce; novel molecules report no neighbors | ChEMBL similarity endpoint |
 | codon_opt | Published codon tables (E. coli, human, yeast) vendored with PROVENANCE.md; cross-validated vs legacy (Arg tie documented) | Edinburgh Genome Foundry codon-usage-tables |
 | liquid_biopsy | cfDNA fragment model anchored to published peaks (166 bp healthy / 134-144 bp ctDNA; Snyder 2016, Underhill 2016); monotone in tumor fraction | literature anchors (labeled) |
 | neuroplan_ai | A* over eloquent-region risk field; 33% risk reduction on obstructed entries live-verified | internal verification |
