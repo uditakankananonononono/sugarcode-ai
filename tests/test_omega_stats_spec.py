@@ -41,3 +41,18 @@ def test_validation_errors_are_informative():
  with pytest.raises(ValueError,match="non-empty"): validate_observations([])
  with pytest.raises(ValueError,match="kind"): validate_observations([{**rows()[0],"kind":"unknown"}])
  with pytest.raises(ValueError,match="targets"): performance_dashboard(rows(),latency_target_ms=0)
+
+
+def test_audit_accuracy_target_default_and_health_feed():
+    import time as _t
+    from sugarcode.modules.omega_stats import performance_dashboard, recorded_observations
+    from omega.health import compute_flux
+    now = _t.time()
+    obs = [{"module": "crispr_opt", "metric": "precision", "value": v, "kind": "accuracy", "ts": now - i}
+           for i, v in enumerate([.95, .96, .97])]
+    assert performance_dashboard(obs, now=now)["alerts"] == []
+    bad = [dict(o, value=.5) for o in obs]
+    assert performance_dashboard(bad, now=now)["alerts"][0]["severity"] == "critical"
+    before = len(recorded_observations("latency"))
+    compute_flux()
+    assert len(recorded_observations("latency")) > before
