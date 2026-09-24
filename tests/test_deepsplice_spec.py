@@ -19,3 +19,10 @@ def test_report_complete_honest():
  alt=D[:3]+'A'+D[4:]; r=splicing_report(D,alt,context_sequence='GAAGAA'+D); assert r['isoforms'] and r['regulatory'] and 'no transformer/GNN' in r['model_status']
 def test_diagnostics_finite_and_honest():
  d=splice_diagnostics(splicing_report(D,D[:3]+'A'+D[4:])); assert len(d)==13 and all(math.isfinite(x) for x in d.values())
+
+
+def test_audit_exon_inclusion_anchored_to_reference_site():
+    from sugarcode.modules.deepsplice.core import exon_inclusion
+    reg = {"exon_definition_support": .5}
+    assert exon_inclusion(.9, .9, reg)["psi"] > .99
+    assert abs(exon_inclusion(.9, .75, reg)["psi"] - .5) < 1e-9  # calibrated -0.15 loss band -> psi 0.5

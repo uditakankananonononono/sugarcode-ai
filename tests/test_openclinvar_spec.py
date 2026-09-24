@@ -22,3 +22,14 @@ def test_integrated_intelligence_complete_honest():
  r=variant_intelligence('G','v',acmg_evidence=[{'strength':'strong','direction':'pathogenic'}],literature=[{'classification':'pathogenic'}],phenotypes=['H1'],pathways=['P'],patient_hpo=['H1']); assert r['reasoning_graph'] and r['phenotype_match']['score']>0 and 'no trained transformer/GNN' in r['model_status']
 def test_diagnostics_honest_finite():
  r=variant_intelligence('G','v',acmg_evidence=[{'strength':'strong','direction':'pathogenic'}],literature=[{'classification':'pathogenic'}]); d=clinvar_diagnostics(r); assert len(d)==12 and all(math.isfinite(x) for x in d.values())
+
+
+def test_audit_consequence_resolved_from_hgvs_never_silent_missense():
+    from sugarcode.modules.openclinvar.core import _consequence_from_hgvs, interpret_variant
+    assert _consequence_from_hgvs("c.100delA") == "frameshift"
+    assert _consequence_from_hgvs("p.Gly12fs") == "frameshift"
+    assert _consequence_from_hgvs("p.Arg175Ter") == "nonsense"
+    assert _consequence_from_hgvs("c.100+1G>A") == "splice_disruption"
+    assert interpret_variant("TP53", "c.100dupA")["consequence"] == "frameshift"
+    assert interpret_variant("TP53", "c.100A>G")["consequence"] != "missense"
+    assert interpret_variant("TP53", "c.100A>G", consequence="missense")["consequence"] == "missense"

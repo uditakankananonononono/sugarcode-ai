@@ -1,4 +1,5 @@
 from __future__ import annotations
+import re
 from ...bio.sequence import STANDARD_CODE, AA_NAMES
 
 # ACMG-style evidence rules (simplified but mechanistic)
@@ -6,6 +7,7 @@ CONSEQUENCE_WEIGHTS = {
     "nonsense": 0.9, "frameshift": 0.95, "splice_disruption": 0.9,
     "missense": 0.45, "inframe_indel": 0.4, "synonymous": 0.05,
     "utr": 0.15, "intronic": 0.1, "intergenic": 0.05,
+    "unknown": 0.35,  # undetermined consequence starts at VUS, not benign
 }
 # small built-in reference of well-known pathogenic/likely-benign exemplars
 KNOWN = {
@@ -34,6 +36,50 @@ def _classify_consequence(ref_codon: str, alt_codon: str) -> str:
     return "missense"
 
 
+def _consequence_from_hgvs(variant: str) -> str | None:
+    """Infer the molecular consequence from HGVS notation when it is unambiguous.
+
+    Returns None when the notation alone cannot tell (e.g. a coding SNV
+    without codon context) instead of guessing "missense".
+    """
+    v = (variant or "").strip()
+    if re.search(r"fs(\*|Ter)?\d*$", v) or "fs" in v.split(".")[-1]:
+        return "frameshift"
+    if v.startswith("p."):
+        if re.search(r"(\*|Ter|X)$", v):
+            return "nonsense"
+        if v.endswith("="):
+            return "synonymous"
+        if re.search(r"(del|dup|ins)", v):
+            return "inframe_indel"
+        if re.fullmatch(r"p\.\(?[A-Z][a-z]{0,2}\d+[A-Z][a-z]{0,2}\)?", v):
+            return "missense"
+        return None
+    if v.startswith("c."):
+        body = v[2:]
+        m = re.match(r"^-?\*?\d+([+-])(\d+)", body)
+        if m:
+            k = int(m.group(2))
+            if k <= 2:
+                return "splice_disruption"
+            return None if k <= 20 else "intronic"  # splice region: undetermined, not benign
+        if body.startswith("-") or body.startswith("*"):
+            return "utr"
+        m = re.match(r"^(\d+)(?:_(\d+))?(del|dup|ins|delins)([ACGT]*)", body)
+        if m:
+            start, end, kind, bases = int(m.group(1)), m.group(2), m.group(3), m.group(4)
+            if kind in ("del", "dup"):
+                n = (int(end) - start + 1) if end else (len(bases) or 1)
+            elif kind == "ins":
+                n = len(bases)
+            else:  # delins: net length change
+                n = abs(len(bases) - ((int(end) - start + 1) if end else 1))
+            if n == 0 and kind != "delins":
+                return None
+            return "inframe_indel" if n % 3 == 0 else "frameshift"
+    return None
+
+
 def interpret_variant(gene: str, variant: str, consequence: str | None = None,
                       ref_codon: str | None = None, alt_codon: str | None = None,
                       allele_frequency: float | None = None,
@@ -47,7 +93,9 @@ def interpret_variant(gene: str, variant: str, consequence: str | None = None,
     evidence: list[dict] = []
     if consequence is None and ref_codon and alt_codon:
         consequence = _classify_consequence(ref_codon, alt_codon)
-    consequence = consequence or "missense"
+    if consequence is None:
+        consequence = _consequence_from_hgvs(variant)
+    consequence = consequence or "unknown"
     base = CONSEQUENCE_WEIGHTS.get(consequence, 0.3)
     evidence.append({"rule": "consequence_type", "weight": base,
                      "detail": f"{consequence} baseline weight {base}"})
@@ -106,6 +154,8 @@ def _plain(gene: str, variant: str, consequence: str, cls: str) -> str:
         "missense": "swaps one amino-acid building block for another",
         "synonymous": "changes the DNA spelling but not the protein",
         "splice_disruption": "disrupts how the gene's message is cut and joined",
+        "inframe_indel": "adds or removes amino acids without shifting the reading frame",
+        "unknown": "has a molecular effect that cannot be determined from the notation alone",
     }.get(consequence, f"causes a {consequence} change")
     cls_plain = {
         "pathogenic": "is expected to cause disease",
@@ -375,8 +425,8 @@ def forward_trajectory(classification,penetrance=.5,ages=(20,40,60)):
 def federated_evidence(updates,prior_alpha=1,prior_beta=1):
     successes=sum(float(x['supporting']) for x in updates); total=sum(float(x['total']) for x in updates); a=prior_alpha+successes; b=prior_beta+total-successes; return {'alpha':a,'beta':b,'posterior_mean':a/(a+b),'sites':len(updates),'shared_data':'aggregate counts only'}
 
-def variant_intelligence(gene,variant,consequence='missense',acmg_evidence=None,literature=None,phenotypes=(),pathways=(),patient_hpo=()):
-    local=interpret_variant(gene,variant,consequence=consequence); bayes=bayesian_acmg(acmg_evidence or []); lit=evidence_consensus(literature or []); graph=reasoning_graph(gene,variant,consequence,phenotypes,pathways); match=phenotype_match(patient_hpo,phenotypes); return {'local_interpretation':local,'bayesian_acmg':bayes,'literature_consensus':lit,'reasoning_graph':graph,'phenotype_match':match,'trajectory':forward_trajectory(bayes['classification']),'model_status':'Transparent evidence aggregation; no trained transformer/GNN and not a diagnosis or clinical recommendation.'}
+def variant_intelligence(gene,variant,consequence=None,acmg_evidence=None,literature=None,phenotypes=(),pathways=(),patient_hpo=()):
+    local=interpret_variant(gene,variant,consequence=consequence); consequence=local['consequence']; bayes=bayesian_acmg(acmg_evidence or []); lit=evidence_consensus(literature or []); graph=reasoning_graph(gene,variant,consequence,phenotypes,pathways); match=phenotype_match(patient_hpo,phenotypes); return {'local_interpretation':local,'bayesian_acmg':bayes,'literature_consensus':lit,'reasoning_graph':graph,'phenotype_match':match,'trajectory':forward_trajectory(bayes['classification']),'model_status':'Transparent evidence aggregation; no trained transformer/GNN and not a diagnosis or clinical recommendation.'}
 
 def clinvar_diagnostics(report):
     b=report['bayesian_acmg']; l=report['literature_consensus']; g=report['reasoning_graph']; m=report['phenotype_match']; t=report['trajectory']; return {'posterior_probability':b['posterior_probability'],'acmg_evidence_count':float(len(b['reasoning_trace'])),'literature_record_count':float(len(l.get('records',[]))),'literature_conflict_count':float(len(l['conflicts'])),'effective_support':float(l['effective_support']),'graph_nodes':float(len(g['nodes'])),'graph_edges':float(len(g['edges'])),'causal_chain_length':float(len(g['causal_chain'])),'phenotype_exact_matches':float(m['exact_matches']),'phenotype_partial_matches':float(m['semantic_partial']),'phenotype_score':m['score'],'trajectory_final_risk':t['cumulative_risk'][-1]}
