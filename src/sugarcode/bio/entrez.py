@@ -135,12 +135,46 @@ def clinvar_variants(gene: str, retmax: int = 20, offline: bool = False) -> list
     return out
 
 
+_TX_CORE = __import__("re").compile(
+    r"^\s*(?:(?P<tx>[A-Z]{2}_\d+(?:\.\d+)?)(?:\([^)]*\))?:)?(?P<core>[cgmnp]\.[^\s()]+(?:\([^)]*\))?[^\s()]*)")
+
+
+def _hgvs_core(notation: str) -> str | None:
+    """'NM_000038.6(APC):c.1668T>C (p.Asp556=)' -> 'c.1668T>C'."""
+    m = _TX_CORE.match((notation or "").strip().strip('"'))
+    return m.group("core") if m else None
+
+
+def clinvar_query(gene: str, notation: str) -> str:
+    """ClinVar esearch term for one variant. ClinVar names carry a trailing
+    ' (p.X)' that breaks a quoted phrase query, so the query uses the
+    transcript-qualified c. core when a transcript is given (1 exact hit in
+    the 8-variant pilot) and gene + core otherwise."""
+    n = (notation or "").strip().strip('"')
+    m = _TX_CORE.match(n)
+    if not m:
+        return f'{gene}[gene] AND "{n.split(":")[-1]}"'
+    core, tx = m.group("core"), m.group("tx")
+    if tx:
+        return f'"{tx}:{core}"'
+    return f'{gene}[gene] AND "{core}"'
+
+
 def clinvar_exact(gene: str, notation: str, offline: bool = False) -> list[dict]:
     """Targeted ClinVar lookup for one variant notation (e.g. 'c.68_69del',
     'p.Arg273His'). Uses a quoted phrase query - far better than paging the
     gene's whole variant set."""
-    needle = notation.split(":")[-1].strip('"')
-    ids = esearch("clinvar", f"{gene}[gene] AND \"{needle}\"", retmax=20, offline=offline)
+    ids = esearch("clinvar", clinvar_query(gene, notation), retmax=20, offline=offline)
+    core = _hgvs_core(notation)
+    fallback = f'{gene}[gene] AND "{core}"' if core else None
+    if not ids and fallback and fallback != clinvar_query(gene, notation):
+        # transcript-qualified phrase missed (e.g. version drift): gene + core
+        try:
+            ids = esearch("clinvar", fallback, retmax=20, offline=offline)
+        except EntrezError:
+            if not offline:
+                raise
+            ids = []
     out = []
     for uid, doc in esummary("clinvar", ids, offline=offline).items():
         germ = doc.get("germline_classification", {})
@@ -149,3 +183,4 @@ def clinvar_exact(gene: str, notation: str, offline: bool = False) -> list[dict]
                     "review_status": germ.get("review_status", ""),
                     "condition": (doc.get("trait_set") or [{}])[0].get("trait_name", "")})
     return out
+

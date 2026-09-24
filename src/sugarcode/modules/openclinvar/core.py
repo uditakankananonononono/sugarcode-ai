@@ -35,6 +35,30 @@ def _classify_consequence(ref_codon: str, alt_codon: str) -> str:
         return "nonsense"
     return "missense"
 
+_CLINVAR_NAME = re.compile(
+    r"^\s*(?:(?P<tx>[A-Z]{2}_\d+(?:\.\d+)?)(?:\((?P<gene>[^)]+)\))?:)?"
+    r"(?P<c>[cgmn]\.[^\s(]+)?\s*(?:\(?(?P<p>p\.[^\s)]+(?:\))?)\)?)?\s*$")
+
+
+def normalize_hgvs(variant: str) -> dict:
+    """Split a ClinVar-style name such as
+    'NM_000038.6(APC):c.1668T>C (p.Asp556=)' into transcript, gene, the
+    c./g. core and the protein-level change. Bare 'c.68_69del' or
+    'p.Arg518Ser' inputs pass through. Unparseable input returns the
+    stripped string as 'raw' with the other fields None."""
+    v = (variant or "").strip()
+    out = {"raw": v, "transcript": None, "gene": None, "c": None, "p": None}
+    m = _CLINVAR_NAME.match(v)
+    if m and (m.group("c") or m.group("p")):
+        out.update(transcript=m.group("tx"), gene=m.group("gene"), c=m.group("c"))
+        pv = m.group("p")
+        if pv:
+            pv = pv.rstrip(")") if pv.count(")") > pv.count("(") else pv
+            if pv.startswith("p.(") and pv.endswith(")"):
+                pv = "p." + pv[3:-1]
+            out["p"] = pv
+    return out
+
 
 def _consequence_from_hgvs(variant: str) -> str | None:
     """Infer the molecular consequence from HGVS notation when it is unambiguous.
@@ -42,6 +66,21 @@ def _consequence_from_hgvs(variant: str) -> str | None:
     Returns None when the notation alone cannot tell (e.g. a coding SNV
     without codon context) instead of guessing "missense".
     """
+    n = normalize_hgvs(variant)
+    if n["c"] or n["p"]:
+        # ClinVar-style names carry both levels: the protein change decides
+        # coding SNVs (missense/synonymous/nonsense), the c. core decides
+        # splice/intronic/UTR/indel calls that have no protein notation.
+        if n["c"] and n["c"] != variant.strip():
+            from_c = _consequence_from_hgvs(n["c"])
+            if from_c in ("splice_disruption", "intronic", "utr"):
+                return from_c
+        if n["p"] and n["p"] != variant.strip():
+            from_p = _consequence_from_hgvs(n["p"])
+            if from_p is not None:
+                return from_p
+        if n["c"] and n["c"] != variant.strip():
+            return _consequence_from_hgvs(n["c"])
     v = (variant or "").strip()
     if re.search(r"fs(\*|Ter)?\d*$", v) or "fs" in v.split(".")[-1]:
         return "frameshift"
@@ -351,11 +390,16 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
         r["clinvar_live"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
         return r
     # phrase queries can return near-misses: verify the notation truly appears
-    needle = variant.split(":")[-1].replace(" ", "")
+    nv = normalize_hgvs(variant)
+    needle = (nv["c"] or nv["p"] or variant.split(":")[-1]).replace(" ", "")
     matched = [e for e in matched if needle and needle in e["title"].replace(" ", "")]
+    if nv["transcript"]:
+        tx_base = nv["transcript"].split(".")[0]
+        same_tx = [e for e in matched if tx_base in e["title"]]
+        matched = same_tx or matched
     if not matched:
         r["clinvar_live"] = {"status": "no live ClinVar entry for this exact variant",
-                             "query": f'{gene}[gene] AND "{variant.split(":")[-1]}"'}
+                             "query": entrez.clinvar_query(gene, variant)}
         return r
     m = matched[0]
     stars = clinvar_stars(m["review_status"])
@@ -430,3 +474,4 @@ def variant_intelligence(gene,variant,consequence=None,acmg_evidence=None,litera
 
 def clinvar_diagnostics(report):
     b=report['bayesian_acmg']; l=report['literature_consensus']; g=report['reasoning_graph']; m=report['phenotype_match']; t=report['trajectory']; return {'posterior_probability':b['posterior_probability'],'acmg_evidence_count':float(len(b['reasoning_trace'])),'literature_record_count':float(len(l.get('records',[]))),'literature_conflict_count':float(len(l['conflicts'])),'effective_support':float(l['effective_support']),'graph_nodes':float(len(g['nodes'])),'graph_edges':float(len(g['edges'])),'causal_chain_length':float(len(g['causal_chain'])),'phenotype_exact_matches':float(m['exact_matches']),'phenotype_partial_matches':float(m['semantic_partial']),'phenotype_score':m['score'],'trajectory_final_risk':t['cumulative_risk'][-1]}
+
