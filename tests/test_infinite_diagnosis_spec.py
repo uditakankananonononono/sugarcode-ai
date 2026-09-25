@@ -10,7 +10,7 @@ def _joint_result():
 
 def test_cross_domain_top_level_keys():
  r = cross_domain_diagnosis(CASE_TEXT)
- assert set(r.keys()) == {"biomarker_candidates", "case", "experimental_roadmap", "hidden_clusters", "novelty_note"}
+ assert set(r.keys()) == {"biomarker_candidates", "case", "catalog_status", "curated_disease_matches", "experimental_roadmap", "hidden_clusters", "novelty_note"}
  assert isinstance(r["case"], str)
  assert isinstance(r["novelty_note"], str)
  assert isinstance(r["biomarker_candidates"], list)

@@ -10,7 +10,23 @@ def cross_domain_diagnosis(case: str, limit: int = 8, offline: bool = False) -> 
     then composes an experimental roadmap.
     """
     engine = UnifiedSearch()
-    hits = engine.search(case, limit=limit * 2)
+    # Real-case finding (module sweep 102): the raw case went straight to the
+    # catalog ranker, so "and"/"with" produced every angle for real clinical
+    # phrasings ("tall stature and lens dislocation" -> SynDroid, Micro-Tx...).
+    # Rank on content words only.
+    hits = engine.search(_content_query(case), limit=limit * 2)
+    # Real-case finding (module sweep 102): module specs never name diseases,
+    # symptoms or genes, so a case like "cystic fibrosis" matched zero modules
+    # even though RareNet AI holds a curated record for it. Bridge the case
+    # terms to rarenet's structured disease records and add that module.
+    curated = _curated_disease_matches(case)
+    if curated and not any(h["slug"] == "rarenet_ai" for h in hits):
+        from omega.search import REGISTRY
+        spec = REGISTRY.get("rarenet_ai")
+        if spec is not None:
+            hits.append({"slug": "rarenet_ai", "name": spec.name,
+                         "subnetwork": spec.subnetwork, "summary": spec.summary,
+                         "score": 0.0})
     clusters: dict[str, list[dict]] = {}
     for h in hits:
         clusters.setdefault(h["subnetwork"], []).append(h)
@@ -28,10 +44,49 @@ def cross_domain_diagnosis(case: str, limit: int = 8, offline: bool = False) -> 
         "hidden_clusters": perspectives,
         "biomarker_candidates": leads,
         "experimental_roadmap": roadmap,
+        "curated_disease_matches": curated,
+        "catalog_status": (f"{len(hits)} module hits" if hits else
+                           "no module in the catalog matched the case terms"),
         "novelty_note": ("angles come from a keyword match against Sugarcode's own module "
                          "catalog; biomarker candidates are PubMed records (live NCBI "
                          f"E-utilities) for the case terms - {lit_status}"),
     }
+
+
+_FUNCTION_WORDS = {"and", "or", "with", "without", "of", "the", "a", "an", "in", "on",
+                   "for", "to", "is", "are", "was", "were", "be", "has", "have", "had",
+                   "who", "which", "that", "this", "from", "by", "at", "as", "but",
+                   "not", "no", "his", "her", "their", "its", "into", "than"}
+
+
+def _content_query(case: str) -> str:
+    """Case text minus English function words (catalog ranking input)."""
+    import re
+    return " ".join(t for t in re.findall(r"[a-z0-9]+", case.lower())
+                    if t not in _FUNCTION_WORDS)
+
+
+def _curated_disease_matches(case: str) -> list[dict]:
+    """Rarenet curated diseases whose name, symptom or gene appears in the case.
+
+    Whole-phrase, case-insensitive matching on the structured record fields
+    (disease key and symptoms with underscores read as spaces; gene symbols as
+    whole words). Returns [] when nothing matches - nothing is inferred."""
+    import re
+    from ..rarenet_ai.core import RARE_DISEASES
+    text = " " + re.sub(r"[^a-z0-9]+", " ", case.lower()) + " "
+    out = []
+    for disease, d in RARE_DISEASES.items():
+        via = []
+        name = disease.replace("_", " ")
+        if f" {name} " in text or (name.endswith("s") and f" {name[:-1]} " in text):
+            via.append(f"disease:{disease}")
+        via += [f"symptom:{s}" for s in sorted(d["symptoms"])
+                if f" {s.replace('_', ' ')} " in text]
+        via += [f"gene:{g}" for g in d["genes"] if f" {g.lower()} " in text]
+        if via:
+            out.append({"disease": disease, "genes": list(d["genes"]), "matched_via": via})
+    return out
 
 
 def _hook(subnetwork: str) -> str:
