@@ -45,7 +45,15 @@ import math, random
 from collections import Counter
 
 def sequence_risk(seq):
- s=''.join(x for x in seq.upper() if x in 'ACGT'); gc=(s.count('G')+s.count('C'))/max(1,len(s)); repeats=max((s.count(s[i:i+k]) for k in range(2,9) for i in range(max(0,len(s)-k+1))),default=0); pal=sum(s[i:i+6]==s[i:i+6][::-1] for i in range(max(0,len(s)-5))); return {'gc_fraction':gc,'gc_extreme':abs(gc-.5)*2,'repeat_burden':repeats/max(1,len(s)),'palindrome_count':pal,'mutation_risk':min(1,abs(gc-.5)+repeats/max(1,len(s))+.05*pal)}
+ s=''.join(x for x in seq.upper() if x in 'ACGT')
+ gc=(s.count('G')+s.count('C'))/max(1,len(s))
+ repeats=max((s.count(s[i:i+k]) for k in range(2,9) for i in range(max(0,len(s)-k+1))),default=0)
+ # BUG 49 fix: biological palindromes are inverted repeats - a 6-mer equal to its
+ # REVERSE COMPLEMENT (EcoRI GAATTC). The old check compared against the plain
+ # reverse, which matches almost nothing in DNA and counted 0 for real sites.
+ comp=str.maketrans('ACGT','TGCA')
+ pal=sum(s[i:i+6]==s[i:i+6].translate(comp)[::-1] for i in range(max(0,len(s)-5)))
+ return {'gc_fraction':gc,'gc_extreme':abs(gc-.5)*2,'repeat_burden':repeats/max(1,len(s)),'palindrome_count':pal,'mutation_risk':min(1,abs(gc-.5)+repeats/max(1,len(s))+.05*pal)}
 def resource_burden(ribosome_fraction,atp_fraction,cofactor_fraction,toxic_intermediate=0): return {'total':min(1,.4*ribosome_fraction+.3*atp_fraction+.2*cofactor_fraction+.1*toxic_intermediate),'components':{'ribosome':ribosome_fraction,'atp':atp_fraction,'cofactor':cofactor_fraction,'toxicity':toxic_intermediate}}
 def population_simulation(initial_functional=1,mutation_rate=.001,selection_cost=.01,drift_population=1000,generations=100,seed=0):
  rng=random.Random(seed); f=initial_functional; trace=[]
