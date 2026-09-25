@@ -99,12 +99,13 @@ def deterministic_expression(hours=24,transcription=1,translation=2,mrna_decay=.
 
 def gillespie_expression(hours=24,transcription=1,translation=2,mrna_decay=.5,protein_decay=.1,seed=0):
  if min(hours,transcription,translation,mrna_decay,protein_decay)<=0: raise ValueError("SSA parameters positive required")
- rng=np.random.default_rng(seed); t=0.; m=p=0; events=[]
- while t<hours and len(events)<200000:
+ rng=np.random.default_rng(seed); t=0.; m=p=0; events=[]; truncated=False
+ while t<hours:
+  if len(events)>=200000: truncated=True; break
   rates=np.array([transcription,translation*m,mrna_decay*m,protein_decay*p]); total=rates.sum(); t+=rng.exponential(1/total)
   if t>hours: break
   event=int(rng.choice(4,p=rates/total)); m+=1 if event==0 else -1 if event==2 else 0; p+=1 if event==1 else -1 if event==3 else 0; events.append((t,m,p))
- return {"hours":hours,"seed":seed,"event_count":len(events),"final_mrna":m,"final_protein":p,"events":events}
+ return {"hours":hours,"simulated_hours":round(t,4),"truncated":truncated,"seed":seed,"event_count":len(events),"final_mrna":m,"final_protein":p,"events":events}
 
 def logic_circuit(operator,inputs):
  vals=[bool(x) for x in inputs]; op=operator.upper()
@@ -126,7 +127,9 @@ def scan_guides(sequence,pams=('NGG','NAG')):
 
 def variant_effect(ref_codon,alt_codon,conservation=.5,active_site=False):
  code={"GCT":"A","GCC":"A","GCA":"A","GCG":"A","TGG":"W","TGA":"*","TAA":"*","TAG":"*","GAA":"E","GAG":"E","GAC":"D","GAT":"D","AAA":"K","AAG":"K","ATG":"M"}
- ref=code.get(ref_codon.upper(),'X'); alt=code.get(alt_codon.upper(),'X'); cons=_unit(conservation,'conservation'); stop=alt=='*'; missense=ref!=alt and not stop
+ ref=code.get(ref_codon.upper()); alt=code.get(alt_codon.upper())
+ if ref is None or alt is None: raise ValueError("codon not in the translation table (was: silently mapped to X, so invalid codons scored as synonymous); valid: "+str(sorted(code)))
+ cons=_unit(conservation,'conservation'); stop=alt=='*'; missense=ref!=alt and not stop
  sift=max(0,1-cons-(.3 if active_site else 0)); poly=min(1,.2+.6*cons+(.2 if active_site else 0)+(.3 if stop else 0))
  return {"ref_aa":ref,"alt_aa":alt,"class":"stop_gain" if stop else "missense" if missense else "synonymous","sift_proxy":sift,"polyphen_proxy":poly,"deleterious_probability":max(1-sift,poly)}
 
