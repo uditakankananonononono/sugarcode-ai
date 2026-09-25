@@ -23,7 +23,7 @@ KEYWORDS = {
     "security": ("security", "breach", "leak", "credential", "vulnerability"),
     "bug": ("error", "crash", "wrong", "fail", "bug", "broken", "traceback", "exception"),
     "custom_build": ("custom", "bespoke", "build", "tailor", "white-label"),
-    "integration": ("integrate", "api", "pipeline", "connect", "deploy", "webhook"),
+    "integration": ("integrate", "integration", "api", "pipeline", "connect", "deploy", "webhook"),
     "feature": ("add", "support", "feature", "would like", "request"),
 }
 URGENCY = {"blocked": 3, "production": 3, "urgent": 3, "deadline": 2,
@@ -41,18 +41,27 @@ def _tokens(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+(?:[_-][a-z0-9]+)*", text.lower())
 
 
+_SUFFIX = r"(?:s|es|ed|d|ing|ure|ures)?"
+
+
+def _kw_hits(q: str, words) -> list[str]:
+    """Whole-word keyword hits with simple inflections.  Plain substring tests
+    matched "add" in "address", "api" in "rapid" and "build" in "rebuild"."""
+    return [w for w in words if re.search(rf"(?<![a-z0-9]){re.escape(w)}{_SUFFIX}(?![a-z0-9])", q)]
+
+
 def classify_inquiry(inquiry: str) -> dict:
     """Rule-based multi-label classification with auditable evidence."""
     if not isinstance(inquiry, str) or not inquiry.strip():
         raise ValueError("inquiry must be non-empty text")
     q = inquiry.lower()
-    hits = {kind: [word for word in words if word in q] for kind, words in KEYWORDS.items()}
+    hits = {kind: _kw_hits(q, words) for kind, words in KEYWORDS.items()}
     hits = {k: v for k, v in hits.items() if v}
     precedence = ("security", "bug", "custom_build", "integration", "feature")
     primary = next((k for k in precedence if k in hits), "question")
     if primary == "feature" and "custom" in q:
         primary = "custom_build"
-    urgency_hits = [word for word in URGENCY if word in q]
+    urgency_hits = _kw_hits(q, URGENCY)
     return {"primary": primary, "labels": sorted(hits), "keyword_evidence": hits,
             "urgency_score": min(5, sum(URGENCY[w] for w in urgency_hits)),
             "urgency_evidence": urgency_hits}
@@ -64,9 +73,18 @@ def detect_modules(inquiry: str, module: str | None = None) -> list[dict]:
         raise KeyError(f"unknown module {module!r}")
     q = inquiry.lower().replace("-", "_").replace(" ", "_")
     found = {module} if module else set()
+    flat = q.replace("_", "")
+    # Longest slugs first; a matched span is blanked so "neuro_hub_dashboard"
+    # no longer also reports its prefix "neuro_hub" (same for cellpainter_4d).
+    # Slugs that share a key (syn_bio_studio / synbio_studio) stay reported
+    # together - that name collision is genuinely ambiguous.
+    keys: dict[str, list[str]] = {}
     for slug in MODULE_TO_NET:
-        if slug in q or slug.replace("_", "") in q.replace("_", ""):
-            found.add(slug)
+        keys.setdefault(slug.replace("_", ""), []).append(slug)
+    for key in sorted(keys, key=lambda k: (-len(k), k)):
+        if key in flat:
+            found.update(keys[key])
+            flat = flat.replace(key, " " * len(key))
     return [{"module": slug, "sub_network": MODULE_TO_NET[slug]} for slug in sorted(found)]
 
 
@@ -208,18 +226,22 @@ def schedule_queue(tickets: Iterable[Mapping], capacity_hours: float) -> dict:
     rows = [dict(t) for t in tickets]
     if capacity_hours < 0 or len(rows) > 22:
         raise ValueError("capacity must be non-negative and queue limited to 22 tickets")
-    best = (-1.0, -1, (), 0.0)
+    # Selection is tracked by row index.  The old code keyed rows by
+    # ticket_id, defaulting to the position inside the chosen subset, so
+    # tickets without IDs returned the wrong row and duplicate IDs returned
+    # every row sharing the ID (over capacity).
+    best = (-1.0, -1, (), 0.0, ())
     for mask in range(1 << len(rows)):
-        chosen = [rows[i] for i in range(len(rows)) if mask >> i & 1]
-        hours = sum(float(x.get("estimated_hours", 1)) for x in chosen)
+        idx = [i for i in range(len(rows)) if mask >> i & 1]
+        hours = sum(float(rows[i].get("estimated_hours", 1)) for i in idx)
         if hours <= capacity_hours + 1e-12:
-            value = sum(float(x.get("priority_score", 1)) * float(x.get("sla_risk", 1)) for x in chosen)
-            ids = tuple(sorted(str(x.get("ticket_id", i)) for i, x in enumerate(chosen)))
-            candidate = (value, len(chosen), tuple(reversed(ids)), hours)
+            value = sum(float(rows[i].get("priority_score", 1)) * float(rows[i].get("sla_risk", 1)) for i in idx)
+            ids = tuple(sorted(str(rows[i].get("ticket_id", i)) for i in idx))
+            candidate = (value, len(idx), tuple(reversed(ids)), hours, tuple(idx))
             if candidate[:3] > best[:3]: best = candidate
-    selected_ids = set(reversed(best[2]))
-    selected = [r for i, r in enumerate(rows) if str(r.get("ticket_id", i)) in selected_ids]
-    return {"selected": selected, "deferred": [r for r in rows if r not in selected],
+    chosen_idx = set(best[4])
+    selected = [r for i, r in enumerate(rows) if i in chosen_idx]
+    return {"selected": selected, "deferred": [r for i, r in enumerate(rows) if i not in chosen_idx],
             "used_hours": round(best[3], 6), "capacity_hours": capacity_hours,
             "objective_value": round(best[0], 6), "solver": "exact_binary_enumeration",
             "optimal": True}
