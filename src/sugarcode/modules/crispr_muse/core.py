@@ -16,8 +16,8 @@ from ..crispr_opt.core import score_on_target, score_off_targets, cfd_score
 NUCLEASES = {
  "SpCas9":{"pam":"NGG","guide_length":20,"cut_offset":-3,"editor":"nuclease"},
  "SaCas9":{"pam":"NNGRRT","guide_length":21,"cut_offset":-3,"editor":"nuclease"},
- "Cas12a":{"pam":"TTTV","guide_length":23,"cut_offset":18,"editor":"nuclease"},
- "CasX":{"pam":"TTCN","guide_length":20,"cut_offset":14,"editor":"nuclease"},
+ "Cas12a":{"pam":"TTTV","guide_length":23,"cut_offset":18,"editor":"nuclease","pam_side":"5p"},
+ "CasX":{"pam":"TTCN","guide_length":20,"cut_offset":14,"editor":"nuclease","pam_side":"5p"},
  "xCas9":{"pam":"NG","guide_length":20,"cut_offset":-3,"editor":"nuclease"},
 }
 BASES="ACGT"
@@ -184,9 +184,16 @@ def enumerate_configurations(target,nucleases=None):
  for name in names:
   if name not in NUCLEASES: raise ValueError(f"unknown nuclease {name!r}")
   cfg=NUCLEASES[name]; k=cfg["guide_length"]; p=cfg["pam"]
-  for i in range(k,len(seq)-len(p)+1):
-   pam=seq[i:i+len(p)]
-   if pam_matches(pam,p): out.append({"nuclease":name,"guide":seq[i-k:i],"pam":pam,"start":i-k,"end":i,"cut_site":i+cfg["cut_offset"]})
+  if cfg.get("pam_side")=="5p":
+   # Cas12a/CasX PAMs are 5' of the spacer (Zetsche et al. 2015; Liu et al.
+   # 2019); the 3'-PAM loop below misses every valid site (BUG 66).
+   for i in range(0,len(seq)-len(p)-k+1):
+    pam=seq[i:i+len(p)]
+    if pam_matches(pam,p): out.append({"nuclease":name,"guide":seq[i+len(p):i+len(p)+k],"pam":pam,"start":i+len(p),"end":i+len(p)+k,"cut_site":i+cfg["cut_offset"]})
+  else:
+   for i in range(k,len(seq)-len(p)+1):
+    pam=seq[i:i+len(p)]
+    if pam_matches(pam,p): out.append({"nuclease":name,"guide":seq[i-k:i],"pam":pam,"start":i-k,"end":i,"cut_site":i+cfg["cut_offset"]})
  return out
 
 def rank_strategies(configurations,background=None,chromatin=0.5,repair_context=None,top_n=10):
