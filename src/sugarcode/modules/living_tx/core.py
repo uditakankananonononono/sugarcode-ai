@@ -127,7 +127,7 @@ def simulate_gut_community(chassis: str, payload: str, *, dose_cfu: float=1e9, d
     rows=[]
     for h,e,r,s,p in zip(sol.t,*sol.y):
         vals=[max(0,float(x)) for x in (e,r,s,p)]; rows.append({"hour":float(h),"engineered_biomass":vals[0],"resident_biomass":vals[1],"substrate":vals[2],"therapeutic_compound":vals[3],"engineered_fraction":vals[0]/max(vals[0]+vals[1],1e-12)})
-    return {"chassis":chassis,"payload":payload,"dose_cfu":dose_cfu,"trajectory":rows,"terminal_engraftment_fraction":rows[-1]["engineered_fraction"],"terminal_compound":rows[-1]["therapeutic_compound"],"solver":{"method":"LSODA","nfev":sol.nfev,"success":sol.success},"model_status":"mechanistic hermetic gut-community ODE; no clinical success prediction"}
+    return {"chassis":chassis,"payload":payload,"dose_cfu":dose_cfu,"trajectory":rows,"terminal_engraftment_fraction":rows[-1]["engineered_fraction"],"terminal_compound":rows[-1]["therapeutic_compound"],"solver":{"method":"LSODA","nfev":sol.nfev,"success":sol.success},"model_status":"mechanistic hermetic gut-community ODE; single-inoculum challenge (one inoculum at t=0, no re-dosing - the legacy delivery_model text prescribes daily dosing, which this challenge deliberately does not model); no clinical success prediction"}
 
 
 def containment_risk(chassis: str, payload: str, simulation: dict) -> dict:
@@ -174,4 +174,20 @@ def simulation_verdict(simulation: dict) -> dict:
     """
     f=simulation["terminal_engraftment_fraction"]
     status="washed_out" if f<WASHOUT_FRACTION else "resident_takeover" if f>TAKEOVER_FRACTION else "persists"
-    return {"status":status,"terminal_engraftment_fraction":f,"terminal_compound":simulation["terminal_compound"],"thresholds":{"washout_fraction":WASHOUT_FRACTION,"takeover_fraction":TAKEOVER_FRACTION},"basis":"final engineered fraction of community biomass at simulation end"}
+    out={"status":status,"terminal_engraftment_fraction":f,"terminal_compound":simulation["terminal_compound"],"thresholds":{"washout_fraction":WASHOUT_FRACTION,"takeover_fraction":TAKEOVER_FRACTION},"basis":"final engineered fraction of community biomass at simulation end"}
+    # Sweep 104: a short window reads "persists" only because the washout loss
+    # has not had time to act (days=1 -> persists, days=14 -> washed_out for
+    # the same design). Surface the window against the chassis washout
+    # timescale tau = 1/(0.08*(1-engraftment)) so a 1-day "persists" is not
+    # mistaken for durable engraftment.
+    ch=CHASSIS.get(simulation.get("chassis",""))
+    if ch is not None and simulation.get("trajectory"):
+        window_h=float(simulation["trajectory"][-1]["hour"])
+        tau_h=1.0/(0.08*(1-ch["engraftment"]))
+        out["assessment_window_days"]=round(window_h/24.0,2)
+        out["washout_timescale_days"]=round(tau_h/24.0,2)
+        if window_h<3*tau_h:
+            out["caution"]=("window %.1f d is shorter than 3 washout timescales (%.1f d) for %s; "
+                            "a 'persists' verdict here only means decay has not finished - "
+                            "extend days to assess durable engraftment"%(window_h/24.0,3*tau_h/24.0,simulation.get("chassis")))
+    return out
