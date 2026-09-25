@@ -1,5 +1,14 @@
 from __future__ import annotations
+import bisect
 import random
+
+
+def _snapshot(pop, genes, gen, pop_size, fitness):
+    mean_expr = {g: round(sum(i[g] for i in pop) / pop_size, 3) for g in genes}
+    frac_ko = round(sum(1 for i in pop if any(i[g] == 0.0 for g in genes)) / pop_size, 3)
+    mean_fit = round(sum(fitness(i) for i in pop) / pop_size, 4)
+    return {"gen": gen, "mean_expression": mean_expr,
+            "knockout_fraction": frac_ko, "mean_fitness": mean_fit}
 
 
 def evolve(pathway_genes: list[str] | None = None, generations: int = 2000,
@@ -14,6 +23,14 @@ def evolve(pathway_genes: list[str] | None = None, generations: int = 2000,
     classic failure mode: silencing of the burdensome pathway.
     """
     genes = pathway_genes or ["enzymeA", "enzymeB", "transporter"]
+    if not genes or any(not isinstance(g, str) or not g.strip() for g in genes): raise ValueError("pathway_genes must be a non-empty list of non-blank gene names")
+    if len(set(genes)) != len(genes): raise ValueError("pathway_genes must be unique")
+    if generations < 1: raise ValueError("generations must be at least 1")
+    if pop_size < 1: raise ValueError("pop_size must be at least 1")
+    if sample_every < 1: raise ValueError("sample_every must be at least 1")
+    if mutation_rate < 0: raise ValueError("mutation_rate must be non-negative")
+    if mutation_rate * len(genes) > 1: raise ValueError("mutation_rate x gene count exceeds 1: the single-mutation-per-offspring model no longer applies; reduce mutation_rate")
+    if burden_cost < 0 or selection_on_yield < 0: raise ValueError("burden_cost and selection_on_yield must be non-negative")
     rng = random.Random(seed)
     # population: list of expression dicts; founder expresses all at 1.0
     pop = [{g: 1.0 for g in genes} for _ in range(pop_size)]
@@ -37,10 +54,10 @@ def evolve(pathway_genes: list[str] | None = None, generations: int = 2000,
             cum.append(c)
         for _ in range(pop_size):
             r = rng.random()
-            for i, cp in enumerate(cum):
-                if r <= cp:
-                    child = dict(pop[i])
-                    break
+            i = bisect.bisect_left(cum, r)
+            if i >= pop_size:
+                i = pop_size - 1  # cumulative sum can undershoot 1.0 in floating point: clamp to the last individual instead of crashing or reusing the previous parent
+            child = dict(pop[i])
             # mutation
             if rng.random() < mutation_rate * len(genes):
                 g = rng.choice(genes)
@@ -54,13 +71,16 @@ def evolve(pathway_genes: list[str] | None = None, generations: int = 2000,
             new_pop.append(child)
         pop = new_pop
         if gen % sample_every == 0:
-            mean_expr = {g: round(sum(i[g] for i in pop) / pop_size, 3) for g in genes}
-            frac_ko = round(sum(1 for i in pop if any(i[g] == 0.0 for g in genes)) / pop_size, 3)
-            mean_fit = round(sum(fitness(i) for i in pop) / pop_size, 4)
-            history.append({"gen": gen, "mean_expression": mean_expr,
-                            "knockout_fraction": frac_ko, "mean_fitness": mean_fit})
-            if frac_ko > 0.5 and dominant_gen is None:
+            snap = _snapshot(pop, genes, gen, pop_size, fitness)
+            history.append(snap)
+            if snap["knockout_fraction"] > 0.5 and dominant_gen is None:
                 dominant_gen = gen
+    if not history or history[-1]["gen"] != generations:
+        # always judge the true endpoint: the last sampled generation is not the final state
+        snap = _snapshot(pop, genes, generations, pop_size, fitness)
+        history.append(snap)
+        if snap["knockout_fraction"] > 0.5 and dominant_gen is None:
+            dominant_gen = generations
     final = history[-1]
     silenced = final["knockout_fraction"] > 0.5
     return {
@@ -104,6 +124,16 @@ def _validate_experiment(genes, generations, population, mutation_rate, sample_e
     if sample_every<1 or sample_every>generations: raise ValueError("sample_every must be in [1, generations]")
 
 
+def _check_schedule_coverage(schedule, generations):
+    # every simulated generation must be covered by a listed environment; no silent fallback
+    cur = 0
+    for s, e in sorted((e["start"], e["end"]) for e in schedule):
+        if s > cur: raise ValueError("environment schedule leaves generation %d uncovered; add an environment for it" % cur)
+        cur = max(cur, e)
+        if cur > generations: return
+    if cur <= generations: raise ValueError("environment schedule leaves generation %d uncovered; extend an environment past generation %d (end is exclusive)" % (cur, generations))
+
+
 def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, population:int=5000,
  burden:float=.08, yield_selection:float=.5, mutation_rate:float=1e-4,
  environment_schedule:list[dict]|None=None, sample_every:int=50, seed:int=42) -> dict:
@@ -116,17 +146,19 @@ def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, popu
     """
     _validate_experiment(genes,generations,population,mutation_rate,sample_every)
     if burden<0 or yield_selection<0: raise ValueError("burden and yield_selection must be non-negative")
-    schedule=environment_schedule or [{"start":0,"end":generations,"product_selection":1.0,"stress":0.0,"name":"production"}]
+    schedule=environment_schedule or [{"start":0,"end":generations+1,"product_selection":1.0,"stress":0.0,"name":"production"}]
     for e in schedule:
         if not {"start","end"}<=set(e): raise ValueError("each environment requires start and end generations")
         if e["start"]<0 or e["end"]<=e["start"]: raise ValueError("environment intervals require 0 <= start < end")
+    _check_schedule_coverage(schedule, generations)
     # classes: intact, downregulated, knockout, compensatory, amplified
     names=["intact","downregulated","knockout","compensatory","amplified"]
     expression=np.array([1,.45,0,.8,1.4]); compensation=np.array([0,0,0,.6,0])
     counts=np.array([population,0,0,0,0]); rng=np.random.default_rng(seed); history=[]; onset=None
-    M=np.eye(5); mu=min(.2,mutation_rate*len(genes)); M[0]=[1-mu,mu*.35,mu*.25,mu*.25,mu*.15]; M[1]=[mu*.05,1-mu*.25,mu*.12,mu*.05,mu*.03]; M[2]=[0,0,1,0,0]; M[3]=[0,0,mu*.05,1-mu*.05,0]; M[4]=[0,mu*.05,mu*.05,0,1-mu*.1]
+    if mutation_rate*len(genes)>.2: raise ValueError("mutation_rate x gene count exceeds 0.2 per generation, the class-transition model capacity; reduce mutation_rate or the number of genes")
+    M=np.eye(5); mu=mutation_rate*len(genes); M[0]=[1-mu,mu*.35,mu*.25,mu*.25,mu*.15]; M[1]=[mu*.05,1-mu*.25,mu*.12,mu*.05,mu*.03]; M[2]=[0,0,1,0,0]; M[3]=[0,0,mu*.05,1-mu*.05,0]; M[4]=[0,mu*.05,mu*.05,0,1-mu*.1]
     for gen in range(generations+1):
-        env=next((e for e in schedule if e["start"]<=gen<e["end"]),schedule[-1]); prod=float(env.get("product_selection",1)); stress=float(env.get("stress",0))
+        env=next(e for e in schedule if e["start"]<=gen<e["end"]); prod=float(env.get("product_selection",1)); stress=float(env.get("stress",0))
         fitness=np.maximum(.01,1-burden*len(genes)*expression+yield_selection*prod*expression-stress*(1-compensation))
         q=counts*fitness; q=q/q.sum()@M; q=np.maximum(q,0); q/=q.sum()
         if gen<generations: counts=rng.multinomial(population,q)
@@ -150,7 +182,7 @@ def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, popu
 
 def _evo_diagnostics(h,f,expr,fitness,genes,N,mu,burden,selection,onset):
     arr=np.array([[x["frequencies"][k] for k in ["intact","downregulated","knockout","compensatory","amplified"]] for x in h]); prod=np.array([x["productivity"] for x in h]); fit=np.array([x["mean_fitness"] for x in h]); x=np.arange(len(h)); entropy=-np.sum(f*np.log(f+1e-12));
-    d={"final_intact_fraction":f[0],"final_downregulated_fraction":f[1],"final_knockout_fraction":f[2],"final_compensatory_fraction":f[3],"final_amplified_fraction":f[4],"final_functional_fraction":f[0]+f[3]+f[4],"final_escape_fraction":f[1]+f[2],"genotype_entropy":entropy,"effective_genotype_number":float(np.exp(entropy)),"dominance_fraction":float(f.max()),"productivity_final":prod[-1],"productivity_peak":float(prod.max()),"productivity_minimum":float(prod.min()),"productivity_retention":float(prod[-1]/max(prod[0],1e-12)),"productivity_slope":float(np.polyfit(x,prod,1)[0]),"fitness_final":fit[-1],"fitness_gain":fit[-1]-fit[0],"fitness_slope":float(np.polyfit(x,fit,1)[0]),"failure_onset_generation":onset if onset is not None else h[-1]["generation"],"failure_observed":onset is not None,"intact_half_life_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,0]) if z<.5),h[-1]["generation"]),"knockout_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,2]) if z>1/N),h[-1]["generation"]),"compensation_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,3]) if z>1/N),h[-1]["generation"]),"amplification_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,4]) if z>1/N),h[-1]["generation"]),"mutation_supply":N*mu*len(genes),"population_size":N,"gene_count":len(genes),"burden_per_gene":burden,"yield_selection":selection,"selection_burden_ratio":selection/max(burden*len(genes),1e-12),"drift_strength":1/(2*N),"expected_neutral_fixation_probability":1/N,"expected_mutations_per_generation":N*mu*len(genes),"trajectory_points":len(h),"environment_transition_count":sum(h[i]["environment"]!=h[i-1]["environment"] for i in range(1,len(h))),"max_knockout_fraction":float(arr[:,2].max()),"max_compensatory_fraction":float(arr[:,3].max()),"max_amplified_fraction":float(arr[:,4].max()),"intact_auc":float(_trapz(arr[:,0],x)/max(len(x)-1,1)),"functional_auc":float(_trapz(arr[:,0]+arr[:,3]+arr[:,4],x)/max(len(x)-1,1)),"escape_auc":float(_trapz(arr[:,1]+arr[:,2],x)/max(len(x)-1,1)),"genetic_load":float(1-fit[-1]/max(fitness.max(),1e-12)),"expression_final":float(f@expr),"expression_retention":float((f@expr)/expr[0]),"frequency_normalization_error":float(abs(f.sum()-1)),"sampling_resolution_generations":h[1]["generation"]-h[0]["generation"] if len(h)>1 else 0,"endpoint_standard_error":float(np.sqrt(f[0]*(1-f[0])/N)),"intact_CI95_low":float(max(0,f[0]-1.96*np.sqrt(f[0]*(1-f[0])/N))),"intact_CI95_high":float(min(1,f[0]+1.96*np.sqrt(f[0]*(1-f[0])/N))),"resilience_score":float((f[0]+f[3])*(prod[-1]/max(prod[0],1e-12))),"stability_class":"stable" if f[0]+f[3]>.8 else "at-risk" if f[0]+f[3]>.5 else "unstable","dominant_genotype_index":int(f.argmax()),"replicate_seed_recorded":True}
+    d={"final_intact_fraction":f[0],"final_downregulated_fraction":f[1],"final_knockout_fraction":f[2],"final_compensatory_fraction":f[3],"final_amplified_fraction":f[4],"final_functional_fraction":f[0]+f[3]+f[4],"final_escape_fraction":f[1]+f[2],"genotype_entropy":entropy,"effective_genotype_number":float(np.exp(entropy)),"dominance_fraction":float(f.max()),"productivity_final":prod[-1],"productivity_peak":float(prod.max()),"productivity_minimum":float(prod.min()),"productivity_retention":float(prod[-1]/max(prod[0],1e-12)),"productivity_slope":float(np.polyfit(x,prod,1)[0]),"fitness_final":fit[-1],"fitness_gain":fit[-1]-fit[0],"fitness_slope":float(np.polyfit(x,fit,1)[0]),"failure_onset_generation":onset,"failure_observed":onset is not None,"intact_half_life_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,0]) if z<.5),None),"knockout_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,2]) if z>1/N),None),"compensation_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,3]) if z>1/N),None),"amplification_detection_generation":next((h[i]["generation"] for i,z in enumerate(arr[:,4]) if z>1/N),None),"mutation_supply":N*mu*len(genes),"population_size":N,"gene_count":len(genes),"burden_per_gene":burden,"yield_selection":selection,"selection_burden_ratio":selection/max(burden*len(genes),1e-12),"drift_strength":1/(2*N),"expected_neutral_fixation_probability":1/N,"expected_mutations_per_generation":N*mu*len(genes),"trajectory_points":len(h),"environment_transition_count":sum(h[i]["environment"]!=h[i-1]["environment"] for i in range(1,len(h))),"max_knockout_fraction":float(arr[:,2].max()),"max_compensatory_fraction":float(arr[:,3].max()),"max_amplified_fraction":float(arr[:,4].max()),"intact_auc":float(_trapz(arr[:,0],x)/max(len(x)-1,1)),"functional_auc":float(_trapz(arr[:,0]+arr[:,3]+arr[:,4],x)/max(len(x)-1,1)),"escape_auc":float(_trapz(arr[:,1]+arr[:,2],x)/max(len(x)-1,1)),"genetic_load":float(1-fit[-1]/max(fitness.max(),1e-12)),"expression_final":float(f@expr),"expression_retention":float((f@expr)/expr[0]),"frequency_normalization_error":float(abs(f.sum()-1)),"sampling_resolution_generations":h[1]["generation"]-h[0]["generation"] if len(h)>1 else 0,"endpoint_standard_error":float(np.sqrt(f[0]*(1-f[0])/N)),"intact_CI95_low":float(max(0,f[0]-1.96*np.sqrt(f[0]*(1-f[0])/N))),"intact_CI95_high":float(min(1,f[0]+1.96*np.sqrt(f[0]*(1-f[0])/N))),"resilience_score":float((f[0]+f[3])*(prod[-1]/max(prod[0],1e-12))),"stability_class":"stable" if f[0]+f[3]>.8 else "at-risk" if f[0]+f[3]>.5 else "unstable","dominant_genotype_index":int(f.argmax()),"replicate_seed_recorded":True}
     assert len(d)>=50; return d
 
 
@@ -192,12 +224,13 @@ def simulate_competition(genes, *, generations=2000, population=5000, burden=.08
         raise ValueError("competitor_fraction must be in [0, 1)")
     if competitor_fitness <= 0:
         raise ValueError("competitor_fitness must be positive")
-    schedule = environment_schedule or [{"start": 0, "end": generations, "product_selection": 1.0, "stress": 0.0, "name": "production"}]
+    schedule = environment_schedule or [{"start": 0, "end": generations + 1, "product_selection": 1.0, "stress": 0.0, "name": "production"}]
     for e in schedule:
         if not {"start", "end"} <= set(e):
             raise ValueError("each environment requires start and end generations")
         if e["start"] < 0 or e["end"] <= e["start"]:
             raise ValueError("environment intervals require 0 <= start < end")
+    _check_schedule_coverage(schedule, generations)
     n = len(genes); G = 3 ** n
     states = np.array(np.unravel_index(np.arange(G), (3,) * n)).T   # G x n, 0/1/2 per gene
     expr = _GENE_EXPR[states]                                       # G x n
@@ -213,7 +246,7 @@ def simulate_competition(genes, *, generations=2000, population=5000, burden=.08
     rng = np.random.default_rng(seed); history = []; takeover = None
     first_fail = {g: None for g in genes}
     for gen in range(generations + 1):
-        env = next((e for e in schedule if e["start"] <= gen < e["end"]), schedule[-1])
+        env = next(e for e in schedule if e["start"] <= gen < e["end"])
         prod = float(env.get("product_selection", 1)); stress = float(env.get("stress", 0))
         fit = np.maximum(.01, 1 - burden * load + yield_selection * prod * flux - stress)
         fit_all = np.append(fit, max(.01, competitor_fitness - stress))
