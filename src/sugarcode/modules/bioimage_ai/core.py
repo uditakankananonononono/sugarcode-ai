@@ -18,6 +18,80 @@ def _segment(img: np.ndarray, threshold_pct: float = 60.0) -> tuple[np.ndarray, 
     return labels, n
 
 
+def _regional_maxima(dist: np.ndarray) -> np.ndarray:
+    """True regional maxima by morphological reconstruction.
+
+    A marker must be a plateau no upward path leaves. The previous test
+    (dist == maximum_filter(dist, size=5)) also fired on mid-ramp step
+    plateaus (pixelation staircases), so one convex cell could seed several
+    markers and be Voronoi-split into fragments. Reconstruct dist - 1 under
+    the mask dist; the pixels the reconstruction cannot reach are the real
+    maxima.
+    """
+    if dist.size == 0 or not np.any(dist > 0):
+        return np.zeros_like(dist, dtype=bool)
+    rec = np.maximum(dist - 1.0, 0.0)
+    prev = np.zeros_like(rec)
+    while not np.array_equal(rec, prev):
+        prev = rec
+        rec = np.minimum(ndimage.grey_dilation(rec, size=3), dist)
+    return dist > rec
+
+
+def _chain_perimeter(mask: np.ndarray) -> float:
+    """Boundary-chain perimeter: orthogonal steps x 1, diagonal steps x sqrt(2).
+
+    The previous estimator counted ring pixels, which measures a 45-degree
+    boundary at 1/sqrt(2) of its length and inflated circularity
+    (4*pi*A/P^2) to 1.27 for a perfect disk (and ~1.6 for a 45-degree
+    square). This is the standard Freeman chain convention of region-props
+    tools: a filled disk scores ~0.91 (the residual is pixelation, constant
+    with radius), an axis-aligned n x n square scores
+    4*pi*n^2/(4*(n-1))^2.
+    """
+    m = np.pad(mask.astype(bool), 1)
+    ring = m ^ ndimage.binary_erosion(m)
+    ys, xs = np.nonzero(ring)
+    n = len(ys)
+    if n == 0:
+        return 0.0
+    if n <= 2:
+        return float(4 * n)
+    pts = set(zip(ys.tolist(), xs.tolist()))
+    order = list(zip(ys.tolist(), xs.tolist()))
+    nb = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    total = 0.0
+    visited = set()
+    while len(visited) < n:
+        start = next(q for q in order if q not in visited)
+        cur, prev = start, None
+        visited.add(cur)
+        for _ in range(12 * n):
+            cands = [(dy, dx, (cur[0] + dy, cur[1] + dx)) for dy, dx in nb
+                     if (cur[0] + dy, cur[1] + dx) in pts and (cur[0] + dy, cur[1] + dx) != prev]
+            fresh = [c for c in cands if c[2] not in visited]
+            pick = None
+            if fresh:
+                diags = [c for c in fresh if c[0] and c[1]]
+                if prev is not None:
+                    fy, fx = cur[0] - prev[0], cur[1] - prev[1]
+                    same = [c for c in fresh if (c[0], c[1]) == (fy, fx)]
+                    pick = same[0] if same else (diags[0] if diags else fresh[0])
+                else:
+                    pick = diags[0] if diags else fresh[0]
+            elif len(visited) > 2 and any(c[2] == start for c in cands):
+                pick = next(c for c in cands if c[2] == start)
+            if pick is None:
+                break
+            dy, dx, q = pick
+            total += math.sqrt(2) if (dy and dx) else 1.0
+            prev, cur = cur, q
+            visited.add(q)
+            if q == start:
+                break
+    return total
+
+
 def count_cells(image: list[list[float]], threshold_pct: float = 60.0) -> dict:
     """Count cells in a grayscale microscopy image (2D array)."""
     img = np.asarray(image, dtype=float)
@@ -50,7 +124,7 @@ def analyze_image(image: list[list[float]], threshold_pct: float = 60.0) -> dict
         h = ys.max() - ys.min() + 1
         w = xs.max() - xs.min() + 1
         aspect = max(h, w) / max(1, min(h, w))
-        perimeter = float(np.sum(ndimage.binary_erosion(labels == i) ^ (labels == i)))
+        perimeter = _chain_perimeter(labels == i)
         circularity = round(4 * np.pi * area / max(perimeter ** 2, 1e-9), 3)
         intensity = float(img[ys, xs].mean())
         cells.append({"id": i, "area_px": area, "aspect_ratio": round(aspect, 2),
@@ -103,7 +177,7 @@ def corrected_segmentation(image, *, pixel_size_um: float=1, min_area_um2: float
         mask=corrected>threshold
     else:
         local=ndimage.gaussian_filter(corrected,max(2,min(img.shape)/16)); threshold=float(np.mean(local)); mask=corrected>local
-    mask=ndimage.binary_fill_holes(ndimage.binary_opening(mask)); distance=ndimage.distance_transform_edt(mask); maxima=(distance==ndimage.maximum_filter(distance,size=5))&(distance>1)
+    mask=ndimage.binary_fill_holes(ndimage.binary_opening(mask)); distance=ndimage.distance_transform_edt(mask); maxima=_regional_maxima(distance)&(distance>1)
     markers,nmark=ndimage.label(maxima)
     # Voronoi assignment within foreground splits touching objects without skimage.
     if nmark:
@@ -122,7 +196,7 @@ def morphology_table(image, segmentation: dict) -> list[dict]:
     img=validate_image(image,pixel_size_um=segmentation["pixel_size_um"]); labels=np.asarray(segmentation["labels"],int); px=segmentation["pixel_size_um"]; rows=[]
     if labels.shape!=img.shape: raise ValueError("segmentation labels must match image shape")
     for j in range(1,int(labels.max())+1):
-        mask=labels==j; ys,xs=np.nonzero(mask); area=len(xs); eroded=ndimage.binary_erosion(mask); perimeter=np.sum(mask^eroded)*px; cy,cx=ys.mean(),xs.mean(); cov=np.cov(np.column_stack([ys,xs]).T) if area>1 else np.eye(2); eig=np.linalg.eigvalsh(cov); aspect=math.sqrt(max(eig[-1],1e-12)/max(eig[0],1e-12))
+        mask=labels==j; ys,xs=np.nonzero(mask); area=len(xs); perimeter=_chain_perimeter(mask)*px; cy,cx=ys.mean(),xs.mean(); cov=np.cov(np.column_stack([ys,xs]).T) if area>1 else np.eye(2); eig=np.linalg.eigvalsh(cov); aspect=math.sqrt(max(eig[-1],1e-12)/max(eig[0],1e-12))
         rows.append({"cell_id":j,"area_um2":area*px**2,"perimeter_um":float(perimeter),"circularity":float(4*np.pi*area*px**2/max(perimeter**2,1e-12)),"aspect_ratio":float(aspect),"mean_intensity":float(img[mask].mean()),"integrated_intensity":float(img[mask].sum()),"centroid_y_px":float(cy),"centroid_x_px":float(cx),"edge_touching":bool(np.any(ys==0)|np.any(xs==0)|np.any(ys==img.shape[0]-1)|np.any(xs==img.shape[1]-1))})
     return rows
 
