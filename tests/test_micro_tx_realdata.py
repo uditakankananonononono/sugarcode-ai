@@ -1,13 +1,13 @@
 """Real-data/curation validation for micro_tx (module 105).
 
-BUG 75: SCFA_YIELD credited butyrate to Bifidobacterium (.10), Akkermansia
+BUG 74: SCFA_YIELD credited butyrate to Bifidobacterium (.10), Akkermansia
 (.15) and L. reuteri (.10) - none produce butyrate. Bifidobacterium makes
 acetate + lactate and only feeds butyrate producers via cross-feeding
 (PMID 38126785); butyrate production is restricted to specific clostridial
 clusters (PMIDs 26925050, 19807780) - in this table F. prausnitzii and
 Roseburia. Non-producer butyrate entries zeroed.
 
-BUG 76: compartment migration used np.roll - a periodic boundary, so the
+BUG 75: compartment migration used np.roll - a periodic boundary, so the
 proximal compartment exchanged directly with the distal one as if the gut
 were a ring. Replaced with a zero-padded chain Laplacian (endpoints have one
 neighbour); mass conservation is identical (column sums 0).
