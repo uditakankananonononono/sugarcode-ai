@@ -1,17 +1,23 @@
 from __future__ import annotations
-import math,time
+import math,re,time
 from ..neuro_hub.core import dashboard as legacy_dashboard, initiate_search, recent_projects, register_project
 
 def platform_health(module_records):
- total=len(module_records); online=sum(bool(x.get('importable',False)) for x in module_records); latency=[float(x.get('latency_ms',0)) for x in module_records]; return {'modules_total':total,'modules_online':online,'global_flux':online/max(1,total),'latency_mean_ms':sum(latency)/max(1,total),'latency_max_ms':max(latency,default=0),'degraded':[x.get('module') for x in module_records if not x.get('importable',False)]}
+ total=len(module_records); online=sum(bool(x.get('importable',False)) for x in module_records); latency=[float(x.get('latency_ms',0)) for x in module_records]; return {'modules_total':total,'modules_online':online,'global_flux':online/max(1,total),'latency_mean_ms':sum(latency)/max(1,total),'latency_max_ms':max(latency,default=0),'degraded':[x.get('module',x.get('slug')) for x in module_records if not x.get('importable',False)]}
 def compute_flux_series(samples):
+ """Flux time series in timestamp order (input order used to decide the trend sign)."""
+ samples=sorted(samples,key=lambda x:x['timestamp'])
  return {'timestamps':[x['timestamp'] for x in samples],'global_flux':[x['modules_online']/max(1,x['modules_total']) for x in samples],'trend':(samples[-1]['modules_online']/max(1,samples[-1]['modules_total'])-samples[0]['modules_online']/max(1,samples[0]['modules_total'])) if samples else 0}
+_TOK=re.compile(r'[a-z0-9]+')
 def unified_search(query,module_results,limit=10):
- terms=query.lower().split(); scored=[]
+ """Whole-token term counting.  Substring counting matched 'a' inside every record and 'rna' inside 'internal'."""
+ if limit<0: raise ValueError(f'limit must be >= 0, got {limit}')
+ terms=_TOK.findall(query.lower()); scored=[]
  for r in module_results:
-  text=' '.join(str(v) for v in r.values()).lower(); score=sum(text.count(t) for t in terms); 
+  toks=_TOK.findall(' '.join(str(v) for v in r.values()).lower()); score=sum(toks.count(t) for t in terms)
   if score: scored.append({**r,'relevance':score})
- return {'query':query,'results':sorted(scored,key=lambda x:-x['relevance'])[:limit],'sources':sorted({r.get('module','unknown') for r in scored})}
+ scored.sort(key=lambda x:-x['relevance'])
+ return {'query':query,'results':scored[:limit],'sources':sorted({r.get('module',r.get('slug','unknown')) for r in scored})}
 _STATES={'created':0,'running':.5,'completed':1,'failed':0}
 def project_state(name,module,state='created',artifacts=None):
  if state not in _STATES: raise ValueError(f"unknown project state {state!r}; expected one of {sorted(_STATES)}")
