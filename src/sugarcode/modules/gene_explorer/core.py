@@ -25,12 +25,24 @@ def explore(dna: str, gene_name: str = "gene", reading_frame: int = 0) -> dict:
     Returns DNA stats, the mRNA transcript, the translated protein with
     annotations, detected ORFs and display segments.
     """
+    if reading_frame not in (0, 1, 2):
+        raise ValueError("reading_frame must be 0, 1, or 2")
     dna = clean_dna(dna)
     mrna = transcribe(dna)
-    protein = translate(dna, reading_frame=reading_frame)
-    mature = protein.split("*")[0]
     found_orfs = orfs(dna, min_aa=10)
     longest = max(found_orfs, key=lambda o: o["aa_length"], default=None)
+    # BUG 70: frame-0 translation of a real mRNA starts in the 5' UTR and
+    # reports a short UTR peptide as "the protein" (NM_000518 HBB gave a
+    # 20-aa peptide / 2260 Da while its own longest_orf found the true
+    # 147-aa hemoglobin).  When an ORF exists, annotate the ORF protein.
+    if longest is not None:
+        mature = longest["protein"]
+        protein = mature
+        translation_mode = "longest_orf"
+    else:
+        protein = translate(dna, reading_frame=reading_frame)
+        mature = protein.split("*")[0]
+        translation_mode = "frame"
     return {
         "gene": gene_name,
         "dna": {
@@ -51,6 +63,7 @@ def explore(dna: str, gene_name: str = "gene", reading_frame: int = 0) -> dict:
             "hydrophobicity": [round(v, 3) for v in hydrophobicity_profile(mature)],
             "composition": {aa: mature.count(aa) for aa in sorted(set(mature)) if aa in AA_NAMES},
             "truncated_by_stop": "*" in protein,
+            "translation_mode": translation_mode,
         },
         "orfs": [
             {"strand": o["strand"], "frame": o["frame"], "start": o["start"],
