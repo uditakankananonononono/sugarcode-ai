@@ -54,9 +54,11 @@ def compare_profiles(profiles: list[dict]) -> dict:
     for a, b in itertools.combinations(profiles, 2):
         va, vb = a["signature_vector"], b["signature_vector"]
         keys = set(va) & set(vb)
-        dot = sum(va[k] * vb[k] for k in keys)
-        na = math.sqrt(sum(va[k] ** 2 for k in keys))
-        nb = math.sqrt(sum(vb[k] ** 2 for k in keys))
+        # compare DELTAS from the vehicle baseline (1.0): raw vectors are dominated
+        # by the constant component, making all pairs spuriously identical (~0.999)
+        dot = sum((va[k] - 1.0) * (vb[k] - 1.0) for k in keys)
+        na = math.sqrt(sum((va[k] - 1.0) ** 2 for k in keys))
+        nb = math.sqrt(sum((vb[k] - 1.0) ** 2 for k in keys))
         sim = dot / (na * nb) if na and nb else 0.0
         sims.append({"pair": [a["mechanism"], b["mechanism"]],
                      "cosine_similarity": round(sim, 4)})
@@ -81,9 +83,9 @@ def batch_correct(batches):
   x=np.asarray(b,float); corrected.append((x-x.mean(0)).tolist())
  return {'batches':corrected,'method':'within-batch mean centering'}
 def nearest_mechanism(query,references):
- q=np.array(list(query['signature_vector'].values())); rows=[]
+ q=np.array(list(query['signature_vector'].values()))-1.; rows=[]
  for r in references:
-  v=np.array(list(r['signature_vector'].values())); sim=float(q@v/(np.linalg.norm(q)*np.linalg.norm(v))); rows.append({'mechanism':r['mechanism'],'similarity':sim})
+  v=np.array(list(r['signature_vector'].values()))-1.; nq,nv=np.linalg.norm(q),np.linalg.norm(v); sim=float(q@v/(nq*nv)) if nq>0 and nv>0 else 0.; rows.append({'mechanism':r['mechanism'],'similarity':sim})
  return sorted(rows,key=lambda x:-x['similarity'])
 def concentration_trajectory(mechanism,doses,hours): return {'profiles':[profile_perturbation(mechanism,d,h) for d in doses for h in hours]}
 def cellpainting_report(profiles,controls):
