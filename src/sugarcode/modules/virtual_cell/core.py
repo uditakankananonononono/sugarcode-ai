@@ -81,7 +81,7 @@ def fba(model: MetabolicModel, objective: str | None = None,
     res = linprog(c, A_eq=model.S, b_eq=np.zeros(len(model.metabolites)),
                   bounds=list(zip(lb, ub)), method="highs")
     if not res.success:
-        return {"status": "infeasible", "objective": 0.0,
+        return {"status": "infeasible", "objective": 0.0, "objective_reaction": obj_name,
                 "fluxes": {r: 0.0 for r in model.reactions}}
     fluxes = {r: round(float(v), 6) for r, v in zip(model.reactions, res.x)}
     return {"status": "optimal", "objective": round(float(-res.fun), 6),
@@ -96,6 +96,8 @@ def pfba(model: MetabolicModel, objective: str | None = None,
     FBA optima are often degenerate; pFBA picks the unique minimal-enzyme-cost
     flux distribution, so flux differences between conditions are meaningful.
     """
+    if not 0 < optimum_fraction <= 1:
+        raise ValueError("optimum_fraction must be in (0, 1]")
     first = fba(model, objective, bounds_override)
     if first["status"] != "optimal":
         return first
@@ -113,7 +115,8 @@ def pfba(model: MetabolicModel, objective: str | None = None,
              [(max(0.0, -u), max(0.0, -l)) for l, u in zip(lb, ub)]
     res = linprog(c, A_eq=A_eq, b_eq=np.zeros(len(model.metabolites)), bounds=bounds, method="highs")
     if not res.success:
-        return first
+        # honest fallback: the caller asked for pFBA and gets plain FBA - say so
+        return {**first, "method": "fba", "pfba_stage": "failed: %s" % res.message}
     v = res.x[:n] - res.x[n:]
     fluxes = {r: round(float(x), 6) + 0.0 for r, x in zip(model.reactions, v)}
     return {"status": "optimal", "objective": first["objective"], "objective_reaction": obj_name,
@@ -163,6 +166,8 @@ def simulate_growth(model: MetabolicModel, hours: float = 8.0,
     """
     if hours <= 0 or dt <= 0 or mu_per_flux <= 0:
         raise ValueError("hours, dt and mu_per_flux must be positive")
+    if glucose0 <= 0:
+        raise ValueError("glucose0 must be positive")
     biomass = 0.01  # gDW/L seed
     glucose = glucose0
     t, series = 0.0, []
@@ -193,6 +198,12 @@ def regulatory_state(genes, interactions, initial=None, steps=12, threshold=0.5)
     unknown = {x for e in interactions for x in e[:2]} - set(genes)
     if unknown:
         raise ValueError(f"interaction references unknown genes: {sorted(unknown)}")
+    unknown_initial = set(initial or {}) - set(genes)
+    if unknown_initial:
+        raise ValueError(f"initial references unknown genes: {sorted(unknown_initial)}")
+    bad_initial = {g: v for g, v in (initial or {}).items() if not 0 <= float(v) <= 1}
+    if bad_initial:
+        raise ValueError(f"initial Boolean states must be within [0, 1]: {bad_initial}")
     state = {g: float((initial or {}).get(g, 0.0)) for g in genes}
     trajectory = [{g: round(v, 6) for g, v in state.items()}]
     for _ in range(steps):
@@ -219,8 +230,10 @@ def environment_response(model, conditions=None):
     for name, bounds in conditions.items():
         sol = fba(model, bounds_override=bounds)
         ratio = sol["objective"] / baseline if baseline else 0.0
+        phenotype = ("infeasible - contradictory bounds, no steady-state solution" if sol["status"] != "optimal"
+                     else "no growth" if ratio < .01 else "slow growth" if ratio < .7 else "robust growth")
         results[name] = {"growth": sol["objective"], "growth_ratio": round(ratio, 6),
-                         "phenotype": "no growth" if ratio < .01 else "slow growth" if ratio < .7 else "robust growth",
+                         "status": sol["status"], "phenotype": phenotype,
                          "fluxes": sol["fluxes"]}
     return {"baseline_growth": baseline, "conditions": results,
             "model_status": "computational prediction; requires experimental validation"}
