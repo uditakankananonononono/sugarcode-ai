@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 # small grounded knowledge slice (the local stand-in for PubMed/UniProt grounding)
+# lof_pathogenic: is loss of function this gene's disease mechanism? Grounded in
+# ClinVar (2026-09-25): TP53 R213* (uid 43590) and BRCA1 Q563* (uid 37426) are
+# Pathogenic; KRAS nonsense is not - L168* (uid 4915976) Likely benign, R164*
+# (uid 3065766) Conflicting, E168fs/K184fs VUS. Tumor suppressors True, GOF
+# oncogenes False; a blanket nonsense->pathogenic rule misfires on oncogenes.
 GENES = {
     "TP53": {"protein_len": 393, "domains": {"DBD": (102, 292), "TAD": (1, 61)},
              "hotspots": [175, 245, 248, 273, 282],
-             "pathway": "DNA damage response / apoptosis"},
+             "pathway": "DNA damage response / apoptosis", "lof_pathogenic": True},
     "BRCA1": {"protein_len": 1863, "domains": {"RING": (1, 109), "BRCT": (1646, 1863)},
-              "hotspots": [61, 1699, 1756], "pathway": "homologous recombination repair"},
+              "hotspots": [61, 1699, 1756], "pathway": "homologous recombination repair",
+              "lof_pathogenic": True},
     "KRAS": {"protein_len": 189, "domains": {"G-domain": (1, 166)},
-             "hotspots": [12, 13, 61], "pathway": "MAPK signaling"},
+             "hotspots": [12, 13, 61], "pathway": "MAPK signaling", "lof_pathogenic": False},
 }
 CODON_TABLE = {"A": "GCN", "R": "CGN/AGR", "N": "AAY", "D": "GAY", "C": "TGY", "Q": "CAR", "E": "GAR",
                "G": "GGN", "H": "CAY", "I": "ATH", "L": "CTN/TTR", "K": "AAR", "M": "ATG", "F": "TTY",
@@ -23,7 +29,10 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
     """Directed computation graph: variant -> domain -> structure -> pathway -> phenotype.
 
     Each node is a small real computation; inconsistencies between nodes are
-    flagged instead of blended.
+    flagged instead of blended. Nonsense handling is mechanism-aware: a
+    PVS1-style risk floor applies only in loss-of-function-mechanism genes
+    (the lof_pathogenic flag); in gain-of-function oncogenes a premature stop
+    stays in the uncertainty band.
     """
     if gene not in GENES:
         raise KeyError(f"gene {gene!r} not grounded; have {sorted(GENES)}")
@@ -42,7 +51,8 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
     hotspot = pos in g["hotspots"]
     nodes.append({"node": "variant_annotation",
                   "consequence": "nonsense (premature stop)" if nonsense else "missense", "domain": domain, "hotspot": hotspot,
-                  "codon_change": f"{CODON_TABLE.get(ref_aa, '???')}->{CODON_TABLE.get(alt_aa, '???')}"})
+                  "codon_change": f"{CODON_TABLE.get(ref_aa, '???')}->{CODON_TABLE.get(alt_aa, '???')}",
+                  "lof_mechanism_gene": bool(g.get("lof_pathogenic"))})
     # node 2: structural perturbation (ddG proxy)
     d_hydro = (alt_aa in HYDROPHOB) - (ref_aa in HYDROPHOB)
     ddg = round(0.8 * abs(d_hydro) + (1.2 if hotspot else 0.3) + (0.5 if domain else 0.0), 2)
@@ -59,6 +69,12 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
                   "flux_disruption": flux_impact})
     # node 4: phenotype with uncertainty
     risk = round(0.15 + 0.5 * flux_impact + (0.25 if hotspot else 0.0), 2)
+    # BUG 53 fix: the base formula capped nonsense risk at 0.65 (flux=1.0, no
+    # hotspot) -> "uncertain significance", contradicting ClinVar Pathogenic
+    # for TP53 R213*/BRCA1 Q563*. ACMG PVS1-style floor, per-gene (see GENES):
+    # oncogene nonsense is often VUS/benign, so no blanket rule.
+    if nonsense and g.get("lof_pathogenic"):
+        risk = max(risk, 0.75)
     phenotype = ("likely pathogenic" if risk > 0.7 else
                  "uncertain significance" if risk > 0.4 else "likely tolerated")
     nodes.append({"node": "phenotype_inference", "phenotype": phenotype,
@@ -69,6 +85,9 @@ def mutation_to_phenotype(gene: str, ref_aa: str, pos: int, alt_aa: str) -> dict
         flags.append("structure tolerated but pathway disrupted - functional assay needed")
     if destabilizing and flux_impact < 0.3:
         flags.append("destabilizing yet low predicted pathway impact - possible aggregation route")
+    if nonsense and not g.get("lof_pathogenic"):
+        flags.append("nonsense in a gain-of-function oncogene: LoF pathogenicity prior not applied - "
+                     "ClinVar nonsense calls in such genes are often VUS or benign")
     return {
         "variant": f"{gene} {ref_aa}{pos}{alt_aa}",
         "computation_graph": nodes,
