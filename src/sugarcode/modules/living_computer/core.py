@@ -71,9 +71,15 @@ REFERENCE_PROMOTER_STRENGTH = 1.0
 DEFAULT_HOST_CAPACITY = 10.0
 
 # Kinetic parameters for internal fan-out gates (post-transcriptional
-# regulatory layer). n=4 gives steep digital switching; vmax=1.0 REU scales
-# internal signals into the same regime the legacy single-gate used.
-INTERNAL_GATE_PARAMS = {"basal": 0.01, "vmax": 1.0, "K": 0.5, "n": 4.0, "decay": 0.2}
+# regulatory layer). vmax=1.0 REU scales internal signals into the same
+# regime the legacy single-gate used. n=8: at the documented input level
+# (fully induced = 1.0 REU) an n=4 repress edge leaks 1/(1+2^4) = 5.9% of
+# vmax, and with internal protein at 5x transcription that leak (~0.33 REU,
+# near K) compounds down cascades - at 1.0/0.0 inputs XOR(1,1) read 7.45
+# (ON), XNOR(1,1) read 0.15, AND-NOT(1,1) read 1.21, all wrong. n=8 cuts
+# the leak to 1/(1+2^8) = 0.39% and restores digital truth rows at the
+# documented levels (module sweep 103).
+INTERNAL_GATE_PARAMS = {"basal": 0.01, "vmax": 1.0, "K": 0.5, "n": 8.0, "decay": 0.2}
 # Output driver gate: same shape, higher ceiling so the reporter saturates.
 OUTPUT_GATE_VMAX = 1.5
 # Post-transcriptional gates are faster than transcription-driven promoters.
