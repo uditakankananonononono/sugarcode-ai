@@ -21,6 +21,9 @@ def simulate_minimal_cell(gene_set: list[str], hours: float = 10.0,
     State: [mass, atp, glucose_int]. Missing modules create specific failure
     phenotypes (no metabolism -> ATP crash; no division -> filamentation).
     """
+    unknown = [m for m in gene_set if m not in GENE_MODULES]
+    if unknown:
+        raise ValueError(f"unknown gene modules {unknown}; have {sorted(GENE_MODULES)} (was: silently ignored)")
     missing = [m for m in GENE_MODULES if m not in gene_set]
     active = {m: GENE_MODULES[m] for m in gene_set if m in GENE_MODULES}
 
@@ -54,7 +57,7 @@ def simulate_minimal_cell(gene_set: list[str], hours: float = 10.0,
         "divisions": divisions,
         "final_cells": cell_count,
         "emergent_behaviors": logs,
-        "viable": "metabolism" in active and sol.y[1][-1] > 0.1,
+        "viable": bool("metabolism" in active and sol.y[1][-1] > 0.1),
         "summary": _summary(active, missing, cell_count, sol),
     }
 
@@ -101,6 +104,10 @@ def optimize_minimal_genome(required_processes=None, environment=None) -> dict:
     environment=environment or {}
     genes=list(GENE_CATALOG); c=np.array([GENE_CATALOG[g]["cost"] for g in genes],float)
     rows=[]; lb=[]; ub=[]
+    # rich medium rescues glyA (serine/glycine uptake); on minimal medium glyA is required.
+    # (the parameter was previously accepted but never consulted)
+    if environment.get("medium","rich")=="minimal":
+        row=np.zeros(len(genes)); row[genes.index("glyA")]=-1; rows.append(row); lb.append(-np.inf); ub.append(-1)
     for process in required_processes:
         rows.append([-int(GENE_CATALOG[g]["process"]==process) for g in genes]); lb.append(-np.inf); ub.append(-1)
     # ATP synthase subunits are jointly required; rich medium can rescue glyA.
@@ -123,8 +130,9 @@ def stochastic_gene_expression(genes, *, minutes=120, seed=23, transcription_rat
                                translation_rate=.8, mrna_decay=.08, protein_decay=.01) -> dict:
     """Exact Gillespie SSA for transcription, translation, and degradation."""
     genes=list(genes); rng=np.random.default_rng(seed); n=len(genes)
-    m=np.zeros(n,dtype=int); p=np.zeros(n,dtype=int); t=0.; events=[]
-    while t<minutes and len(events)<200000:
+    m=np.zeros(n,dtype=int); p=np.zeros(n,dtype=int); t=0.; events=[]; total_count=0; truncated=False
+    while t<minutes:
+        if total_count>=200000: truncated=True; break
         rates=np.concatenate([np.full(n,transcription_rate), translation_rate*m,
                               mrna_decay*m, protein_decay*p])
         total=rates.sum()
@@ -136,9 +144,12 @@ def stochastic_gene_expression(genes, *, minutes=120, seed=23, transcription_rat
         elif kind==1:p[i]+=1; action="translation"
         elif kind==2:m[i]-=1; action="mRNA_decay"
         else:p[i]-=1; action="protein_decay"
+        total_count+=1
         if len(events)<1000: events.append({"minute":round(t,5),"gene":genes[i],"event":action})
     return {"genes":genes,"mRNA":dict(zip(genes,map(int,m))),"protein":dict(zip(genes,map(int,p))),
-            "events":events,"total_event_count":len(events),"algorithm":"exact Gillespie direct method","seed":seed}
+            "events":events,"stored_event_count":len(events),"total_event_count":total_count,
+            "simulated_minutes":round(t,4),"truncated":truncated,
+            "algorithm":"exact Gillespie direct method","seed":seed}
 
 
 def mechanistic_cell_program(gene_set=None, *, hours=24, glucose=10, seed=23,
