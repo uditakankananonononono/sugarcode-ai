@@ -135,11 +135,19 @@ def optimize_intervention(initial: dict[str,float], target_metabolites: dict[str
     """Optimize fiber and sugar inputs against metabolite targets with scipy."""
     from scipy.optimize import differential_evolution
     if not target_metabolites or set(target_metabolites)-set(METABOLITES): raise ValueError("target_metabolites must use known metabolites")
+    # Sweep 107 (BUG 78): the .02/g input penalty was ~1000x larger than the
+    # squared metabolite errors this model produces (~1e-5 at its natural
+    # ~1e-2 output scale), so the penalty always won and the optimizer
+    # returned fiber=sugar=0 for EVERY target - even reachable ones
+    # (butyrate 0.005 -> diet {0,0}, achieved 0.002). The penalty is now a
+    # tie-breaker (1e-6/g), and the result reports target vs achieved per
+    # metabolite so an unreachable target is visible instead of silent.
     def objective(z):
-        r=simulate_metabolic_community(initial,days=days,diet={"fiber":z[0],"sugar":z[1]},sample_hours=24); return sum((r["final_metabolites"][m]-v)**2 for m,v in target_metabolites.items())+.02*sum(z)
+        r=simulate_metabolic_community(initial,days=days,diet={"fiber":z[0],"sugar":z[1]},sample_hours=24); return sum((r["final_metabolites"][m]-v)**2 for m,v in target_metabolites.items())+1e-6*sum(z)
     fit=differential_evolution(objective,[(0,3),(0,3)],seed=4,maxiter=20,popsize=6,polish=True)
     diet={"fiber":float(fit.x[0]),"sugar":float(fit.x[1])}; sim=simulate_metabolic_community(initial,days=days,diet=diet)
-    return {"diet":diet,"objective":float(fit.fun),"simulation":sim,"solver":"differential_evolution","evaluations":fit.nfev,"converged":fit.success}
+    achieved={m:{"target":float(v),"achieved":float(sim["final_metabolites"][m]),"abs_error":float(abs(sim["final_metabolites"][m]-v))} for m,v in target_metabolites.items()}
+    return {"diet":diet,"objective":float(fit.fun),"simulation":sim,"solver":"differential_evolution","evaluations":fit.nfev,"converged":fit.success,"target_vs_achieved":achieved}
 
 def enhancement_features(sim: dict, opt: dict) -> dict:
     rows=sim["trajectory"]; t=np.array([x["day"] for x in rows]); species=sorted(rows[0]["species"]); mets=list(METABOLITES); out={"duration_days":float(t[-1]),"timepoint_count":len(t),"solver_evaluations":sim["solver"]["nfev"],"species_count":len(species),"metabolite_count":len(mets)}
