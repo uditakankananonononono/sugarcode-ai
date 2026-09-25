@@ -52,22 +52,30 @@ def validate_genome_design(design):
  return {"valid":not duplicate and not missing_core,"duplicate_gene_names":duplicate,"missing_core_categories":missing_core,"category_counts":category_counts,"genome_bp":sum(g.get('size_bp',1000) for g in kept)}
 
 def design_minimal_genome(genes=None):
- genes=genes or _default_catalog(); scored=[]
+ if genes is None: genes=_default_catalog()
+ elif not genes: raise ValueError("genes must not be empty; pass None to use the default catalog")
+ scored=[]
  for g in genes:
-  prior=CATEGORY_ESSENTIALITY.get(g['category'],.3); scored.append({**g,"essentiality_prior":prior,"keep":prior>=.45})
+  cat=g.get('category','unknown')
+  if cat not in CATEGORY_ESSENTIALITY: raise ValueError(f"unrecognized gene category {cat!r}; valid categories: {sorted(CATEGORY_ESSENTIALITY)}")
+  prior=CATEGORY_ESSENTIALITY[cat]; scored.append({**g,"category":cat,"essentiality_prior":prior,"keep":prior>=.45})
  kept=[g for g in scored if g['keep']]; dropped=[g for g in scored if not g['keep']]; original=sum(g.get('size_bp',1000) for g in genes); genome=sum(g.get('size_bp',1000) for g in kept)
  return {"input_genes":len(genes),"minimal_set_size":len(kept),"genome_size_bp":genome,"reduction_fraction":round(1-genome/original,3),"kept_by_category":_count_by(kept,'category'),"dropped_by_category":_count_by(dropped,'category'),"metabolic_support":essentiality_scan(),"chassis_protocol":["partition design into reviewable genomic segments","select a validated assembly strategy","verify genome integrity and phenotype with institutional controls"]}
 
 def flux_optimize(model=None,product_reaction='BIOMASS',growth_floor=0,oxygen_limit=None,glucose_limit=None):
  model=model or demo_model(); c=np.zeros(len(model.reactions)); c[model.rxn_index(product_reaction)]=-1; bounds=list(zip(model.lb.copy(),model.ub.copy()))
  bounds=[list(x) for x in bounds]
- if glucose_limit is not None and 'GLC_UP' in model.reactions: bounds[model.rxn_index('GLC_UP')][1]=glucose_limit
- if oxygen_limit is not None and 'RESP' in model.reactions: bounds[model.rxn_index('RESP')][1]=oxygen_limit
+ if glucose_limit is not None:
+  if 'GLC_UP' not in model.reactions: raise KeyError("glucose_limit requires a 'GLC_UP' reaction in the model")
+  bounds[model.rxn_index('GLC_UP')][1]=glucose_limit
+ if oxygen_limit is not None:
+  if 'RESP' not in model.reactions: raise KeyError("oxygen_limit requires a 'RESP' reaction in the model")
+  bounds[model.rxn_index('RESP')][1]=oxygen_limit
  A=[]; b=[]
  if product_reaction!='BIOMASS' and 'BIOMASS' in model.reactions:
   row=np.zeros(len(model.reactions)); row[model.rxn_index('BIOMASS')]=-1; A.append(row); b.append(-growth_floor)
  result=linprog(c,A_eq=model.S,b_eq=np.zeros(len(model.metabolites)),A_ub=np.array(A) if A else None,b_ub=np.array(b) if b else None,bounds=[tuple(x) for x in bounds],method='highs')
- if not result.success: return {"status":"infeasible","objective":0,"fluxes":{r:0 for r in model.reactions}}
+ if not result.success: return {"status":"infeasible","objective":None,"product_reaction":product_reaction,"fluxes":{r:0 for r in model.reactions},"growth_floor":growth_floor}
  return {"status":"optimal","objective":float(-result.fun),"product_reaction":product_reaction,"fluxes":{r:float(v) for r,v in zip(model.reactions,result.x)},"growth_floor":growth_floor}
 
 def monod_rate(substrate,mu_max=.6,ks=.2,inhibition=0,ki=10):
@@ -85,7 +93,10 @@ def dynamic_fba(model=None,hours=24,dt=.25,glucose0=50,biomass0=.1,oxygen_limit=
  t=0.; glucose=glucose0; biomass=biomass0; trajectory=[]
  while t<=hours and glucose>1e-9:
   uptake=min(10,glucose/max(biomass*dt,.00001)); sol=flux_optimize(model,glucose_limit=uptake,oxygen_limit=oxygen_limit); mu=sol['objective']*.1; growth=biomass*(math.exp(mu*dt)-1); biomass+=growth; glucose=max(0,glucose-uptake*biomass*.01*dt); trajectory.append({"time_h":t,"biomass_gdw_l":biomass,"glucose_mM":glucose,"growth_rate_h":mu,"uptake_flux":uptake}); t+=dt
- return {"trajectory":trajectory,"final_biomass_gdw_l":biomass,"final_glucose_mM":glucose,"oxygen_limit":oxygen_limit}
+ if not trajectory:
+  trajectory.append({"time_h":0.0,"biomass_gdw_l":biomass,"glucose_mM":glucose,"growth_rate_h":0.0,"uptake_flux":0.0})
+ simulated=trajectory[-1]["time_h"]; terminated_early=simulated<hours-1e-6
+ return {"trajectory":trajectory,"final_biomass_gdw_l":biomass,"final_glucose_mM":glucose,"oxygen_limit":oxygen_limit,"simulated_hours":simulated,"terminated_early":terminated_early}
 
 def cofactor_balance(nadh_production,nadh_use,nadph_production,nadph_use):
  if min(nadh_production,nadh_use,nadph_production,nadph_use)<0: raise ValueError("cofactor fluxes non-negative required")
@@ -97,10 +108,13 @@ def overflow_metabolism(carbon_uptake,respiratory_capacity,yield_coefficient=.5)
 
 def fermentation_simulate(hours=48,substrate0=100,biomass0=.1,product_yield=.4,mu_max=.6,ks=.2,kla=50,temperature_c=30,ph=7):
  if min(hours,substrate0,biomass0,product_yield,mu_max,ks,kla)<=0: raise ValueError("fermentation inputs positive required")
+ if not all(map(math.isfinite,(hours,substrate0,biomass0,product_yield,mu_max,ks,kla,temperature_c,ph))): raise ValueError("fermentation inputs must be finite")
  temp=math.exp(-((temperature_c-30)/10)**2); phf=math.exp(-((ph-7)/1.5)**2)
  def rhs(_t,y):
   x,s,p,o=y; mu=monod_rate(max(s,0),mu_max*temp*phf,ks,inhibition=p,ki=100); oxygen_factor=o/(.1+o); growth=mu*oxygen_factor*x; uptake=growth/.5; otr=kla*(.21-o); return [growth,-uptake,product_yield*uptake,otr-2*growth]
- t=np.linspace(0,hours,193); sol=solve_ivp(rhs,(0,hours),[biomass0,substrate0,0,.21],t_eval=t,rtol=1e-7,atol=1e-9); y=np.maximum(sol.y,0)
+ t=np.linspace(0,hours,193); sol=solve_ivp(rhs,(0,hours),[biomass0,substrate0,0,.21],t_eval=t,rtol=1e-7,atol=1e-9)
+ if not sol.success: raise RuntimeError("fermentation integration failed: %s" % sol.message)
+ y=np.maximum(sol.y,0)
  return {"time_h":sol.t.tolist(),"biomass_gdw_l":y[0].tolist(),"substrate_mM":y[1].tolist(),"product_mM":y[2].tolist(),"oxygen_mM":y[3].tolist(),"final_product_mM":float(y[2,-1]),"final_biomass_gdw_l":float(y[0,-1])}
 
 def stress_response(ph=7,temperature_c=30,osmolarity=.3,product_mM=0):
@@ -190,5 +204,7 @@ def genome_diagnostics(genes,model=None):
  return d
 
 def compile_synthetic_life(genes=None,product='biomass',module_genes=None,seed=0):
- genes=genes or _default_catalog(); optimized=optimize_minimal_genome(genes); validation=validate_genome_design(optimized); legacy=design_minimal_genome(genes); module=production_module(product,module_genes or ['enzyme_A','enzyme_B']); chassis=modular_chassis(legacy,[module]); fermentation=fermentation_simulate(hours=12); stress=stress_response(product_mM=fermentation['final_product_mM']); diagnostics=genome_diagnostics(genes)
+ if genes is None: genes=_default_catalog()
+ elif not genes: raise ValueError("genes must not be empty; pass None to use the default catalog")
+ optimized=optimize_minimal_genome(genes); validation=validate_genome_design(optimized); legacy=design_minimal_genome(genes); module=production_module(product,module_genes or ['enzyme_A','enzyme_B']); chassis=modular_chassis(legacy,[module]); fermentation=fermentation_simulate(hours=12); stress=stress_response(product_mM=fermentation['final_product_mM']); diagnostics=genome_diagnostics(genes)
  return {"genome_optimization":optimized,"validation":validation,"legacy_minimal_design":legacy,"chassis":chassis,"metabolic_optimization":flux_optimize(),"dynamic_fba":dynamic_fba(hours=4),"cofactor":cofactor_balance(10,8,5,6),"control":dynamic_control(1.5),"stochastic_control":stochastic_control(hours=2,seed=seed),"fermentation":fermentation,"stress":stress,"resilience":resilience_design(stress),"integration_site":integration_site_score(.8,2000,.05),"evolution":ale_trajectory(generations=50,seed=seed),"diagnostics":diagnostics,"model_status":"Mechanistic/optimization models only; no trained model and not clinically validated.","design_status":"Computational architecture requiring expert and institutional review before physical work."}
