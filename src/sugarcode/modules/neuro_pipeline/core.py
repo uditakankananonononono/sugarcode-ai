@@ -64,13 +64,16 @@ def train(n_in: int = 6, n_hidden: int = 12, epochs: int = 300, lr: float = 0.5,
     }
 
 
-def lesion_study(model: MLP, n_in: int = 6, seed: int = 42,
+def lesion_study(model: MLP, n_in: int | None = None, seed: int = 42,
                  X: np.ndarray | None = None, y: np.ndarray | None = None) -> dict:
     """Virtual lesioning: ablate each hidden unit, measure accuracy drop.
 
     Pass X/y to lesion on a specific dataset (e.g. encoded DNA sequences);
     defaults to the built-in toy task."""
     if X is None or y is None:
+        n_in = model.W1.shape[0] if n_in is None else n_in
+        if n_in < 3:
+            raise ValueError("built-in toy task needs >= 3 inputs; pass X/y")
         rng = np.random.default_rng(seed + 1)
         X = rng.normal(0, 1, (200, n_in))
         y = ((X[:, 0] + X[:, 1] - X[:, 2]) > 0).astype(float).reshape(-1, 1)
@@ -105,11 +108,17 @@ def activation_trace(model: MLP, x: np.ndarray) -> dict:
     }
 
 
-def rsa(model: MLP, n_in: int = 6, n_stimuli: int = 40, seed: int = 7) -> dict:
+def rsa(model: MLP, n_in: int | None = None, n_stimuli: int = 40, seed: int = 7,
+        X: np.ndarray | None = None) -> dict:
     """Representational similarity analysis: correlate input-space and hidden-space
-    dissimilarity matrices (are model embeddings organized like the data?)."""
-    rng = np.random.default_rng(seed)
-    X = rng.normal(0, 1, (n_stimuli, n_in))
+    dissimilarity matrices (are model embeddings organized like the data?).
+
+    n_in defaults to the model's input width (a fixed 6 crashed on every
+    sequence-trained model); pass X to use real stimuli (e.g. encoded DNA)."""
+    if X is None:
+        rng = np.random.default_rng(seed)
+        X = rng.normal(0, 1, (n_stimuli, model.W1.shape[0] if n_in is None else n_in))
+    X = np.asarray(X, float); n_stimuli = len(X)
     h = np.tanh(X @ model.W1 + model.b1)
     def rdm(M):
         d = np.zeros((len(M), len(M)))
@@ -217,15 +226,41 @@ def synthetic_promoter_dataset(n: int = 400, seq_len: int = 50,
             "motif": m, "seq_len": seq_len}
 
 
+def _stratified_split(labels, holdout, seed):
+    y = np.asarray(labels).ravel()
+    rng = np.random.default_rng(seed + 1000)
+    test = []
+    for c in np.unique(y):
+        idx = rng.permutation(np.flatnonzero(y == c))
+        test.extend(idx[:int(round(holdout * len(idx)))].tolist())
+    test = np.array(sorted(test), int)
+    train = np.setdiff1d(np.arange(len(y)), test)
+    return train, test
+
+
+def _encode(sequences, encoding, k, max_len=None):
+    return kmer_encode(sequences, k=k) if encoding == "kmer" else one_hot_encode(sequences, max_len=max_len)
+
+
 def train_on_sequences(sequences=None, labels=None, k: int = 3,
                        encoding: str = "onehot", n_hidden: int = 24,
                        epochs: int = 800, lr: float = 0.8,
-                       stdp_mod: float = 0.0, seed: int = 42) -> dict:
+                       stdp_mod: float = 0.0, seed: int = 42,
+                       holdout: float = 0.2) -> dict:
     """Train the MLP to classify DNA sequences by motif content.
 
     Defaults to synthetic_promoter_dataset() (TATA-box vs random). Pass your
     own sequences + labels (0/1) for real biological data. encoding is
-    'kmer' (default, 4**k frequency features) or 'onehot'."""
+    'onehot' (default, position-specific) or 'kmer' (4**k frequency features).
+
+    A stratified `holdout` fraction (default 0.2) is kept out of training and
+    scored separately: training accuracy alone hid severe overfitting (default
+    one-hot run: train 0.965 vs 0.64 on fresh sequences). Set holdout=0 to
+    train on everything (no generalisation estimate is then reported)."""
+    if encoding not in ("onehot", "kmer"):
+        raise ValueError("encoding must be 'onehot' or 'kmer'")
+    if not 0 <= holdout < 1:
+        raise ValueError("holdout must be in [0, 1)")
     if sequences is None:
         data = synthetic_promoter_dataset(seed=seed)
         sequences, labels = data["sequences"], data["labels"]
@@ -234,19 +269,30 @@ def train_on_sequences(sequences=None, labels=None, k: int = 3,
     else:
         if labels is None:
             raise ValueError("labels required when sequences are provided")
-        labels = np.asarray(labels, float).reshape(-1, 1)
         dataset_note = "user-supplied sequences"
-    X = kmer_encode(sequences, k=k) if encoding == "kmer" else one_hot_encode(sequences)
+    labels = np.asarray(labels, float).reshape(-1, 1)
+    sequences = list(sequences)
+    if len(sequences) != len(labels):
+        raise ValueError("sequences and labels differ in length")
+    max_len = max(len(s) for s in sequences) if encoding == "onehot" else None
+    X = _encode(sequences, encoding, k, max_len)
+    tr, te = _stratified_split(labels, holdout, seed) if holdout > 0 else (np.arange(len(X)), np.array([], int))
     model = MLP(X.shape[1], n_hidden, 1, seed=seed)
     losses = []
     for _ in range(epochs):
-        losses.append(model.backward(X, labels, lr, stdp_mod))
-    acc = float(np.mean((model.forward(X) > 0.5) == labels))
+        losses.append(model.backward(X[tr], labels[tr], lr, stdp_mod))
+    acc = float(np.mean((model.forward(X[tr]) > 0.5) == labels[tr]))
+    hacc = float(np.mean((model.forward(X[te]) > 0.5) == labels[te])) if len(te) else None
     return {
         "model": model, "final_loss": round(losses[-1], 4),
         "train_accuracy": round(acc, 3),
+        "holdout_accuracy": None if hacc is None else round(hacc, 3),
+        "generalization_gap": None if hacc is None else round(acc - hacc, 3),
+        "n_train": int(len(tr)), "n_holdout": int(len(te)),
+        "holdout_index": te.tolist(),
         "loss_curve": [round(l, 4) for l in losses[:: max(1, epochs // 20)]],
         "encoding": encoding, "k": k if encoding == "kmer" else None,
+        "max_len": max_len,
         "n_sequences": len(sequences), "n_features": int(X.shape[1]),
         "dataset": dataset_note,
         "plasticity_note": ("stdp_mod applies STDP-style co-activation potentiation; "
@@ -254,16 +300,25 @@ def train_on_sequences(sequences=None, labels=None, k: int = 3,
     }
 
 
+def predict_sequences(run: dict, sequences) -> np.ndarray:
+    """Score new sequences with a train_on_sequences() result, using the same
+    encoding and one-hot width as training (sequences are padded/truncated)."""
+    X = _encode(list(sequences), run["encoding"], run["k"] or 3, run.get("max_len"))
+    return run["model"].forward(X).ravel()
+
+
 def sequence_pipeline_demo(seed: int = 42) -> dict:
     """End-to-end biological demo: train on the TATA-box promoter dataset,
-    then lesion the trained model on the encoded sequences."""
+    then lesion the trained model on its held-out sequences, encoded the same
+    way as training."""
     run = train_on_sequences(seed=seed)
     data = synthetic_promoter_dataset(seed=seed)
-    X = one_hot_encode(data["sequences"])
-    y = data["labels"]
+    te = np.array(run["holdout_index"], int)
+    X = _encode([data["sequences"][i] for i in te], run["encoding"], run["k"] or 3, run["max_len"])
+    y = data["labels"][te]
     lesion = lesion_study(run["model"], X=X, y=y)
-    return {"training": {k: v for k, v in run.items() if k != "model"},
-            "lesion_on_sequences": lesion}
+    return {"training": {k: v for k, v in run.items() if k not in ("model", "holdout_index")},
+            "lesion_on_sequences": lesion, "lesion_data": "held-out sequences"}
 
 # Explicit multimodal, continual-learning and causal-debugging extensions.
 def align_modalities(modalities,latent_dim=4):
