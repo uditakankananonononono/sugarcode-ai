@@ -16,20 +16,28 @@ def fidelity_assessment(patient_profile: dict, pdx_profile: dict,
     """
     p_mut = set(patient_profile.get("mutations", []))
     x_mut = set(pdx_profile.get("mutations", []))
+    # Measured components are reported as measured.  The old code multiplied
+    # the OBSERVED retention by .98**passage and the observed correlation by
+    # .95**passage, so a PDX identical to its patient read retention 0.817
+    # and correlation 0.599 at passage 10 - drift counted twice.
     retention = len(p_mut & x_mut) / max(1, len(p_mut)) if p_mut else 1.0
-    retention_adj = retention * (DRIFT_RATES["mutation_retention"] ** passage)
+    retention_adj = retention
     p_expr = patient_profile.get("expression", {})
     x_expr = pdx_profile.get("expression", {})
-    corr = _correlation(p_expr, x_expr)
-    corr_adj = corr * (1 - DRIFT_RATES["expression_drift"]) ** passage
+    corr = _correlation(p_expr, x_expr)  # None when not measurable
+    corr_adj = corr
+    # stroma replacement / subclone selection are not measured here: they are
+    # passage-based PRIORS and are labelled as such.
     stroma = min(1.0, DRIFT_RATES["stroma_replacement"] * passage)
     subclone = min(1.0, DRIFT_RATES["subclone_selection"] * passage)
-    mfi = round(0.4 * retention_adj + 0.35 * corr_adj
-                + 0.15 * (1 - stroma) + 0.10 * (1 - subclone), 3)
+    terms = [(0.4, retention_adj), (0.15, 1 - stroma), (0.10, 1 - subclone)]
+    if corr_adj is not None:
+        terms.append((0.35, max(0.0, corr_adj)))
+    mfi = round(sum(w * v for w, v in terms) / sum(w for w, _ in terms), 3)
     drift_flags = []
     if retention_adj < 0.8:
         drift_flags.append("key driver mutations lost in PDX")
-    if corr_adj < 0.7:
+    if corr_adj is not None and corr_adj < 0.7:
         drift_flags.append("expression program drifting from patient")
     if stroma > 0.4:
         drift_flags.append("human stroma largely replaced by mouse")
@@ -38,7 +46,7 @@ def fidelity_assessment(patient_profile: dict, pdx_profile: dict,
         "passage": passage,
         "model_fidelity_index": mfi,
         "components": {"mutation_retention": round(retention_adj, 3),
-                       "expression_correlation": round(corr_adj, 3),
+                       "expression_correlation": None if corr_adj is None else round(corr_adj, 3),
                        "stroma_human_fraction": round(1 - stroma, 3),
                        "subclone_drift": round(subclone, 3)},
         "translational_drift": drift_flags,
@@ -46,13 +54,17 @@ def fidelity_assessment(patient_profile: dict, pdx_profile: dict,
                     "moderate - interpret with caution" if mfi > 0.6 else
                     "low fidelity - re-derive model from patient sample"),
         "crispr_restoration": restoration,
+        "component_basis": {"mutation_retention": "measured", "expression_correlation":
+                            "measured" if corr_adj is not None else "not measurable (<2 shared genes or zero variance)",
+                            "stroma_human_fraction": "passage prior", "subclone_drift": "passage prior"},
     }
 
 
-def _correlation(a: dict, b: dict) -> float:
-    genes = set(a) & set(b)
+def _correlation(a: dict, b: dict):
+    """Pearson r over shared genes; None when not measurable (was a fabricated 0.5)."""
+    genes = sorted(set(a) & set(b))
     if len(genes) < 2:
-        return 0.5
+        return None
     import math
     xa = [a[g] for g in genes]
     xb = [b[g] for g in genes]
@@ -60,7 +72,7 @@ def _correlation(a: dict, b: dict) -> float:
     cov = sum((x - ma) * (y - mb) for x, y in zip(xa, xb))
     va = math.sqrt(sum((x - ma) ** 2 for x in xa))
     vb = math.sqrt(sum((y - mb) ** 2 for y in xb))
-    return cov / (va * vb) if va and vb else 0.5
+    return cov / (va * vb) if va and vb else None
 
 
 def _restoration(lost: set) -> dict:
@@ -96,15 +108,22 @@ def multiomic_fidelity(patient_profile: dict, pdx_profile: dict, passage: int=3)
         corr=float(np.corrcoef(a,b)[0,1]) if len(a)>1 and np.std(a)>0 and np.std(b)>0 else 0.
         return {"similarity":float(max(0,min(1,(corr+1)/2*math.exp(-rmse/scale)))),"shared_features":len(genes),"rmse":rmse,"correlation":corr}
     expression=similarity("expression"); cnv=similarity("copy_number"); methylation=similarity("methylation")
-    passage_penalty=math.exp(-.018*passage); raw=.35*mutation+.3*expression["similarity"]+.2*cnv["similarity"]+.15*methylation["similarity"]; mfi=raw*passage_penalty
+    # Layers with no shared features were scored similarity 0 and flagged as
+    # drift, so a PDX identical to its patient but profiled only for
+    # mutations + expression read MFI 0.65 with copy-number and methylation
+    # "drift".  Unmeasured layers are now excluded and the weights renormalised.
+    layers={"expression":(expression,.3,"expression drift"),"copy_number":(cnv,.2,"copy-number drift"),"methylation":(methylation,.15,"methylation drift")}
+    for layer in (expression,cnv,methylation): layer["measured"]=layer["shared_features"]>0
+    measured={k:v for k,v in layers.items() if v[0]["measured"]}
+    wsum=.35+sum(w for _,w,_ in measured.values())
+    passage_penalty=math.exp(-.018*passage); raw=(.35*mutation+sum(w*d["similarity"] for d,w,_ in measured.values()))/wsum; mfi=raw*passage_penalty
     flags=[]
     if mutation<.8: flags.append("driver mutation retention below 80%")
-    if expression["similarity"]<.7: flags.append("expression drift")
-    if cnv["similarity"]<.7: flags.append("copy-number drift")
-    if methylation["similarity"]<.7: flags.append("methylation drift")
+    for d,_,flag in measured.values():
+        if d["similarity"]<.7: flags.append(flag)
     return {"passage":passage,"model_fidelity_index":round(mfi,8),"raw_multiomic_similarity":round(raw,8),"passage_penalty":round(passage_penalty,8),
       "components":{"mutation_retention":mutation,"expression":expression,"copy_number":cnv,"methylation":methylation},"retained_mutations":sorted(retained),"lost_mutations":sorted(lost),"gained_mutations":sorted(gained),"translational_drift":flags,
-      "crispr_restoration":_restoration(lost) if lost else None,"model_status":"mechanistic hermetic multi-omic comparison; no translational or clinical claim"}
+      "crispr_restoration":_restoration(lost) if lost else None,"layers_measured":["mutations"]+sorted(measured),"layers_not_measured":sorted(set(layers)-set(measured)),"model_status":"mechanistic hermetic multi-omic comparison; no translational or clinical claim"}
 
 
 def longitudinal_drift(patient_profile: dict, passages: list[dict]) -> dict:
