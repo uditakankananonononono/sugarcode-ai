@@ -69,8 +69,15 @@ ENZYME_ACCESS = np.array([
  [.10,.05,.05,.10,.05,1,.65,.05], [.20,.85,.15,.10,.10,.05,.95,.15],
  [.25,.10,1,.35,.85,.05,.20,.90]], float)
 YIELDS = np.array([.58,.52,.47,.55,.50])
-SCFA_YIELD = np.array([[.35,.20,.10],[.10,.15,.75],[.45,.30,.15],
-                       [.25,.55,.10],[.15,.20,.70]])  # acetate/propionate/butyrate
+# acetate/propionate/butyrate. Sweep 105: the butyrate column previously
+# credited Bifidobacterium (.10), Akkermansia (.15) and L. reuteri (.10) -
+# none of which produce butyrate. Bifidobacterium makes acetate + lactate and
+# only feeds butyrate producers by cross-feeding (PMID 38126785); butyrate
+# production is restricted to specific clostridial clusters - here F.
+# prausnitzii and Roseburia (PMIDs 26925050, 19807780). Zeroed for the three
+# non-producers.
+SCFA_YIELD = np.array([[.35,.20,0.],[.10,.15,.75],[.45,.30,0.],
+                       [.25,.55,0.],[.15,.20,.70]])  # acetate/propionate/butyrate
 
 
 def constraint_based_fiber_flux(strain: str, fiber_doses: dict[str, float]) -> dict:
@@ -112,6 +119,20 @@ def enzymatic_fiber_fermentation(fiber: str, dose_g: float, hours: float=48,
             "kinetics":{"type":"Michaelis-Menten","vmax":vmax,"km":km}}
 
 
+def _migration(x: np.ndarray, rate: float = .04) -> np.ndarray:
+    """Discrete Laplacian mixing across the 3 gut compartments.
+
+    Sweep 105: this used to be np.roll-based, i.e. a PERIODIC boundary - the
+    proximal compartment exchanged directly with the distal one as if the gut
+    were a ring. The colon is a chain: endpoints have one neighbour. Zero-
+    padded Laplacian conserves mass identically (column sums are 0).
+    """
+    up = np.zeros_like(x); down = np.zeros_like(x)
+    up[1:] = x[:-1]; down[:-1] = x[1:]
+    deg = np.ones((x.shape[0], 1)); deg[1:-1] = 2.0
+    return rate * (up + down - deg * x)
+
+
 def simulate_spatial_ecology(initial: dict[str,float], fiber_doses: dict[str,float], *,
                               days: float=28, pH: float=6.8, bile: float=.3,
                               immune_activity: float=.4, points: int=113) -> dict:
@@ -126,8 +147,7 @@ def simulate_spatial_ecology(initial: dict[str,float], fiber_doses: dict[str,flo
     def rhs(_,z):
         x=z.reshape(3,5); dz=np.empty_like(x)
         for c in range(3): dz[c]=x[c]*(intrinsic*compartments[c]+A@x[c])
-        migration=.04*(np.roll(x,1,axis=0)+np.roll(x,-1,axis=0)-2*x)
-        return (dz+migration).ravel()
+        return (dz+_migration(x)).ravel()
     z0=np.tile(x0,(3,1)).ravel(); t=np.linspace(0,days,points)
     z=solve_ivp(rhs,(0,days),z0,t_eval=t,rtol=1e-7,atol=1e-9).y.T.reshape(-1,3,5)
     z=np.maximum(z,0); total=z.sum((1,2),keepdims=True); rel=z/np.maximum(total,1e-15)
