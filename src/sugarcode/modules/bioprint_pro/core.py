@@ -70,9 +70,31 @@ def carreau_yasuda(shear,eta0=150,eta_inf=.5,lam=2,n=.55,a=2):
 
 
 def oldroyd_b_extrusion(pressure_kpa,nozzle_mm,length_mm=10,ink="alginate_2pct",cells=500,seed=5):
-    """Axisymmetric pressure flow with Carreau viscosity and Oldroyd-B stress."""
-    p=INKS[ink]; r=nozzle_mm*1e-3/2; dp=pressure_kpa*1000; eta=_viscosity(p,max(dp*r/(2*length_mm*1e-3*p["eta0"]),1e-6))
-    q=np.pi*r**4*dp/(8*eta*length_mm*1e-3); velocity=q/(np.pi*r*r); shear=4*velocity/r
+    """Axisymmetric pressure flow with the Cross/Carreau viscosity solved
+    self-consistently with the flow it produces (fixed point of
+    q = pi r^4 dp / (8 eta(4q/(pi r^3)) L)). The elastic shear stress is
+    Giesekus-family: an Oldroyd-B fluid has constant shear viscosity and
+    cannot shear-thin."""
+    p=INKS[ink]; r=nozzle_mm*1e-3/2; dp=pressure_kpa*1000; L=length_mm*1e-3
+    # BUG 57 fix: the old code evaluated eta once at a guessed shear
+    # (dp*r/(2*L*eta0)) - for these shear-thinning inks that overestimated
+    # viscosity ~4x and underestimated the flow rate ~4.4x. F(q) = q - flow(q)
+    # is monotone increasing (flow grows sublinearly, bounded by the
+    # eta_inf Newtonian rate), so bisection converges to the unique root.
+    def _flow(qq):
+        return math.pi * r ** 4 * dp / (8 * _viscosity(p, 4 * qq / (math.pi * r ** 3)) * L)
+    q_lo, q_hi = 1e-15, math.pi * r ** 4 * dp / (8 * p["eta_inf"] * L)
+    for _ in range(200):
+        q_mid = 0.5 * (q_lo + q_hi)
+        if _flow(q_mid) > q_mid:
+            q_lo = q_mid
+        else:
+            q_hi = q_mid
+        if q_hi - q_lo < 1e-18 * max(q_hi, 1e-30):
+            break
+    q = 0.5 * (q_lo + q_hi)
+    eta = _viscosity(p, 4 * q / (math.pi * r ** 3))
+    velocity=q/(np.pi*r*r); shear=4*velocity/r
     solvent=.2*eta; polymer=max(eta-solvent,0); relaxation=p["lambda_s"]
     stress=solvent*shear+polymer*shear/(1+(relaxation*shear)**2)**.5
     rng=np.random.default_rng(seed); radial=r*np.sqrt(rng.random(cells)); local_shear=4*velocity*radial/r**2
@@ -80,7 +102,9 @@ def oldroyd_b_extrusion(pressure_kpa,nozzle_mm,length_mm=10,ink="alginate_2pct",
     return {"flow_rate_mm3_s":float(q*1e9),"velocity_mm_s":float(velocity*1e3),"wall_shear_s-1":float(shear),
             "shear_stress_Pa":float(stress),"Weissenberg":float(relaxation*shear),"Reynolds":float(1000*velocity*2*r/max(eta,1e-12)),
             "cell_radial_position_mm":(radial*1e3).tolist(),"cell_viability":viability.tolist(),"mean_viability":float(viability.mean()),
-            "constitutive_model":"Oldroyd-B elastic stress with Carreau-Yasuda viscosity"}
+            "viscosity_Pa_s_at_wall":float(eta),
+            "constitutive_model":("Giesekus-style elastic shear stress with Carreau-Yasuda viscosity - "
+                                  "an Oldroyd-B fluid has constant shear viscosity and cannot shear-thin")}
 
 
 def crosslink_reaction_diffusion(kind="ionic",seconds=60,size_mm=2,points=41):
