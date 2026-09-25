@@ -22,8 +22,15 @@ BIOINKS = {
 }
 
 
+def _validate_size(size_mm) -> tuple:
+    if len(size_mm) != 3 or any((not isinstance(x, (int, float))) or x <= 0 for x in size_mm):
+        raise ValueError("size_mm must be three positive dimensions (x, y, z) in mm")
+    return tuple(float(x) for x in size_mm)
+
+
 def design_tissue(tissue: str, size_mm: tuple[float, float, float] = (10, 10, 2)) -> dict:
     """Full bioprinting strategy: cells, bioink, print parameters, mechanics."""
+    size_mm = _validate_size(size_mm)
     key = tissue.lower()
     if key not in TISSUES:
         raise KeyError(f"unknown tissue {tissue!r}; have {sorted(TISSUES)}")
@@ -114,7 +121,7 @@ def calibrate_printing(tissue, ink_name=None, nozzle_um=250, target_fidelity=0.8
         raise ValueError("nozzle_um must be positive and target_fidelity within (0, 1]")
     pressure = 80 / max(ink["printability"], .2) * (250 / nozzle_um)
     speed = 10 * ink["printability"] * (nozzle_um / 250) ** .5
-    fidelity = min(.99, .55 + .35 * ink["printability"] - .0002 * abs(nozzle_um - 250))
+    fidelity = min(.99, max(0.0, .55 + .35 * ink["printability"] - .0002 * abs(nozzle_um - 250)))
     return {"tissue": key, "bioink": ink["name"], "nozzle_um": nozzle_um,
             "pressure_kpa": round(pressure, 2), "speed_mm_s": round(speed, 2),
             "predicted_fidelity": round(fidelity, 3), "target_fidelity": target_fidelity,
@@ -145,8 +152,12 @@ def oxygen_profile(tissue, size_mm=(10,10,2), channel_spacing_um=None, points=11
     key=tissue.lower()
     if key not in TISSUES:
         raise KeyError(f"unknown tissue {tissue!r}; have {sorted(TISSUES)}")
+    size_mm=_validate_size(size_mm)
     vascular=_vascularization(TISSUES[key],size_mm)
-    spacing=channel_spacing_um or vascular["channel_spacing_um"] or size_mm[2]*1000
+    if channel_spacing_um is not None:
+        spacing=channel_spacing_um
+    else:
+        spacing=vascular["channel_spacing_um"] or size_mm[2]*1000
     if spacing <= 0:
         raise ValueError("channel_spacing_um must be positive")
     distances=[spacing*i/(points-1) for i in range(points)]
@@ -154,7 +165,7 @@ def oxygen_profile(tissue, size_mm=(10,10,2), channel_spacing_um=None, points=11
     oxygen=[max(0,1-(d/200)**2)*100 for d in nearest]
     return {"tissue":key,"channel_spacing_um":spacing,"distance_um":[round(x,2) for x in distances],
             "oxygen_percent":[round(x,2) for x in oxygen],"minimum_oxygen_percent":round(min(oxygen),2),
-            "hypoxic":min(oxygen)<5,"recommended_max_spacing_um":400,
+            "hypoxic":min(oxygen)<5,"recommended_max_spacing_um":math.floor(400*math.sqrt(0.95)*10)/10,  # largest spacing whose midpoint stays >= 5% oxygen in this model
             "model_status":"diffusion-only prediction; perfusion validation required"}
 
 
