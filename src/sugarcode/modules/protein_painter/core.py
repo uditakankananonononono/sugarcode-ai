@@ -32,9 +32,14 @@ def _design_sequence(pattern: str, active_residues: str, rng: random.Random) -> 
     mid = len(pattern) // 2
     active_sites = []
     if active_residues and coils:
-        start = min(coils, key=lambda c: abs(c - mid))
-        tail = sorted(i for i in coils if i >= start)
-        active_sites = tail[:len(active_residues)]
+        n = len(active_residues)
+        # Centre the site on the middle-nearest coil and take the n nearest
+        # coils overall.  The old code took only coils AFTER that one: a
+        # left-heavy coil run silently truncated the catalytic triad ("HDE"
+        # became "H"), and a right-heavy run pushed the site to the terminus.
+        ordered = sorted(coils, key=lambda c: (abs(c - mid), c))
+        active_sites = sorted(ordered[:n])
+    placement_complete = len(active_sites) == len(active_residues)
     seq = []
     ai = 0
     for i, ss in enumerate(pattern):
@@ -43,7 +48,7 @@ def _design_sequence(pattern: str, active_residues: str, rng: random.Random) -> 
             ai += 1
         else:
             seq.append(rng.choice(AA_FOR[ss]))
-    return "".join(seq), active_sites
+    return "".join(seq), active_sites, placement_complete
 
 
 def _stability(seq: str, ss_pred: list[str]) -> dict:
@@ -69,6 +74,10 @@ def design_protein(description: str, length: int | None = None, seed: int = 0,
     with active-site placement -> Chou-Fasman fold verification -> stability
     ranking. Returns the best candidate plus alternates.
     """
+    if length is not None and length < 1:
+        raise ValueError("length must be >= 1 (0 was silently ignored as falsy)")
+    if candidates < 1:
+        raise ValueError("candidates must be >= 1 (0 crashed IndexError)")
     rng = random.Random(seed)
     fold = _pick_template(description)
     template = FOLD_TEMPLATES[fold]
@@ -78,7 +87,7 @@ def design_protein(description: str, length: int | None = None, seed: int = 0,
         pattern = (pattern * reps)[:length]
     results = []
     for c in range(candidates):
-        seq, active = _design_sequence(pattern, template["active"], rng)
+        seq, active, placed = _design_sequence(pattern, template["active"], rng)
         ss_pred = chou_fasman(seq)
         match = sum(1 for want, got in zip(pattern, ss_pred) if want == got) / len(pattern)
         stab = _stability(seq, ss_pred)
@@ -88,6 +97,7 @@ def design_protein(description: str, length: int | None = None, seed: int = 0,
             "predicted_ss": "".join(ss_pred),
             "active_site_residues": [f"{seq[i]}{i + 1}" for i in active],
             "active_site_positions": active,
+            "active_site_placement_complete": placed,
             "stability": stab, "design_score": round(score, 4),
             "molecular_weight_da": round(molecular_weight(seq), 1),
         })
@@ -118,7 +128,9 @@ def clean_protein(seq):
     return s
 CODONS={'ecoli':{a:c for a,c in zip("ACDEFGHIKLMNPQRSTVWY",("GCG","TGC","GAT","GAA","TTT","GGT","CAT","ATT","AAA","CTG","ATG","AAC","CCG","CAA","CGT","AGC","ACC","GTT","TGG","TAT"))},'yeast':{a:c for a,c in zip("ACDEFGHIKLMNPQRSTVWY",("GCT","TGT","GAC","GAG","TTC","GGA","CAC","ATC","AAG","TTG","ATG","AAT","CCA","CAG","AGA","TCT","ACT","GTC","TGG","TAC"))}}
 def codon_optimize(seq,host='ecoli'):
-    table=CODONS.get(host,CODONS['ecoli']); return "".join(table[a] for a in clean_protein(seq))
+    if host not in CODONS:  # an unknown host silently used the E. coli table
+        raise KeyError(f"unknown host {host!r}; have {sorted(CODONS)}")
+    table=CODONS[host]; return "".join(table[a] for a in clean_protein(seq))
 
 CHARGE={'D':-1,'E':-1,'K':1,'R':1,'H':.1}; HYDRO=set('AILMFWVY'); AROM=set('FWY')
 
