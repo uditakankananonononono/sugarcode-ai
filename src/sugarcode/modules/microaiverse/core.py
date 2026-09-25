@@ -31,7 +31,9 @@ def cultivation_plan(target: str, lifestyle: str = "syntroph",
     if lifestyle not in GROWTH_FACTORS:
         raise KeyError(f"unknown lifestyle; have {sorted(GROWTH_FACTORS)}")
     spec = GROWTH_FACTORS[lifestyle]
-    gaps = genome_gaps or []
+    # Sweep 106 (BUG 76): duplicate gaps used to stack identical supplements
+    # and inflate the score - dedupe before counting.
+    gaps = list(dict.fromkeys(genome_gaps or []))
     supplements = _supplements(gaps)
     partners = list(spec["partners"])
     for g in gaps:
@@ -42,7 +44,9 @@ def cultivation_plan(target: str, lifestyle: str = "syntroph",
         "media_recipe": {"base": spec["media"], "supplements": supplements},
         "techniques": spec["tricks"],
         "coculture_partners": sorted(set(partners)),
-        "predicted_success": round(0.3 + 0.2 * len(supplements) + 0.2 * bool(partners), 2),
+        # BUG 76: the raw linear score reached 1.5 with 5 supplements - a
+        # probability above 1. Capped at 0.95: no cultivation is a certainty.
+        "predicted_success": min(0.95, round(0.3 + 0.2 * len(supplements) + 0.2 * bool(partners), 2)),
         "natural_product_potential": ("uncultured taxa are enriched for novel biosynthetic "
                                       "gene clusters - genome-mine for NRPS/PKS after isolation"),
         "validation": ["colony formation on predicted medium",
@@ -81,6 +85,11 @@ def optimize_medium(target_model: dict, available_supplements: dict[str,float], 
     names=sorted(target["requirements"])
     missing=set(names)-set(available_supplements)
     if missing: raise ValueError(f"missing supplement costs for requirements: {sorted(missing)}")
+    # Sweep 106 (BUG 77): a target with no requirements crashed inside
+    # linprog with a raw solver error; the answer is trivially the empty
+    # medium at zero cost.
+    if not names:
+        return {"supplements":{},"total_cost":0.0,"within_budget":True,"budget":budget,"solver":"scipy HiGHS linear program","optimal":True,"requirements_met":{}}
     costs=np.array([float(available_supplements[x]) for x in names]); req=np.array([target["requirements"][x] for x in names]);
     if np.any(costs<0): raise ValueError("supplement costs must be non-negative")
     fit=linprog(costs,A_ub=-np.eye(len(names)),b_ub=-req,bounds=[(0,None)]*len(names),method="highs")
