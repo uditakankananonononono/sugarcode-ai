@@ -58,17 +58,23 @@ def pk_model(vehicle: str, dose_ug: float = 100.0, hours: float = 96.0,
     vd_l = 3.0  # plasma volume approximation (L, human-scaled per kg dose input)
     ke = math.log(2) / v["half_life_h"]
     c0 = dose_ug / vd_l
+    if dt <= 0 or hours < 0:
+        raise ValueError("dt must be positive and hours non-negative")
+    # BUG 65: the old loop added a zero-width-time trapezoid (c0+c0)/2*dt at
+    # t=0, overstating AUC by exactly c0*dt (+5.8% for LNP over 96 h), and
+    # accumulated t by repeated float addition.  Times are now index-based.
+    n = int(math.floor(hours / dt + 1e-9))
     ts, conc = [], []
-    t = 0.0
     auc = 0.0
-    prev = c0
-    while t <= hours:
+    prev = None
+    for k in range(n + 1):
+        t = k * dt
         c = c0 * math.exp(-ke * t)
-        auc += (c + prev) / 2 * dt
+        if prev is not None:
+            auc += (c + prev) / 2 * dt
         prev = c
-        ts.append(round(t, 2))
+        ts.append(round(t, 6))
         conc.append(round(c, 5))
-        t += dt
     return {
         "vehicle": vehicle, "dose_ug": dose_ug,
         "half_life_h": v["half_life_h"], "elimination_ke": round(ke, 6),
