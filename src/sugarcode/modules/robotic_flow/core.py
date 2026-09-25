@@ -17,7 +17,12 @@ def pipette_plan(transfers: list[dict]) -> dict:
     steps = []
     total_s = 0.0
     for i, t in enumerate(transfers):
-        lc = LIQUID_CLASSES.get(t.get("liquid", "water"), LIQUID_CLASSES["water"])
+        liquid = t.get("liquid", "water")
+        if liquid not in LIQUID_CLASSES:
+            # was: silently calibrated with water's speeds while labelling
+            # the step with the unknown class (e.g. "mercury" at 200 ul/s)
+            raise KeyError(f"unknown liquid class {liquid!r}; have {sorted(LIQUID_CLASSES)}")
+        lc = LIQUID_CLASSES[liquid]
         vol = t["volume_ul"]
         asp_t = vol / lc["aspirate_speed_ul_s"]
         evap = round(vol * 0.002 * (asp_t / 60), 4)
@@ -40,6 +45,13 @@ def schedule_run(tasks: list[dict]) -> dict:
     tasks: [{"id": str, "instrument": str, "duration_min": x, "after": [ids]}]
     Returns instrument timelines with makespan.
     """
+    ids = [t["id"] for t in tasks]
+    if len(set(ids)) != len(ids):
+        raise ValueError("duplicate task ids make the schedule ambiguous")
+    unknown = {d for t in tasks for d in t.get("after", []) if d not in set(ids)}
+    if unknown:
+        # was: misreported as "dependency cycle in task graph"
+        raise ValueError(f"unknown dependencies: {sorted(unknown)}")
     done: dict[str, float] = {}
     instrument_free: dict[str, float] = {}
     timeline: list[dict] = []
@@ -107,7 +119,10 @@ def sample_lineage(samples,operations):
  lineage={s:{'parents':[],'operations':[]} for s in samples}
  for op in operations:
   out=op['output']; lineage[out]={'parents':list(op.get('inputs',[])),'operations':[op['op']]}
- return {'samples':lineage,'traceable':all('parents' in x for x in lineage.values())}
+ # traceable was trivially True ('parents' always exists); check that every
+ # parent is itself a known sample in the lineage
+ unknown=sorted({p for x in lineage.values() for p in x['parents'] if p not in lineage})
+ return {'samples':lineage,'unknown_parents':unknown,'traceable':not unknown}
 def reagent_status(age_days,half_life_days,temperature_excursion_h=0,incompatible=False):
  activity=2**(-age_days/half_life_days)*math.exp(-.03*temperature_excursion_h); return {'activity_fraction':activity,'usable':activity>.7 and not incompatible,'incompatible':incompatible}
 def contamination_control(transfers):
