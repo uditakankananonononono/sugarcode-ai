@@ -22,7 +22,9 @@ def run_sandbox(pop_size: int = 200, generations: int = 300, n_alleles: int = 3,
     trajectory = [list(freq)]
     fixed_at = None
     events = []
+    gens_done = 0
     for gen in range(1, generations + 1):
+        gens_done = gen
         # selection
         w_bar = sum(f * w for f, w in zip(freq, fit))
         sel = [f * w / w_bar for f, w in zip(freq, fit)]
@@ -56,8 +58,14 @@ def run_sandbox(pop_size: int = 200, generations: int = 300, n_alleles: int = 3,
             events.append({"gen": gen, "event": "construct_fixed"})
             break
     return {
-        "pop_size": pop_size, "generations_run": len(trajectory) * 10,
+        # BUG 56 fix: generations_run is the actual number of simulated
+        # generations (len(trajectory)*10 over-reported by up to 10: 310 for a
+        # 300-generation run, 10 for a gen-1 fixation). final_freq is the full
+        # final vector so downstream reports need not reuse a stale
+        # every-10-gen snapshot.
+        "pop_size": pop_size, "generations_run": gens_done,
         "final_construct_freq": round(freq[0], 4),
+        "final_freq": [round(f, 6) for f in freq],
         "construct_retained": freq[0] > 0.5,
         "fixation_gen": fixed_at,
         "events": events,
@@ -92,4 +100,4 @@ def ecological_competition(initial,growth,competition,steps=100,dt=.05):
   x=[max(0,x[i]+dt*growth[i]*x[i]*(1-sum(competition[i][j]*x[j] for j in range(len(x))))) for i in range(len(x))]; trace.append(list(x))
  return {'trajectory':trace,'final':x,'coexistence':sum(v>.01 for v in x)>1}
 def playground_report(environments):
- sweep=environment_sweep(environments,pop_size=100,generations=50,n_alleles=len(environments[0]['fitness']),bottleneck_size=10); return {'environment_sweep':sweep,'diversity':diversity_metrics(sweep['most_stable']['result']['trajectory_every_10gen'][-1]),'model_status':'Seeded Wright-Fisher and Lotka-Volterra equations; no learned evolutionary model and not a production forecast.'}
+ sweep=environment_sweep(environments,pop_size=100,generations=50,n_alleles=len(environments[0]['fitness']),bottleneck_size=10); return {'environment_sweep':sweep,'diversity':diversity_metrics(sweep['most_stable']['result']['final_freq']),'model_status':'Seeded Wright-Fisher and Lotka-Volterra equations; no learned evolutionary model and not a production forecast.'}
