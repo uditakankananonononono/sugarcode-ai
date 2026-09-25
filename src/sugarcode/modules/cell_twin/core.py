@@ -75,7 +75,7 @@ def run_drug_trial(twin: dict, drugs: list[str], doses: list[float] | None = Non
             curves.append({"dose_uM": dose, "apoptosis_rate": round(apoptosis, 3),
                            "proliferation_rate": round(proliferation, 3)})
         per_drug[d] = {"curves": curves, "resistance_flag": bool(resist),
-                       "max_apoptosis": curves[-1]["apoptosis_rate"]}
+                       "max_apoptosis": max(c["apoptosis_rate"] for c in curves)}
     combos = []
     for i in range(len(drugs)):
         for j in range(i + 1, len(drugs)):
@@ -137,6 +137,29 @@ def simulate_drug_response(twin: dict, drug: str, dose_uM: float, *, hours: floa
     return {"drug":drug,"dose_uM":dose_uM,"trajectory":rows,"terminal_viability":rows[-1]["viable"],"terminal_apoptosis":rows[-1]["apoptotic"],"terminal_proliferation":rows[-1]["proliferating"],"resistance_factor":resistance,"solver":{"method":"LSODA","nfev":sol.nfev,"success":sol.success},"model_status":"mechanistic hermetic response simulation; no patient treatment prediction"}
 
 
+def _drug_effect(twin: dict, drug: str, dose_uM: float) -> float:
+    """Single-drug effect scalar: kill * dose/(dose+1) * (1 - resistance)."""
+    action=DRUG_ACTIONS[drug]; genes={m["gene"] for m in twin["patient_omics"]["mutations"]}
+    resistance=.5 if genes&set(action["resist_genes"]) else 0.
+    return action["kill"]*dose_uM/(dose_uM+1)*(1-resistance)
+
+def simulate_combined_response(twin: dict, drug_a: str, dose_a: float, drug_b: str, dose_b: float, *, hours: float=72, sample_hours: float=2) -> dict:
+    """Mechanistic combination run: Bliss-combined effect scalar in the response ODEs."""
+    import numpy as np
+    from scipy.integrate import solve_ivp
+    for d in (drug_a, drug_b):
+        if d not in DRUG_ACTIONS: raise ValueError(f"unknown drug {d!r}; choose {sorted(DRUG_ACTIONS)}")
+    eff_a=_drug_effect(twin,drug_a,dose_a); eff_b=_drug_effect(twin,drug_b,dose_b)
+    effect=1-(1-eff_a)*(1-eff_b)  # Bliss independence on the effect scalars
+    pa=twin["pathway_activities"]
+    def rhs(_,y):
+        viable,apoptotic,prolif,damage=y; growth=.04*pa["proliferation"]*viable*(1-viable/2); injury=.08*effect*viable; repair=.03*pa["dna_repair"]*damage; death=injury*(.5+pa["apoptosis"])*(1-.5*pa["survival"])
+        return [growth-death,death-.02*apoptotic,-.05*effect*prolif+.02*pa["proliferation"]*(1-prolif),injury-repair-.02*damage]
+    times=np.arange(0,hours+1e-9,sample_hours); times=np.unique(np.append(times,hours)); y0=list(twin["initial_state"].values()); sol=solve_ivp(rhs,(0,hours),y0,t_eval=times,method="LSODA",rtol=1e-9,atol=1e-10)
+    if not sol.success: raise RuntimeError(sol.message)
+    rows=[{"hour":float(t),"viable":max(0,float(v)),"apoptotic":max(0,float(a)),"proliferating":max(0,float(p)),"damage":max(0,float(d))} for t,v,a,p,d in zip(sol.t,*sol.y)]
+    return {"drugs":[drug_a,drug_b],"doses_uM":[dose_a,dose_b],"combined_effect":effect,"terminal_viability":rows[-1]["viable"],"trajectory":rows,"solver":{"method":"LSODA","nfev":sol.nfev,"success":sol.success},"model_status":"mechanistic hermetic combination simulation; no patient treatment prediction"}
+
 def combination_screen(twin: dict, drugs: list[str], doses: list[float]) -> dict:
     """Screen monotherapies and exact pair combinations with Bliss excess."""
     if len(drugs)<2 or len(doses)!=len(drugs): raise ValueError("provide at least two drugs and one matching dose per drug")
@@ -144,8 +167,9 @@ def combination_screen(twin: dict, drugs: list[str], doses: list[float]) -> dict
     for i in range(len(drugs)):
         for j in range(i+1,len(drugs)):
             a,b=drugs[i],drugs[j]; ea=1-mono[a]["terminal_viability"]; eb=1-mono[b]["terminal_viability"]; expected=ea+eb-ea*eb
-            # Mechanistic combined exposure reruns with effective multiplicative survival.
-            observed=min(1,expected+.08*(1-mono[a]["resistance_factor"])*(1-mono[b]["resistance_factor"])); combos.append({"combination":[a,b],"bliss_expected_kill":expected,"predicted_combination_kill":observed,"bliss_excess":observed-expected,"predicted_viability":1-observed})
+            # Mechanistic combined exposure rerun: Bliss-combined effect scalar in the response ODEs.
+            combined=simulate_combined_response(twin,a,float(doses[i]),b,float(doses[j]))
+            observed=min(1,1-combined["terminal_viability"]); combos.append({"combination":[a,b],"bliss_expected_kill":expected,"predicted_combination_kill":observed,"bliss_excess":observed-expected,"predicted_viability":1-observed})
     combos.sort(key=lambda x:(-x["bliss_excess"],x["predicted_viability"]))
     return {"monotherapies":mono,"combinations":combos,"recommended":combos[0]}
 
