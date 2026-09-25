@@ -42,23 +42,6 @@ def plan_surgery(tumor: dict, image_size: tuple[int, int, int] = (128, 128, 128)
     }
 
 
-def _place_regions(image_size, center, radius) -> dict:
-    """Deterministic anatomical placement around the tumor for planning math."""
-    import hashlib
-    out = {}
-    for i, (name, props) in enumerate(ELOQUENT_REGIONS.items()):
-        h = int(hashlib.md5(name.encode()).hexdigest(), 16)
-        dx = ((h % 100) - 50) * 1.5
-        dy = (((h // 100) % 100) - 50) * 1.5
-        dz = (((h // 10000) % 100) - 50) * 1.5
-        pos = [min(max(center[0] + dx, 2.0), image_size[0] - 3.0),
-               min(max(center[1] + dy, 2.0), image_size[1] - 3.0),
-               min(max(center[2] + dz, 2.0), image_size[2] - 3.0)]  # keep regions inside the grid
-        dist = math.sqrt(dx ** 2 + dy ** 2 + dz ** 2)
-        out[name] = {**props, "position": pos, "distance_to_tumor_mm": round(dist, 1)}
-    return out
-
-
 def _corridors(center, radius, regions, image_size) -> list:
     """Candidate entry corridors (6 canonical directions), risk-scored."""
     dirs = {"superior": [0, 0, 1], "anterior": [0, 1, 0], "posterior": [0, -1, 0],
@@ -97,19 +80,6 @@ def _segmentation(tumor, image_size) -> dict:
             "confidence": 0.9}
 
 
-def _neurotwin(center, radius, corridor, regions) -> dict:
-    """Digital clone simulation: resect along corridor, compute deficits."""
-    deficits = []
-    for rname, r in regions.items():
-        if corridor.get("nearest_eloquent") == rname:
-            deficits.append({"region": rname, "function": r["function"],
-                             "deficit_probability": round(min(0.8, 10 / max(r["distance_to_tumor_mm"], 1) * r["risk_weight"]), 2)})
-    return {"simulated_resection_fraction": 0.95,
-            "predicted_deficits": deficits,
-            "preserved_functions": [r["function"] for rn, r in regions.items()
-                                    if rn != corridor.get("nearest_eloquent")][:4]}
-
-
 # --- drop 13: real A* corridor pathfinding over a voxel risk field -------------
 def _risk_field_fn(regions: dict, sigma: float = 12.0):
     """risk(p) = sum_i w_i * exp(-d^2 / 2 sigma^2) over eloquent regions."""
@@ -129,9 +99,13 @@ def plan_path_astar(tumor: dict, entry: list[float] | None = None,
                     risk_lambda: float = 8.0, max_expand: int = 400000) -> dict:
     """A* shortest-risk path from a scalp entry point to the tumor center over
     the eloquent-region risk field. Cost per step = euclidean * (1 + lambda *
-    risk(midpoint)); 26-connected grid, euclidean heuristic (admissible since
-    risk term is >= 1). Returns the voxel path and compares it against the
-    straight-line corridor it replaces."""
+    risk(midpoint)); 26-connected grid. The frontier priority is g + 50*h, a
+    50x-inflated weighted heuristic chosen for speed: it is NOT admissible, so
+    the path is greedy-near-optimal, not optimal. Measured against an admissible
+    oracle on the same cost function (sweep_neuroplan_ai), the returned path can
+    cost up to ~1.9x optimal on oblique entries; the waypoint refinement then
+    re-minimizes a discrete risk objective. Returns the voxel path and compares
+    it against the straight-line corridor it replaces."""
     import heapq
     import math as _m
     center = [float(c) for c in tumor["center"]]
@@ -271,7 +245,13 @@ def analyze_tractography(streamlines, tumor_center, tumor_radius_mm: float, *, c
     for i,line in enumerate(streamlines):
         a=np.asarray(line,float)
         if a.ndim!=2 or a.shape[1]!=3 or len(a)<2 or not np.all(np.isfinite(a)): raise ValueError(f"streamline {i} must be finite Nx3 with N >= 2")
-        clearance=float(np.min(np.linalg.norm(a-c,axis=1))-tumor_radius_mm)
+        # point-to-SEGMENT distance (BUG 47 fix): vertex-only distances overstate
+        # clearance when a tract passes near the tumor between sampled points
+        dmin=float(np.min(np.linalg.norm(a-c,axis=1)))
+        for p0,p1 in zip(a[:-1],a[1:]):
+            seg=p1-p0; t=float(np.dot(c-p0,seg)/max(float(np.dot(seg,seg)),1e-300))
+            t=min(1.0,max(0.0,t)); dmin=min(dmin,float(np.linalg.norm(p0+t*seg-c)))
+        clearance=dmin-tumor_radius_mm
         length=float(np.linalg.norm(np.diff(a,axis=0),axis=1).sum())
         rows.append({"streamline":i,"length_mm":round(length,6),"clearance_mm":round(clearance,6),"at_risk":clearance<critical_distance_mm,"intersects_tumor":clearance<0})
     return {"streamlines":rows,"streamline_count":len(rows),"at_risk_count":sum(x["at_risk"] for x in rows),
@@ -299,48 +279,6 @@ def simulate_neurotwin(tumor: dict, corridor: dict, regions: dict | None=None,
             "recommended_actions":["validate anatomy with neuronavigation","perform awake mapping for language-risk corridors","use intraoperative monitoring for motor-risk corridors"],
             "model_status":"mechanistic hermetic NeuroTwin; surgical team adjudication required"}
 
-
-def enhancement_features(plan: dict) -> dict:
-    """Compute exactly 52 independently meaningful neurosurgical diagnostics."""
-    import numpy as np
-    tumor=plan["tumor"]; seg=plan["segmentation"]; corridors=plan["corridor_options"]; twin=plan["neurotwin"]
-    risks=np.asarray([x["risk"] for x in corridors],float); clears=[x["clearance_mm"] for x in corridors if x["clearance_mm"] is not None]
-    center=tumor["center"]; radius=float(tumor.get("radius_mm",20)); deficits=twin.get("predicted_deficits",[])
-    out={
-    "tumor_radius_mm":radius,"tumor_diameter_mm":2*radius,"tumor_volume_mm3":seg["tumor_volume_mm3"],"tumor_center_x":center[0],"tumor_center_y":center[1],"tumor_center_z":center[2],
-    "segmentation_label_count":len(seg["labels"]),"segmentation_confidence":seg["confidence"],"voxel_size_mm":seg["voxel_size_mm"],"corridor_count":len(corridors),
-    "recommended_corridor":plan["recommended_corridor"]["corridor"],"recommended_risk":plan["risk_score"],"risk_class":plan["risk_class"],"minimum_corridor_risk":float(risks.min()),
-    "maximum_corridor_risk":float(risks.max()),"risk_range":float(risks.max()-risks.min()),"second_best_risk":float(np.sort(risks)[1]),"best_margin":float(np.sort(risks)[1]-np.sort(risks)[0]),
-    "corridors_below_quarter_risk":int(np.sum(risks<.25)),"corridors_below_half_risk":int(np.sum(risks<.5)),"corridors_with_eloquent_neighbor":sum(x["nearest_eloquent"] is not None for x in corridors),
-    "minimum_clearance_mm":min(clears) if clears else None,"maximum_clearance_mm":max(clears) if clears else None,"recommended_clearance_mm":plan["recommended_corridor"]["clearance_mm"],
-    "recommended_nearest_eloquent":plan["recommended_corridor"]["nearest_eloquent"],"resection_fraction":twin["simulated_resection_fraction"],"predicted_deficit_count":len(deficits),
-    "preserved_function_count":len(twin["preserved_functions"]),"motor_monitoring_recommended":any("motor" in x.lower() for x in plan["plan"]),"awake_mapping_recommended":any("awake" in x.lower() for x in plan["plan"]),
-    "intraoperative_mri_recommended":any("MRI" in x for x in plan["plan"]),"tract_count":len(plan["tractography"]["tracts_modeled"]),"corticospinal_tract_modeled":"corticospinal_tract" in plan["tractography"]["tracts_modeled"],
-    "arcuate_fasciculus_modeled":"arcuate_fasciculus" in plan["tractography"]["tracts_modeled"],"center_in_bounds":all(0<=center[i]<128 for i in range(3)),"tumor_crosses_midline":abs(center[0]-64)<radius,
-    "superior_corridor_available":any(x["corridor"]=="superior" for x in corridors),"transsulcal_corridor_available":any(x["corridor"]=="transsulcal" for x in corridors),
-    "lateral_corridor_count":sum("lateral" in x["corridor"] for x in corridors),"eloquent_region_catalog_count":len(ELOQUENT_REGIONS),"language_region_count":sum("language" in x["function"] or "speech" in x["function"] for x in ELOQUENT_REGIONS.values()),
-    "motor_region_count":sum("motor" in x["function"] or "movement" in x["function"] for x in ELOQUENT_REGIONS.values()),"visual_region_count":sum("vision" in x["function"] for x in ELOQUENT_REGIONS.values()),
-    "memory_region_count":sum("memory" in x["function"] for x in ELOQUENT_REGIONS.values()),"vital_region_count":sum("vital" in x["function"] for x in ELOQUENT_REGIONS.values()),
-    "high_weight_region_count":sum(x["risk_weight"]>=.95 for x in ELOQUENT_REGIONS.values()),"plan_action_count":len(plan["plan"]),"has_neurotwin":bool(twin),"has_segmentation":bool(seg),
-    "has_tractography":bool(plan["tractography"]),"plan_review_priority":"urgent" if plan["risk_class"]=="high" else "multidisciplinary",
-    "actionable_output_complete":all(k in plan for k in ("recommended_corridor","risk_score","plan")),
-    }
-    assert len(out)==52
-    return out
-
-
-def analyze_neurosurgical_case(tumor: dict, *, image_size=(128,128,128), resection_fraction=.95) -> dict:
-    """Create an end-to-end, scientist-reviewable surgical planning package."""
-    if not isinstance(tumor,dict): raise ValueError("tumor must be a mapping")
-    center=tumor.get("center"); radius=tumor.get("radius_mm")
-    if not isinstance(center,(list,tuple)) or len(center)!=3 or any(not isinstance(x,(int,float)) for x in center): raise ValueError("tumor center must contain three numeric coordinates")
-    if radius is None or not isinstance(radius,(int,float)) or radius<=0: raise ValueError("tumor radius_mm must be positive")
-    if len(image_size)!=3 or any(x<=0 for x in image_size) or any(center[i]<0 or center[i]>=image_size[i] for i in range(3)): raise ValueError("tumor center must lie inside positive image_size")
-    plan=plan_surgery(tumor,image_size); regions=_place_regions(image_size,center,radius)
-    detailed=simulate_neurotwin(tumor,plan["recommended_corridor"],regions,resection_fraction)
-    return {**plan,"neurotwin_detailed":detailed,"diagnostics":enhancement_features(plan),"diagnostic_count":52,
-            "review_packet":{"recommended_corridor":plan["recommended_corridor"]["corridor"],"risk_class":plan["risk_class"],"highest_risk_function":detailed["highest_risk_function"],"required_reviews":["neuroradiology","neurosurgery","functional mapping"]},
-            "model_status":"mechanistic hermetic planning; not autonomous surgical guidance"}
 
 # --- atlas-anchored geometry and strictly case-derived diagnostics ------------
 def _place_regions(image_size, center, radius) -> dict:
