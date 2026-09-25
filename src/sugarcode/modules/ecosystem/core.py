@@ -93,7 +93,14 @@ def validate_plugin_manifest(manifest: dict) -> dict:
 
 def resolve_plugin_order(manifests: list[dict]) -> dict:
     """Topologically resolve plugin dependencies, rejecting cycles and missing providers."""
-    validated=[validate_plugin_manifest(x) for x in manifests]; names={x["name"] for x in validated}
+    validated=[validate_plugin_manifest(x) for x in manifests]
+    names=[x["name"] for x in validated]
+    # BUG 67: duplicate names silently collapsed into one plugin (the dict
+    # below overwrote the first manifest), losing capabilities.
+    if len(names)!=len(set(names)):
+        dupes=sorted({n for n in names if names.count(n)>1})
+        raise ValueError(f"duplicate plugin names: {dupes}")
+    names=set(names)
     deps={x["name"]:set(x["normalized"].get("depends_on",[])) for x in validated}
     missing={n:sorted(v-names) for n,v in deps.items() if v-names}
     if missing: raise ValueError(f"missing plugin dependencies: {missing}")
