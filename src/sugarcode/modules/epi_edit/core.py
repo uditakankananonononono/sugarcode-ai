@@ -66,10 +66,19 @@ def design_epigenome_edit(seq: str, target_span: tuple[int, int], mode: str = "C
     a, b = target_span
     if mode == "CRISPRi":
         lo, hi = max(0, a - 50), min(len(s), a + 300)
+        region = s[lo:hi] if hi > lo else s[max(0, a - 300):a + 100]
     else:
         lo, hi = max(0, a - 400), max(0, a - 50)
-    region = s[lo:hi] if hi > lo else s[max(0, a - 300):a + 100]
-    designs = design_guides(region, background=background, top_n=5)
+        # BUG 69: when the TSS sits too close to the sequence start for an
+        # upstream window, the old fallback pulled guides from -300..+100,
+        # i.e. inside the gene / the CRISPRi window, and reported
+        # guide_window [0, 0]. CRISPRa now stays upstream-only; no room
+        # upstream means no guides, reported honestly.
+        region = s[lo:hi] if hi > lo else ""
+    if region:
+        designs = design_guides(region, background=background, top_n=5)
+    else:
+        designs = {"guides": []}
     landscape = chromatin_landscape(s, target_span)
     open_frac = _open_fraction(landscape, (lo, hi))
     effect = _predict_effect(mode, designs["guides"], open_frac)
@@ -146,7 +155,14 @@ def expression_trajectory(effector,occupancy,hours=72,mrna_half_life=6,feedback=
     target=effector_response(effector,occupancy)['relative_expression']; decay=math.log(2)/mrna_half_life
     def rhs(_t,y): return [target/(1+feedback*y[0])-decay*y[0]]
     t=np.linspace(0,hours,145); sol=solve_ivp(rhs,(0,hours),[1],t_eval=t,rtol=1e-8,atol=1e-9)
-    return {"time_h":sol.t.tolist(),"relative_expression":sol.y[0].tolist(),"steady_state":target/decay,"reversible":True}
+    # BUG 68: steady_state used to ignore the feedback term (target/decay),
+    # overstating the true fixed point whenever feedback > 0.
+    # Fixed point of target/(1+feedback*y) = decay*y:
+    if feedback>0:
+        steady=(-decay+math.sqrt(decay**2+4*decay*feedback*target))/(2*decay*feedback)
+    else:
+        steady=target/decay
+    return {"time_h":sol.t.tolist(),"relative_expression":sol.y[0].tolist(),"steady_state":steady,"reversible":True}
 
 def cell_state_effect(effector,occupancy,states):
     return {name:effector_response(effector,occupancy,state) for name,state in states.items()}
