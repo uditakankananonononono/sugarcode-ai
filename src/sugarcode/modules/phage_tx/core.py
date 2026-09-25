@@ -27,10 +27,10 @@ RESISTANCE_MECHANISMS = {
     "LamB": "LamB receptor loss or modification",
     "type_IV_pilus": "type IV pilus loss or retraction defect",
 }
-RECEPTOR_REDUNDANCY = {"LPS": ["capsule", "Epa"], "OmpC": ["capsule"],
+RECEPTOR_REDUNDANCY = {"LPS": ["capsule", "Epa"],
                        "capsule": ["LPS", "wall_teichoic"], "Epa": ["LPS"],
                        "wall_teichoic": ["capsule"], "F_pilus": ["LPS/OmpC"],
-                       "LamB": ["LPS", "OmpC"], "type_IV_pilus": ["LPS"]}
+                       "LamB": ["LPS", "LPS/OmpC"], "type_IV_pilus": ["LPS"]}
 
 
 def match_phages(pathogen: str) -> dict:
@@ -62,6 +62,8 @@ def match_phages(pathogen: str) -> dict:
 
 
 def evolve_cocktail(pathogen: str, rounds: int = 3, seed: int = 42) -> dict:
+    if rounds < 1:
+        raise ValueError("rounds must be >= 1 (was: IndexError on empty history)")
     """Model cocktail composition to suppress resistance: pair phages with
     non-overlapping receptors, iterate against simulated escape mutants."""
     rng = random.Random(seed)
@@ -152,5 +154,8 @@ def enhancement_features(simulation: dict, optimization: dict) -> dict:
 
 def design_phage_therapy(pathogen: str, isolate_susceptibility: dict[str,float], parameters: dict | None=None) -> dict:
     """Create a lab-actionable cocktail and coevolution monitoring package."""
-    opt=optimize_cocktail(pathogen,isolate_susceptibility); selected=opt["selected"]; base=dict(parameters or {}); base["burst_size"]=sum(PHAGE_LIBRARY[x]["burst"] for x in selected["cocktail"])/len(selected["cocktail"]); sim=simulate_coevolution(base); diag=enhancement_features(sim,opt)
+    opt=optimize_cocktail(pathogen,isolate_susceptibility); selected=opt["selected"]; base=dict(parameters or {}); base["burst_size"]=sum(PHAGE_LIBRARY[x]["burst"] for x in selected["cocktail"])/len(selected["cocktail"])
+    if "latent_h" not in base:  # use the selected phages' latent periods, not the library-blind default
+        base["latent_h"]=sum(PHAGE_LIBRARY[x]["latent_min"] for x in selected["cocktail"])/len(selected["cocktail"])/60
+    sim=simulate_coevolution(base); diag=enhancement_features(sim,opt)
     return {"optimization":opt,"simulation":sim,"diagnostics":diag,"diagnostic_count":51,"modification_suggestions":[{"phage":x,"receptor":PHAGE_LIBRARY[x]["receptor"],"action":"retain distinct receptor coverage"} for x in selected["cocktail"]],"monitoring_plan":["time-kill assay at 0/6/24/48 h","plaque assay on breakthrough isolates","sequence receptor loci","measure endotoxin and sterility before translational work"]}
