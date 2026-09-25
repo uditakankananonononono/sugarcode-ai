@@ -62,7 +62,14 @@ def design_lysin(gram_type: str = "gram+", domains: list[str] | None = None) -> 
 import math
 
 def adsorption_kinetics(phage,bacteria,k_ads,time_min=60):
- bound=phage*bacteria/(bacteria+1/k_ads); remaining=phage-bound; return {'bound':bound,'free':remaining,'adsorbed_fraction':bound/phage,'time_min':time_min}
+ # BUG 50 fix: first-order adsorption kinetics, bound(t) = P0*(1-exp(-k*B*t))
+ # (Schlesinger 1932). The old Langmuir isotherm never used time_min, so bound
+ # was identical at t=1 and t=60. k_ads is per (concentration x minute).
+ if phage<=0: raise ValueError("phage must be positive")
+ if bacteria<0 or k_ads<0 or time_min<0: raise ValueError("bacteria, k_ads and time_min must be non-negative")
+ frac=1-math.exp(-k_ads*bacteria*time_min) if bacteria and k_ads and time_min else 0.0
+ bound=phage*frac; remaining=phage-bound
+ return {'bound':bound,'free':remaining,'adsorbed_fraction':frac,'time_min':time_min,'model':'first-order adsorption, bound=P0*(1-exp(-k*B*t))'}
 def host_range(receptor_profile,design):
  scores={strain:sum(float(expr.get(design['target_receptor'],0))*design['predicted_adsorption_rate'] for _ in [0]) for strain,expr in receptor_profile.items()}; return {'strain_scores':scores,'predicted_hosts':[s for s,v in scores.items() if v>.3]}
 def escape_probability(mutation_rate,target_sites,population): return {'escape_probability':1-math.exp(-mutation_rate*target_sites*population),'expected_escape_variants':mutation_rate*target_sites*population}
