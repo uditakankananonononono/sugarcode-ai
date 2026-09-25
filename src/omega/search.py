@@ -33,20 +33,42 @@ class UnifiedSearch:
         self.idf = {t: math.log(1 + (len(self.docs) - c + 0.5) / (c + 0.5))
                     for t, c in df.items()}
 
+    # Okapi BM25 constants (standard defaults, not tuned to this corpus).
+    K1 = 1.2
+    B = 0.75
+
     def search(self, query: str, limit: int = 10) -> list[dict]:
+        """Okapi BM25 ranking with document-length normalisation.
+
+        The earlier raw tf*idf score had no length normalisation, so the
+        longest spec files (up to ~190x the shortest document) outranked a
+        module even when queried with its own registry summary (self-retrieval
+        R@1 67/95).  The name boost now requires a whole query token to equal a
+        whole name token; substring matching boosted any name containing
+        "a", "in" or "of".
+        """
+        if limit is None or limit < 0:
+            raise ValueError(f"limit must be >= 0, got {limit!r}")
         q = _tokenize(query)
-        if not q:
+        if not q or limit == 0:
             return []
+        n_docs = len(self.tokens) or 1
+        avgdl = (sum(len(t) for t in self.tokens.values()) / n_docs) or 1.0
+        qset = set(q)
         scored = []
         for slug, toks in self.tokens.items():
             tf = Counter(toks)
-            score = sum(self.idf.get(t, 0.0) * tf.get(t, 0) for t in q)
+            norm = self.K1 * (1 - self.B + self.B * len(toks) / avgdl)
+            score = 0.0
+            for t in q:
+                f = tf.get(t, 0)
+                if f:
+                    score += self.idf.get(t, 0.0) * f * (self.K1 + 1) / (f + norm)
             if score > 0:
-                name = REGISTRY[slug].name.lower()
-                if any(t in name for t in q):
+                if set(_tokenize(REGISTRY[slug].name)) & qset:
                     score *= 1.5
                 scored.append((score, slug))
-        scored.sort(reverse=True)
+        scored.sort(key=lambda x: (-x[0], x[1]))
         return [
             {"slug": s, "name": REGISTRY[s].name,
              "subnetwork": REGISTRY[s].subnetwork,

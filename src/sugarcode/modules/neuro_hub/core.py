@@ -27,11 +27,24 @@ def _alerts(flux: dict) -> list[str]:
 
 
 def recent_projects(limit: int = 10) -> list[dict]:
+    """Most recent projects first.  limit=0 returns [] (the old slice
+    _PROJECTS[-0:] returned every project); negative limits are rejected."""
+    if limit < 0:
+        raise ValueError(f"limit must be >= 0, got {limit}")
+    if limit == 0:
+        return []
     return _PROJECTS[-limit:][::-1]
 
 
 def register_project(name: str, module: str, state: str = "created") -> dict:
-    p = {"name": name, "module": module, "state": state}
+    """Register a project against a real registry module slug."""
+    from omega.registry import REGISTRY
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("project name must be a non-empty string")
+    if module not in REGISTRY:
+        raise ValueError(f"unknown module slug {module!r}; must be one of the "
+                         f"{len(REGISTRY)} registered modules")
+    p = {"name": name.strip(), "module": module, "state": state}
     _PROJECTS.append(p)
     return p
 
