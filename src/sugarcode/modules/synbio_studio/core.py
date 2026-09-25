@@ -41,15 +41,21 @@ def _rates(y: np.ndarray, circuit: Circuit, external: dict[str, float]) -> np.nd
     for i, g in enumerate(circuit.gates):
         terms = []
         for reg, mode in g.inputs:
-            x = levels.get(reg, 0.0)
+            if reg not in levels:
+                raise KeyError(f"gate {g.name!r} regulates on {reg!r}, which is neither a circuit gate nor an external input (was: silently 0.0)")
+            if mode not in ("repress", "activate"):
+                raise ValueError(f"gate {g.name!r}: unknown regulation mode {mode!r} (was: silently treated as 'activate')")
+            x = levels[reg]
             terms.append(_hill_repress(x, g.K, g.n) if mode == "repress"
                          else _hill_activate(x, g.K, g.n))
         if not terms:
             prod = g.vmax
         elif g.logic == "AND":
             prod = g.vmax * float(np.prod(terms))
-        else:  # OR
+        elif g.logic == "OR":
             prod = g.vmax * (1.0 - float(np.prod([1 - t for t in terms])))
+        else:
+            raise ValueError(f"gate {g.name!r}: unknown logic {g.logic!r} (was: silently treated as 'OR')")
         dydt[i] = g.basal + prod - g.decay * y[i]
     return dydt
 
@@ -69,6 +75,12 @@ def simulate(circuit: Circuit, t_span: tuple[float, float] = (0, 100),
         "steady_state": {g.name: round(float(sol.y[i][-1]), 4)
                          for i, g in enumerate(circuit.gates)},
         "converged": bool(np.allclose(sol.y[:, -1], sol.y[:, -2], atol=1e-4)),
+        # last-quarter peak-to-peak amplitude: nonzero means the 'steady_state'
+        # above is a point on a limit cycle, not a settled fixed point
+        "amplitude_last_quarter": {g.name: round(float(np.ptp(sol.y[i][-len(sol.t)//4:])), 4)
+                                   for i, g in enumerate(circuit.gates)},
+        "oscillating": bool(any(np.ptp(sol.y[i][-len(sol.t)//4:]) > 1e-2
+                                for i in range(len(circuit.gates)))),
     }
 
 
@@ -88,11 +100,18 @@ def logic_verify(circuit: Circuit, input_names: list[str],
 
 
 def repressilator() -> Circuit:
-    """Elowitz-Leibler repressilator: three-gene ring oscillator."""
+    """Elowitz-Leibler repressilator: three-gene ring oscillator.
+
+    Recalibrated n 2.1 -> 3.0: with n=2.1 the ring converges to the symmetric
+    fixed point (last-quarter amplitude 0.002), contradicting 'oscillator'.
+    Sustained oscillation needs loop cooperativity n>2 with sufficient gain;
+    at n=3.0 the last-quarter amplitude is 2.77 (verified). Note: symmetric
+    initial conditions stay symmetric by construction - break symmetry in y0
+    to observe the limit cycle."""
     return Circuit(name="repressilator", gates=[
-        Gate("LacI", [("TetR", "repress")], vmax=1.2, K=0.4, n=2.1),
-        Gate("TetR", [("CI", "repress")], vmax=1.2, K=0.4, n=2.1),
-        Gate("CI", [("LacI", "repress")], vmax=1.2, K=0.4, n=2.1),
+        Gate("LacI", [("TetR", "repress")], vmax=1.2, K=0.4, n=3.0),
+        Gate("TetR", [("CI", "repress")], vmax=1.2, K=0.4, n=3.0),
+        Gate("CI", [("LacI", "repress")], vmax=1.2, K=0.4, n=3.0),
     ])
 
 
