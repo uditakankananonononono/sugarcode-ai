@@ -40,8 +40,8 @@ def design_organoid(tissue: str, patient_mutations: list[str] | None = None) -> 
 
 def _spatial_map(tissue: str, mutations: list[str]) -> dict:
     zones = {"intestinal": {"crypt": ["LGR5", "OLFM4"], "villus": ["VIL1", "ALPI"]},
-             "cerebral": {"ventricular": ["PAX6", "SOX2"], "cortical": ["TBR1", "CTIP2"]},
-             "hepatic": {"periportal": ["ALB", "CPS1"], "perivenous": ["CYP2E1", "GS"]},
+             "cerebral": {"ventricular": ["PAX6", "SOX2"], "cortical": ["TBR1", "BCL11B"]},
+             "hepatic": {"periportal": ["ALB", "CPS1"], "perivenous": ["CYP2E1", "GLUL"]},
              "pancreatic": {"duct": ["KRT19", "SOX9"], "acinar": ["AMY2A"]},
              "tumor": {"core": ["MKI67", "HIF1A"], "rim": ["KRT14"]}}
     return {"zones": zones.get(tissue, {}),
@@ -50,7 +50,10 @@ def _spatial_map(tissue: str, mutations: list[str]) -> dict:
 
 def simulate_growth(tissue: str, days: int = 14, seed_cells: int = 5000) -> dict:
     """Logistic growth of the organoid population + size estimate."""
-    r = ORGANOID_RECIPES.get(tissue.lower(), ORGANOID_RECIPES["intestinal"])
+    if tissue.lower() not in ORGANOID_RECIPES:
+        # previously modeled any unknown tissue silently as intestinal
+        raise KeyError(f"unknown tissue {tissue!r}; have {sorted(ORGANOID_RECIPES)}")
+    r = ORGANOID_RECIPES[tissue.lower()]
     lam = math.log(2) / r["doubling_days"]
     carrying = 5e6
     series = []
@@ -69,15 +72,22 @@ def drug_response(tissue: str, compounds: list[str], mutations: list[str] | None
     muts = set(mutations or [])
     out = {}
     for c in compounds:
+        curated = c in DRUG_ACTIONS
         act = DRUG_ACTIONS.get(c, {"kill": 0.4, "resist_genes": []})
         resist = 0.4 if muts & set(act.get("resist_genes", [])) else 0.0
-        ic50 = round(1.0 * (1 + 3 * resist), 3)
+        base = round(1.0 * (1 + 3 * resist), 3)
         doses = [0.03, 0.1, 0.3, 1, 3, 10]
-        viability = [round(100 / (1 + (d / ic50) ** 1.5 * act["kill"]), 1) for d in doses]
-        out[c] = {"ic50_uM": ic50, "doses_uM": doses, "viability_pct": viability,
-                  "resistance_modifier": resist}
+        viability = [round(100 / (1 + (d / base) ** 1.5 * act["kill"]), 1) for d in doses]
+        # The curve is V(d)=100/(1+k(d/b)^1.5), so V=50 at d=b*k^(-1/1.5).
+        # Reporting b as the IC50 was wrong for every k<1 (cisplatin k=.7:
+        # 58.8% viability at the "IC50" of 1 uM) and tied every compound.
+        ic50 = round(base * act["kill"] ** (-1 / 1.5), 3)
+        out[c] = {"ic50_uM": ic50, "curve_scale_uM": base, "doses_uM": doses, "viability_pct": viability,
+                  "resistance_modifier": resist, "curated": curated}
+    ranked = [c for c in out if out[c]["curated"]]
     return {"tissue": tissue, "mutations": sorted(muts), "responses": out,
-            "most_effective": min(out, key=lambda c: out[c]["ic50_uM"]) if out else None}
+            "most_effective": min(ranked, key=lambda c: (out[c]["ic50_uM"], c)) if ranked else None,
+            "uncurated_compounds": [c for c in out if not out[c]["curated"]]}
 
 # --- specification-complete patient-derived digital-twin stack ----------------
 def optimize_growth_conditions(tissue: str, observations: list[dict] | None = None) -> dict:
