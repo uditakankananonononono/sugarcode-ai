@@ -1,6 +1,12 @@
 from __future__ import annotations
 import random
 
+# Receptor-contact annotations are serotype-dependent and follow the default AAV9.
+# For AAV2, the primary heparan-sulfate receptor contact is R585/R588 inside VR-VIII
+# (Summerford & Samulski, J Virol 1998, PMID 9445046), so treat VR-VIII as a receptor
+# contact when capsid="AAV2". Region conservation constants are qualitative: measured
+# AAV2/AAV9 VP1 identity is 0.33 (VR-VIII), 0.43 (VR-IV), 0.62 (HI loop), 0.81 over the
+# GH-loop span 590-620 (the module's 0.35 reflects the loop tip / VR-VIII, not the whole span).
 CAPSID_REGIONS = {
     "VR-IV": {"surface": True, "nab_epitope": True, "receptor_contact": True},
     "VR-VIII": {"surface": True, "nab_epitope": True, "receptor_contact": False},
@@ -65,7 +71,6 @@ def directed_evolution(capsid: str = "AAV9", target_receptor: str = "generic",
                        nab_escape: bool = True, seed: int = 1) -> dict:
     """Run multi-round seeded capsid directed evolution - each round engineers
     a population from the previous round's lead variant."""
-    rng = random.Random(seed)
     rounds = []
     lineage = [capsid]
     current = capsid
