@@ -13,32 +13,70 @@ CF = {
 
 
 def chou_fasman(seq: str) -> list[str]:
-    """Chou-Fasman secondary structure prediction (real 1978 algorithm)."""
+    """Chou-Fasman secondary structure prediction (real 1978 algorithm).
+
+    Nucleation: a helix nucleates on any hexapeptide with >= 4 residues of
+    Pa >= 100; a strand nucleates on any pentapeptide with >= 3 residues of
+    Pb >= 100. Extension: propagate in both directions until a tetrapeptide
+    breaker (mean propensity < 100 over the next 4 residues). Overlaps are
+    resolved per residue by the higher mean propensity over its +/-3 window.
+
+    BUG 48 fix: the old extension admitted any single residue with Pa > 100
+    and strands could only claim leftover coil, so helix ran away - ubiquitin
+    (1UBQ: one helix, five strands) was predicted 92% helix. With the 1978
+    breaker rule and Pa/Pb conflict resolution the same protein predicts the
+    23-34 helix plus strand regions instead.
+    """
     n = len(seq)
-    ss = ["C"] * n
-    # helix nucleation: 4 of 6 residues with Pa > 100
-    for i in range(n - 5):
-        win = seq[i:i + 6]
-        if sum(1 for a in win if CF.get(a, (0, 0, 0))[0] >= 100) >= 4:
-            for j in range(i, min(n, i + 6)):
-                ss[j] = "H"
-    # extend helices
+    pa = [CF.get(a, (0, 0, 0))[0] for a in seq]
+    pb = [CF.get(a, (0, 0, 0))[1] for a in seq]
+
+    def mean_prop(prop, i, j):
+        seg = prop[max(0, i):min(n, j)]
+        return sum(seg) / len(seg) if seg else 0.0
+
+    helix = [False] * n
     i = 0
-    while i < n:
-        if ss[i] == "H":
+    while i <= n - 6:
+        if sum(1 for k in range(i, i + 6) if pa[k] >= 100) >= 4:
             j = i
-            while j + 1 < n and CF.get(seq[j + 1], (0, 0, 0))[0] > 100:
+            for k in range(i, min(n, i + 6)):
+                helix[k] = True
+            while j + 4 < n and mean_prop(pa, j + 1, j + 5) >= 100:
                 j += 1
-                ss[j] = "H"
-            i = j
+                helix[j] = True
+            k = i
+            while k - 4 >= 0 and mean_prop(pa, k - 4, k) >= 100:
+                k -= 1
+                helix[k] = True
+            i = max(i + 1, j)
         i += 1
-    # strands where not helix
-    for i in range(n - 4):
-        win = seq[i:i + 5]
-        if sum(1 for a in win if CF.get(a, (0, 0, 0))[1] >= 105) >= 3:
-            for j in range(i, min(n, i + 5)):
-                if ss[j] == "C":
-                    ss[j] = "E"
+    strand = [False] * n
+    i = 0
+    while i <= n - 5:
+        if sum(1 for k in range(i, i + 5) if pb[k] >= 100) >= 3:
+            j = i
+            for k in range(i, min(n, i + 5)):
+                strand[k] = True
+            while j + 4 < n and mean_prop(pb, j + 1, j + 5) >= 100:
+                j += 1
+                strand[j] = True
+            k = i
+            while k - 4 >= 0 and mean_prop(pb, k - 4, k) >= 100:
+                k -= 1
+                strand[k] = True
+            i = max(i + 1, j)
+        i += 1
+    ss = []
+    for k in range(n):
+        if helix[k] and strand[k]:
+            ss.append("H" if mean_prop(pa, k - 3, k + 4) >= mean_prop(pb, k - 3, k + 4) else "E")
+        elif helix[k]:
+            ss.append("H")
+        elif strand[k]:
+            ss.append("E")
+        else:
+            ss.append("C")
     return ss
 
 
