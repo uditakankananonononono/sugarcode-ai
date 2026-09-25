@@ -68,15 +68,16 @@ def run_session(task: str = "crispr_transfection") -> dict:
         observations.append(f"incubated 48 h at {r2['temp_C']} C")
         lab.objects["plate_96"]["state"]["signal"] = 0.72
         lab.move_to("plate_96", "reader")
-        r3 = lab.interact("reader", "measure", assay="fluorescence")
+        # the reader measures the PLATE's signal; measuring the reader object itself reads 0
+        r3 = lab.interact("plate_96", "measure", assay="fluorescence")
         observations.append(f"reporter fluorescence {r3['reading']} (edit proxy)")
         conclusion = ("editing reporter positive at 0.72 RFU - transfection succeeded; "
                       "confirm indels by NGS before claiming edit rate")
     elif task == "molecular_docking":
         from ..docking_studio.core import dock
         lab.interact("p1000", "pipette", volume_uL=10)
-        res = dock("CCO", "kinase_pocket", seed=1)
-        observations.append(f"dock score {res.get('score', res)}")
+        res = dock("ELKVIGKGAFG", "CCO")  # kinase-hinge-like pocket residues, ethanol ligand
+        observations.append(f"dock dG {res.get('binding_dg_kcal_mol', res)} kcal/mol")
         conclusion = "binding pose scored in silico; wet-lab confirmation via SPR next"
     else:
         raise KeyError(f"unknown task {task!r}; have crispr_transfection, molecular_docking")
