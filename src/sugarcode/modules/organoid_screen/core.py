@@ -12,26 +12,43 @@ def screen(tissue: str, compounds: list[str], mutations: list[str] | None = None
         "tissue": tissue, "mutations": mutations or [],
         "screened": len(compounds),
         "ranking": [{"compound": c, "ic50_uM": d["ic50_uM"]} for c, d in ranked],
-        "hit": ranked[0][0] if ranked else None,
+        "hit": resp["most_effective"],
+        "uncurated_compounds": resp.get("uncurated_compounds", []),
         "synergy": synergies,
         "response_biomarkers": biomarkers,
         "interaction_network": _network(mutations or [], [c for c, _ in ranked[:3]]),
-        "clinical_efficacy_prediction": round(0.4 + 0.3 * (1 / (1 + ranked[0][1]["ic50_uM"])), 3) if ranked else None,
+        "clinical_efficacy_prediction": (round(0.4 + 0.3 * (1 / (1 + resp["responses"][resp["most_effective"]]["ic50_uM"])), 3)
+                                         if resp["most_effective"] else None),
     }
 
 
-def _synergy(responses: dict) -> list[dict]:
+def _synergy(responses: dict, ref_dose_uM: float = 1.0) -> list[dict]:
+    """Bliss-independence EXPECTED combination viability from single-agent curves.
+
+    The previous index a/(a+b)+b/(a+b)-1 is identically 0, so every pair got
+    synergy_score 1.0.  Synergy needs a measured combination viability; with
+    single agents only, the defensible output is the Bliss expectation
+    V_ab = V_a * V_b at a reference dose.  Pass measured combination data to
+    bliss_synergy() to score synergy.
+    """
+    def v_at(d):
+        doses, viab = d["doses_uM"], d["viability_pct"]
+        if ref_dose_uM in doses:
+            return viab[doses.index(ref_dose_uM)] / 100
+        import numpy as _n
+        return float(_n.interp(_n.log10(ref_dose_uM), _n.log10(doses), viab)) / 100
     items = list(responses.items())
     out = []
     for i in range(len(items)):
         for j in range(i + 1, len(items)):
             (ca, da), (cb, db) = items[i], items[j]
-            # Bliss-style combined index from IC50s
-            ci = round(da["ic50_uM"] / (da["ic50_uM"] + db["ic50_uM"])
-                       + db["ic50_uM"] / (da["ic50_uM"] + db["ic50_uM"]) - 1.0, 3)
-            out.append({"combination": [ca, cb], "combination_index": abs(ci),
-                        "synergy_score": round(1 - abs(ci), 3)})
-    out.sort(key=lambda x: -x["synergy_score"])
+            va, vb = v_at(da), v_at(db)
+            out.append({"combination": [ca, cb], "reference_dose_uM": ref_dose_uM,
+                        "single_viability": [round(va, 4), round(vb, 4)],
+                        "bliss_expected_viability": round(va * vb, 4),
+                        "synergy_score": None,
+                        "status": "Bliss expectation only; no measured combination viability - use bliss_synergy() with observed data"})
+    out.sort(key=lambda x: (x["bliss_expected_viability"], x["combination"]))
     return out
 
 
@@ -261,7 +278,19 @@ import numpy as np
 _trapz = getattr(np, "trapezoid", None) or np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 
 def dose_response(concentrations,viability):
- c=np.asarray(concentrations,float); v=np.asarray(viability,float); idx=int(np.argmin(abs(v-.5))); auc=float(_trapz(v,np.log10(c))); return {'ic50_uM':float(c[idx]),'auc_log_concentration':auc,'max_kill':float(1-v.min())}
+ """IC50 by log-linear interpolation between the doses that bracket 50% viability
+ (viability as a fraction 0-1).  The previous nearest-tested-dose rule snapped the IC50
+ onto the dose grid (1.0 uM for a curve whose true IC50 is 1.268 uM).  Returns
+ ic50_uM None with a status when the curve never crosses 0.5."""
+ c=np.asarray(concentrations,float); v=np.asarray(viability,float)
+ if len(c)<2 or len(c)!=len(v) or np.any(c<=0): raise ValueError('need >=2 positive concentrations with matching viabilities')
+ if np.nanmax(v)>1.5: raise ValueError('viability must be a fraction (0-1), not percent')
+ o=np.argsort(c); c,v=c[o],v[o]; auc=float(_trapz(v,np.log10(c))); ic50=None; status='interpolated'
+ for i in range(len(c)-1):
+  if (v[i]-.5)*(v[i+1]-.5)<=0 and v[i]!=v[i+1]:
+   f=(v[i]-.5)/(v[i]-v[i+1]); ic50=float(10**(np.log10(c[i])+f*(np.log10(c[i+1])-np.log10(c[i])))); break
+ if ic50 is None: status='50% viability not bracketed by tested doses'
+ return {'ic50_uM':ic50,'ic50_status':status,'auc_log_concentration':auc,'max_kill':float(1-v.min())}
 def bliss_synergy(single_a,single_b,combo):
  expected=single_a*single_b; return {'expected_viability':expected,'observed_viability':combo,'bliss_excess':expected-combo,'synergistic':combo<expected}
 def replicate_quality(replicates):
