@@ -232,16 +232,36 @@ def predict_interactions(disease: str, *, top_n: int=5, dimensions: int=12) -> d
                 if disease in PATHWAY_DISEASES.get(p,[]): paths.append({"target":t,"pathway":p})
         path_support=1-math.exp(-len(paths)); target_diversity=len({x["target"] for x in paths})/max(1,len(DRUG_TARGETS[drug])); tri=.4*((sim+1)/2)+.35*path_support+.25*target_diversity
         candidates.append({"drug":drug,"graph_score":round(sim,8),"paths":paths,"path_count":len(paths),"target_diversity":target_diversity,"therapeutic_resilience_index":round(tri,8)})
+    # Sweep 108 (BUG 79): drugs with NO drug-target-pathway-disease path were
+    # kept and ranked by the untrained random-embedding cosine alone - for
+    # T2D, myeloma, pulmonary_hypertension, ED, alcoholism, fungal_infection
+    # and GERD the ENTIRE candidate list was such noise. Keep only drugs with
+    # at least one mechanistic path (same contract as repurposing_scan) and
+    # say so when none exists.
+    zero_path = sum(1 for c in candidates if c["path_count"] == 0)
+    candidates = [c for c in candidates if c["path_count"] > 0]
     candidates.sort(key=lambda x:(-x["therapeutic_resilience_index"],x["drug"]))
-    return {"disease":disease,"candidates":candidates[:top_n],"graph":graph,"embedding_model":learned,"model_status":"mechanistic hermetic graph convolution; no trained or therapeutic claim"}
+    out = {"disease":disease,"candidates":candidates[:top_n],"graph":graph,"embedding_model":learned,
+           "excluded_zero_path_drugs":zero_path,
+           "model_status":"mechanistic hermetic graph convolution; no trained or therapeutic claim"}
+    if not candidates:
+        out["status"] = (f"no drug in the graph has a target-pathway-disease path to {disease} "
+                         "(approved indications excluded); extend the graph rather than rank noise")
+    return out
 
 
 def enhancement_features(result: dict) -> dict:
     """Compute 50 graph/candidate-derived diagnostics."""
     import numpy as np
     g=result["graph"]; c=result["candidates"]; tri=np.array([x["therapeutic_resilience_index"] for x in c]); gs=np.array([x["graph_score"] for x in c]); pc=np.array([x["path_count"] for x in c]); td=np.array([x["target_diversity"] for x in c]); edges=g["edges"]
-    vals={"candidate_count":len(c),"node_count":g["node_count"],"edge_count":g["edge_count"],**{f"{k}_node_count":v for k,v in g["layer_counts"].items()},"graph_density":2*g["edge_count"]/(g["node_count"]*(g["node_count"]-1)),"embedding_dimensions":result["embedding_model"]["dimensions"],"embedding_layers":result["embedding_model"]["layers"],"tri_min":float(tri.min()),"tri_max":float(tri.max()),"tri_range":float(np.ptp(tri)),"tri_mean":float(tri.mean()),"tri_top_margin":float(tri[0]-tri[1]),"graph_score_min":float(gs.min()),"graph_score_max":float(gs.max()),"graph_score_range":float(np.ptp(gs)),"graph_score_mean":float(gs.mean()),"path_count_total":int(pc.sum()),"path_count_max":int(pc.max()),"path_count_min":int(pc.min()),"candidates_with_paths":int(np.sum(pc>0)),"target_diversity_min":float(td.min()),"target_diversity_max":float(td.max()),"target_diversity_mean":float(td.mean()),"unique_candidate_drugs":len({x["drug"] for x in c}),"unique_candidate_targets":len({p["target"] for x in c for p in x["paths"]}),"unique_candidate_pathways":len({p["pathway"] for x in c for p in x["paths"]}),"binds_edges":sum(e[2]=="binds" for e in edges),"participates_edges":sum(e[2]=="participates" for e in edges),"implicated_edges":sum(e[2]=="implicated" for e in edges)}
-    for j,x in enumerate(c[:5]): vals[f"rank_{j+1}_tri"]=x["therapeutic_resilience_index"]; vals[f"rank_{j+1}_graph_score"]=x["graph_score"]; vals[f"rank_{j+1}_path_count"]=x["path_count"]
+    vals={"candidate_count":len(c),"node_count":g["node_count"],"edge_count":g["edge_count"],**{f"{k}_node_count":v for k,v in g["layer_counts"].items()},"graph_density":2*g["edge_count"]/(g["node_count"]*(g["node_count"]-1)),"embedding_dimensions":result["embedding_model"]["dimensions"],"embedding_layers":result["embedding_model"]["layers"],"tri_min":float(tri.min()),"tri_max":float(tri.max()),"tri_range":float(np.ptp(tri)),"tri_mean":float(tri.mean()),"tri_top_margin":float(tri[0]-tri[1]) if len(tri)>1 else 0.0,"graph_score_min":float(gs.min()),"graph_score_max":float(gs.max()),"graph_score_range":float(np.ptp(gs)),"graph_score_mean":float(gs.mean()),"path_count_total":int(pc.sum()),"path_count_max":int(pc.max()),"path_count_min":int(pc.min()),"candidates_with_paths":int(np.sum(pc>0)),"target_diversity_min":float(td.min()),"target_diversity_max":float(td.max()),"target_diversity_mean":float(td.mean()),"unique_candidate_drugs":len({x["drug"] for x in c}),"unique_candidate_targets":len({p["target"] for x in c for p in x["paths"]}),"unique_candidate_pathways":len({p["pathway"] for x in c for p in x["paths"]}),"binds_edges":sum(e[2]=="binds" for e in edges),"participates_edges":sum(e[2]=="participates" for e in edges),"implicated_edges":sum(e[2]=="implicated" for e in edges)}
+    # Sweep 108: pad rank slots when fewer than 5 candidates remain after
+    # zero-path filtering, so the 50-diagnostic contract holds at any count.
+    for j in range(5):
+        x = c[j] if j < len(c) else None
+        vals[f"rank_{j+1}_tri"]=x["therapeutic_resilience_index"] if x else None
+        vals[f"rank_{j+1}_graph_score"]=x["graph_score"] if x else None
+        vals[f"rank_{j+1}_path_count"]=x["path_count"] if x else None
     vals.update({"top_drug_name_length":len(c[0]["drug"]),"top_target_count":len({p["target"] for p in c[0]["paths"]}),"top_pathway_count":len({p["pathway"] for p in c[0]["paths"]})})
     assert len(vals)==50
     return vals
@@ -249,5 +269,11 @@ def enhancement_features(result: dict) -> dict:
 
 def analyze_repurposing(disease: str, top_n: int=5) -> dict:
     """Return a lab-actionable graph-learning repurposing package."""
-    r=predict_interactions(disease,top_n=top_n); f=enhancement_features(r)
+    r=predict_interactions(disease,top_n=top_n)
+    if not r["candidates"]:
+        # Sweep 108 (BUG 79): no mechanistic candidates - report the status
+        # instead of computing candidate statistics over an empty list.
+        return {**r,"diagnostics":{},"diagnostic_count":0,
+                "validation_plan":[]}
+    f=enhancement_features(r)
     return {**r,"diagnostics":f,"diagnostic_count":50,"validation_plan":["confirm direct target binding by SPR or ITC","run orthogonal target-engagement assay","test disease-relevant cellular phenotype","review exposure and safety margin"]}
