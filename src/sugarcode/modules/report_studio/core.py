@@ -22,13 +22,17 @@ def _short(v) -> str:
     return s if len(s) <= _MAX_SCALAR_LEN else s[:_MAX_SCALAR_LEN] + "... [truncated]"
 
 
-def _scalar_items(d: dict, skip: set[str]) -> dict[str, str]:
+def _scalar_items(d: dict, skip: set[str], prefix: str = "") -> dict[str, str]:
     items = {}
     for k, v in d.items():
         if k in skip:
             continue
         if isinstance(v, (str, int, float, bool)) or v is None:
-            items[k] = _short(v)
+            items[prefix + k] = _short(v)
+        elif isinstance(v, dict):
+            # nested dicts hold scalar data too (e.g. branchpoint metrics);
+            # the old code dropped them silently
+            items.update(_scalar_items(v, set(), prefix=f"{prefix}{k}."))
     return items
 
 
@@ -48,7 +52,7 @@ def _tables(d: dict) -> list[tuple[str, list[str], list[list]]]:
         if not cols:
             continue
         rows = [[_short(r.get(c, "")) for c in cols] for r in v[:_MAX_TABLE_ROWS]]
-        out.append((k, cols, rows))
+        out.append((k, cols, rows, len(v)))
     return out
 
 
@@ -86,8 +90,10 @@ def splice_assessment_report(assessment: dict, *,
     tables = _tables(assessment)
     sections = [{"heading": "Assessment summary", "blocks": blocks or
                  [{"type": "paragraph", "text": "No scalar summary fields present."}]}]
-    for name, cols, rows in tables:
-        sections.append({"heading": f"Detail: {name} ({len(rows)} rows)",
+    for name, cols, rows, total in tables:
+        label = (f"{total} rows" if total == len(rows)
+                 else f"{total} rows, first {len(rows)} shown")
+        sections.append({"heading": f"Detail: {name} ({label})",
                          "blocks": [{"type": "table", "columns": cols, "rows": rows}]})
     sources = ["source: deepsplice live_splice_assessment output dict"]
     if assessment.get("transcript"):
@@ -114,9 +120,11 @@ def crispr_guides_report(guides: list[dict], *, target: str | None = None,
     summary = {"guide_count": len(guides)}
     if target:
         summary["target"] = target
+    label = (f"{len(guides)}" if len(guides) == len(rows)
+             else f"{len(guides)}, first {len(rows)} shown")
     sections = [
         {"heading": "Summary", "blocks": [{"type": "kv", "items": summary}]},
-        {"heading": f"Guides ({len(rows)})",
+        {"heading": f"Guides ({label})",
          "blocks": [{"type": "table", "columns": cols, "rows": rows}]},
     ]
     return _finish(title, sections,
@@ -137,9 +145,10 @@ def codon_optimization_report(result: dict, *,
         blocks.append({"type": "paragraph",
                        "text": f"Optimized DNA ({len(dna)} nt): {dna}"})
     sections = [{"heading": "Optimization result", "blocks": blocks}]
-    sections.extend(({"heading": f"Detail: {n} ({len(r)} rows)",
+    sections.extend(({"heading": (f"Detail: {n} ({t} rows)" if t == len(r)
+                                  else f"Detail: {n} ({t} rows, first {len(r)} shown)"),
                       "blocks": [{"type": "table", "columns": c, "rows": r}]}
-                     for n, c, r in _tables(result)))
+                     for n, c, r, t in _tables(result)))
     return _finish("Codon optimization report", sections,
                    ["source: codon_opt optimize() output dict"], generated_utc)
 
