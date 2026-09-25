@@ -139,7 +139,22 @@ def design_guides(seq: str, pam: str = "NGG", background: str | None = None,
             on_model = "heuristic_edge_fallback"
         hairpin = _hairpin_score(c["guide"])
         # off-target: published CFD (Doench 2016) scan
-        offs = score_off_targets_cfd(c["guide"], background, max_mismatches=3) if background else []
+        if background:
+            bg = clean_dna(background)
+            # When the background IS the target sequence, exclude only the
+            # candidate's own locus (the intended cut site). A distinct
+            # background keeps perfect matches - they are the worst
+            # off-targets (previously all perfect matches were silently
+            # skipped everywhere, BUG 51).
+            if bg == s:
+                excl = ({(c["start"], "+")} if c["strand"] == "+"
+                        else {(len(s) - c["end"], "-")})
+            else:
+                excl = None
+            offs = score_off_targets_cfd(c["guide"], bg, max_mismatches=3,
+                                         exclude_sites=excl)
+        else:
+            offs = []
         off_risk = sum(o["cfd_score"] for o in offs)
         # GC filter per spec (40-60% optimal window), hairpin suppresses folding
         composite = on * (1.0 - 0.5 * hairpin) / (1.0 + off_risk)
@@ -216,11 +231,18 @@ def cfd_score(wt_guide: str, off_guide: str, pam2: str = "GG") -> float:
 
 
 def score_off_targets_cfd(guide: str, background: str,
-                          max_mismatches: int = 4) -> list[dict]:
+                          max_mismatches: int = 4,
+                          exclude_sites: set | None = None) -> list[dict]:
     """Genome scan with the PUBLISHED CFD model: candidate sites within
-    max_mismatches are scored by the real Doench matrices, PAM-aware."""
+    max_mismatches are scored by the real Doench matrices, PAM-aware.
+    Perfect-match (0-mismatch) sites are reported like any other hit -
+    they are the highest-risk off-targets - except coordinates in
+    exclude_sites ((position, strand) pairs; design_guides uses this to
+    skip a candidate's own locus when the background IS the target
+    sequence)."""
     guide = guide.upper()
     out = []
+    excl = exclude_sites or set()
     for strand, s in (("+", background.upper()),
                       ("-", str.maketrans("ACGT", "TGCA"))):
         seq = s if strand == "+" else background.upper().translate(str.maketrans("ACGT", "TGCA"))[::-1]
@@ -230,7 +252,9 @@ def score_off_targets_cfd(guide: str, background: str,
             if len(pam) < 3 or pam[1:] != "GG":
                 continue
             mm = sum(1 for a, b in zip(guide, protospacer) if a != b)
-            if mm == 0 or mm > max_mismatches:
+            if mm > max_mismatches:
+                continue
+            if mm == 0 and (i, strand) in excl:
                 continue
             score = cfd_score(guide, protospacer, "GG")
             if score < 0.001:
