@@ -83,3 +83,16 @@ def test_shared_jev_evaluate_through_client():
     assert out["answers"]["risk"]["score"] == 2.3
     assert seen["headers"]["Authorization"] == "Bearer sk-s"
     assert seen["url"] == "https://thejevai.com/v1/systemone"
+
+
+def test_local_hermes_and_explicit_openclaw_owner_bridge():
+    from instinct_models import Router
+    cfg = shared.shared_config({"INSTINCT_HERMES_URL": "http://127.0.0.1:11434/v1",
+                                "INSTINCT_HERMES_MODEL": "hermes3:3b"})
+    names = [p.name for p in Router.from_config(cfg).providers]
+    assert "hermes-local" in names and "openclaw-owner" not in names
+    assert "inkling-hf-router" not in names
+    with pytest.raises(Exception, match="owner"):
+        shared.openclaw_owner_call([{"role": "user", "content": "hi"}],
+                                   env={"SUGARCODE_OPENCLAW_URL": "http://localhost:18789/v1",
+                                        "SUGARCODE_OPENCLAW_TOKEN": "dummy"})
