@@ -56,3 +56,30 @@ def test_needle_dataset_through_shared_pipeline(tmp_path):
     assert m["off_topic_ratio"] >= 0.1 and not m["warnings"]
     row = json.loads((tmp_path / "n.jsonl").read_text().splitlines()[0])
     assert {"query", "tools", "answers"} <= set(row)
+
+
+def test_shared_jev_off_without_key():
+    jev = shared.shared_jev({})
+    assert jev.name == "jev"
+    assert not jev.available()
+
+
+def test_shared_jev_key_resolution():
+    assert shared.shared_jev({"INSTINCT_JEV_API_KEY": "sk-s"}).api_key == "sk-s"
+    assert shared.shared_jev({"JEV_API_KEY": "sk-j"}).api_key == "sk-j"
+
+
+def test_shared_jev_evaluate_through_client():
+    seen = {}
+
+    def fake(url, body, headers, timeout):
+        seen.update(url=url, body=body, headers=headers)
+        return {"model": "jev-1.13.0", "answers": {"risk": {"type": "score", "score": 2.3}}, "usage": {}}
+
+    jev = shared.shared_jev({"INSTINCT_JEV_API_KEY": "sk-s"})
+    jev.transport = fake
+    out = jev.evaluate("sgRNA: GACCT...", {"risk": {"type": "score", "instructions": "Off-target risk",
+                                                  "criteria": ["low", "medium", "high"]}})
+    assert out["answers"]["risk"]["score"] == 2.3
+    assert seen["headers"]["Authorization"] == "Bearer sk-s"
+    assert seen["url"] == "https://thejevai.com/v1/systemone"
