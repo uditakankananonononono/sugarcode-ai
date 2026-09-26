@@ -117,3 +117,12 @@ class SugarcodeDataset:
 
 def build_shared_needle_dataset(out_path: str | Path, per_tool: int = 120, max_tools: int | None = None) -> dict:
     return build_needle_jsonl(SugarcodeDataset(per_tool=per_tool, max_tools=max_tools), out_path)
+
+
+def openclaw_owner_call(messages: list[dict], *, owner_confirmed: bool = False,
+                        env: dict | None = None):
+    """Explicit authenticated-owner call, never in the public/shared_ask model chain."""
+    from instinct_models import OpenClawOwner
+    e = os.environ if env is None else env
+    return OpenClawOwner(e.get("SUGARCODE_OPENCLAW_URL") or "", e.get("SUGARCODE_OPENCLAW_TOKEN") or "").chat(
+        messages, owner_confirmed=owner_confirmed)
