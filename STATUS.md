@@ -5,10 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: **1831 passed, 0 failed, 8 skipped** after the 2026-09-24 audit fix wave (earlier: 1709 passed / 7 skipped on the pb3 + pb6 integration merge), 95 modules, run locally 2026-09-24; pb3 alone reported 1642 passed / 1 skipped and pb6 alone 1466 passed / 1 skipped (hermetic fixtures; live calls
-verified outside pytest and recorded below). The suite now runs in GitHub
-Actions CI on every push (`.github/workflows/ci.yml`, Python 3.10-3.12), so the
-count is independently reproduced, not developer-reported.
+Test suite: the latest full-suite report (2026-09-27) is **2,279 passed, 1 failed**. The failure is the drop54 style gate: three intentional ellipsis protocol stubs in `self_improve` coexist with working concrete implementations. This is not a green full suite and must not be reported as one. The older 2026-09-24 audit-fix run had 1,831 passed / 0 failed / 8 skipped; that historical count is not the current result. This OpenClaw/Hermes change was checked with 10 targeted SugarCode shared-layer tests, not a full-suite rerun. CI runs via `.github/workflows/ci.yml` (Python 3.10-3.12); its current outcome should be checked separately.
 
 Audit-fix drop (third-party repo audit, 2026-09-22):
 - Registry reconciled: **95 modules registered** - the 77 spec modules plus 18
@@ -142,8 +139,8 @@ model endpoint or HF token is configured here.
 - protein_painter, alpha_fold_ui: PWM log-odds / Chou-Fasman-style
   statistical propensities (real computations, not trained models)
 - codon_opt: TASEP stochastic simulation (Gillespie KMC) + CAI (Sharp & Li 1987)
-- living_computer, synbio_wizard: stochastic kinetics (Gillespie)
-- gene_analysis: Hill-kinetics ODE models
+- living_computer: stochastic chemical-Langevin simulation (Euler-Maruyama); synbio_wizard: Gillespie stochastic kinetics
+- synbio_wizard.promoter_kinetics and virtual_cell._transcription_rates: Hill-kinetics regulation (not gene_analysis)
 - evofold_4d: anisotropic network model normal modes
 
 ## Tier 3 - spec-level heuristic engines
