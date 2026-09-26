@@ -1,3 +1,4 @@
+"""ctDNA liquid-biopsy analysis: curated marker panels, fragment-length modeling, haplotype inference and multi-omics integration."""
 from .core import (
     CTDNA_MARKERS, analyze_liquid_biopsy, bayesian_haplotype_inference,
     detect_ctdna, enhancement_features, fragment_length_model,

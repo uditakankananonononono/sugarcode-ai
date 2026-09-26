@@ -38,7 +38,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-testpaths = ["tests"]
+testpaths = ["tests", "src/sugarcode/modules/pgx_guidelines"]
 
 [tool.setuptools.package-data]
 "sugarcode.bio" = ["data/**/*"]
