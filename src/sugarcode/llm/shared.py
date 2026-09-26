@@ -7,6 +7,8 @@
                       private=True never reaches the hosted route.
 - `SugarcodeDataset`  DomainDataset for the shared Needle LoRA pipeline, built from
                       SugarCode's own verified-executable tool calls plus off-topic rows.
+- `shared_jev()`      optional Jev evaluation client (TypeSafe AI's hosted System One model):
+                      key-gated and paid, OFF unless INSTINCT_JEV_API_KEY or JEV_API_KEY is set.
 No paid route is reachable from here; Fugu stays in sugarcode.llm.providers behind
 SUGARCODE_ALLOW_PAID.
 """
@@ -18,7 +20,7 @@ import random
 from pathlib import Path
 from typing import Iterable
 
-from instinct_models import ProductConfig, Router, Task, load_config
+from instinct_models import JevEval, ProductConfig, Router, Task, load_config
 from instinct_models.training.dataset import ExampleRow, build_needle_jsonl
 
 from .router import route as route_modules
@@ -42,6 +44,17 @@ def shared_config(env: dict | None = None, path: str | None = None) -> ProductCo
     if cfg.product != PRODUCT:
         raise ValueError(f"INSTINCT_PRODUCT is {cfg.product!r}; SugarCode must run as {PRODUCT!r}")
     return cfg
+
+
+def shared_jev(env: dict | None = None) -> JevEval:
+    """Jev evaluation client (TypeSafe AI's System One model, https://thejevai.com).
+
+    Key from INSTINCT_JEV_API_KEY, else JEV_API_KEY; without one the client is unavailable and
+    OFF - nothing is called or billed. Jev is hosted and paid (credits). It evaluates typed
+    questions (choice / score / noul); it does not chat, and it must never receive private
+    state (sequences count as private: keep them on the local routes).
+    """
+    return JevEval(api_key=shared_config(env).jev_api_key)
 
 
 def shared_tools(question: str, k: int = 3, limit: int = 12) -> tuple[list[dict], list[dict]]:
