@@ -1,2 +1,2 @@
 Vendored copy of `instinct_models` from https://github.com/uditakankananonononono/shared-models
-pinned at commit d2d708315fa36f2e18a5653ec89c728106277a5b, with SugarCode local Hermes/OpenClaw additions preserved. Reconcile both changes when syncing.
+pinned at commit eaacd54f9d1e41d23defc9008741b2122bc0cb94. Do not edit here: change it in shared-models, then re-run the sync script.
