@@ -9,9 +9,10 @@ Env (prefix INSTINCT_):
   INSTINCT_ORNITH_MODEL        model tag as pulled locally (no default: must match what she pulled)
   INSTINCT_NEEDLE_WEIGHTS      path to a product .cact (tuned) - empty means the base Needle model
   INSTINCT_ALLOW_HOSTED        1 to allow metered hosted HF router for non-private tasks (default 0)
-  INSTINCT_HERMES_URL           local Ollama OpenAI-compatible /v1 URL (opt-in)
-  INSTINCT_HERMES_MODEL         pulled Hermes tag, e.g. hermes3:3b
-  INSTINCT_JEV_API_KEY         TypeSafe AI Jev evaluation API key (optional; falls back to JEV_API_KEY).
+  INSTINCT_HERMES_URL          local Ollama OpenAI-compatible /v1 URL (opt-in)
+  INSTINCT_HERMES_MODEL        pulled Hermes tag, e.g. hermes3:3b
+  INSTINCT_JEV_API_KEY        TypeSafe AI direct evaluation API key (optional; falls back to JEV_API_KEY).
+  INSTINCT_AI_GATEWAY_API_KEY Vercel AI Gateway key for Jev (optional; falls back to AI_GATEWAY_API_KEY).
                                Jev is hosted and key-gated (paid credits); empty keeps it OFF.
 """
 from __future__ import annotations

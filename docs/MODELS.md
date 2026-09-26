@@ -104,11 +104,15 @@ https://github.com/uditakankananonononono/shared-models, vendored at `src/instin
 - Env: `INSTINCT_PRODUCT=sugarcode` (default), `INSTINCT_INKLING_LOCAL_URL`, `INSTINCT_INKLING_LOCAL_MODEL`,
   `INSTINCT_ORNITH_URL`, `INSTINCT_ORNITH_MODEL`, `INSTINCT_NEEDLE_WEIGHTS`, `INSTINCT_ALLOW_HOSTED`, `HF_TOKEN`.
 - Fugu (paid) is not in the shared layer. It stays in `sugarcode.llm.providers` behind `SUGARCODE_ALLOW_PAID`.
-- Jev (TypeSafe AI's hosted "System One" evaluation model, https://thejevai.com) is available through
+- Jev (TypeSafe AI's hosted "System One" evaluation model, https://typesafe.ai) is available through
   `sugarcode.llm.shared.shared_jev()`: it evaluates one state against typed questions (choice / score / noul)
   and returns structured decisions with probabilities. It is NOT a chat model, so it is not a model profile
   and never joins `SUGARCODE_MODEL_ROUTE`. It is key-gated and paid (credits,
-  https://thejevai.com/pricing - no free tier as of 2026-09-26; also listed on the Vercel AI Gateway as
+  https://docs.typesafe.ai/models - no free tier as of 2026-09-26; also listed on the Vercel AI Gateway as
   `typesafe-ai/jev`), and it is OFF unless a key is set (`INSTINCT_JEV_API_KEY` or `JEV_API_KEY`; create one
-  at https://thejevai.com/settings/apikeys). Hosted route: never send it private state - keep sequences on
+  at https://console.typesafe.ai/keys). Hosted route: never send it private state - keep sequences on
   the local routes.
+
+### Jev API correction (2026-09-26)
+
+Vercel currently lists `typesafe-ai/jev` without Free Tier eligibility; the gateway route is paid. The TypeSafe direct API is also paid. A browser playground, if available from an official provider, is not free API access. The previously referenced `thejevai.com` could not be verified as TypeSafe AI's official site; do not use it for API keys, billing, or model calls. Official direct API: https://api.typesafe.ai/v1/systemone; keys: https://console.typesafe.ai/keys (https://docs.typesafe.ai/api). Gateway: https://ai-gateway.vercel.sh/typesafe/v1/systemone (https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe). Both routes stay OFF until a key is explicitly configured. Set `AI_GATEWAY_API_KEY` (or `INSTINCT_AI_GATEWAY_API_KEY`) for the preferred gateway route, or `JEV_API_KEY` (or `INSTINCT_JEV_API_KEY`) for the direct alternate; if both are present the gateway wins. Do not add keys to git. Vercel eligibility: https://vercel.com/ai-gateway/models/providers/typesafe-ai and https://vercel.com/docs/ai-gateway/pricing.
