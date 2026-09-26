@@ -47,14 +47,17 @@ def shared_config(env: dict | None = None, path: str | None = None) -> ProductCo
 
 
 def shared_jev(env: dict | None = None) -> JevEval:
-    """Jev evaluation client (TypeSafe AI's System One model, https://thejevai.com).
+    """Jev evaluation client (TypeSafe AI's System One model, https://typesafe.ai).
 
     Key from INSTINCT_JEV_API_KEY, else JEV_API_KEY; without one the client is unavailable and
     OFF - nothing is called or billed. Jev is hosted and paid (credits). It evaluates typed
     questions (choice / score / noul); it does not chat, and it must never receive private
     state (sequences count as private: keep them on the local routes).
     """
-    return JevEval(api_key=shared_config(env).jev_api_key)
+    import os
+    e = os.environ if env is None else env
+    return JevEval(api_key=shared_config(env).jev_api_key,
+                   gateway_api_key=e.get("SUGARCODE_AI_GATEWAY_API_KEY") or e.get("INSTINCT_AI_GATEWAY_API_KEY") or e.get("AI_GATEWAY_API_KEY") or "")
 
 
 def shared_tools(question: str, k: int = 3, limit: int = 12) -> tuple[list[dict], list[dict]]:

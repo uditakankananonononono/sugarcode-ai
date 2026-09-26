@@ -82,7 +82,7 @@ def test_shared_jev_evaluate_through_client():
                                                   "criteria": ["low", "medium", "high"]}})
     assert out["answers"]["risk"]["score"] == 2.3
     assert seen["headers"]["Authorization"] == "Bearer sk-s"
-    assert seen["url"] == "https://thejevai.com/v1/systemone"
+    assert seen["url"] == "https://api.typesafe.ai/v1/systemone"
 
 
 def test_local_hermes_and_explicit_openclaw_owner_bridge():
