@@ -1,3 +1,4 @@
+"""Cell Painting morphological profiling: mechanism-of-action signatures across five imaging channels."""
 from .core import *
 from .core import __dict__ as _d
 __all__=[k for k,v in _d.items() if not k.startswith('_') and (callable(v) or k in ('CHANNELS','FEATURES','FEATURE_NAMES','MECHANISM_SIGNATURES'))]
