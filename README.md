@@ -1,6 +1,6 @@
 # SugarCode AI
 
-**Current honest status: see [STATUS.md](STATUS.md)** - what is verified, thin, and Missing, updated each push.
+**Current honest status: see [STATUS.md](STATUS.md)** - what is verified, thin, and Missing, updated each push. The latest prior full-suite result was 2,279 passed / 1 failed; a narrow guard fix now passes 39 targeted tests, but a fresh full-suite result is pending.
 
 A multi-omic bio-design platform organized as a network of specialized modules on the
 **Omega OS v7.0** framework. Built line-by-line from the SugarCode AI spec doc

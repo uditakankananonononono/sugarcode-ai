@@ -32,18 +32,46 @@ def test_zero_stub_markers():
     assert offenders == []
 
 
+def _protocol_classes(tree):
+    """Type-only Protocol signatures are contracts, not callable product code."""
+    return {node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
+            and any(isinstance(base, ast.Name) and base.id == "Protocol"
+                    or isinstance(base, ast.Attribute) and base.attr == "Protocol"
+                    for base in node.bases)}
+
+
+def _empty_functions(tree):
+    """Find executable empty functions while excluding only direct Protocol signatures."""
+    excluded = {id(method) for cls in _protocol_classes(tree)
+                for method in cls.body if isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or id(node) in excluded:
+            continue
+        body = node.body
+        if len(body) == 1 and isinstance(body[0], ast.Pass):
+            yield node
+        elif len(body) == 1 and isinstance(body[0], ast.Expr) and \
+                isinstance(body[0].value, ast.Constant) and body[0].value.value is Ellipsis:
+            yield node
+
+
 def test_zero_empty_function_bodies():
-    hits = []
-    for p in _py_files():
-        for node in ast.walk(ast.parse(p.read_text())):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                b = node.body
-                if len(b) == 1 and isinstance(b[0], ast.Pass):
-                    hits.append(f"{p}:{node.name}")
-                elif len(b) == 1 and isinstance(b[0], ast.Expr) and \
-                        isinstance(b[0].value, ast.Constant) and b[0].value.value is Ellipsis:
-                    hits.append(f"{p}:{node.name}")
+    hits = [f"{p}:{node.name}" for p in _py_files()
+            for node in _empty_functions(ast.parse(p.read_text()))]
     assert hits == []
+
+
+def test_protocol_exclusion_does_not_hide_executable_stubs():
+    tree = ast.parse("""from typing import Protocol
+class Contract(Protocol):
+    def type_only(self): ...
+class Product:
+    def runtime(self): ...
+class Child(Contract):
+    def inherited_contract_does_not_exempt_runtime(self): pass
+""")
+    assert {node.name for node in _empty_functions(tree)} == {
+        "runtime", "inherited_contract_does_not_exempt_runtime"}
 
 
 def test_sbml_export_is_a_real_model():
