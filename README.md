@@ -21,6 +21,7 @@ sugarcode splice assess SCN1A 'c.959+1G>A' --transcript NM_001165963.1 --offline
 # offline bio tools (drop 60), all JSON on stdout:
 sugarcode codon cai ATGGCGGCGAAA                 # CAI vs a published usage table
 sugarcode codon optimize MAAKRF --gc-min 0.4 --gc-max 0.6
+# optimization rejects invalid amino-acid symbols and impossible forbidden motifs; GC repair is heuristic
 sugarcode fasta stats sequences.fa               # records, lengths, GC
 sugarcode genbank features plasmid.gb            # feature counts + spans
 sugarcode pwm score CAGGTAAGT --motif donor      # splice matrix score/scan
