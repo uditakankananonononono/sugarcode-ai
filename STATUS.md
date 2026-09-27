@@ -37,7 +37,7 @@ a verified Needle fine-tune dataset builder and a read-only AI Library connector
 against a local OpenAI-format server; no live model answer has been recorded yet because no
 model endpoint or HF token is configured here.
 
-Codon optimizer input guard (2026-09-27): strict protein-residue and GC-bound validation; impossible forbidden motifs now raise rather than returning DNA that violates the stated constraint. Targeted codon tests: 32 passed on Python 3.12. This does not prove every GC window meets the requested band, nor any wet-lab translation improvement. Full suite not rerun after this change.
+Codon optimizer input guard (2026-09-27): strict protein-residue and GC-bound validation; impossible forbidden motifs now raise rather than returning DNA that violates the stated constraint. A follow-on CAI fix makes any observed zero-reference-frequency synonymous codon force CAI to zero (it was incorrectly skipped). Targeted codon tests: 33 passed on Python 3.12. This does not prove every GC window meets the requested band, nor any wet-lab translation improvement. Full suite not rerun after this change.
 
 ## Tier 1 - verified against live external data
 
