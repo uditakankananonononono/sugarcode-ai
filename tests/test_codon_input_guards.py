@@ -22,3 +22,12 @@ def test_unavoidable_motif_fails_instead_of_claiming_avoidance():
         optimize_sequence('MAK', avoid_motifs=['ATN'])
     clean = optimize_sequence('MAK', avoid_motifs=['GCGGCG'])
     assert translate(clean) == 'MAK'
+
+
+def test_cai_zero_weight_codon_is_not_silently_omitted():
+    from sugarcode.bio.codon import ECOLI_K12, cai
+    table = dict(ECOLI_K12)
+    table['AAA'] = 0
+    assert cai('AAG', table) == 1.0
+    assert cai('AAA', table) == 0.0
+    assert cai('AAGAAA', table) == 0.0

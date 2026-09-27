@@ -70,8 +70,11 @@ def cai(seq: str, table: dict[str, float] | None = None) -> float:
         if aa in (None, "*", "M", "W"):
             continue  # excluded by convention (Met/Trp have w=1 always)
         wi = w.get(cod, 0.0)
-        if wi > 0:
-            vals.append(math.log(wi))
+        if wi <= 0:
+            # One observed codon with zero reference usage makes the
+            # geometric mean zero; skipping it falsely inflates CAI.
+            return 0.0
+        vals.append(math.log(wi))
     if not vals:
         return 0.0
     return math.exp(sum(vals) / len(vals))
