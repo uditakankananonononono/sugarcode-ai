@@ -80,18 +80,27 @@ def cai(seq: str, table: dict[str, float] | None = None) -> float:
 def optimize_sequence(protein: str, table: dict[str, float] | None = None,
                       gc_min: float = 0.40, gc_max: float = 0.60,
                       avoid_motifs: list[str] | None = None) -> str:
-    """Greedy per-codon optimization toward max relative adaptiveness,
-    with GC-window repair and forbidden-motif avoidance."""
+    """Greedy per-codon optimization toward max relative adaptiveness.
+
+    GC repair is heuristic. Reject invalid residues and impossible forbidden
+    motifs rather than silently shortening the protein or claiming success.
+    """
     from .sequence import find_motif, gc_content
+    if not protein or any(aa not in "ACDEFGHIKLMNPQRSTVWY" for aa in protein.upper()):
+        raise ValueError("protein must be a nonempty sequence of the 20 standard amino acids")
+    if not 0 <= gc_min <= gc_max <= 1:
+        raise ValueError("GC bounds must satisfy 0 <= gc_min <= gc_max <= 1")
     table = table or ECOLI_K12
     w = relative_adaptiveness(table)
     avoid = [m.upper() for m in (avoid_motifs or [])]
+    if any(not m or set(m) - set("ACGT") for m in avoid):
+        raise ValueError("avoid motifs must be nonempty A/C/G/T strings")
 
     def best_codons(aa: str) -> list[str]:
         cods = synonymous_codons(aa)
         return sorted(cods, key=lambda c: -w.get(c, 0.0))
 
-    codon_list = [best_codons(a)[0] for a in protein if a in "ACDEFGHIKLMNPQRSTVWY*"]
+    codon_list = [best_codons(a)[0] for a in protein.upper()]
 
     def local_gc(cl: list[str], idx: int, span: int = 10) -> float:
         lo, hi = max(0, idx - span), min(len(cl), idx + span)
@@ -124,7 +133,11 @@ def optimize_sequence(protein: str, table: dict[str, float] | None = None,
                         codon_list = trial
                         seq = tseq
                         break
-    return "".join(codon_list)
+    result = "".join(codon_list)
+    unresolved = [motif for motif in avoid if motif in result]
+    if unresolved:
+        raise ValueError("forbidden motif cannot be removed by synonymous codons: " + ", ".join(sorted(set(unresolved))))
+    return result
 
 
 # --- published tables (Edinburgh Genome Foundry codon-usage-tables, see
