@@ -13,11 +13,11 @@ Truth pass (2026-10-07), honest retractions:
 - robotic_flow: liquid-class, evaporation, droplet-bias and reagent-decay coefficients are uncalibrated defaults, now overridable and disclosed in output.
 - crispr_muse: the 'simulated lab' loop was surrogate score plus noise. Now disclosed as surrogate-only; real feedback goes through `measured=`.
 - Renamed in the registry (slugs kept): genomegpt = Genome k-mer & Motif Analyzer, biogpt_lit = Literature Relation Extractor, chemgpt_engine = Fragment Molecule Designer, alpha_fold_ui = Chou-Fasman Structure Sketch & Viewer. None of these is a GPT/AlphaFold-class model.
-- neohunter: 9-mer HLA binding now uses a position-specific matrix actually fitted on measured IEDB 2013 IC50 data (scripts/train_neohunter_pssm.py; held-out per-allele Pearson r 0.74-0.79, AUC 0.84-0.92, stored in data_pssm_iedb2013.json). It is a linear PSSM, not a deep model; 8/10/11-mers still use a disclosed anchor heuristic; immunogenicity is not a trained model.
+- neohunter: 9-mer HLA binding now uses a position-specific matrix actually fitted on measured IEDB 2013 IC50 data (scripts/train_neohunter_pssm.py; held-out per-allele Pearson r 0.74-0.79, AUC 0.84-0.92, stored in data_pssm_iedb2013.json). The IEDB data is a static 2013 snapshot, not a live IEDB query. Caveats: shipped weights are refit on ALL data while the stored metrics come from the 80% fit; about 12% of A*02:01 held-out peptides have a training peptide within 2 mismatches, so the r/AUC values are optimistic for novel peptides; class cutoffs are sharp (the known epitope GILGFVFTL scores ~48.5 nM, just under the 50 nM strong-binder line). It is a linear PSSM, not a deep model; 8/10/11-mers still use a disclosed anchor heuristic; immunogenicity is not a trained model.
 - bio_copilot: the "in deployment" PubMed stub is replaced by a real live PubMed E-utilities retrieval (retrieval only, no LLM synthesis); router is keyword-based and says so.
 - liquid_biopsy: the random-weight `transformer_denoise` is removed; `consensus_denoise` is a deterministic evidence/concordance formula (not trained, not neural).
 - rna_decoder, bioimage_ai: registry text no longer implies deep/trained models.
-- STILL OPEN: (bio_copilot router, liquid_biopsy done above) rna_decoder real model, prime_design, dark_genome, str_scope, liquid_biopsy (random-weight, disclosed), bioimage_ai, cellfatenet and the PARTIAL units are not yet rebuilt; spec 'trained ML' claims for them remain unmet. Module/package slugs and docstrings for the four renamed units are not yet renamed.
+- STILL OPEN: rna_decoder real model, prime_design, dark_genome, str_scope, bioimage_ai, cellfatenet and the PARTIAL units are not yet rebuilt; spec 'trained ML' claims for them remain unmet. Module/package slugs and docstrings for the four renamed units are not yet renamed.
 
 Audit-fix drop (third-party repo audit, 2026-09-22):
 - Registry reconciled: **95 modules registered** - the 77 spec modules plus 18
@@ -33,9 +33,7 @@ Audit-fix drop (third-party repo audit, 2026-09-22):
   `src/`) and two stray root-level test files are deleted. The orphaned work
   survives in git history (commits b78b943, 35e0995, 1d43dc8) if it is ever
   promoted properly.
-- liquid_biopsy wording fixed: `transformer_denoise` is a real attention
-  computation with RANDOM, UNTRAINED weights drawn at inference (seeded for
-  reproducibility); docs and the function itself now say so explicitly.
+- liquid_biopsy (superseded 2026-10-07): at this drop `transformer_denoise` was an untrained random-weight attention computation and was disclosed as such. It has since been REMOVED and replaced by `consensus_denoise` (see the truth-pass section above).
 - Overclaim sweep: registry summaries and docstrings no longer use
   deep-learning/RL/continual-learning wording for deterministic computations;
   the spec corpus in `spec/` is labeled as aspirational source text.
