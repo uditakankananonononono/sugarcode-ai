@@ -53,6 +53,24 @@ def test_diagnostics_fifty_for_short_candidate_lists():
 def test_graph_and_embeddings_shapes():
     g = nd.build_multiplex_graph()
     assert g["layer_counts"]["drug"] == len(nd.DRUG_TARGETS)
-    e = nd.graph_neural_embeddings(g, dimensions=8, layers=2)
+    e = nd.graph_spectral_embeddings(g, dimensions=8, layers=2)
     assert len(e["embeddings"]) == g["node_count"]
     assert e["dimensions"] == 8
+
+
+def test_embeddings_are_weight_free_and_structure_dependent():
+    """Fails on random-weight or constant stubs: output must come from topology only."""
+    import inspect
+    assert "default_rng" not in inspect.getsource(nd.graph_spectral_embeddings)
+    assert not hasattr(nd, "graph_neural_embeddings")
+    g = nd.build_multiplex_graph()
+    e = nd.graph_spectral_embeddings(g, dimensions=6)
+    assert e["trained"] is False and e["neural"] is False
+    # topology-dependence: a drug sharing a target with another is closer than an unrelated drug
+    emb = {k: __import__("numpy").array(v) for k, v in e["embeddings"].items()}
+    cos = lambda a, b: float(a @ b)
+    g2 = nd.build_multiplex_graph({"A": ["T1"], "B": ["T1"], "C": ["T9"]}, {"T1": ["P1"], "T9": ["P9"]}, {"P1": ["D"], "P9": ["E"]})
+    m = {k: __import__("numpy").array(v) for k, v in nd.graph_spectral_embeddings(g2, dimensions=6)["embeddings"].items()}
+    assert cos(m["drug:A"], m["drug:B"]) > cos(m["drug:A"], m["drug:C"])
+    # determinism with no seed
+    assert nd.graph_spectral_embeddings(g, dimensions=6) == e

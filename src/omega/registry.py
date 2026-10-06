@@ -149,7 +149,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("neuroplan_ai", "NeuroPlan AI", "therapeutics",
      "Neurosurgical planning: MRI segmentation + tractography, safest-path mapping, NeuroTwin risk scores."),
     ("neodti_engine", "NeoDti Engine", "therapeutics",
-     "Drug repurposing via graph learning on drug-target interactions; Therapeutic Resilience Index."),
+     "Drug repurposing by mechanistic path analysis plus deterministic spectral graph embedding over drug-target-pathway-disease links (no trained model); Therapeutic Resilience Index."),
     ("liquid_biopsy", "Liquid Biopsy", "therapeutics",
      "ctDNA detection with error-rate-aware statistical filters (beta-binomial floor, smoothing); biomarker selection, raw vs filtered signal."),
     ("rarenet_ai", "RareNet AI", "therapeutics",
