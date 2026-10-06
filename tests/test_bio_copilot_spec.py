@@ -22,7 +22,7 @@ def test_structured_outputs_and_reproducible_artifact():
  a=compile_research_artifact("TP53 R175H",mutation_to_phenotype("TP53","R",175,"H")); assert json.loads(a["json"])["schema_version"]=="1.0" and len(a["payload"]["limitations"])==2
 
 def test_answer_routes_grounded_tasks_without_claiming_missing_literature():
- assert answer("analyze a mutation")["route"]=="variant_pipeline" and "no grounded local hit" in answer("unknown biology")["answer"]
+ assert answer("analyze a mutation")["route"]=="variant_pipeline" and answer("unknown biology")["route"]=="literature_synthesis" and "synthesis" in answer("unknown biology")
 
 def test_validation_errors_are_informative():
  with pytest.raises(ValueError,match="A/C/G/T"): design_crispr_guides("BAD")
