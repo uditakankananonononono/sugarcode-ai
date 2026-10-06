@@ -126,8 +126,8 @@ def test_combo_screen_live_axes(monkeypatch):
     from sugarcode.modules.mutdock.core import mutation_effect
     e = mutation_effect("TYE", "CCO", 0, "I", resnums=[315, 253, 286], drug_name="drugA")
     assert by["drugA"]["wt_potency_nM"] == 5.0
-    assert by["drugA"]["resistance_fold"] == e["affinity_change_fold"]
-    assert by["drugA"]["effective_ic50_uM"] == round(5.0 * e["affinity_change_fold"] / 1000, 4)
+    assert by["drugA"]["resistance_fold"] == e["uncalibrated_fold_estimate"]
+    assert by["drugA"]["effective_ic50_uM"] == round(5.0 * e["uncalibrated_fold_estimate"] / 1000, 4)
     assert by["drugB"]["wt_potency_nM"] == 500.0
     # D800N outside pocket: named, not silently dropped
     d800 = next(m for m in r["mutation_reports"] if m["mutation"] == "D800N")
@@ -156,3 +156,11 @@ def test_combo_wt_mismatch_named(monkeypatch):
                         {"status": "no UniProt entry", "gene": g})
     r = screen_with_structure("colon", ["drugA"], "ABL1", "1IEP", "STI", mutations=["A315I"])
     assert r["mutation_reports"][0]["effects"]["drugA"]["status"] == "wt mismatch"
+
+
+def test_mutdock_fold_is_labeled_uncalibrated():
+    from sugarcode.modules.mutdock.core import mutation_effect
+    e = mutation_effect("TEFMLGSAV", "CC(=O)Nc1ccccc1", 0, "I")
+    assert "affinity_change_fold" not in e
+    assert "uncalibrated_fold_estimate" in e
+    assert "NOT fitted" in e["calibration"] and "T315I" in e["calibration"]

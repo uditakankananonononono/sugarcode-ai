@@ -13,6 +13,12 @@ DDG_CLASS_CHANGE = {
 }
 
 
+CALIBRATION_NOTE = ("uncalibrated class-level heuristic: ddG and the fold estimate are NOT fitted to "
+                    "or validated against measured IC50 shifts. Real clinical resistance mutations "
+                    "(e.g. BCR-ABL T315I vs imatinib) show far larger shifts than this model produces; "
+                    "use as a qualitative ranking only.")
+
+
 def _cls(aa: str) -> str:
     for k, v in _CLASS.items():
         if aa in v:
@@ -48,9 +54,10 @@ def mutation_effect(pocket_residues: str, smiles: str, position: int,
         "drug": drug_name,
         "wt_dg": wt["binding_dg_kcal_mol"], "mutant_dg": mt["binding_dg_kcal_mol"],
         "ddg_kcal_mol": ddg,
-        "affinity_change_fold": round(2.718 ** (ddg / 0.593), 2),
+        "uncalibrated_fold_estimate": round(2.718 ** (ddg / 0.593), 2),
         "resistance_risk": resistance,
         "hotspot": ddg > 0.5,
+        "calibration": CALIBRATION_NOTE,
     }
 
 
@@ -330,4 +337,4 @@ def mutdock_report(pocket,drugs,mutations):
     matrix=cross_drug_matrix(pocket,drugs,mutations); epi=epistasis_effect(pocket,next(iter(drugs.values())),mutations[:2]) if len(mutations)>=2 else None; return {'cross_drug':matrix,'epistasis':epi,'fitness':mutational_fitness_landscape(pocket,next(iter(drugs.values()))),'forecast':evolutionary_forecast(pocket,next(iter(drugs.values()))),'model_status':'Transparent docking-feature, ensemble and epistasis models; no trained GNN and not clinical treatment guidance.'}
 
 def mutdock_diagnostics(pocket,smiles,position,mutant):
-    r=mutation_effect(pocket,smiles,position,mutant); g=graph_perturbation(pocket,smiles,position,mutant); f=mutational_fitness_landscape(pocket,smiles,[position]); vals=np.array([x['ddg_kcal_mol'] for x in f['variants']]); return {'pocket_length':float(len(pocket)),'position':float(position),'wt_dg':r['wt_dg'],'mutant_dg':r['mutant_dg'],'ddg':r['ddg_kcal_mol'],'affinity_fold':r['affinity_change_fold'],'hotspot':float(r['hotspot']),'wt_contacts':float(len(g['wild_type']['edges'])),'mutant_contacts':float(len(g['mutant']['edges'])),'lost_contacts':float(g['lost_contacts']),'gained_contacts':float(g['gained_contacts']),'scan_ddg_mean':float(vals.mean()),'scan_ddg_std':float(vals.std()),'scan_ddg_max':float(vals.max())}
+    r=mutation_effect(pocket,smiles,position,mutant); g=graph_perturbation(pocket,smiles,position,mutant); f=mutational_fitness_landscape(pocket,smiles,[position]); vals=np.array([x['ddg_kcal_mol'] for x in f['variants']]); return {'pocket_length':float(len(pocket)),'position':float(position),'wt_dg':r['wt_dg'],'mutant_dg':r['mutant_dg'],'ddg':r['ddg_kcal_mol'],'affinity_fold':r['uncalibrated_fold_estimate'],'hotspot':float(r['hotspot']),'wt_contacts':float(len(g['wild_type']['edges'])),'mutant_contacts':float(len(g['mutant']['edges'])),'lost_contacts':float(g['lost_contacts']),'gained_contacts':float(g['gained_contacts']),'scan_ddg_mean':float(vals.mean()),'scan_ddg_std':float(vals.std()),'scan_ddg_max':float(vals.max())}
