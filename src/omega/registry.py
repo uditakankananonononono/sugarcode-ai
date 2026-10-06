@@ -39,7 +39,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("neuro_hub", "Neuro-Hub (Dashboard)", "core-intelligence",
      "Central command center: global compute flux, unified search across the module stack, platform-wide health."),
     ("bio_copilot", "Bio-Copilot", "core-intelligence",
-     "AI-native research assistant grounded in PubMed data; mutation-to-phenotype reasoning; FASTA/PDB outputs; CRISPR design; SBML simulation; FBA; docking; executable notebooks."),
+     "Keyword-routed research assistant (no language model): live PubMed retrieval, UniProt gene context; mutation-to-phenotype pipeline; FASTA/PDB outputs; CRISPR design; SBML simulation; FBA; docking; executable notebooks."),
     ("synbio_wizard", "SynBio Wizard", "core-intelligence",
      "Guided synthetic-biology compiler: goal definition to pathway design, chassis selection, feasibility and assembly recommendations."),
     ("neuro_pipeline", "Neuro-Pipeline", "core-intelligence",

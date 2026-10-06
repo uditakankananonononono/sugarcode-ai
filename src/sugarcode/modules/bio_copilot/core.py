@@ -151,11 +151,29 @@ def answer(question: str) -> dict:
     if "fasta" in q or "pdb" in q:
         return {"route": "structured_output",
                 "answer": "to_fasta / to_pdb generate valid structured files"}
-    return {"route": "literature_synthesis",
-            "answer": ("no grounded local hit; in deployment this route queries PubMed E-utilities "
-                       "and synthesizes with citations - local graph has genes: "
-                       + ", ".join(sorted(GENES))),
+    return literature_route(question)
+
+
+def literature_route(question: str, retmax: int = 5, offline: bool = False) -> dict:
+    """Real PubMed E-utilities search (free, no key). Returns the retrieved
+    records verbatim (PMID, title, journal, year, abstract excerpt). There is no
+    language-model synthesis here: the answer is the list of papers found, and the
+    result says so. Failure is reported, never papered over."""
+    from ...bio import entrez
+    base = {"route": "literature_synthesis", "synthesis": "none - retrieval only (no language model)",
             "followups": ["narrow the question to a gene or variant"]}
+    try:
+        ids = entrez.pubmed_ids(question, retmax=retmax, offline=offline)
+        recs = entrez.pubmed_abstracts(ids, offline=offline) if ids else []
+    except Exception as e:
+        return {**base, "papers": [], "grounding": "PubMed (unreachable)",
+                "answer": f"PubMed lookup failed: {type(e).__name__}: {e}"}
+    papers = [{"pmid": r.get("pmid"), "title": r.get("title"), "year": r.get("year"),
+               "journal": r.get("journal"), "abstract_excerpt": (r.get("abstract") or "")[:400],
+               "url": f"https://pubmed.ncbi.nlm.nih.gov/{r.get('pmid')}/"} for r in recs]
+    return {**base, "papers": papers, "grounding": "PubMed E-utilities (live)",
+            "answer": (f"{len(papers)} PubMed records retrieved for the query; see papers[] "
+                       "(retrieval only, not a synthesized answer)") if papers else "no PubMed records found"}
 
 
 def live_gene_context(gene: str, offline: bool = False) -> dict:
