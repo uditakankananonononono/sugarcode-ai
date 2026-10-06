@@ -139,7 +139,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("living_tx", "Living Tx", "therapeutics",
      "Engineered probiotic therapeutics: strain selection, modifications, gut-microbiome impact simulation."),
     ("neohunter", "NeoHunter", "therapeutics",
-     "Neoantigen candidate ranking with an anchor-motif HLA heuristic (5 alleles) and foreignness; not a trained immunogenicity or binding model."),
+     "Neoantigen candidate ranking. HLA binding for 9-mers (5 alleles) is a ridge matrix trained on measured IEDB IC50 data with held-out metrics; other lengths use a disclosed heuristic. Immunogenicity is not a trained model."),
     ("gene_tx_opt", "Gene-Tx Opt", "therapeutics",
      "Gene-therapy vector optimization: tissue-specific promoters/capsids, delivery simulation."),
     ("vector_opt", "Vector Opt", "therapeutics",
