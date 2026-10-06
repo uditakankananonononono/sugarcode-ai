@@ -3,6 +3,9 @@ IEDB 2013 MHC-I binding benchmark (measured IC50 nM):
   http://tools.iedb.org/static/main/binding_data_2013.zip  (bdata.20130222.mhci.txt)
 Target y = 1 - ln(IC50)/ln(50000) clipped to [0,1] (NetMHC convention). Only
 inequality '=' rows, human, 9-mers. 80/20 split by fixed hash for held-out metrics.
+Data is a static 2013 snapshot (not a live IEDB query). Stored metrics come from the 80% fit;
+shipped weights are refit on all rows; held-out peptides can have close training neighbours
+(optimistic for novel peptides).
 Usage: python scripts/train_neohunter_pssm.py bdata.20130222.mhci.txt
 """
 import sys, json, math, hashlib, collections
