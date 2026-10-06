@@ -1,5 +1,17 @@
 from __future__ import annotations
 
+# Every numeric coefficient below is an UNCALIBRATED placeholder default, not
+# a measured value for any instrument, liquid or reagent. Callers must supply
+# their own measured values (liquid_classes=, evaporation_ul_per_ul_min=, ...)
+# before treating outputs as quantitative. Outputs carry "coefficients_status".
+COEFFICIENTS_STATUS = ("uncalibrated defaults: liquid-class speeds/air gaps, evaporation, droplet-bias and "
+                       "reagent-decay coefficients are not measured; supply instrument-specific values")
+EVAPORATION_FRACTION_PER_MIN = 0.002
+DROPLET_BIAS_PER_CP = 0.002
+DROPLET_BIAS_PER_MN_M = 0.001
+DROPLET_BIAS_PER_DEG_C = 0.0005
+REAGENT_EXCURSION_DECAY_PER_H = 0.03
+
 LIQUID_CLASSES = {
     "water": {"viscosity_cp": 1.0, "aspirate_speed_ul_s": 200, "air_gap_ul": 2},
     "glycerol_50": {"viscosity_cp": 6.0, "aspirate_speed_ul_s": 40, "air_gap_ul": 4},
@@ -8,24 +20,27 @@ LIQUID_CLASSES = {
 }
 
 
-def pipette_plan(transfers: list[dict]) -> dict:
-    """Convert transfer list to calibrated liquid-class handling steps.
+def pipette_plan(transfers: list[dict], liquid_classes: dict | None = None,
+                 evaporation_fraction_per_min: float | None = None) -> dict:
+    """Convert transfer list to liquid-class handling steps (defaults are UNCALIBRATED; pass measured liquid_classes).
 
     Each transfer: {"source": well, "dest": well, "volume_ul": x, "liquid": class}
     Applies viscosity-dependent speeds, air gaps and evaporation correction.
     """
     steps = []
     total_s = 0.0
+    classes = liquid_classes or LIQUID_CLASSES
+    evap_k = EVAPORATION_FRACTION_PER_MIN if evaporation_fraction_per_min is None else evaporation_fraction_per_min
     for i, t in enumerate(transfers):
         liquid = t.get("liquid", "water")
-        if liquid not in LIQUID_CLASSES:
+        if liquid not in classes:
             # was: silently calibrated with water's speeds while labelling
             # the step with the unknown class (e.g. "mercury" at 200 ul/s)
-            raise KeyError(f"unknown liquid class {liquid!r}; have {sorted(LIQUID_CLASSES)}")
-        lc = LIQUID_CLASSES[liquid]
+            raise KeyError(f"unknown liquid class {liquid!r}; have {sorted(classes)}")
+        lc = classes[liquid]
         vol = t["volume_ul"]
         asp_t = vol / lc["aspirate_speed_ul_s"]
-        evap = round(vol * 0.002 * (asp_t / 60), 4)
+        evap = round(vol * evap_k * (asp_t / 60), 4)
         steps.append({
             "step": i + 1, "source": t["source"], "dest": t["dest"],
             "volume_ul": vol, "liquid_class": t.get("liquid", "water"),
@@ -36,7 +51,8 @@ def pipette_plan(transfers: list[dict]) -> dict:
         })
         total_s += 2 * asp_t + 3
     return {"n_transfers": len(steps), "steps": steps,
-            "estimated_total_min": round(total_s / 60, 1)}
+            "estimated_total_min": round(total_s / 60, 1),
+            "coefficients_status": COEFFICIENTS_STATUS if liquid_classes is None else "caller-supplied liquid classes"}
 
 
 def schedule_run(tasks: list[dict]) -> dict:
@@ -108,7 +124,7 @@ import math
 from collections import defaultdict
 
 def droplet_error(volume_ul,viscosity_cp,surface_tension=72,temp_c=22):
- bias=.002*viscosity_cp+.001*abs(surface_tension-72)+.0005*abs(temp_c-22); return {'bias_ul':volume_ul*bias,'delivered_ul':volume_ul*(1-bias),'relative_error':bias}
+ bias=DROPLET_BIAS_PER_CP*viscosity_cp+DROPLET_BIAS_PER_MN_M*abs(surface_tension-72)+DROPLET_BIAS_PER_DEG_C*abs(temp_c-22); return {'coefficients_status':COEFFICIENTS_STATUS,'bias_ul':volume_ul*bias,'delivered_ul':volume_ul*(1-bias),'relative_error':bias}
 def environmental_control(setpoint,observations,kp=.5,ki=.05):
  integ=0; control=[]
  for x in observations: err=setpoint-x; integ+=err; control.append(kp*err+ki*integ)
@@ -124,7 +140,7 @@ def sample_lineage(samples,operations):
  unknown=sorted({p for x in lineage.values() for p in x['parents'] if p not in lineage})
  return {'samples':lineage,'unknown_parents':unknown,'traceable':not unknown}
 def reagent_status(age_days,half_life_days,temperature_excursion_h=0,incompatible=False):
- activity=2**(-age_days/half_life_days)*math.exp(-.03*temperature_excursion_h); return {'activity_fraction':activity,'usable':activity>.7 and not incompatible,'incompatible':incompatible}
+ activity=2**(-age_days/half_life_days)*math.exp(-REAGENT_EXCURSION_DECAY_PER_H*temperature_excursion_h); return {'coefficients_status':COEFFICIENTS_STATUS,'activity_fraction':activity,'usable':activity>.7 and not incompatible,'incompatible':incompatible}
 def contamination_control(transfers):
  last=None; actions=[]
  for t in transfers:
