@@ -1,7 +1,7 @@
 import numpy as np
 from sugarcode.modules.liquid_biopsy import (
     analyze_liquid_biopsy, bayesian_haplotype_inference, enhancement_features,
-    integrate_multiomics, longitudinal_trajectory, transformer_denoise,
+    integrate_multiomics, longitudinal_trajectory, consensus_denoise,
 )
 
 
@@ -10,12 +10,18 @@ def fixture_features():
     return x
 
 
-def test_transformer_is_real_contextual_attention_and_deterministic():
-    a=transformer_denoise(fixture_features()); b=transformer_denoise(fixture_features())
-    assert a==b and a["architecture"]["heads"]==4
-    att=np.asarray(a["attention"]); assert att.shape==(3,8,8)
-    assert np.allclose(att.sum(-1),1)
-    assert np.mean(np.asarray(a["somatic_probability"])[:,3]) > np.mean(np.asarray(a["somatic_probability"])[:,0])
+def test_consensus_denoise_is_deterministic_weight_free_and_concordance_sensitive():
+    import inspect
+    from sugarcode.modules.liquid_biopsy import core as lb
+    assert "default_rng" not in inspect.getsource(lb.consensus_denoise)
+    assert not hasattr(lb, "transformer_denoise")
+    a=consensus_denoise(fixture_features()); b=consensus_denoise(fixture_features())
+    assert a==b and a["trained"] is False and a["neural"] is False
+    p=np.asarray(a["somatic_probability"]); assert p.shape==(3,8)
+    assert np.mean(p[:,3]) > np.mean(p[:,0])
+    # concordance: same allele in 1 of 3 fragments scores lower than in 3 of 3
+    x=fixture_features(); y=x.copy(); y[1:,3,0]=.0005
+    assert consensus_denoise(y)["somatic_probability"][0][3] < consensus_denoise(x)["somatic_probability"][0][3]
 
 
 def test_bayesian_haplotype_missing_data_and_posterior():
@@ -53,5 +59,5 @@ def test_end_to_end_report_contains_every_spec_layer():
 
 def test_bad_shapes_rejected():
     import pytest
-    with pytest.raises(ValueError): transformer_denoise([1,2,3])
+    with pytest.raises(ValueError): consensus_denoise([1,2,3])
     with pytest.raises(ValueError): bayesian_haplotype_inference([])

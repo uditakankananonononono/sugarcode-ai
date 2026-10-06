@@ -130,75 +130,39 @@ def _softmax(x, axis=-1):
     return e / np.maximum(e.sum(axis=axis, keepdims=True), 1e-15)
 
 
-def transformer_denoise(fragment_features, *, heads: int = 4, seed: int = 17,
-                        error_prior: float = 1e-3) -> dict:
-    """Contextual somatic-call denoising with a transformer-encoder computation.
+def consensus_denoise(fragment_features, *, error_prior: float = 1e-3) -> dict:
+    """Evidence-based somatic-call filtering. No neural network, no random weights.
 
     ``fragment_features`` is ``[fragments, positions, channels]``; channels are
     allele support, base quality (0..1), mapping quality (0..1), strand balance
-    (0..1), and optional assay covariates. Multi-head scaled dot-product self
-    attention, residual layer normalisation and a GELU feed-forward block are
-    evaluated directly in NumPy.
-
-    IMPORTANT: every projection/attention/feed-forward weight is drawn from a
-    seeded random generator AT INFERENCE TIME. This is an UNTRAINED,
-    random-weight architecture - the attention mathematics is real, but no
-    weight carries learned signal. The fixed seed makes output hermetic and
-    reproducible; it does not make it trained or calibrated. Do not describe
-    this function as a trained transformer.
+    (0..1). Per fragment and position the log-odds are
+    log((af+e)/e) + 2*quality - 3, then shifted by cross-fragment
+    CONCORDANCE: the support of a position is compared with the cohort's
+    per-position background (median across positions), and positions where
+    several fragments independently carry the allele get a bonus. All terms
+    are explicit, deterministic, and not trained or clinically calibrated.
     """
     x = np.asarray(fragment_features, dtype=float)
     if x.ndim == 2:
         x = x[None, ...]
     if x.ndim != 3 or x.shape[1] < 2 or x.shape[2] < 1:
         raise ValueError("fragment_features must be [fragments, positions, channels]")
-    if heads < 1:
-        raise ValueError("heads must be positive")
     n, length, channels = x.shape
-    d_model = max(8, int(np.ceil(channels / heads)) * heads)
-    rng = np.random.default_rng(seed)
-    proj = rng.normal(0, 1 / np.sqrt(channels), (channels, d_model))
-    h = x @ proj
-    pos = np.arange(length)[:, None]
-    scale = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))
-    pe = np.zeros((length, d_model)); pe[:, 0::2] = np.sin(pos * scale)
-    pe[:, 1::2] = np.cos(pos * scale[:pe[:, 1::2].shape[1]])
-    h += pe
-    head_dim = d_model // heads
-    attentions = []
-    pieces = []
-    for _ in range(heads):
-        wq, wk, wv = (rng.normal(0, 1 / np.sqrt(d_model), (d_model, head_dim))
-                      for __ in range(3))
-        q, k, v = h @ wq, h @ wk, h @ wv
-        a = _softmax(q @ np.swapaxes(k, -1, -2) / np.sqrt(head_dim), axis=-1)
-        attentions.append(a); pieces.append(a @ v)
-    attended = np.concatenate(pieces, axis=-1)
-    wo = rng.normal(0, 1 / np.sqrt(d_model), (d_model, d_model))
-    h1 = h + attended @ wo
-    h1 = (h1 - h1.mean(-1, keepdims=True)) / (h1.std(-1, keepdims=True) + 1e-6)
-    w1 = rng.normal(0, 1 / np.sqrt(d_model), (d_model, 2 * d_model))
-    w2 = rng.normal(0, 1 / np.sqrt(2 * d_model), (2 * d_model, d_model))
-    z = h1 @ w1
-    gelu = .5 * z * (1 + np.tanh(np.sqrt(2 / np.pi) * (z + .044715 * z**3)))
-    h2 = h1 + gelu @ w2
-    h2 = (h2 - h2.mean(-1, keepdims=True)) / (h2.std(-1, keepdims=True) + 1e-6)
-    # Evidence-preserving head: contextual logit plus direct allele/quality terms.
-    context = h2.mean(-1)
     af = np.clip(x[..., 0], 0, 1)
     quality = np.clip(x[..., 1:4].mean(-1), 0, 1) if channels >= 4 else 0.5
-    logits = np.log((af + error_prior) / (error_prior + 1e-12)) + 2*quality + .25*context - 3
+    background = np.median(af)
+    carrying = (af > max(5 * background, 10 * error_prior)).astype(float)
+    concordance = carrying.mean(axis=0)            # fraction of fragments carrying allele, per position
+    concordance = np.broadcast_to(concordance, af.shape)
+    logits = np.log((af + error_prior) / (error_prior + 1e-12)) + 2 * quality + 1.5 * concordance - 3
     probabilities = _sigmoid(logits)
     return {
         "somatic_probability": probabilities.tolist(),
         "denoised_allele_support": (af * probabilities).tolist(),
-        "attention": np.mean(np.stack(attentions), axis=0).tolist(),
-        "architecture": {"type": "transformer_encoder", "heads": heads,
-                         "d_model": d_model, "layers": 1,
-                         "weights": "random_untrained_seeded_at_inference",
-                         "components": ["sinusoidal_position", "scaled_dot_product_attention",
-                                        "residual_layer_norm", "GELU_feed_forward"]},
-        "calibration": "untrained random-weight computation, seeded for reproducibility; not trained, not clinically calibrated",
+        "concordance": concordance[0].tolist(),
+        "method": "log-odds evidence model with cross-fragment concordance; deterministic",
+        "trained": False, "neural": False,
+        "calibration": "explicit untrained formula; not clinically calibrated",
     }
 
 
@@ -378,7 +342,7 @@ def analyze_liquid_biopsy(fragment_features, fragment_alleles, variants, *, cove
                            fragment_lengths=(), methylation=(), proteins=(), metabolites=(),
                            longitudinal=()) -> dict:
     """End-to-end spec pipeline returning a clinically interpretable report."""
-    denoised = transformer_denoise(fragment_features)
+    denoised = consensus_denoise(fragment_features)
     arch = reconstruct_tumor_architecture(variants, fragment_alleles, coverage, methylation)
     raw = np.asarray(fragment_features, float)[...,0].ravel()
     calls = [{"locus_index": i, "allele_fraction": float(v), "confidence": float(c)}
