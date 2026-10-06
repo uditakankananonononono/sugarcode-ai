@@ -225,7 +225,7 @@ def screen_with_structure(tissue: str, compounds: list[str], target_gene: str,
                 "status": "in pocket",
                 "pocket": f"{pk['pdb_id']}:{pk['ligand']}",
                 "ddg_kcal_mol": e["ddg_kcal_mol"],
-                "affinity_loss_fold": e["affinity_change_fold"],
+                "affinity_loss_fold": e["uncalibrated_fold_estimate"],
                 "resistance_risk": e["resistance_risk"]}
         mut_reports.append({"mutation": mut, "effects": per_comp_effect})
 
