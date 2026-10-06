@@ -3,7 +3,7 @@ from ...bio.sequence import clean_dna, find_motif, gc_content
 
 # m6A installs at DRACH motifs (D=A/G/T, R=A/G, H=A/C/T); the central A is modified.
 DRACH = "DRACH"
-# trained-prior positional weights: sites near stop codons / 3' UTR enrich
+# HAND-SET positional priors (not trained or fitted here): m6A is reported to enrich near stop codons / 3' UTR
 REGION_PRIORS = {"5utr": 0.35, "cds": 0.55, "near_stop": 0.85, "3utr": 0.75}
 
 
