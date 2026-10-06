@@ -11,9 +11,41 @@ HLA_SUPERTYPES = {
 HYDROPHOBIC = set("AILMFWVY")
 
 
+_RIDGE = None
+
+
+def hla_binding_trained(peptide: str, hla: str) -> dict:
+    """Trained position-specific scoring matrix (ridge regression on measured IC50).
+
+    Fitted by scripts/train_neohunter_pssm.py on the IEDB 2013 MHC-I benchmark
+    (human, 9-mers, '=' measurements). Held-out Pearson r and AUC per allele are stored
+    with the weights (data_pssm_iedb2013.json). Predicted IC50 = 50000**(1-score) nM.
+    """
+    import json, math
+    from pathlib import Path
+    global _RIDGE
+    if _RIDGE is None:
+        _RIDGE = json.load(open(Path(__file__).with_name("data_pssm_iedb2013.json")))
+    key = "HLA-" + hla if not hla.startswith("HLA-") else hla
+    if key not in _RIDGE["alleles"]:
+        raise KeyError(f"no trained matrix for {hla!r}; have {sorted(_RIDGE['alleles'])}")
+    p = peptide.upper()
+    if len(p) != 9 or any(c not in "ACDEFGHIKLMNPQRSTVWY" for c in p):
+        raise ValueError("trained matrix scores standard-amino-acid 9-mers only")
+    m = _RIDGE["alleles"][key]
+    z = m["bias"] + sum(m["weights"][str(i)][c] for i, c in enumerate(p))
+    score = max(0.0, min(1.0, z))
+    ic50 = 50000 ** (1 - score)
+    cls = "strong binder" if ic50 < 50 else "weak binder" if ic50 < 500 else "non-binder"
+    return {"peptide": p, "hla": hla, "score": round(score, 3), "predicted_ic50_nM": round(ic50, 1), "class": cls,
+            "method": "ridge PSSM trained on IEDB 2013 measured IC50 (9-mers)",
+            "heldout_pearson_r": m["heldout_pearson_r"], "heldout_auc_ic50_lt_500nM": m["heldout_auc_ic50_lt_500nM"]}
+
+
 def hla_binding(peptide: str, hla: str) -> dict:
-    """Anchor-residue + hydrophobicity binding score. NOT netMHC and not a trained model:
-    5 alleles, hand-set anchor motifs and weights; scores are not IC50 predictions.
+    """HLA binding score. 9-mers use hla_binding_trained (matrix fitted on measured IEDB IC50).
+    Other lengths (8/10/11) fall back to a hand-set anchor heuristic (5 alleles) with
+    no IC50 meaning; the result's "method" field says which was used.
 
     Returns predicted affinity class (strong/weak/non-binder) and 0-1 score.
     """
@@ -21,6 +53,8 @@ def hla_binding(peptide: str, hla: str) -> dict:
         raise KeyError(f"unknown HLA {hla!r}; have {sorted(HLA_SUPERTYPES)}")
     if len(peptide) not in (8, 9, 10, 11):
         raise ValueError("peptide must be 8-11 aa")
+    if len(peptide) == 9 and set(peptide.upper()) <= set("ACDEFGHIKLMNPQRSTVWY"):
+        return hla_binding_trained(peptide, hla)
     spec = HLA_SUPERTYPES[hla]
     p = peptide.upper()
     score = 0.2
