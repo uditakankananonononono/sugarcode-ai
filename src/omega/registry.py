@@ -59,7 +59,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("crispr_cargo", "CRISPR Cargo", "genome-editing",
      "Delivery-system optimization: LNP/AAV serotype selection per payload and tissue, pharmacokinetic concentration models."),
     ("crispr_muse", "CRISPR Muse", "genome-editing",
-     "gRNA generator refined through deterministic simulated feedback loops (not reinforcement learning); multi-PAM compatibility."),
+     "gRNA designer: REINFORCE-style categorical policy over a mechanistic surrogate reward, optional measured-efficiency feedback (no lab validation, no trained deep model); multi-PAM compatibility."),
     ("epi_edit", "Epi-Edit", "genome-editing",
      "Epigenome engineering via CRISPRa/i: chromatin landscape, histone marks and accessibility modeling."),
     ("prime_design", "Prime Design", "genome-editing",

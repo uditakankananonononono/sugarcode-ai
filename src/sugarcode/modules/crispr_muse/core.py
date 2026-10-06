@@ -263,12 +263,25 @@ class MuseAgent:
  def state_dict(self):
   return {"logits":self.logits.tolist(),"baseline":self.baseline,"rounds":self.rounds,"history":self.history,"posterior":self.posterior,"seed":self.seed}
 
-def train_round(agent,background=None,n_samples=32,simulated_lab=True,chromatin=.5):
+def train_round(agent,background=None,n_samples=32,synthetic_noise=0.0,chromatin=.5,measured=None):
+ """One REINFORCE-style policy update.
+
+ Reward = mechanistic surrogate decomposition. Real feedback: pass ``measured``,
+ a {guide: observed_efficiency in [0,1]} mapping from sequencing; guides in it
+ blend their measured value into the reward (0.4 weight). ``synthetic_noise`` (sd,
+ default 0) only jitters the surrogate to exercise exploration; it is NOT lab data and
+ the summary says so. Without ``measured`` the policy only optimises the surrogate.
+ """
+ if synthetic_noise<0: raise ValueError("synthetic_noise must be >= 0")
+ measured=dict(measured or {})
  guides=agent.sample_guides(n_samples); samples=[]
  for g in guides:
-  obs=float(np.clip(score_on_target(g)+agent.rng.normal(0,.08),0,1)) if simulated_lab else None
+  obs=measured.get(g)
+  if obs is None and synthetic_noise>0: obs=float(np.clip(score_on_target(g)+agent.rng.normal(0,synthetic_noise),0,1))
   samples.append((g,agent.reward(g,background=background,observed_efficiency=obs,chromatin=chromatin)))
- summary=agent.update(samples); summary.update({"current_best_guide":agent.best_guide(),"best_guide_on_target":round(score_on_target(agent.best_guide()),3),"pam_compatibility":{k:v["pam"] for k,v in NUCLEASES.items()},"reward_model":"explicit mechanistic/heuristic decomposition; no trained model"}); return summary
+ summary=agent.update(samples)
+ n_meas=sum(1 for g in guides if g in measured)
+ summary.update({"current_best_guide":agent.best_guide(),"best_guide_on_target":round(score_on_target(agent.best_guide()),3),"pam_compatibility":{k:v["pam"] for k,v in NUCLEASES.items()},"reward_model":"explicit mechanistic/heuristic decomposition; no trained model","measured_feedback_samples":n_meas,"feedback_source":("measured sequencing efficiencies blended into reward" if n_meas else ("synthetic noise around surrogate score; NOT lab data" if synthetic_noise>0 else "surrogate reward only; no experimental feedback")),"lab_validated":False}); return summary
 
 def continual_learning_report(agent):
  rewards=[h["mean_reward"] for h in agent.history]
