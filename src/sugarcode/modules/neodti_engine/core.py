@@ -205,23 +205,37 @@ def build_multiplex_graph(drug_targets=None, target_pathways=None, pathway_disea
     return {"nodes":nodes,"index":index,"edges":edges,"node_count":len(nodes),"edge_count":len(edges),"layer_counts":{k:sum(x.startswith(k+':') for x in nodes) for k in ("drug","target","pathway","disease")}}
 
 
-def graph_neural_embeddings(graph: dict, *, dimensions: int=12, layers: int=3, seed: int=7) -> dict:
-    """Run normalized graph convolution message passing on the multiplex graph."""
+def graph_spectral_embeddings(graph: dict, *, dimensions: int=12, layers: int=3) -> dict:
+    """Deterministic spectral embedding of the multiplex graph.
+
+    No neural network, no learned or random weights. Nodes are embedded with
+    the top eigenvectors of the symmetric-normalised adjacency matrix with
+    self loops, D^-1/2 (A+I) D^-1/2, scaled by eigenvalue**layers (``layers``
+    is the number of propagation hops the spectrum is raised to). This is
+    classical graph signal processing / spectral embedding, the same operator
+    a GCN layer applies, minus any weights.
+    """
     import numpy as np
     if dimensions<2 or layers<1: raise ValueError("dimensions >= 2 and layers >= 1 required")
     n=graph["node_count"]; A=np.eye(n)
-    for a,b,_ in graph["edges"]: i,j=graph["index"][a],graph["index"][b]; A[i,j]=A[j,i]=1
-    deg=A.sum(1); norm=A/np.sqrt(deg[:,None]*deg[None,:]); rng=np.random.default_rng(seed); H=rng.normal(0,1,(n,dimensions))
-    for _ in range(layers):
-        W=rng.normal(0,1/dimensions**.5,(dimensions,dimensions)); H=np.tanh(norm@H@W)
-    H/=np.maximum(np.linalg.norm(H,axis=1,keepdims=True),1e-12)
-    return {"embeddings":{node:H[i].tolist() for i,node in enumerate(graph["nodes"])},"dimensions":dimensions,"layers":layers,"method":"normalized graph convolution with typed multiplex topology"}
+    for a_,b_,_ in graph["edges"]: i,j=graph["index"][a_],graph["index"][b_]; A[i,j]=A[j,i]=1
+    deg=A.sum(1); norm=A/np.sqrt(deg[:,None]*deg[None,:])
+    vals,vecs=np.linalg.eigh(norm)
+    k=min(dimensions,n); order=np.argsort(-vals)[:k]
+    H=vecs[:,order]*(np.abs(vals[order])**layers)
+    # eigenvector sign is arbitrary: fix it so output is reproducible
+    for c in range(H.shape[1]):
+        r=int(np.argmax(np.abs(H[:,c])))
+        if H[r,c]<0: H[:,c]=-H[:,c]
+    H=H/np.maximum(np.linalg.norm(H,axis=1,keepdims=True),1e-12)
+    return {"embeddings":{node:H[i].tolist() for i,node in enumerate(graph["nodes"])},"dimensions":int(k),"layers":layers,
+            "method":"spectral embedding of normalised adjacency (deterministic, no trained or random weights)","trained":False,"neural":False}
 
 
 def predict_interactions(disease: str, *, top_n: int=5, dimensions: int=12) -> dict:
     """Rank repurposing candidates with graph embeddings and path resilience."""
     import numpy as np
-    disease=resolve_disease(disease); graph=build_multiplex_graph(); learned=graph_neural_embeddings(graph,dimensions=dimensions); emb=learned["embeddings"]
+    disease=resolve_disease(disease); graph=build_multiplex_graph(); learned=graph_spectral_embeddings(graph,dimensions=dimensions); emb=learned["embeddings"]
     dn=f"disease:{disease}"; candidates=[]
     if dn not in emb: raise ValueError(f"disease {disease!r} absent from graph")
     for drug in DRUG_TARGETS:
@@ -243,7 +257,7 @@ def predict_interactions(disease: str, *, top_n: int=5, dimensions: int=12) -> d
     candidates.sort(key=lambda x:(-x["therapeutic_resilience_index"],x["drug"]))
     out = {"disease":disease,"candidates":candidates[:top_n],"graph":graph,"embedding_model":learned,
            "excluded_zero_path_drugs":zero_path,
-           "model_status":"mechanistic hermetic graph convolution; no trained or therapeutic claim"}
+           "model_status":"mechanistic graph analysis with deterministic spectral embedding; not a trained model; no therapeutic claim"}
     if not candidates:
         out["status"] = (f"no drug in the graph has a target-pathway-disease path to {disease} "
                          "(approved indications excluded); extend the graph rather than rank noise")
