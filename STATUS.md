@@ -5,7 +5,7 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,260 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
+Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,262 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 Truth pass (2026-10-07), honest retractions:
 - neodti_engine: the random-weight GCN is gone. `graph_spectral_embeddings` is a deterministic spectral embedding (no weights, no RNG, not neural, not trained).
@@ -13,7 +13,8 @@ Truth pass (2026-10-07), honest retractions:
 - robotic_flow: liquid-class, evaporation, droplet-bias and reagent-decay coefficients are uncalibrated defaults, now overridable and disclosed in output.
 - crispr_muse: the 'simulated lab' loop was surrogate score plus noise. Now disclosed as surrogate-only; real feedback goes through `measured=`.
 - Renamed in the registry (slugs kept): genomegpt = Genome k-mer & Motif Analyzer, biogpt_lit = Literature Relation Extractor, chemgpt_engine = Fragment Molecule Designer, alpha_fold_ui = Chou-Fasman Structure Sketch & Viewer. None of these is a GPT/AlphaFold-class model.
-- STILL OPEN: bio_copilot, neohunter, rna_decoder, prime_design, dark_genome, str_scope, liquid_biopsy (random-weight, disclosed), bioimage_ai, cellfatenet and the PARTIAL units are not yet rebuilt; spec 'trained ML' claims for them remain unmet. Module/package slugs and docstrings for the four renamed units are not yet renamed.
+- neohunter: HLA scoring is disclosed as an anchor-motif heuristic (5 alleles), not a trained predictor; not yet replaced by a real matrix model.
+- STILL OPEN: bio_copilot, rna_decoder, prime_design, dark_genome, str_scope, liquid_biopsy (random-weight, disclosed), bioimage_ai, cellfatenet and the PARTIAL units are not yet rebuilt; spec 'trained ML' claims for them remain unmet. Module/package slugs and docstrings for the four renamed units are not yet renamed.
 
 Audit-fix drop (third-party repo audit, 2026-09-22):
 - Registry reconciled: **95 modules registered** - the 77 spec modules plus 18

@@ -12,7 +12,8 @@ HYDROPHOBIC = set("AILMFWVY")
 
 
 def hla_binding(peptide: str, hla: str) -> dict:
-    """Anchor-residue + hydrophobicity binding score (netMHC-style heuristic).
+    """Anchor-residue + hydrophobicity binding score. NOT netMHC and not a trained model:
+    5 alleles, hand-set anchor motifs and weights; scores are not IC50 predictions.
 
     Returns predicted affinity class (strong/weak/non-binder) and 0-1 score.
     """
@@ -33,7 +34,8 @@ def hla_binding(peptide: str, hla: str) -> dict:
         score -= 0.15
     score = max(0.0, min(1.0, score))
     cls = "strong binder" if score >= 0.7 else "weak binder" if score >= 0.45 else "non-binder"
-    return {"peptide": p, "hla": hla, "score": round(score, 3), "class": cls}
+    return {"peptide": p, "hla": hla, "score": round(score, 3), "class": cls,
+            "method": "anchor-motif heuristic (5 HLA alleles); not a trained predictor, not IC50"}
 
 
 def _peptides_around(protein: str, pos: int, lengths=(9,)) -> list[str]:
