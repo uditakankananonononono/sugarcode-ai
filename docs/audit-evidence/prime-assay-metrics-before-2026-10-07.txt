@@ -1,0 +1,258 @@
+FFFFFFFFFFFFF                                                            [100%]
+=================================== FAILURES ===================================
+______________ test_hand_calculated_metrics_and_missing_exclusion ______________
+
+    def test_hand_calculated_metrics_and_missing_exclusion():
+>       r=score()(labels(),{'a':(.25,.5,.25),'c':(.5,.5,0)},'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred0] ______________________
+
+pred = {'a': (0.2, 0.2, 0.2), 'c': (0.5, 0.5, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred1] ______________________
+
+pred = {'a': (-0.1, 0.6, 0.5), 'c': (0.5, 0.5, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred2] ______________________
+
+pred = {'a': (nan, 0.5, 0.5), 'c': (0.5, 0.5, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred3] ______________________
+
+pred = {'a': (True, 0, 0), 'c': (0.5, 0.5, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred4] ______________________
+
+pred = {'a': (0.5, 0.5, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________________ test_bad_prediction_contract[pred5] ______________________
+
+pred = {'a': (0.5, 0.5, 0), 'c': (0.5, 0.5, 0), 'wrong': (1, 0, 0)}
+
+    @pytest.mark.parametrize('pred', [
+        {'a':(.2,.2,.2),'c':(.5,.5,0)},
+        {'a':(-.1,.6,.5),'c':(.5,.5,0)},
+        {'a':(float('nan'),.5,.5),'c':(.5,.5,0)},
+        {'a':(True,0,0),'c':(.5,.5,0)},
+        {'a':(.5,.5,0)},
+        {'a':(.5,.5,0),'c':(.5,.5,0),'wrong':(1,0,0)},
+    ])
+    def test_bad_prediction_contract(pred):
+>       with pytest.raises(ValueError):score()(labels(),pred,'HEK',[0,1,2])
+
+tests/test_prime_assay_metrics.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+______________ test_indices_must_be_distinct_and_valid[indices0] _______________
+
+indices = [0, 0]
+
+    @pytest.mark.parametrize('indices',[[0,0],[True],[3],[-1]])
+    def test_indices_must_be_distinct_and_valid(indices):
+>       with pytest.raises(ValueError):score()(labels(),{},'HEK',indices)
+
+tests/test_prime_assay_metrics.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+______________ test_indices_must_be_distinct_and_valid[indices1] _______________
+
+indices = [True]
+
+    @pytest.mark.parametrize('indices',[[0,0],[True],[3],[-1]])
+    def test_indices_must_be_distinct_and_valid(indices):
+>       with pytest.raises(ValueError):score()(labels(),{},'HEK',indices)
+
+tests/test_prime_assay_metrics.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+______________ test_indices_must_be_distinct_and_valid[indices2] _______________
+
+indices = [3]
+
+    @pytest.mark.parametrize('indices',[[0,0],[True],[3],[-1]])
+    def test_indices_must_be_distinct_and_valid(indices):
+>       with pytest.raises(ValueError):score()(labels(),{},'HEK',indices)
+
+tests/test_prime_assay_metrics.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+______________ test_indices_must_be_distinct_and_valid[indices3] _______________
+
+indices = [-1]
+
+    @pytest.mark.parametrize('indices',[[0,0],[True],[3],[-1]])
+    def test_indices_must_be_distinct_and_valid(indices):
+>       with pytest.raises(ValueError):score()(labels(),{},'HEK',indices)
+
+tests/test_prime_assay_metrics.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+__________________ test_missing_prediction_must_not_be_scored __________________
+
+    def test_missing_prediction_must_not_be_scored():
+>       with pytest.raises(ValueError):score()(labels(),{'b':(1,0,0)},'HEK',[1])
+
+tests/test_prime_assay_metrics.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+_____________ test_no_observed_labels_returns_explicit_no_metrics ______________
+
+    def test_no_observed_labels_returns_explicit_no_metrics():
+>       r=score()(labels(),{},'HEK',[1])
+
+tests/test_prime_assay_metrics.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def score():
+>       from sugarcode.modules.prime_design.assay_data import evaluate_outcome_predictions
+E       ImportError: cannot import name 'evaluate_outcome_predictions' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_metrics.py:6: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_prime_assay_metrics.py::test_hand_calculated_metrics_and_missing_exclusion
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred0]
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred1]
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred2]
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred3]
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred4]
+FAILED tests/test_prime_assay_metrics.py::test_bad_prediction_contract[pred5]
+FAILED tests/test_prime_assay_metrics.py::test_indices_must_be_distinct_and_valid[indices0]
+FAILED tests/test_prime_assay_metrics.py::test_indices_must_be_distinct_and_valid[indices1]
+FAILED tests/test_prime_assay_metrics.py::test_indices_must_be_distinct_and_valid[indices2]
+FAILED tests/test_prime_assay_metrics.py::test_indices_must_be_distinct_and_valid[indices3]
+FAILED tests/test_prime_assay_metrics.py::test_missing_prediction_must_not_be_scored
+FAILED tests/test_prime_assay_metrics.py::test_no_observed_labels_returns_explicit_no_metrics
+13 failed in 0.18s

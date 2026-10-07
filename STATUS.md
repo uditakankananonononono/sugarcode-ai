@@ -8,6 +8,24 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 synthetic outcome metric contracts
+
+13 missing-function canaries failed before implementation, now pass. Targeted
+prime: **160 passed, 2 skipped**. Full tests/ across 346 files, four isolated
+batches: **2,570 passed, 15 skipped, 0 failed**. Evidence retained under
+`docs/audit-evidence/prime-assay-metrics-*`.
+
+Added explicit-ID evaluation arithmetic for intended fraction MAE/RMSE, mean
+total variation and squared distribution error. Missing labels excluded, never
+imputed; predictions must match selected observed IDs exactly and be finite,
+nonnegative normalized triples. Invalid/duplicate indices and identities fail.
+Zero observed rows return None metrics. Hand-calculated synthetic case reproduced.
+
+This is an evaluation utility, NOT fitted model performance: no real-data scores,
+fit, count likelihood, uncertainty intervals, calibration or held-out assertion.
+Caller must establish evaluation split provenance separately. Dataset reuse gate
+remains CLOSED. No assay redistribution or clinical/spec validation claims.
+
 ## 2026-10-07 non-fitting assay partition planner
 
 10 missing-planner canaries failed before implementation, now pass. Targeted
