@@ -1,0 +1,10 @@
+Pinned CSV and workbook SHA256 checks passed; all rows joined without normalization
+Records: 22956
+Groups: 11953
+Source commits: {'csv': 'c133c35e205062e766bf515d1766169167e993b9', 'workbook': 'c024f806a9590b1395b85a337276629caac134a5'}
+HEK missing: 337
+HEK test folds: {1: 4524, None: 337, 3: 4520, 2: 4522, 0: 4542, 4: 4511}
+K562 missing: 204
+K562 test folds: {1: 4551, 3: 4559, 2: 4545, 0: 4554, 4: 4543, None: 204}
+DATA_REUSE_UNVERIFIED: no fitting or redistribution approval
+Loader only; no model fitted, no clinical/spec validation
