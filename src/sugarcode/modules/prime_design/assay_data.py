@@ -228,3 +228,76 @@ def load_pridict2_assay(csv_path, workbook_path, *, verify_source=True):
             'source_integrity_verified': verify_source,
             'reuse_status': 'DATA_REUSE_UNVERIFIED: no fitting or redistribution approval',
             'model_status': 'Loader only; no model fitted, no clinical/spec validation'}
+
+
+def plan_pridict2_partition(assay, cell, test_fold, *, validation_fraction=.1,
+                            seed=42):
+    """Plan an additional group-safe validation holdout, without any fitting.
+
+    Original cell-specific test folds are preserved. Validation groups are
+    selected from non-test groups by a stable seeded SHA256 ordering, not the
+    original author's training/validation algorithm. validation_fraction applies
+    to remaining groups, not rows; rounding can change realized row fraction.
+    Empty/single-group training pools cannot form both train and validation and
+    are reported, never silently split a group. The reuse gate stays closed.
+    """
+    from collections.abc import Mapping
+    if cell not in CELLS or type(test_fold) is not int or not 0 <= test_fold <= 4:
+        raise ValueError('cell must be HEK/K562 and test_fold an integer 0-4')
+    if (isinstance(validation_fraction, bool) or
+            not isinstance(validation_fraction, (int, float)) or
+            not math.isfinite(validation_fraction) or not 0 < validation_fraction < 1):
+        raise ValueError('validation_fraction must be finite and strictly between zero and one')
+    if type(seed) is not int:
+        raise ValueError('seed must be integer')
+    if not isinstance(assay, Mapping) or not isinstance(assay.get('records'), list):
+        raise ValueError('assay must contain records list')
+    groups, missing, seen = {}, [], set()
+    for i, row in enumerate(assay['records']):
+        if not isinstance(row, Mapping):
+            raise ValueError('record must be mapping')
+        identity, group = row.get('seq_id'), row.get('grp_id')
+        if not isinstance(identity, str) or not identity or identity in seen or not isinstance(group, str) or not group:
+            raise ValueError('record identity/group invalid or duplicated')
+        seen.add(identity)
+        outcomes, folds = row.get('outcomes'), row.get('test_folds')
+        if not isinstance(outcomes, Mapping) or cell not in outcomes or not isinstance(folds, Mapping) or cell not in folds:
+            raise ValueError('record requires selected cell outcome and fold')
+        value, fold = outcomes[cell], folds[cell]
+        if value is None:
+            if fold is not None:
+                raise ValueError('missing outcome requires missing fold')
+            missing.append(i)
+            continue
+        if (not isinstance(value, (tuple, list)) or len(value) != 3 or
+                any(isinstance(v, bool) or not isinstance(v, (int, float)) or
+                    not math.isfinite(v) or not 0 <= v <= 1 for v in value) or
+                not math.isclose(sum(value), 1, rel_tol=0, abs_tol=1e-7)):
+            raise ValueError('selected cell outcomes invalid')
+        if type(fold) is not int or not 0 <= fold <= 4:
+            raise ValueError('nonmissing outcome requires integer fold 0-4')
+        if group not in groups:
+            groups[group] = {'fold': fold, 'indices': []}
+        if groups[group]['fold'] != fold:
+            raise ValueError('group leakage across folds')
+        groups[group]['indices'].append(i)
+    available = [g for g in groups if groups[g]['fold'] != test_fold]
+    available.sort(key=lambda g: (hashlib.sha256(f'{seed}:{g}'.encode()).digest(), g))
+    count = min(len(available)-1, max(1, math.floor(len(available)*validation_fraction+.5))) if len(available) >= 2 else 0
+    validation_groups = set(available[:count])
+    result = {'train': [], 'validation': [], 'test': [], 'excluded_missing': missing}
+    for group, info in groups.items():
+        destination = ('test' if info['fold'] == test_fold else
+                       'validation' if group in validation_groups else 'train')
+        result[destination].extend(info['indices'])
+    for key in ('train', 'validation', 'test'):
+        result[key].sort()
+    result.update(cell=cell, test_fold=test_fold, seed=seed,
+                  validation_fraction_requested=validation_fraction,
+                  validation_group_count=count,
+                  non_test_group_count=len(available),
+                  partition_status=('ready' if len(available) >= 2 else 'insufficient groups for train and validation'),
+                  fitting_permitted=False,
+                  reuse_status='DATA_REUSE_UNVERIFIED: fitting/redistribution gate CLOSED',
+                  method='original cell test folds; stable SHA256 group validation holdout')
+    return result
