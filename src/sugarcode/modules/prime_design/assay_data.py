@@ -84,14 +84,21 @@ def load_pridict2_csv(path, *, verify_source=True):
     into SugarCode's design coordinate system. Full pegRNA strings and folds need
     the supplementary workbook. No missing outcome is imputed or normalized.
     """
+    if type(verify_source) is not bool:
+        raise ValueError('verify_source must be boolean')
     if verify_source:
         _verify(path, CSV_SHA256)
     records, seen = [], set()
     with Path(path).open(newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f)
-        if not _REQUIRED <= set(reader.fieldnames or ()):
+        fields = reader.fieldnames or ()
+        if len(set(fields)) != len(fields):
+            raise ValueError('duplicate CSV headers')
+        if not _REQUIRED <= set(fields):
             raise ValueError('missing required PRIDICT2 columns')
         for row in reader:
+            if None in row or any(v is None for v in row.values()):
+                raise ValueError('CSV row width differs from schema')
             identity, group = row['seq_id'], row['grp_id']
             if not identity or identity in seen or not group:
                 raise ValueError('empty or duplicate identity / empty group')
@@ -144,13 +151,27 @@ def _workbook_rows(path):
                         raise ValueError('formula cells not accepted as measured assay values')
                     value = c.find('s:v', _NS)
                     text = value.text if value is not None else ''.join(c.itertext())
+                    if c.get('t') == 'e':
+                        text = None  # Preserve spreadsheet errors as missing, never literal labels.
                     if c.get('t') == 's':
-                        text = shared[int(text)]
+                        try:
+                            index = int(text)
+                        except (ValueError, TypeError) as exc:
+                            raise ValueError('invalid workbook shared-string index') from exc
+                        if not 0 <= index < len(shared):
+                            raise ValueError('workbook shared-string index outside table')
+                        text = shared[index]
                     column = ''.join(filter(str.isalpha, c.get('r', '')))
+                    if not column or column in values:
+                        raise ValueError('invalid or duplicate workbook cell reference')
                     values[column] = text
                 if header is None:
+                    if not values or any(v is None for v in values.values()) or len(set(values.values())) != len(values):
+                        raise ValueError('empty or duplicate workbook headers')
                     header = values
                 else:
+                    if not set(values) <= set(header):
+                        raise ValueError('workbook value outside header schema')
                     yield {header[k]: v for k, v in values.items() if k in header}
                 element.clear()
 

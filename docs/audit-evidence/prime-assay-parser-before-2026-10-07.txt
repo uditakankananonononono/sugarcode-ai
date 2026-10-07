@@ -1,0 +1,300 @@
+.FF.F.FFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+____ test_invalid_workbook_cells_fail_closed[<c r="A2" t="s"><v>-1</v></c>] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa0')
+cell = '<c r="A2" t="s"><v>-1</v></c>'
+
+    @pytest.mark.parametrize('cell',[
+        '<c r="A2" t="s"><v>-1</v></c>',
+        '<c r="A2" t="s"><v>99</v></c>',
+        '<c r="A2" t="s"><v>bad</v></c>',
+        '<c r="A2" t="e"><v>#VALUE!</v></c>',
+        '<c r="A2"><f>1+1</f><v>2</v></c>',
+        '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>',
+        '<c r="B2"><v>1</v></c>',
+    ])
+    def test_invalid_workbook_cells_fail_closed(tmp_path,cell):
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,cell)))
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_assay_parser.py:34: Failed
+____ test_invalid_workbook_cells_fail_closed[<c r="A2" t="s"><v>99</v></c>] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa1')
+cell = '<c r="A2" t="s"><v>99</v></c>'
+
+    @pytest.mark.parametrize('cell',[
+        '<c r="A2" t="s"><v>-1</v></c>',
+        '<c r="A2" t="s"><v>99</v></c>',
+        '<c r="A2" t="s"><v>bad</v></c>',
+        '<c r="A2" t="e"><v>#VALUE!</v></c>',
+        '<c r="A2"><f>1+1</f><v>2</v></c>',
+        '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>',
+        '<c r="B2"><v>1</v></c>',
+    ])
+    def test_invalid_workbook_cells_fail_closed(tmp_path,cell):
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,cell)))
+
+tests/test_prime_assay_parser.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa1/synthetic.xlsx')
+
+    def _workbook_rows(path):
+        """Read values only; never execute formulas, macros, links or pickle payloads."""
+        with ZipFile(path) as z:
+            if sum(i.file_size for i in z.infolist()) > 300_000_000:
+                raise ValueError('workbook exceeds decompressed resource limit')
+            workbook = ET.fromstring(z.read('xl/workbook.xml'))
+            sheets = workbook.findall('s:sheets/s:sheet', _NS)
+            if len(sheets) != 1 or sheets[0].get('name') != 'final_df_with_splits':
+                raise ValueError('unexpected workbook sheet layout')
+            shared = []
+            with z.open('xl/sharedStrings.xml') as f:
+                for _, element in ET.iterparse(f, events=('end',)):
+                    if element.tag.endswith('}si'):
+                        shared.append(''.join(element.itertext()))
+                        element.clear()
+            header = None
+            with z.open('xl/worksheets/sheet1.xml') as f:
+                for _, element in ET.iterparse(f, events=('end',)):
+                    if not element.tag.endswith('}row'):
+                        continue
+                    values = {}
+                    for c in element.findall('s:c', _NS):
+                        if c.find('s:f', _NS) is not None:
+                            raise ValueError('formula cells not accepted as measured assay values')
+                        value = c.find('s:v', _NS)
+                        text = value.text if value is not None else ''.join(c.itertext())
+                        if c.get('t') == 's':
+>                           text = shared[int(text)]
+E                           IndexError: list index out of range
+
+src/sugarcode/modules/prime_design/assay_data.py:148: IndexError
+_ test_invalid_workbook_cells_fail_closed[<c r="A2" t="e"><v>#VALUE!</v></c>] __
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa3')
+cell = '<c r="A2" t="e"><v>#VALUE!</v></c>'
+
+    @pytest.mark.parametrize('cell',[
+        '<c r="A2" t="s"><v>-1</v></c>',
+        '<c r="A2" t="s"><v>99</v></c>',
+        '<c r="A2" t="s"><v>bad</v></c>',
+        '<c r="A2" t="e"><v>#VALUE!</v></c>',
+        '<c r="A2"><f>1+1</f><v>2</v></c>',
+        '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>',
+        '<c r="B2"><v>1</v></c>',
+    ])
+    def test_invalid_workbook_cells_fail_closed(tmp_path,cell):
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,cell)))
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_assay_parser.py:34: Failed
+_ test_invalid_workbook_cells_fail_closed[<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>] _
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa5')
+cell = '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>'
+
+    @pytest.mark.parametrize('cell',[
+        '<c r="A2" t="s"><v>-1</v></c>',
+        '<c r="A2" t="s"><v>99</v></c>',
+        '<c r="A2" t="s"><v>bad</v></c>',
+        '<c r="A2" t="e"><v>#VALUE!</v></c>',
+        '<c r="A2"><f>1+1</f><v>2</v></c>',
+        '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>',
+        '<c r="B2"><v>1</v></c>',
+    ])
+    def test_invalid_workbook_cells_fail_closed(tmp_path,cell):
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,cell)))
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_assay_parser.py:34: Failed
+_______ test_invalid_workbook_cells_fail_closed[<c r="B2"><v>1</v></c>] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_invalid_workbook_cells_fa6')
+cell = '<c r="B2"><v>1</v></c>'
+
+    @pytest.mark.parametrize('cell',[
+        '<c r="A2" t="s"><v>-1</v></c>',
+        '<c r="A2" t="s"><v>99</v></c>',
+        '<c r="A2" t="s"><v>bad</v></c>',
+        '<c r="A2" t="e"><v>#VALUE!</v></c>',
+        '<c r="A2"><f>1+1</f><v>2</v></c>',
+        '<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>',
+        '<c r="B2"><v>1</v></c>',
+    ])
+    def test_invalid_workbook_cells_fail_closed(tmp_path,cell):
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,cell)))
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_assay_parser.py:34: Failed
+___________________ test_duplicate_workbook_headers_rejected ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_duplicate_workbook_header0')
+
+    def test_duplicate_workbook_headers_rejected(tmp_path):
+        header='<c r="A1" t="inlineStr"><is><t>field</t></is></c><c r="B1" t="inlineStr"><is><t>field</t></is></c>'
+>       with pytest.raises(ValueError):list(_workbook_rows(book(tmp_path,'<c r="A2"><v>1</v></c>',header=header)))
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_assay_parser.py:39: Failed
+______________________ test_duplicate_csv_header_rejected ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_duplicate_csv_header_reje0')
+
+    def test_duplicate_csv_header_rejected(tmp_path):
+        from sugarcode.modules.prime_design.assay_data import _REQUIRED
+        keys=sorted(_REQUIRED)+['seq_id'];p=tmp_path/'dup.csv'
+        p.write_text(','.join(keys)+'\n'+','.join(['x']*len(keys))+'\n')
+>       with pytest.raises(ValueError,match='duplicate'):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'duplicate'
+E         Actual message: 'assay sequence must be nonempty unambiguous uppercase DNA'
+
+tests/test_prime_assay_parser.py:46: AssertionError
+_______________ test_integrity_flag_requires_explicit_bool[None] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e0')
+flag = None
+
+    @pytest.mark.parametrize('flag',[None,0,1,'false'])
+    def test_integrity_flag_requires_explicit_bool(tmp_path,flag):
+        with pytest.raises(ValueError,match='boolean'):
+>           load_pridict2_csv(tmp_path/'nonexistent.csv',verify_source=flag)
+
+tests/test_prime_assay_parser.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/prime_design/assay_data.py:90: in load_pridict2_csv
+    with Path(path).open(newline='', encoding='utf-8-sig') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e0/nonexistent.csv')
+mode = 'r', buffering = -1, encoding = 'utf-8-sig', errors = None, newline = ''
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return self._accessor.open(self, mode, buffering, encoding, errors,
+                                   newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e0/nonexistent.csv'
+
+/usr/lib/python3.10/pathlib.py:1119: FileNotFoundError
+________________ test_integrity_flag_requires_explicit_bool[0] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e1')
+flag = 0
+
+    @pytest.mark.parametrize('flag',[None,0,1,'false'])
+    def test_integrity_flag_requires_explicit_bool(tmp_path,flag):
+        with pytest.raises(ValueError,match='boolean'):
+>           load_pridict2_csv(tmp_path/'nonexistent.csv',verify_source=flag)
+
+tests/test_prime_assay_parser.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/prime_design/assay_data.py:90: in load_pridict2_csv
+    with Path(path).open(newline='', encoding='utf-8-sig') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e1/nonexistent.csv')
+mode = 'r', buffering = -1, encoding = 'utf-8-sig', errors = None, newline = ''
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return self._accessor.open(self, mode, buffering, encoding, errors,
+                                   newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e1/nonexistent.csv'
+
+/usr/lib/python3.10/pathlib.py:1119: FileNotFoundError
+________________ test_integrity_flag_requires_explicit_bool[1] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e2')
+flag = 1
+
+    @pytest.mark.parametrize('flag',[None,0,1,'false'])
+    def test_integrity_flag_requires_explicit_bool(tmp_path,flag):
+        with pytest.raises(ValueError,match='boolean'):
+>           load_pridict2_csv(tmp_path/'nonexistent.csv',verify_source=flag)
+
+tests/test_prime_assay_parser.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/prime_design/assay_data.py:88: in load_pridict2_csv
+    _verify(path, CSV_SHA256)
+src/sugarcode/modules/prime_design/assay_data.py:31: in _verify
+    with Path(path).open('rb') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e2/nonexistent.csv')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return self._accessor.open(self, mode, buffering, encoding, errors,
+                                   newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e2/nonexistent.csv'
+
+/usr/lib/python3.10/pathlib.py:1119: FileNotFoundError
+______________ test_integrity_flag_requires_explicit_bool[false] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e3')
+flag = 'false'
+
+    @pytest.mark.parametrize('flag',[None,0,1,'false'])
+    def test_integrity_flag_requires_explicit_bool(tmp_path,flag):
+        with pytest.raises(ValueError,match='boolean'):
+>           load_pridict2_csv(tmp_path/'nonexistent.csv',verify_source=flag)
+
+tests/test_prime_assay_parser.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/prime_design/assay_data.py:88: in load_pridict2_csv
+    _verify(path, CSV_SHA256)
+src/sugarcode/modules/prime_design/assay_data.py:31: in _verify
+    with Path(path).open('rb') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e3/nonexistent.csv')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return self._accessor.open(self, mode, buffering, encoding, errors,
+                                   newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-sandbox/pytest-92/test_integrity_flag_requires_e3/nonexistent.csv'
+
+/usr/lib/python3.10/pathlib.py:1119: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_prime_assay_parser.py::test_invalid_workbook_cells_fail_closed[<c r="A2" t="s"><v>-1</v></c>]
+FAILED tests/test_prime_assay_parser.py::test_invalid_workbook_cells_fail_closed[<c r="A2" t="s"><v>99</v></c>]
+FAILED tests/test_prime_assay_parser.py::test_invalid_workbook_cells_fail_closed[<c r="A2" t="e"><v>#VALUE!</v></c>]
+FAILED tests/test_prime_assay_parser.py::test_invalid_workbook_cells_fail_closed[<c r="A2"><v>1</v></c><c r="A2"><v>2</v></c>]
+FAILED tests/test_prime_assay_parser.py::test_invalid_workbook_cells_fail_closed[<c r="B2"><v>1</v></c>]
+FAILED tests/test_prime_assay_parser.py::test_duplicate_workbook_headers_rejected
+FAILED tests/test_prime_assay_parser.py::test_duplicate_csv_header_rejected
+FAILED tests/test_prime_assay_parser.py::test_integrity_flag_requires_explicit_bool[None]
+FAILED tests/test_prime_assay_parser.py::test_integrity_flag_requires_explicit_bool[0]
+FAILED tests/test_prime_assay_parser.py::test_integrity_flag_requires_explicit_bool[1]
+FAILED tests/test_prime_assay_parser.py::test_integrity_flag_requires_explicit_bool[false]
+11 failed, 3 passed in 0.28s

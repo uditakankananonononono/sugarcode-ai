@@ -1,0 +1,7 @@
+Initial synthetic parser checks rejected every spreadsheet error cell.
+Real pinned workbook execution then failed on optional beforeafteredit cells.
+Reading source cell types counted 6237 errors in beforeafteredit only.
+Corrected parser to preserve error cells as None, not literal #VALUE! labels.
+Header errors and required field errors remain invalid through downstream checks.
+Revised optional-error test accordingly; no measured outcomes fabricated.
+Reran real joined ingestion and all four full-suite batches after correction.
