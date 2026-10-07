@@ -1,0 +1,23 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_stochastic_validation_is_simulation_frequency_not_biological_success ___
+
+    def test_stochastic_validation_is_simulation_frequency_not_biological_success():
+        from sugarcode.modules.cellfatenet.core import stochastic_validate
+        r=stochastic_validate({}, {'TNNT2':1}, [], replicates=2, noise=0)
+>       assert r['status']=='Simulated target-similarity threshold frequency, not biological success probability'
+E       KeyError: 'status'
+
+tests/test_cellfate_execution_canaries.py:36: KeyError
+_______ test_model_does_not_silently_validate_an_empty_or_unknown_target _______
+
+    def test_model_does_not_silently_validate_an_empty_or_unknown_target():
+        from sugarcode.modules.cellfatenet.core import stochastic_validate
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:41: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_stochastic_validation_is_simulation_frequency_not_biological_success
+FAILED tests/test_cellfate_execution_canaries.py::test_model_does_not_silently_validate_an_empty_or_unknown_target
+2 failed, 16 deselected in 0.40s
