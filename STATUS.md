@@ -8,6 +8,20 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 serialized classifier contract
+
+6 new cases: **4 reproduced before failures, 2 already passing** (numeric classes
+already failed during evaluation and parameters already remained unchanged).
+Targeted classifier tests: **19 passed**. Full tests/ across 338 files, four isolated
+batches: **2,454 passed, 15 skipped, 0 failed**. Evidence in
+`docs/audit-evidence/fitted-contract-*`.
+
+Stored fitted models now require unique feature names, string classes, positive
+integer per-class counts matching class set and training sample total. Prediction
+returns the exact feature schema instead of silently dropping order information.
+This is serialization/inference validation, not measurement provenance or clinical
+validation. Callers still must supply columns in that reported order.
+
 ## 2026-10-07 fixed-support control refit
 
 1 new case, **1 reproduced before failure**, now passing. Targeted control/fate:

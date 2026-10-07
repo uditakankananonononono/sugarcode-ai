@@ -73,11 +73,20 @@ def predict_multiomics_classifier(model,X):
         len(set(classes))!=len(classes) or not np.isfinite(mean).all() or not np.isfinite(scale).all() or
         not np.isfinite(weights).all() or not np.isfinite(intercept).all() or np.any(scale<=0)):
         raise ValueError('model shapes/classes/finite parameters do not match features')
+    names=model.get('feature_names')
+    counts=model.get('class_counts')
+    if (any(not isinstance(c,str) or not c for c in classes) or
+        not isinstance(names,list) or len(names)!=x.shape[1] or
+        any(not isinstance(name,str) or not name for name in names) or len(set(names))!=len(names) or
+        not isinstance(counts,dict) or set(counts)!=set(classes) or
+        any(isinstance(value,bool) or not isinstance(value,int) or value<1 for value in counts.values()) or
+        sum(counts.values())!=model.get('sample_count')):
+        raise ValueError('stored feature/class counts schema is invalid')
     logits=((x-mean)/scale)@weights+intercept
     if not np.isfinite(logits).all():
         raise ValueError('prediction overflow')
     probabilities=np.exp(logits-logsumexp(logits,axis=1,keepdims=True))
-    return {'classes':classes,'probabilities':probabilities.tolist(),
+    return {'classes':classes,'feature_names':list(names),'probabilities':probabilities.tolist(),
             'predicted_labels':[classes[i] for i in probabilities.argmax(1)],
             'scope':'Fitted label-class softmax scores, not clinical calibrated probabilities'}
 
