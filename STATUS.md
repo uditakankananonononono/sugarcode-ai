@@ -8,6 +8,22 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 end-to-end evidence wiring
+
+2 new cases, **2 reproduced before failures**, now passing. Targeted position/
+liquid/multiomics tests: **22 passed**. Full tests/ across 336 files, four isolated
+batches: **2,447 passed, 15 skipped, 0 failed**. Evidence in
+`docs/audit-evidence/position-aggregation-*`.
+
+Build-out: report candidates are unique supplied position indices aggregated
+across fragments, not flattened fragment rows masquerading as separate variant
+loci. Reports mean support/heuristic score and observed supporting/total fragment
+counts under an explicit hand-set support threshold. These are feature summaries,
+NOT variant allele counts, genomic variant identity or somatic origin. Metrics count
+positions rather than duplicated fragments. Optional fitted multiomics model,
+matched-normal depth and measured junction evidence now reach the end-to-end path,
+not merely isolated helper functions. No clinical model validation is implied.
+
 ## 2026-10-07 fragment-bootstrap uncertainty build-out
 
 6 new cases, **6 reproduced before failures**, now passing. Targeted bootstrap/
