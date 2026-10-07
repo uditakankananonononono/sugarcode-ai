@@ -8,6 +8,24 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 prime pegRNA thermodynamic secondary structure
+
+5 new cases: **4 reproduced before failures, 1 already passing** (empty sequence
+rejected). Targeted prime suite: **51 passed**. Full tests/ across 339 files,
+four isolated batches: **2,459 passed, 15 skipped, 0 failed**. Evidence retained
+in `docs/audit-evidence/prime-fold-*`.
+
+Built actual ViennaRNA Turner 2004 pegRNA RNA folding with dot-bracket, compatible
+pairs and MFE; longest contiguous stem and paired fraction now measured from that
+structure rather than self-complement shifts allowing overlapping incompatible
+stems. min_stem is validated and reports qualifying stems. Unambiguous sequence
+and 2000-base resource limit enforced; free optional ViennaRNA dependency required.
+
+Remaining penalty is explicitly uncalibrated, not editing efficiency. This is RNA
+secondary structure, NOT DNA/RNA PBS duplex thermodynamics, modified-base folding,
+experimental structure or validated prime-edit efficacy. PBS/repair/outcome models
+remain OPEN/unfitted; no spec completion claimed.
+
 ## 2026-10-07 serialized classifier contract
 
 6 new cases: **4 reproduced before failures, 2 already passing** (numeric classes
