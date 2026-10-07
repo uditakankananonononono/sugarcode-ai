@@ -60,7 +60,13 @@ def find_strs(seq: str, min_unit: int = 1, max_unit: int = 6, min_repeats: int =
     and the full periodic span including partial units at either edge.
     """
     import numpy as np
-    s = clean_dna(seq)
+    if any(isinstance(x,bool) or not isinstance(x,int) for x in (min_unit,max_unit,min_repeats)) or not 1 <= min_unit <= max_unit or min_repeats < 2:
+        raise ValueError('integer unit range 1 <= min_unit <= max_unit and min_repeats >= 2 required')
+    if not isinstance(seq,str):
+        raise ValueError('sequence must be text')
+    s = ''.join(seq.split()).upper()
+    if set(s)-set('ACGTN'):
+        raise ValueError('unsupported sequence symbols')
     n = len(s)
     if n == 0:
         return []
@@ -76,7 +82,7 @@ def find_strs(seq: str, min_unit: int = 1, max_unit: int = 6, min_repeats: int =
         keep = (ends - starts + u) >= min_repeats * u
         for j0, j1 in zip(starts[keep].tolist(), ends[keep].tolist()):
             unit = s[j0:j0 + u]
-            if _min_period(unit) < u:
+            if 'N' in unit or _min_period(unit) < u:
                 continue  # homopolymers / lower-period runs are reported at their own period
             cand = _phase_normalize(s, j0, u)
             if cand["repeats"] >= min_repeats:
@@ -132,6 +138,12 @@ def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "",
     those bands; the generic delta rule otherwise mislabels e.g. HTT 27-28 as
     normal and FMR1 premutations (55-200) as pathogenic full expansions.
     """
+    if any(isinstance(x,bool) or not isinstance(x,int) or x < 0 for x in (sample_repeats,reference_repeats)):
+        raise ValueError('repeat counts must be nonnegative integers')
+    if locus and locus.upper() in LOCUS_BANDS:
+        expected = {'HTT':'CAG','FMR1':'CGG'}[locus.upper()]
+        if not unit or expected not in _motif_class(unit):
+            raise ValueError('repeat motif does not match supplied disease locus')
     delta = sample_repeats - reference_repeats
     bands = LOCUS_BANDS.get((locus or "").upper())
     if bands:
@@ -139,16 +151,18 @@ def expansion_call(sample_repeats: int, reference_repeats: int, unit: str = "",
     elif delta <= 2:
         cls = "normal range"
     elif delta <= 10:
-        cls = "intermediate / premutation range"
+        cls = "moderate repeat-count increase"
     else:
-        cls = "expanded - pathogenic-range candidate"
+        cls = "expanded repeat-count comparison"
     out = {
         "unit": unit,
         "reference_repeats": reference_repeats,
         "sample_repeats": sample_repeats,
         "delta": delta,
         "classification": cls,
-        "instability_risk": round(1 - math.exp(-max(delta, 0) / 12.0), 3),
+        "instability_risk": None,
+        "status": "Published locus repeat band only; not individual disease prediction" if bands else
+                  "Generic repeat-count comparison only; no disease or instability model",
     }
     if bands:
         out["locus"] = locus.upper()
@@ -229,20 +243,27 @@ def diagnostic_index(str_loci: list[dict], repair_pathway_links: int = 0,
 import numpy as np
 
 def reconstruct_repeat_reads(reads,motif):
-    motif=clean_dna(motif); rows=[]
+    """Anchored sequence tract reconstruction, not an aligned long-read caller.
+
+    Require >=2 exact consecutive units. Extend across <=1 substitution/unit,
+    retaining only tract ends on exact units. No indel alignment or base qualities.
+    """
+    motif = clean_dna(motif)
+    if 'N' in motif:
+        raise ValueError('motif must be unambiguous DNA')
+    rows = []
     for rid,read in enumerate(reads):
-        s=clean_dna(read); best={'repeat_count':0,'start':None,'interruptions':[]}
-        for frame in range(len(motif)):
-            chunks=[s[i:i+len(motif)] for i in range(frame,len(s)-len(motif)+1,len(motif))]; runs=[]; start=0
-            for i,c in enumerate(chunks+['END']):
-                if c==motif or (len(c)==len(motif) and sum(a!=b for a,b in zip(c,motif))<=1): continue
-                if i>start: runs.append((start,i,chunks[start:i]))
-                start=i+1
-            if runs:
-                a,b,cs=max(runs,key=lambda x:x[1]-x[0]); ints=[{'repeat_index':j,'observed':c} for j,c in enumerate(cs) if c!=motif]
-                if b-a>best['repeat_count']: best={'repeat_count':b-a,'start':frame+a*len(motif),'interruptions':ints}
-        rows.append({'read_id':rid,**best,'purity':1-len(best['interruptions'])/max(1,best['repeat_count'])})
-    counts=np.array([r['repeat_count'] for r in rows],float); return {'reads':rows,'molecule_count':len(rows),'median_repeats':float(np.median(counts)) if len(counts) else 0,'mosaicism_std':float(counts.std()) if len(counts) else 0}
+        s = clean_dna(read)
+        tract = locus_architecture(s,motif,flank=0)
+        count = tract['repeat_count']
+        rows.append({'read_id':rid,'repeat_count':count,'start':tract.get('start'),
+                     'interruptions':tract['interruptions'],'purity':tract['purity'],
+                     'status':'anchored sequence tract' if count else 'no anchored tract'})
+    counts = np.array([r['repeat_count'] for r in rows],float)
+    return {'reads':rows,'molecule_count':len(rows),
+            'median_repeats':float(np.median(counts)) if counts.size else 0.,
+            'mosaicism_std':float(counts.std()) if counts.size else 0.,
+            'status':'Sequence tract dispersion only; no allele phasing, quality/indel model or demonstrated somatic mosaicism'}
 
 def locus_architecture(sequence,motif,flank=20,max_mismatch=1):
     """Locus repeat architecture with interruption-tolerant tract extension.
@@ -262,7 +283,7 @@ def locus_architecture(sequence,motif,flank=20,max_mismatch=1):
             if r>best[0]: best=(r,i0)
     if best[0]<2: return empty
     h={'repeats':best[0]}; start,end=best[1],best[1]+best[0]*u
-    def ok(c): return len(c)==u and sum(x!=y for x,y in zip(c,motif))<=max_mismatch
+    def ok(c): return len(c)==u and 'N' not in c and sum(x!=y for x,y in zip(c,motif))<=max_mismatch
     while end+u<=len(s) and ok(s[end:end+u]): end+=u
     while start-u>=0 and ok(s[start-u:start]): start-=u
     while end-start>u and s[end-u:end]!=motif: end-=u
@@ -311,7 +332,7 @@ def str_diagnostics(report):
        'motif_gc_fraction':gc,'left_flank_gc':_gc(a.get('left_flank','')),'right_flank_gc':_gc(a.get('right_flank','')),
        'hot_motif':float(any(m in _motif_class(motif) for m in _HOT_MOTIFS)) if motif else 0.0,
        'reference_repeats':float(ref),'delta_vs_reference':n_rep-ref,'fold_over_reference':n_rep/ref if ref else 0.0,
-       'expansion_call_risk':expansion_call(int(n_rep),ref,motif)['instability_risk'],
+       'repeat_delta_vs_reference':float(n_rep-ref),
        'molecule_count':float(sm['molecule_count'] if sm else 0),'median_read_repeats':float(sm['median_repeats'] if sm else 0),
        'mosaicism_std':float(sm['mosaicism_std'] if sm else 0),'read_repeat_min':float(rc.min()),'read_repeat_max':float(rc.max()),
        'read_repeat_range':float(np.ptp(rc)),'read_mean_purity':float(rp.mean()),'read_min_purity':float(rp.min()),
