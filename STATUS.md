@@ -8,6 +8,35 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 cell-fate simulation execution contract
+
+18 new cases: **15 reproduced ordinary failures, 1 solver hang on NaN horizon**
+(terminated at 5 seconds in the per-case evidence runner), **2 already passing**.
+All 18 now pass. Targeted cell-fate: **25 passed**. Full tests/ across 327 files,
+four isolated batches: **2,374 passed, 15 skipped, 0 failed**. Evidence in
+`docs/audit-evidence/cellfate-*`; failures and timeout are counted separately.
+
+Built out a checked numerical simulation contract: known finite gene/state inputs,
+positive finite time, nonnegative noise/concentrations, positive trajectory count,
+epigenetic fractions in [0,1], complete finite solver results. Repression now
+increases degradation instead of subtracting production until concentrations turn
+negative. This changes the hand-set model semantics; it is NOT fitted biology.
+
+Returned control objective now evaluates the selected sparse controls actually
+returned, not discarded dense optimization variables. Dense-relaxation objective
+is preserved separately. Recipe times are all zero: the simulation executes
+simultaneous constant controls, NOT the formerly invented staggered schedule.
+Solver text discloses dense relaxation plus top-factor truncation, not a sparse
+global optimum. Targets must name known nodes. Noise sensitivity explicitly says
+simulated threshold frequency, NOT biological success probability, and reports its
+72-hour horizon (distinct from the deterministic planner horizon).
+
+Named downgrades: removed specification-complete/causal-network wording; network
+is hand-curated signed edges, not learned causal identification. This remains a
+hand-set GRN simulator. Experimental cell-fate prediction, trained GRN, sparse
+optimal control, sequential scheduling, stable-attractor verification and real
+reprogramming validation are OPEN.
+
 ## 2026-10-07 microscopy measurement robustness
 
 11 new cases, **11 reproduced failures**, now passing. Targeted microscopy:

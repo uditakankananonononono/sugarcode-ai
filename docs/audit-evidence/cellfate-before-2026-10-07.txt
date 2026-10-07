@@ -1,0 +1,271 @@
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs0]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_simulation_rejects_invalid_domain_before_solving[kwargs0] ________
+
+kwargs = {'hours': 0}
+
+    @pytest.mark.parametrize('kwargs',[{'hours':0},{'hours':-1},{'hours':np.nan},{'trajectories':0},{'trajectories':True},{'noise':-1},{'noise':np.nan}])
+    def test_simulation_rejects_invalid_domain_before_solving(kwargs):
+        with pytest.raises(ValueError):
+>           simulate_fate({'OCT4':1},**kwargs)
+
+tests/test_cellfate_execution_canaries.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+initial = array([0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+       0.05, 1.  , 0.05, 0.05, 0.05, 0.05, 0.05])
+hours = 0, controls = {}, accessibility = None, methylation = None, noise = 0.0
+seed = 9, trajectories = 1
+
+    def simulate_fate(initial, *, hours=72, controls=None, accessibility=None,
+                      methylation=None, noise=0.0, seed=9, trajectories=1):
+        """Nonlinear Hill-GRN SDE ensemble with epigenetic gate and controls."""
+        nodes,W=grn_matrix(); n=len(nodes); initial=np.array([initial.get(x,0.05) for x in nodes],float)
+        controls=controls or {}; u=np.array([controls.get(x,0) for x in nodes],float)
+        access=np.ones(n) if accessibility is None else np.array([accessibility.get(x,1) for x in nodes],float)
+        meth=np.zeros(n) if methylation is None else np.array([methylation.get(x,0) for x in nodes],float)
+        gate=access*(1-meth); t=np.linspace(0,hours,289); rng=np.random.default_rng(seed); ensemble=[]
+        for rep in range(trajectories):
+            def rhs(_,x):
+                xp=np.maximum(x,0); signal=W@(xp*xp/(.25+xp*xp)); production=1/(1+np.exp(-6*(signal-.5))); return gate*production+u-.35*x
+>           y=solve_ivp(rhs,(0,hours),initial,t_eval=t,rtol=1e-7,atol=1e-9).y.T
+E           AttributeError: 'list' object has no attribute 'T'
+
+src/sugarcode/modules/cellfatenet/core.py:105: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs0]
+1 failed in 0.30s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs1]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_simulation_rejects_invalid_domain_before_solving[kwargs1] ________
+
+kwargs = {'hours': -1}
+
+    @pytest.mark.parametrize('kwargs',[{'hours':0},{'hours':-1},{'hours':np.nan},{'trajectories':0},{'trajectories':True},{'noise':-1},{'noise':np.nan}])
+    def test_simulation_rejects_invalid_domain_before_solving(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:7: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs1]
+1 failed in 0.29s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs2]
+TIMEOUT after 5s, solver did not reject invalid input promptly
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs3]
+EXIT 0
+.                                                                        [100%]
+1 passed in 0.29s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs4]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_simulation_rejects_invalid_domain_before_solving[kwargs4] ________
+
+kwargs = {'trajectories': True}
+
+    @pytest.mark.parametrize('kwargs',[{'hours':0},{'hours':-1},{'hours':np.nan},{'trajectories':0},{'trajectories':True},{'noise':-1},{'noise':np.nan}])
+    def test_simulation_rejects_invalid_domain_before_solving(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:7: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs4]
+1 failed in 0.33s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs5]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_simulation_rejects_invalid_domain_before_solving[kwargs5] ________
+
+kwargs = {'noise': -1}
+
+    @pytest.mark.parametrize('kwargs',[{'hours':0},{'hours':-1},{'hours':np.nan},{'trajectories':0},{'trajectories':True},{'noise':-1},{'noise':np.nan}])
+    def test_simulation_rejects_invalid_domain_before_solving(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:7: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs5]
+1 failed in 0.31s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs6]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_simulation_rejects_invalid_domain_before_solving[kwargs6] ________
+
+kwargs = {'noise': nan}
+
+    @pytest.mark.parametrize('kwargs',[{'hours':0},{'hours':-1},{'hours':np.nan},{'trajectories':0},{'trajectories':True},{'noise':-1},{'noise':np.nan}])
+    def test_simulation_rejects_invalid_domain_before_solving(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:7: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_invalid_domain_before_solving[kwargs6]
+1 failed in 0.30s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs0]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs0] ____
+
+kwargs = {'initial': {'TYPO': 1}}
+
+    @pytest.mark.parametrize('kwargs',[{'initial':{'TYPO':1}}, {'initial':{'OCT4':-1}}, {'initial':{'OCT4':np.nan}}, {'initial':{'OCT4':1},'controls':{'TYPO':1}}, {'initial':{'OCT4':1},'accessibility':{'OCT4':2}}, {'initial':{'OCT4':1},'methylation':{'OCT4':-1}}])
+    def test_simulation_rejects_unknown_nonphysical_or_nonfinite_state(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:12: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs0]
+1 failed in 0.29s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs1]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs1] ____
+
+kwargs = {'initial': {'OCT4': -1}}
+
+    @pytest.mark.parametrize('kwargs',[{'initial':{'TYPO':1}}, {'initial':{'OCT4':-1}}, {'initial':{'OCT4':np.nan}}, {'initial':{'OCT4':1},'controls':{'TYPO':1}}, {'initial':{'OCT4':1},'accessibility':{'OCT4':2}}, {'initial':{'OCT4':1},'methylation':{'OCT4':-1}}])
+    def test_simulation_rejects_unknown_nonphysical_or_nonfinite_state(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:12: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs1]
+1 failed in 0.31s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs2]
+EXIT 0
+.                                                                        [100%]
+1 passed in 0.26s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs3]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs3] ____
+
+kwargs = {'initial': {'OCT4': 1}, 'controls': {'TYPO': 1}}
+
+    @pytest.mark.parametrize('kwargs',[{'initial':{'TYPO':1}}, {'initial':{'OCT4':-1}}, {'initial':{'OCT4':np.nan}}, {'initial':{'OCT4':1},'controls':{'TYPO':1}}, {'initial':{'OCT4':1},'accessibility':{'OCT4':2}}, {'initial':{'OCT4':1},'methylation':{'OCT4':-1}}])
+    def test_simulation_rejects_unknown_nonphysical_or_nonfinite_state(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:12: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs3]
+1 failed in 0.29s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs4]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs4] ____
+
+kwargs = {'initial': {'OCT4': 1}, 'accessibility': {'OCT4': 2}}
+
+    @pytest.mark.parametrize('kwargs',[{'initial':{'TYPO':1}}, {'initial':{'OCT4':-1}}, {'initial':{'OCT4':np.nan}}, {'initial':{'OCT4':1},'controls':{'TYPO':1}}, {'initial':{'OCT4':1},'accessibility':{'OCT4':2}}, {'initial':{'OCT4':1},'methylation':{'OCT4':-1}}])
+    def test_simulation_rejects_unknown_nonphysical_or_nonfinite_state(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:12: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs4]
+1 failed in 0.31s
+
+CASE tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs5]
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs5] ____
+
+kwargs = {'initial': {'OCT4': 1}, 'methylation': {'OCT4': -1}}
+
+    @pytest.mark.parametrize('kwargs',[{'initial':{'TYPO':1}}, {'initial':{'OCT4':-1}}, {'initial':{'OCT4':np.nan}}, {'initial':{'OCT4':1},'controls':{'TYPO':1}}, {'initial':{'OCT4':1},'accessibility':{'OCT4':2}}, {'initial':{'OCT4':1},'methylation':{'OCT4':-1}}])
+    def test_simulation_rejects_unknown_nonphysical_or_nonfinite_state(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:12: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_simulation_rejects_unknown_nonphysical_or_nonfinite_state[kwargs5]
+1 failed in 0.29s
+
+CASE tests/test_cellfate_execution_canaries.py::test_repression_does_not_generate_negative_concentrations
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_repression_does_not_generate_negative_concentrations ___________
+
+    def test_repression_does_not_generate_negative_concentrations():
+        result=simulate_fate({'OCT4':.05},hours=2,controls={'OCT4':-1})
+>       assert np.min(result['mean']) >= 0
+E       assert np.float64(-1.341778257587222) >= 0
+E        +  where np.float64(-1.341778257587222) = <function min at 0x7f91d6557570>([[0.05, 0.05, 0.05, 0.05, 0.05, 0.05, ...], [0.05018936540917124, 0.05017433514144884, 0.050247048687213865, 0.0502267...99, 0.05089915885487834, 0.0512330016507195, 0.05112969156682241, 0.05112986589367413, 0.051233001316890146, ...], ...])
+E        +    where <function min at 0x7f91d6557570> = np.min
+
+tests/test_cellfate_execution_canaries.py:17: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_repression_does_not_generate_negative_concentrations
+1 failed in 0.32s
+
+CASE tests/test_cellfate_execution_canaries.py::test_control_objective_describes_returned_sparse_controls
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_control_objective_describes_returned_sparse_controls ___________
+
+    def test_control_objective_describes_returned_sparse_controls():
+        target={'TNNT2':2.,'MYH6':2.}
+        result=optimal_reprogramming({},target,hours=2,max_factors=1)
+        selected={x['factor']:x['control'] for x in result['interventions']}
+        sim=simulate_fate({},hours=2,controls=selected)
+        objective=sum((sim['final_state'][n]-v)**2 for n,v in target.items())+.08*sum(u*u for u in selected.values())+.04*sum(abs(u) for u in selected.values())
+>       assert result['objective']==pytest.approx(objective,rel=1e-5)
+E       assert 1.4696935701824168 == 1.7649579197288456 ± 1.8e-05
+E         
+E         comparison failed
+E         Obtained: 1.4696935701824168
+E         Expected: 1.7649579197288456 ± 1.8e-05
+
+tests/test_cellfate_execution_canaries.py:25: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_control_objective_describes_returned_sparse_controls
+1 failed in 2.16s
+
+CASE tests/test_cellfate_execution_canaries.py::test_unknown_target_not_silently_optimized_as_empty_goal
+EXIT 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_unknown_target_not_silently_optimized_as_empty_goal ___________
+
+    def test_unknown_target_not_silently_optimized_as_empty_goal():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_cellfate_execution_canaries.py:30: Failed
+=========================== short test summary info ============================
+FAILED tests/test_cellfate_execution_canaries.py::test_unknown_target_not_silently_optimized_as_empty_goal
+1 failed in 0.87s

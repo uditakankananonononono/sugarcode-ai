@@ -21,7 +21,7 @@ CELL_MARKERS = {
 
 
 def lineage_network(focus: list[str] | None = None) -> dict:
-    """Causal regulatory network with edge list and key regulatory nodes."""
+    """Hand-curated signed regulatory graph; no causal identification."""
     edges = []
     for src, d in LINEAGE_GRN.items():
         for dst, sign in d["targets"].items():
@@ -66,7 +66,10 @@ def transition_recipe(source: str, target: str) -> dict:
         "expected_transition": f"{source} -> {target} via {len(drivers)} driver nodes",
     }
 
-# --- specification-complete cell-fate landscape engine ------------------------
+# --- hand-set GRN simulation, not a specification-complete cell-fate engine ------------------------
+import math
+from collections.abc import Mapping
+from scipy.special import expit
 import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.optimize import minimize
@@ -91,18 +94,41 @@ def chromatin_binding(accessibility,methylation,tf_concentration,delta_g=-7.0,te
     return {"occupancy":occupancy.tolist(),"association_constant":float(ka),"delta_g_kcal_mol":delta_g,"temperature_K":temperature}
 
 
+def _finite_number(value, name, lower=None, upper=None):
+    if isinstance(value,bool) or not isinstance(value,(int,float,np.number)) or not math.isfinite(value):
+        raise ValueError(name+' must be a finite number')
+    if (lower is not None and value < lower) or (upper is not None and value > upper):
+        raise ValueError(name+' outside allowed range')
+
+def _state_vector(values, nodes, default, name, lower=None, upper=None):
+    if not isinstance(values,Mapping) or set(values)-set(nodes):
+        raise ValueError(name+' must map known GRN nodes to values')
+    for value in values.values():
+        _finite_number(value,name,lower,upper)
+    return np.asarray([values.get(n,default) for n in nodes],float)
+
 def simulate_fate(initial, *, hours=72, controls=None, accessibility=None,
                   methylation=None, noise=0.0, seed=9, trajectories=1):
     """Nonlinear Hill-GRN SDE ensemble with epigenetic gate and controls."""
-    nodes,W=grn_matrix(); n=len(nodes); initial=np.array([initial.get(x,0.05) for x in nodes],float)
-    controls=controls or {}; u=np.array([controls.get(x,0) for x in nodes],float)
-    access=np.ones(n) if accessibility is None else np.array([accessibility.get(x,1) for x in nodes],float)
-    meth=np.zeros(n) if methylation is None else np.array([methylation.get(x,0) for x in nodes],float)
+    _finite_number(hours,'hours',0)
+    if hours == 0:
+        raise ValueError('hours must be positive')
+    _finite_number(noise,'noise',0)
+    if isinstance(trajectories,bool) or not isinstance(trajectories,int) or trajectories < 1:
+        raise ValueError('trajectories must be a positive integer')
+    nodes,W=grn_matrix(); n=len(nodes)
+    initial=_state_vector(initial,nodes,.05,'initial',0)
+    u=_state_vector({} if controls is None else controls,nodes,0,'controls')
+    access=_state_vector({} if accessibility is None else accessibility,nodes,1,'accessibility',0,1)
+    meth=_state_vector({} if methylation is None else methylation,nodes,0,'methylation',0,1)
     gate=access*(1-meth); t=np.linspace(0,hours,289); rng=np.random.default_rng(seed); ensemble=[]
     for rep in range(trajectories):
         def rhs(_,x):
-            xp=np.maximum(x,0); signal=W@(xp*xp/(.25+xp*xp)); production=1/(1+np.exp(-6*(signal-.5))); return gate*production+u-.35*x
-        y=solve_ivp(rhs,(0,hours),initial,t_eval=t,rtol=1e-7,atol=1e-9).y.T
+            xp=np.maximum(x,0); signal=W@(xp*xp/(.25+xp*xp)); production=expit(6*(signal-.5)); return gate*production+np.maximum(u,0)-(.35+np.maximum(-u,0))*xp
+        solution=solve_ivp(rhs,(0,hours),initial,t_eval=t,rtol=1e-7,atol=1e-9)
+        if not solution.success or solution.y.shape != (n,len(t)) or not np.isfinite(solution.y).all():
+            raise RuntimeError('GRN solver failed to produce a complete finite trajectory')
+        y=np.maximum(0,solution.y.T)
         if noise:
             dt=t[1]-t[0]; z=np.empty_like(y); z[0]=y[0]
             for k in range(1,len(t)): z[k]=np.maximum(0,z[k-1]+rhs(t[k-1],z[k-1])*dt+noise*np.sqrt(dt)*rng.normal(size=n))
@@ -110,7 +136,9 @@ def simulate_fate(initial, *, hours=72, controls=None, accessibility=None,
         ensemble.append(y)
     e=np.stack(ensemble)
     return {"nodes":nodes,"time_hours":t.tolist(),"trajectories":e.tolist(),"mean":e.mean(0).tolist(),"variance":e.var(0).tolist(),
-            "final_state":dict(zip(nodes,e.mean((0,))[ -1].tolist())),"model":"nonlinear Hill GRN with Euler-Maruyama noise"}
+            "final_state":dict(zip(nodes,e.mean((0,))[ -1].tolist())),"model":"Hand-set Hill GRN; deterministic ODE or Euler-Maruyama noise, not trained biology",
+            "control_semantics":"Positive control adds production; negative control increases degradation",
+            "status":"Simulation only, no experimental fate validation"}
 
 
 def identify_attractors(*, starts=32, hours=150, seed=4):
@@ -140,7 +168,14 @@ def optimal_reprogramming(source_state,target_state, *, hours=48, max_factors=4)
     regulatory edges); forcing structural/lineage-marker genes directly is not
     a reprogramming strategy and trivializes the search.
     """
-    nodes,W=grn_matrix(); target=np.array([target_state.get(n,0) for n in nodes],float)
+    _finite_number(hours,'hours',0)
+    if hours == 0 or isinstance(max_factors,bool) or not isinstance(max_factors,int) or max_factors < 1:
+        raise ValueError('positive hours and integer max_factors required')
+    nodes,W=grn_matrix()
+    _state_vector(source_state,nodes,.05,'source',0)
+    target=_state_vector(target_state,nodes,0,'target',0)
+    if not target_state:
+        raise ValueError('at least one known target node required')
     specified=np.array([n in target_state for n in nodes])  # error only over requested targets
     tf_mask=(np.abs(W).sum(0)>0)
     def objective(u):
@@ -149,16 +184,27 @@ def optimal_reprogramming(source_state,target_state, *, hours=48, max_factors=4)
     bounds=[(-1,1) if m else (0,0) for m in tf_mask]
     res=minimize(objective,np.zeros(len(nodes)),method="L-BFGS-B",bounds=bounds,options={"maxiter":80,"eps":1e-3})
     order=np.argsort(-np.abs(res.x))[:max_factors]; selected=[{"factor":nodes[i],"control":float(res.x[i]),"action":"overexpress" if res.x[i]>0 else "repress"} for i in order if abs(res.x[i])>.01]
-    return {"interventions":selected,"objective":float(res.fun),"converged":bool(res.success),"solver":"L-BFGS-B optimal control",
-            "recipe":[{"order":i+1,**x,"start_hour":round(i*hours/max(len(selected),1),2)} for i,x in enumerate(selected)]}
+    sparse=np.zeros(len(nodes))
+    for item in selected:
+        sparse[nodes.index(item['factor'])]=item['control']
+    return {"interventions":selected,"objective":float(objective(sparse)),
+            "dense_relaxation_objective":float(res.fun),"converged":bool(res.success),
+            "solver":"L-BFGS-B dense relaxation followed by top-factor truncation, not a sparse global optimum",
+            "execution_schedule":"simultaneous constant controls",
+            "recipe":[{"order":i+1,**x,"start_hour":0} for i,x in enumerate(selected)]}
 
 
 def stochastic_validate(source,target,interventions,replicates=64,noise=.04,seed=8):
+    nodes,_=grn_matrix()
+    _state_vector(target,nodes,0,'target',0)
+    if not target:
+        raise ValueError('at least one known target required')
     controls={x["factor"]:x["control"] for x in interventions}; r=simulate_fate(source,hours=72,controls=controls,noise=noise,seed=seed,trajectories=replicates)
     nodes=r["nodes"]; spec=np.array([n in target for n in nodes]); tar=np.array([target.get(n,0) for n in nodes]); finals=np.asarray(r["trajectories"])[:,-1,:]; dist=np.linalg.norm((finals-tar)*spec,axis=1)
     success=np.exp(-dist)
     return {"success_probability":float((success>.5).mean()),"mean_target_similarity":float(success.mean()),"similarity_variance":float(success.var()),
-            "robustness_CI95":[float(np.quantile(success,.025)),float(np.quantile(success,.975))],"replicates":replicates}
+            "robustness_CI95":[float(np.quantile(success,.025)),float(np.quantile(success,.975))],"replicates":replicates,"horizon_hours":72,
+            "status":"Simulated target-similarity threshold frequency, not biological success probability"}
 
 
 def _diagnostics(sim,control,validation,attractors,source,target):
@@ -191,7 +237,7 @@ def _diagnostics(sim,control,validation,attractors,source,target):
 
 
 def design_fate_transition(source_state,target_state,*,hours=48,seed=8):
-    """End-to-end causal landscape, optimal-control and stochastic validation."""
+    """Hand-set GRN simulation with numerical control search and noise sensitivity."""
     attractors=identify_attractors(starts=16,seed=seed); control=optimal_reprogramming(source_state,target_state,hours=hours)
     controls={x["factor"]:x["control"] for x in control["interventions"]}; sim=simulate_fate(source_state,hours=hours,controls=controls)
     validation=stochastic_validate(source_state,target_state,control["interventions"],replicates=32,seed=seed)

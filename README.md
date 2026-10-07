@@ -255,7 +255,7 @@ Status per module: **verified** = implemented with passing named tests;
 | phageforge | phage genome feature map + CRISPR guide retargeting for phage engineering |
 | cell_twin | cell-state ODE twin (growth/cycle/stress), perturbation response, state-space trajectories |
 | fate_predictor | curated reprogramming factor maps, route scoring, efficiency/risk estimates |
-| cellfatenet | lineage GRN attractor simulation, fate probabilities under perturbation |
+| cellfatenet | Checked hand-set GRN ODE/noise simulation and dense-relaxation control search with sparse returned-objective verification; simultaneous controls only. Not trained cell-fate prediction, causal identification or biological validation. |
 | organoid_ai | organoid differentiation recipes, growth-factor schedules, maturation scoring |
 | bioimage_ai | Classical microscopy segmentation and measured morphology with finite/label/empty-frame guards; shape/coverage are NOT culture health, viability or passage readiness. No trained phenotype classifier or real-image benchmark verified. |
 | cellpainter | Cell Painting channel simulation, morphological profile extraction, perturbation fingerprints |
