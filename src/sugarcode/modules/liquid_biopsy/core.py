@@ -353,17 +353,48 @@ def integrate_multiomics(ctdna, methylation=(), proteins=(), metabolites=(), *, 
 
 
 def longitudinal_trajectory(samples) -> dict:
-    """Track burden, response and clonal selection through serial blood draws."""
-    rows = sorted(samples, key=lambda x: x["time"])
-    if not rows:
-        return {"trajectory": [], "trend": "insufficient_data", "slope": 0.0}
-    t = np.asarray([r["time"] for r in rows], float)
-    burden = np.asarray([r["burden"] for r in rows], float)
-    slope = float(np.polyfit(t, burden, 1)[0]) if len(rows) > 1 else 0
-    trend = "progression" if slope > 1e-4 else "response" if slope < -1e-4 else "stable"
-    return {"trajectory": rows, "slope": round(slope, 8), "trend": trend,
-            "percent_change": round(float(100*(burden[-1]-burden[0])/max(abs(burden[0]), 1e-9)), 3),
-            "clonal_expansion": [r.get("clone_frequencies", {}) for r in rows]}
+    """Fit supplied signal versus time; no biological response inference."""
+    import copy, math
+    from scipy.stats import linregress, t as student_t
+    rows=copy.deepcopy(list(samples))
+    for row in rows:
+        if not isinstance(row,dict):
+            raise ValueError('samples must be mappings')
+        for key in ('time','burden'):
+            value=row.get(key)
+            if isinstance(value,bool) or not isinstance(value,(int,float,np.number)) or not math.isfinite(value):
+                raise ValueError('time and burden must be finite numeric values')
+        if row['burden']<0:
+            raise ValueError('supplied burden signal must be nonnegative')
+    rows.sort(key=lambda x:x['time'])
+    if len({r['time'] for r in rows})!=len(rows):
+        raise ValueError('time points must be unique; aggregate technical replicates explicitly')
+    result={'trajectory':rows,'sample_count':len(rows),'trend':'insufficient_data',
+            'slope':None,'intercept':None,'slope_interval_95':None,'residual_sum_squares':None,
+            'percent_change':None,'clonal_expansion':None,
+            'status':'Supplied signal trend only; not treatment response, progression or clonal selection',
+            'uncertainty_assumptions':'IID homoscedastic normal residuals; assay error and independence unverified'}
+    if len(rows)<2:
+        return result
+    times=np.array([r['time'] for r in rows]);values=np.array([r['burden'] for r in rows])
+    fit=linregress(times,values)
+    predicted=fit.intercept+fit.slope*times
+    rss=float(np.sum((values-predicted)**2))
+    if not np.isfinite([fit.slope,fit.intercept,rss]).all():
+        raise ValueError('regression overflow')
+    result.update({'slope':float(fit.slope),'intercept':float(fit.intercept),
+                   'residual_sum_squares':rss,
+                   'trend':'increasing' if fit.slope>1e-4 else 'decreasing' if fit.slope< -1e-4 else 'flat',
+                   'trend_threshold_status':'hand-set absolute slope threshold 1e-4 in supplied units'})
+    if values[0]>0:
+        percent=float(100*(values[-1]-values[0])/values[0])
+        if not math.isfinite(percent):
+            raise ValueError('percent change overflow')
+        result['percent_change']=percent
+    if len(rows)>2:
+        width=float(student_t.ppf(.975,len(rows)-2)*fit.stderr)
+        result['slope_interval_95']=[float(fit.slope-width),float(fit.slope+width)]
+    return result
 
 
 def enhancement_features(signal, calls=(), fragment_lengths=(), methylation=(),
@@ -418,8 +449,9 @@ def analyze_liquid_biopsy(fragment_features, fragment_alleles, variants, *, cove
             "enhancement_feature_count": len(enhancements),
             "report": {"cancer_probability": fusion["cancer_probability"],
                        "tumor_origin": fusion["tissue_of_origin"],
-                       "progression_risk": trajectory["trend"],
-                       "treatment_response": trajectory["trend"] == "response",
+                       "signal_trend": trajectory["trend"],
+                       "progression_risk": None,
+                       "treatment_response": None,
                        "raw_vs_denoised": {"raw": raw.tolist(),
                                            "denoised": np.asarray(denoised["score_weighted_allele_support"]).ravel().tolist()},
                        "mutation_heatmap": denoised["evidence_score"],

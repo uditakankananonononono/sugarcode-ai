@@ -8,6 +8,26 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 longitudinal evidence regression
+
+9 new cases: **8 reproduced before failures, 1 already passing** (NaN time was
+already rejected downstream, now checked before fitting). Targeted longitudinal/
+liquid-biopsy: **16 passed**. Full tests/ across 332 files, four isolated batches:
+**2,429 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/longitudinal-*`.
+
+Built out validated unique time points/nonnegative finite supplied signals,
+linear fit intercept/slope/residual sum of squares and t-based slope intervals
+when >=3 observations. Two points have no residual-based interval; zero baseline
+has undefined percent change (None), not billion-percent change. Single observation
+is insufficient. Regression checks finite outputs. The direction threshold remains
+explicitly hand-set at 1e-4 in supplied units. Intervals assume IID homoscedastic
+normal residuals, not verified assay uncertainty/independence.
+
+Named retractions: increasing/decreasing/flat supplied signal is not clinical
+progression/treatment response or demonstrated clonal selection. Clinical report
+progression_risk/treatment_response now None. Clinical longitudinal diagnosis and
+clone-specific evidence remain OPEN.
+
 ## 2026-10-07 fitted multiomics classifier path
 
 13 new cases: **12 reproduced before failures, 1 already passing** after the
