@@ -8,6 +8,34 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 prime-edit construction pipeline
+
+20 new canary cases retained, **17 reproduced failures across three stages**,
+3 cases already passed (empty/bool RTT errors and the spanning-deletion check).
+Before logs: `docs/audit-evidence/prime-*-before-2026-10-07.txt` and
+`prime-canary-before-2026-10-07.txt`. Prime subset: **46 passed** including the
+published HEK3 extension. Full `tests/` regression: 323 files in five isolated
+batches, **2,317 passed, 15 skipped, 0 failed**. The four original batches contain
+2,297 passes; the additional prime canary file contains 20. These are test cases,
+not 17 features or proof of clinical editing performance.
+
+Built out exact construction: oligos require unambiguous DNA; requested RTT
+length must exist in the supplied edited context (no short sequence with false
+length metadata). Edit shape/reference/span are validated before constructing an
+allele; terminal insertion works. Minus-strand nick offset and indel-shifted allele
+coordinates fixed, with plus/minus reverse-complement symmetry regression.
+PE3 candidates now carry actual 20-nt spacer/PAM/nick sequences/coordinates and
+are tied to the selected primary guide, not merely PAM positions. RTT must encode
+the complete edit plus an explicitly chosen 3 nt distal context. This is a
+construction constraint, NOT a validated efficiency threshold. The implementation
+still restricts PBS to 10-16 nt and RTT to 10-20 nt; longer-context design is OPEN.
+
+Known unresolved overclaims: PBS thermodynamics, processivity, flap/repair,
+efficiency and outcome-distribution functions still use hand-set surrogates.
+They are NOT validated biological probabilities. The forthcoming model pass must
+replace these or explicitly withdraw their prediction API. This construction fix
+does not make prime_design a trained or experimentally validated editing engine.
+
 ## 2026-10-07 13:30 RNA build-out and explicit retractions
 
 Retained before evidence: `docs/audit-evidence/rna-canary-before-2026-10-07.txt`.

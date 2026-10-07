@@ -1,0 +1,262 @@
+FF.F.FFFFFFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+__ test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGT-10] ___
+
+edit_seq = 'ACGT', rtt = 10
+
+    @pytest.mark.parametrize('edit_seq,rtt', [('ACGT',10), ('ACGT'*4,20), ('',10), ('ACGT'*5,0), ('ACGT'*5,True)])
+    def test_rtt_requested_length_is_not_silently_truncated_or_defaulted(edit_seq,rtt):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:9: Failed
+_ test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGTACGTACGTACGT-20] _
+
+edit_seq = 'ACGTACGTACGTACGT', rtt = 20
+
+    @pytest.mark.parametrize('edit_seq,rtt', [('ACGT',10), ('ACGT'*4,20), ('',10), ('ACGT'*5,0), ('ACGT'*5,True)])
+    def test_rtt_requested_length_is_not_silently_truncated_or_defaulted(edit_seq,rtt):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:9: Failed
+_ test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGTACGTACGTACGTACGT-0] _
+
+edit_seq = 'ACGTACGTACGTACGTACGT', rtt = 0
+
+    @pytest.mark.parametrize('edit_seq,rtt', [('ACGT',10), ('ACGT'*4,20), ('',10), ('ACGT'*5,0), ('ACGT'*5,True)])
+    def test_rtt_requested_length_is_not_silently_truncated_or_defaulted(edit_seq,rtt):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:9: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit0] ______
+
+edit = {'type': 'deletion', 'position': 4, 'ref': 'TT', 'alt': ''}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit1] ______
+
+edit = {'type': 'deletion', 'position': 158, 'ref': 'GTAC', 'alt': ''}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit2] ______
+
+edit = {'type': 'deletion', 'position': 4, 'ref': '', 'alt': ''}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit3] ______
+
+edit = {'type': 'deletion', 'position': 4, 'ref': 'AC', 'alt': 'G'}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit4] ______
+
+edit = {'type': 'insertion', 'position': 4, 'ref': 'A', 'alt': 'G'}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit5] ______
+
+edit = {'type': 'insertion', 'position': 4, 'ref': '', 'alt': ''}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit6] ______
+
+edit = {'type': 'substitution', 'position': 4, 'ref': '', 'alt': 'G'}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit7] ______
+
+edit = {'type': 'substitution', 'position': 4, 'ref': 'AC', 'alt': ''}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+______ test_edits_validate_reference_and_shape_before_constructing[edit8] ______
+
+edit = {'type': 'substitution', 'position': True, 'ref': 'C', 'alt': 'G'}
+
+    @pytest.mark.parametrize('edit', [
+        {'type':'deletion','position':4,'ref':'TT','alt':''},
+        {'type':'deletion','position':158,'ref':'GTAC','alt':''},
+        {'type':'deletion','position':4,'ref':'','alt':''},
+        {'type':'deletion','position':4,'ref':'AC','alt':'G'},
+        {'type':'insertion','position':4,'ref':'A','alt':'G'},
+        {'type':'insertion','position':4,'ref':'','alt':''},
+        {'type':'substitution','position':4,'ref':'','alt':'G'},
+        {'type':'substitution','position':4,'ref':'AC','alt':''},
+        {'type':'substitution','position':True,'ref':'C','alt':'G'},
+    ])
+    def test_edits_validate_reference_and_shape_before_constructing(edit):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:24: Failed
+________________ test_insertion_at_terminal_boundary_supported _________________
+
+    def test_insertion_at_terminal_boundary_supported():
+>       result=design_edit(REGION,{'type':'insertion','position':len(REGION),'ref':'','alt':'T'})
+
+tests/test_prime_truth_canaries.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target_region = 'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'
+edit = {'type': 'insertion', 'position': 160, 'ref': '', 'alt': 'T'}
+background = None
+
+    def design_edit(target_region: str, edit: dict, background: str | None = None) -> dict:
+        """Design a full prime edit for a point mutation / small indel.
+    
+        edit: {"type": "substitution"|"insertion"|"deletion", "position": int,
+               "ref": str, "alt": str}
+        Finds PAMs near the edit, designs pegRNAs on each strand, finds PE3
+        nicking sgRNAs 40-120 nt on the opposite strand, runs off-target scans.
+        """
+        region = clean_dna(target_region)
+        pos = edit["position"]
+        if not 0 <= pos < len(region):
+>           raise ValueError("edit position outside target region")
+E           ValueError: edit position outside target region
+
+src/sugarcode/modules/prime_design/core.py:76: ValueError
+___________ test_ambiguous_input_is_not_silently_cleaned_for_oligos ____________
+
+    def test_ambiguous_input_is_not_silently_cleaned_for_oligos():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_truth_canaries.py:32: Failed
+=========================== short test summary info ============================
+FAILED tests/test_prime_truth_canaries.py::test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGT-10]
+FAILED tests/test_prime_truth_canaries.py::test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGTACGTACGTACGT-20]
+FAILED tests/test_prime_truth_canaries.py::test_rtt_requested_length_is_not_silently_truncated_or_defaulted[ACGTACGTACGTACGTACGT-0]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit0]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit1]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit2]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit3]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit4]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit5]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit6]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit7]
+FAILED tests/test_prime_truth_canaries.py::test_edits_validate_reference_and_shape_before_constructing[edit8]
+FAILED tests/test_prime_truth_canaries.py::test_insertion_at_terminal_boundary_supported
+FAILED tests/test_prime_truth_canaries.py::test_ambiguous_input_is_not_silently_cleaned_for_oligos
+14 failed, 2 passed in 0.18s
