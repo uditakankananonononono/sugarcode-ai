@@ -9,3 +9,6 @@ __all__ = ["CTDNA_MARKERS", "detect_ctdna", "fragment_length_model",
            "consensus_denoise", "bayesian_haplotype_inference",
            "reconstruct_tumor_architecture", "integrate_multiomics",
            "longitudinal_trajectory", "enhancement_features", "analyze_liquid_biopsy"]
+
+from .multiomics import fit_multiomics_classifier, predict_multiomics_classifier, evaluate_multiomics_classifier
+__all__ += ["fit_multiomics_classifier", "predict_multiomics_classifier", "evaluate_multiomics_classifier"]

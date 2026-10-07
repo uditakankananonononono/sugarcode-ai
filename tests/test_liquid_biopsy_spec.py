@@ -17,11 +17,11 @@ def test_consensus_denoise_is_deterministic_weight_free_and_concordance_sensitiv
     assert not hasattr(lb, "transformer_denoise")
     a=consensus_denoise(fixture_features()); b=consensus_denoise(fixture_features())
     assert a==b and a["trained"] is False and a["neural"] is False
-    p=np.asarray(a["somatic_probability"]); assert p.shape==(3,8)
+    p=np.asarray(a["evidence_score"]); assert p.shape==(3,8)
     assert np.mean(p[:,3]) > np.mean(p[:,0])
     # concordance: same allele in 1 of 3 fragments scores lower than in 3 of 3
     x=fixture_features(); y=x.copy(); y[1:,3,0]=.0005
-    assert consensus_denoise(y)["somatic_probability"][0][3] < consensus_denoise(x)["somatic_probability"][0][3]
+    assert consensus_denoise(y)["evidence_score"][0][3] < consensus_denoise(x)["evidence_score"][0][3]
 
 
 def test_bayesian_haplotype_missing_data_and_posterior():
@@ -32,8 +32,8 @@ def test_bayesian_haplotype_missing_data_and_posterior():
 
 def test_multiomics_has_all_modalities_and_probabilities():
     r=integrate_multiomics([.1,.2],[.7],[1.2,.8],[.4])
-    assert len(r["latent_signature"])==4 and 0<=r["cancer_probability"]<=1
-    assert set(r["tissue_probabilities"])=={"lung","colorectal","breast","pancreatic"}
+    assert len(r["latent_signature"])==4 and r["cancer_probability"] is None
+    assert r["tissue_probabilities"]=={}
 
 
 def test_longitudinal_response_and_progression():

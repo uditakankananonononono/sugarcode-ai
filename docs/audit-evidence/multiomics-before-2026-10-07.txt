@@ -1,0 +1,79 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+___________ test_no_cancer_or_tissue_prediction_without_fitted_model ___________
+
+    def test_no_cancer_or_tissue_prediction_without_fitted_model():
+        result=lb.integrate_multiomics([.1,.2],[.7],[1.2,.8],[.4])
+>       assert result['cancer_probability'] is None and result['tissue_of_origin'] is None
+E       assert (0.132422 is None)
+
+tests/test_multiomics_model_canaries.py:7: AssertionError
+____ test_fitted_multimodal_classifier_learns_and_evaluates_unseen_samples _____
+
+    def test_fitted_multimodal_classifier_learns_and_evaluates_unseen_samples():
+>       assert hasattr(lb,'fit_multiomics_classifier')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'fit_multiomics_classifier')
+
+tests/test_multiomics_model_canaries.py:12: AssertionError
+______________ test_training_requires_valid_labeled_matrix[X0-y0] ______________
+
+X = [[1, 2], [3, 4]], y = ['case', 'case']
+
+    @pytest.mark.parametrize('X,y', [([[1,2],[3,4]],['case','case']), ([[1,np.nan],[2,3]],['a','b']), ([[1,2]],['a','b']), ([[1,2],[3,4]],['a',None])])
+    def test_training_requires_valid_labeled_matrix(X,y):
+>       assert hasattr(lb,'fit_multiomics_classifier')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'fit_multiomics_classifier')
+
+tests/test_multiomics_model_canaries.py:26: AssertionError
+______________ test_training_requires_valid_labeled_matrix[X1-y1] ______________
+
+X = [[1, nan], [2, 3]], y = ['a', 'b']
+
+    @pytest.mark.parametrize('X,y', [([[1,2],[3,4]],['case','case']), ([[1,np.nan],[2,3]],['a','b']), ([[1,2]],['a','b']), ([[1,2],[3,4]],['a',None])])
+    def test_training_requires_valid_labeled_matrix(X,y):
+>       assert hasattr(lb,'fit_multiomics_classifier')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'fit_multiomics_classifier')
+
+tests/test_multiomics_model_canaries.py:26: AssertionError
+______________ test_training_requires_valid_labeled_matrix[X2-y2] ______________
+
+X = [[1, 2]], y = ['a', 'b']
+
+    @pytest.mark.parametrize('X,y', [([[1,2],[3,4]],['case','case']), ([[1,np.nan],[2,3]],['a','b']), ([[1,2]],['a','b']), ([[1,2],[3,4]],['a',None])])
+    def test_training_requires_valid_labeled_matrix(X,y):
+>       assert hasattr(lb,'fit_multiomics_classifier')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'fit_multiomics_classifier')
+
+tests/test_multiomics_model_canaries.py:26: AssertionError
+______________ test_training_requires_valid_labeled_matrix[X3-y3] ______________
+
+X = [[1, 2], [3, 4]], y = ['a', None]
+
+    @pytest.mark.parametrize('X,y', [([[1,2],[3,4]],['case','case']), ([[1,np.nan],[2,3]],['a','b']), ([[1,2]],['a','b']), ([[1,2],[3,4]],['a',None])])
+    def test_training_requires_valid_labeled_matrix(X,y):
+>       assert hasattr(lb,'fit_multiomics_classifier')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'fit_multiomics_classifier')
+
+tests/test_multiomics_model_canaries.py:26: AssertionError
+_______ test_consensus_is_an_uncalibrated_score_not_somatic_probability ________
+
+    def test_consensus_is_an_uncalibrated_score_not_somatic_probability():
+        r=lb.consensus_denoise(np.ones((2,4,4))*.1)
+>       assert 'somatic_probability' not in r and 'evidence_score' in r
+E       AssertionError: assert ('somatic_probability' not in {'somatic_probability': [[0.8599795968794542, 0.8599795968794542, 0.8599795968794542, 0.8599795968794542], [0.85997959...rdance': [0.0, 0.0, 0.0, 0.0], 'method': 'log-odds evidence model with cross-fragment concordance; deterministic', ...})
+
+tests/test_multiomics_model_canaries.py:31: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_multiomics_model_canaries.py::test_no_cancer_or_tissue_prediction_without_fitted_model
+FAILED tests/test_multiomics_model_canaries.py::test_fitted_multimodal_classifier_learns_and_evaluates_unseen_samples
+FAILED tests/test_multiomics_model_canaries.py::test_training_requires_valid_labeled_matrix[X0-y0]
+FAILED tests/test_multiomics_model_canaries.py::test_training_requires_valid_labeled_matrix[X1-y1]
+FAILED tests/test_multiomics_model_canaries.py::test_training_requires_valid_labeled_matrix[X2-y2]
+FAILED tests/test_multiomics_model_canaries.py::test_training_requires_valid_labeled_matrix[X3-y3]
+FAILED tests/test_multiomics_model_canaries.py::test_consensus_is_an_uncalibrated_score_not_somatic_probability
+7 failed in 0.13s

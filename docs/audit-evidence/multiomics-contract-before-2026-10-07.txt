@@ -1,0 +1,142 @@
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+________________ test_model_training_api_exported_from_package _________________
+
+    def test_model_training_api_exported_from_package():
+        import sugarcode.modules.liquid_biopsy as package
+>       assert callable(package.fit_multiomics_classifier)
+E       AttributeError: module 'sugarcode.modules.liquid_biopsy' has no attribute 'fit_multiomics_classifier'
+
+tests/test_multiomics_model_canaries.py:36: AttributeError
+________ test_consensus_rejects_nonphysical_fragments[features0-0.001] _________
+
+features = array([], shape=(0, 3, 4), dtype=float64), error_prior = 0.001
+
+    @pytest.mark.parametrize('features,error_prior',[(np.ones((0,3,4)),.001),(np.full((2,3,4),np.nan),.001),(np.ones((2,3,4))*2,.001),(np.ones((2,3,4)),-1)])
+    def test_consensus_rejects_nonphysical_fragments(features,error_prior):
+>       with pytest.raises(ValueError): lb.consensus_denoise(features,error_prior=error_prior)
+
+tests/test_multiomics_model_canaries.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+fragment_features = array([], shape=(0, 3, 4), dtype=float64)
+error_prior = 0.001
+
+    def consensus_denoise(fragment_features, *, error_prior: float = 1e-3) -> dict:
+        """Evidence-based somatic-call filtering. No neural network, no random weights.
+    
+        ``fragment_features`` is ``[fragments, positions, channels]``; channels are
+        allele support, base quality (0..1), mapping quality (0..1), strand balance
+        (0..1). Per fragment and position the log-odds are
+        log((af+e)/e) + 2*quality - 3, then shifted by cross-fragment
+        CONCORDANCE: the support of a position is compared with the cohort's
+        per-position background (median across positions), and positions where
+        several fragments independently carry the allele get a bonus. All terms
+        are explicit, deterministic, and not trained or clinically calibrated.
+        """
+        x = np.asarray(fragment_features, dtype=float)
+        if x.ndim == 2:
+            x = x[None, ...]
+        if x.ndim != 3 or x.shape[1] < 2 or x.shape[2] < 1:
+            raise ValueError("fragment_features must be [fragments, positions, channels]")
+        n, length, channels = x.shape
+        af = np.clip(x[..., 0], 0, 1)
+        quality = np.clip(x[..., 1:4].mean(-1), 0, 1) if channels >= 4 else 0.5
+        background = np.median(af)
+        carrying = (af > max(5 * background, 10 * error_prior)).astype(float)
+        concordance = carrying.mean(axis=0)            # fraction of fragments carrying allele, per position
+        concordance = np.broadcast_to(concordance, af.shape)
+        logits = np.log((af + error_prior) / (error_prior + 1e-12)) + 2 * quality + 1.5 * concordance - 3
+        probabilities = _sigmoid(logits)
+        return {
+            "evidence_score": probabilities.tolist(),
+            "calibrated": False,
+            "score_weighted_allele_support": (af * probabilities).tolist(),
+>           "concordance": concordance[0].tolist(),
+            "method": "log-odds evidence model with cross-fragment concordance; deterministic",
+            "trained": False, "neural": False,
+            "calibration": "explicit untrained formula; not clinically calibrated",
+        }
+E       IndexError: index 0 is out of bounds for axis 0 with size 0
+
+src/sugarcode/modules/liquid_biopsy/core.py:170: IndexError
+________ test_consensus_rejects_nonphysical_fragments[features1-0.001] _________
+
+features = array([[[nan, nan, nan, nan],
+        [nan, nan, nan, nan],
+        [nan, nan, nan, nan]],
+
+       [[nan, nan, nan, nan],
+        [nan, nan, nan, nan],
+        [nan, nan, nan, nan]]])
+error_prior = 0.001
+
+    @pytest.mark.parametrize('features,error_prior',[(np.ones((0,3,4)),.001),(np.full((2,3,4),np.nan),.001),(np.ones((2,3,4))*2,.001),(np.ones((2,3,4)),-1)])
+    def test_consensus_rejects_nonphysical_fragments(features,error_prior):
+>       with pytest.raises(ValueError): lb.consensus_denoise(features,error_prior=error_prior)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_multiomics_model_canaries.py:40: Failed
+________ test_consensus_rejects_nonphysical_fragments[features2-0.001] _________
+
+features = array([[[2., 2., 2., 2.],
+        [2., 2., 2., 2.],
+        [2., 2., 2., 2.]],
+
+       [[2., 2., 2., 2.],
+        [2., 2., 2., 2.],
+        [2., 2., 2., 2.]]])
+error_prior = 0.001
+
+    @pytest.mark.parametrize('features,error_prior',[(np.ones((0,3,4)),.001),(np.full((2,3,4),np.nan),.001),(np.ones((2,3,4))*2,.001),(np.ones((2,3,4)),-1)])
+    def test_consensus_rejects_nonphysical_fragments(features,error_prior):
+>       with pytest.raises(ValueError): lb.consensus_denoise(features,error_prior=error_prior)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_multiomics_model_canaries.py:40: Failed
+__________ test_consensus_rejects_nonphysical_fragments[features3--1] __________
+
+features = array([[[1., 1., 1., 1.],
+        [1., 1., 1., 1.],
+        [1., 1., 1., 1.]],
+
+       [[1., 1., 1., 1.],
+        [1., 1., 1., 1.],
+        [1., 1., 1., 1.]]])
+error_prior = -1
+
+    @pytest.mark.parametrize('features,error_prior',[(np.ones((0,3,4)),.001),(np.full((2,3,4),np.nan),.001),(np.ones((2,3,4))*2,.001),(np.ones((2,3,4)),-1)])
+    def test_consensus_rejects_nonphysical_fragments(features,error_prior):
+>       with pytest.raises(ValueError): lb.consensus_denoise(features,error_prior=error_prior)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_multiomics_model_canaries.py:40: Failed
+=============================== warnings summary ===============================
+tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features0-0.001]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/fromnumeric.py:3860: RuntimeWarning: Mean of empty slice.
+    return _methods._mean(a, axis=axis, dtype=dtype,
+
+tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features0-0.001]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/_methods.py:145: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features0-0.001]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/liquid_biopsy/core.py:162: RuntimeWarning: Mean of empty slice.
+    concordance = carrying.mean(axis=0)            # fraction of fragments carrying allele, per position
+
+tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features0-0.001]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/_methods.py:137: RuntimeWarning: invalid value encountered in divide
+    ret = um.true_divide(
+
+tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features3--1]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/liquid_biopsy/core.py:164: RuntimeWarning: divide by zero encountered in log
+    logits = np.log((af + error_prior) / (error_prior + 1e-12)) + 2 * quality + 1.5 * concordance - 3
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_multiomics_model_canaries.py::test_model_training_api_exported_from_package
+FAILED tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features0-0.001]
+FAILED tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features1-0.001]
+FAILED tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features2-0.001]
+FAILED tests/test_multiomics_model_canaries.py::test_consensus_rejects_nonphysical_fragments[features3--1]
+5 failed, 1 passed, 7 deselected, 5 warnings in 0.38s

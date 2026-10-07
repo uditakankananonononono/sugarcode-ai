@@ -154,6 +154,10 @@ def consensus_denoise(fragment_features, *, error_prior: float = 1e-3) -> dict:
         x = x[None, ...]
     if x.ndim != 3 or x.shape[1] < 2 or x.shape[2] < 1:
         raise ValueError("fragment_features must be [fragments, positions, channels]")
+    if not x.shape[0] or not np.isfinite(x).all() or np.any(x<0) or np.any(x>1):
+        raise ValueError('fragment feature channels must be nonempty finite fractions in [0,1]')
+    if isinstance(error_prior,bool) or not np.isfinite(error_prior) or not 0<error_prior<1:
+        raise ValueError('error_prior must be finite in (0,1)')
     n, length, channels = x.shape
     af = np.clip(x[..., 0], 0, 1)
     quality = np.clip(x[..., 1:4].mean(-1), 0, 1) if channels >= 4 else 0.5
@@ -164,8 +168,9 @@ def consensus_denoise(fragment_features, *, error_prior: float = 1e-3) -> dict:
     logits = np.log((af + error_prior) / (error_prior + 1e-12)) + 2 * quality + 1.5 * concordance - 3
     probabilities = _sigmoid(logits)
     return {
-        "somatic_probability": probabilities.tolist(),
-        "denoised_allele_support": (af * probabilities).tolist(),
+        "evidence_score": probabilities.tolist(),
+        "calibrated": False,
+        "score_weighted_allele_support": (af * probabilities).tolist(),
         "concordance": concordance[0].tolist(),
         "method": "log-odds evidence model with cross-fragment concordance; deterministic",
         "trained": False, "neural": False,
@@ -325,29 +330,26 @@ def reconstruct_tumor_architecture(variants, fragment_alleles,
             'partial_genome':True,'status':'Supplied evidence summary; not reconstructed tumor genome'}
 
 
-_TISSUE_SIGNATURES = {
-    "lung": np.array([.85, .65, .35, .55]), "colorectal": np.array([.7, .8, .45, .5]),
-    "breast": np.array([.55, .5, .9, .65]), "pancreatic": np.array([.75, .7, .6, .85]),
-}
+from .multiomics import (fit_multiomics_classifier, predict_multiomics_classifier,
+                         evaluate_multiomics_classifier)
 
 
-def integrate_multiomics(ctdna, methylation=(), proteins=(), metabolites=()) -> dict:
-    """Late-fusion multi-omics classifier with modality-specific normalization."""
-    arrays = [np.asarray(v, dtype=float).ravel() for v in
-              (ctdna, methylation, proteins, metabolites)]
-    summaries = np.array([float(a.mean()) if len(a) else 0 for a in arrays])
-    scaled = summaries / (np.abs(summaries) + 1.0)
-    reliability = np.array([min(1, np.sqrt(len(a))/5) for a in arrays])
-    latent = scaled * reliability
-    scores = {name: float(_sigmoid(4 - 8*np.mean(np.abs(latent-sig))))
-              for name, sig in _TISSUE_SIGNATURES.items()}
-    ordered = sorted(scores.items(), key=lambda z: -z[1])
-    cancer_probability = float(_sigmoid(-2.5 + 3.5*np.linalg.norm(latent)))
-    return {"cancer_probability": round(cancer_probability, 6),
-            "tissue_of_origin": ordered[0][0],
-            "tissue_probabilities": {k: round(v, 6) for k, v in ordered},
-            "latent_signature": latent.tolist(), "modality_reliability": reliability.tolist(),
-            "modalities": ["ctDNA", "methylation", "proteomics", "metabolomics"]}
+def integrate_multiomics(ctdna, methylation=(), proteins=(), metabolites=(), *, model=None) -> dict:
+    """Summarize supplied modalities; predict label classes only with fitted model."""
+    arrays=[np.asarray(v,float) for v in (ctdna,methylation,proteins,metabolites)]
+    if any(a.ndim!=1 or not np.isfinite(a).all() for a in arrays):
+        raise ValueError('modalities must be finite 1D arrays')
+    summaries=[float(a.mean()) if a.size else None for a in arrays]
+    names=['ctDNA','methylation','proteomics','metabolomics']
+    result={'cancer_probability':None,'tissue_of_origin':None,'tissue_probabilities':{},
+            'latent_signature':summaries,'modality_counts':[len(a) for a in arrays],
+            'modalities':names,'model_status':'Missing fitted model; supplied modality summaries only'}
+    if model is not None:
+        if model.get('feature_names')!=names or any(v is None for v in summaries):
+            raise ValueError('fitted model must use four modality means in documented order, all supplied')
+        result['fitted_classification']=predict_multiomics_classifier(model,[summaries])
+        result['model_status']='Fitted supplied-label classifier; clinical cancer/tissue semantics not inferred'
+    return result
 
 
 def longitudinal_trajectory(samples) -> dict:
@@ -400,12 +402,12 @@ def enhancement_features(signal, calls=(), fragment_lengths=(), methylation=(),
 def analyze_liquid_biopsy(fragment_features, fragment_alleles, variants, *, coverage=(),
                            fragment_lengths=(), methylation=(), proteins=(), metabolites=(),
                            longitudinal=()) -> dict:
-    """End-to-end spec pipeline returning a clinically interpretable report."""
+    """Research evidence summary; not a clinical or specification-complete pipeline."""
     denoised = consensus_denoise(fragment_features)
     arch = reconstruct_tumor_architecture(variants, fragment_alleles, coverage, methylation)
     raw = np.asarray(fragment_features, float)[...,0].ravel()
-    calls = [{"locus_index": i, "allele_fraction": float(v), "confidence": float(c)}
-             for i,(v,c) in enumerate(zip(raw, np.asarray(denoised["somatic_probability"]).ravel())) if c >= .5]
+    calls = [{"locus_index": i, "allele_fraction": float(v), "evidence_score": float(c)}
+             for i,(v,c) in enumerate(zip(raw, np.asarray(denoised["evidence_score"]).ravel())) if c >= .5]
     fusion = integrate_multiomics([c["allele_fraction"] for c in calls], methylation, proteins, metabolites)
     trajectory = longitudinal_trajectory(longitudinal)
     enhancements = enhancement_features(raw, calls, fragment_lengths, methylation,
@@ -419,6 +421,6 @@ def analyze_liquid_biopsy(fragment_features, fragment_alleles, variants, *, cove
                        "progression_risk": trajectory["trend"],
                        "treatment_response": trajectory["trend"] == "response",
                        "raw_vs_denoised": {"raw": raw.tolist(),
-                                           "denoised": np.asarray(denoised["denoised_allele_support"]).ravel().tolist()},
-                       "mutation_heatmap": denoised["somatic_probability"],
+                                           "denoised": np.asarray(denoised["score_weighted_allele_support"]).ravel().tolist()},
+                       "mutation_heatmap": denoised["evidence_score"],
                        "disclaimer": "research-use inference; not a clinical diagnosis"}}

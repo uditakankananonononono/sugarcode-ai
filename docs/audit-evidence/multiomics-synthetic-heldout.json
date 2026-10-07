@@ -1,0 +1,21 @@
+{
+  "sample_count": 40,
+  "accuracy": 1.0,
+  "majority_baseline_accuracy": 0.55,
+  "log_loss": 0.07195056398317626,
+  "confusion_matrix": [
+    [
+      22,
+      0
+    ],
+    [
+      0,
+      18
+    ]
+  ],
+  "classes": [
+    "case",
+    "control"
+  ],
+  "scope": "Supplied labeled evaluation set; independence and assay validity not verified"
+}
