@@ -205,44 +205,62 @@ def _haplotype_candidates(bits, observed, exhaustive_max_loci: int = 12):
 
 
 def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
-                                 max_iter: int = 200, tol: float = 1e-9) -> dict:
-    """Reconstruct partial tumor haplotypes with a Dirichlet-mixture EM model.
+                                 max_iter: int = 200, tol: float = 1e-9,
+                                 error_probability: float = .02) -> dict:
+    """Regularized finite-mixture EM on partial binary fragments.
 
-    Entries are 0/1 alleles and -1/NaN for unobserved loci. All unique completed
-    observed patterns seed candidate haplotypes. The returned posterior mean and
-    credible intervals retain uncertainty from fragmented observations.
+    Historical function name retained for compatibility. Fitted mixture weights
+    are NOT a full Bayesian posterior. Missing values must be -1 or NaN.
+    The fixed symmetric read-error model must be calibrated independently.
     """
-    f = np.asarray(fragment_alleles, dtype=float)
-    if f.ndim != 2 or not len(f):
-        raise ValueError("fragment_alleles must be a non-empty 2D matrix")
-    observed = np.isfinite(f) & (f >= 0)
-    bits = np.where(observed, (f >= .5).astype(int), 0)
-    candidates = _haplotype_candidates(bits, observed)
-    if len(candidates) == 1:
-        candidates = np.vstack([candidates, 1 - candidates])
-    weights = np.full(len(candidates), 1 / len(candidates))
-    eps = .02
-    for iteration in range(1, max_iter + 1):
-        mismatch = ((bits[:, None, :] != candidates[None, :, :]) & observed[:, None, :]).sum(-1)
-        seen = observed.sum(-1)[:, None]
-        likelihood = (1-eps)**(seen-mismatch) * eps**mismatch
-        resp = likelihood * weights
-        resp /= np.maximum(resp.sum(1, keepdims=True), 1e-300)
-        new = (resp.sum(0) + alpha) / (len(f) + alpha * len(candidates))
-        if np.max(np.abs(new - weights)) < tol:
-            weights = new; break
-        weights = new
-    order = np.argsort(-weights)
-    out = []
-    total = len(f) + alpha * len(candidates)
-    for j in order:
-        p = float(weights[j]); se = np.sqrt(max(p*(1-p)/max(total, 1), 0))
-        out.append({"haplotype": "".join(map(str, candidates[j])),
-                    "posterior_mean": round(p, 8),
-                    "credible_interval_95": [round(max(0, p-1.96*se), 8),
-                                               round(min(1, p+1.96*se), 8)]})
-    return {"haplotypes": out, "iterations": iteration, "error_probability": eps,
-            "model": "Dirichlet finite mixture with missing-data likelihood"}
+    import math
+    from scipy.special import logsumexp
+    f=np.asarray(fragment_alleles,dtype=float)
+    if f.ndim!=2 or min(f.shape)==0 or np.isinf(f).any():
+        raise ValueError('nonempty fragments-by-loci matrix required, no infinite values')
+    if np.any(~(np.isnan(f) | (f==-1) | (f==0) | (f==1))):
+        raise ValueError('alleles must be 0/1 or explicit missing -1/NaN')
+    for value,name in ((alpha,'alpha'),(tol,'tol')):
+        if isinstance(value,bool) or not math.isfinite(value) or value<=0:
+            raise ValueError(name+' must be finite positive')
+    if isinstance(max_iter,bool) or not isinstance(max_iter,int) or max_iter<1:
+        raise ValueError('max_iter must be positive integer')
+    eps=error_probability
+    if isinstance(eps,bool) or not math.isfinite(eps) or not 0<eps<.5:
+        raise ValueError('error_probability must be finite in (0,.5)')
+    observed=np.isfinite(f)&(f>=0)
+    bits=np.where(observed,f,0).astype(int)
+    candidates=_haplotype_candidates(bits,observed)
+    if len(candidates)==1:
+        candidates=np.vstack([candidates,1-candidates])
+    weights=np.full(len(candidates),1/len(candidates))
+    mismatch=((bits[:,None,:]!=candidates[None,:,:])&observed[:,None,:]).sum(-1)
+    seen=observed.sum(-1)[:,None]
+    log_likelihood=(seen-mismatch)*np.log1p(-eps)+mismatch*np.log(eps)
+    converged=False
+    for iteration in range(1,max_iter+1):
+        log_joint=log_likelihood+np.log(weights)
+        resp=np.exp(log_joint-logsumexp(log_joint,axis=1,keepdims=True))
+        new=(resp.sum(0)+alpha)/(len(f)+alpha*len(candidates))
+        delta=float(np.max(np.abs(new-weights))); weights=new
+        if delta<tol:
+            converged=True; break
+    total=len(f)+alpha*len(candidates)
+    out=[]
+    for j in np.argsort(-weights):
+        value=float(weights[j]); se=np.sqrt(value*(1-value)/total)
+        out.append({'haplotype':''.join(map(str,candidates[j])),
+                    'posterior_mean':round(value,8),
+                    'mixture_weight':value,
+                    'approximate_weight_interval_95':[max(0.,value-1.96*se),min(1.,value+1.96*se)]})
+    return {'haplotypes':out,'iterations':iteration,'converged':converged,
+            'max_weight_change':delta,'error_probability':eps,
+            'log_likelihood':float(logsumexp(log_likelihood+np.log(weights),axis=1).sum()),
+            'numerical_method':'log-space responsibilities',
+            'candidate_method':'exhaustive' if f.shape[1]<=12 else 'partial-pattern heuristic completion',
+            'model':'Regularized finite mixture EM with missing-data likelihood',
+            'uncertainty_status':'Normal weight approximations ignore latent/candidate uncertainty; not posterior credible intervals',
+            'compatibility_status':'posterior_mean is a legacy alias for fitted mixture weight, not a full posterior mean'}
 
 
 def reconstruct_tumor_architecture(variants, fragment_alleles,

@@ -1,0 +1,204 @@
+FFFFFFFFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data0] _______
+
+data = [[0.3, 1]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data1] _______
+
+data = [[2, 1]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data2] _______
+
+data = [[-2, 1]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data3] _______
+
+data = [[inf, 1]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data4] _______
+
+data = [[0, 1], [-inf, 1]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+_______ test_only_binary_or_explicit_missing_alleles_are_accepted[data5] _______
+
+data = [[]]
+
+    @pytest.mark.parametrize('data', [[[.3,1]], [[2,1]], [[-2,1]], [[np.inf,1]], [[0,1],[-np.inf,1]], [[]]])
+    def test_only_binary_or_explicit_missing_alleles_are_accepted(data):
+>       with pytest.raises(ValueError): infer(data)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:7: Failed
+______________ test_inference_configuration_is_validated[kwargs0] ______________
+
+kwargs = {'alpha': -1}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:11: Failed
+______________ test_inference_configuration_is_validated[kwargs1] ______________
+
+kwargs = {'alpha': nan}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:11: Failed
+______________ test_inference_configuration_is_validated[kwargs2] ______________
+
+kwargs = {'max_iter': 0}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+
+tests/test_haplotype_truth_canaries.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+fragment_alleles = [[0, 1], [1, 0]], alpha = 0.5, max_iter = 0, tol = 1e-09
+
+    def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
+                                     max_iter: int = 200, tol: float = 1e-9) -> dict:
+        """Reconstruct partial tumor haplotypes with a Dirichlet-mixture EM model.
+    
+        Entries are 0/1 alleles and -1/NaN for unobserved loci. All unique completed
+        observed patterns seed candidate haplotypes. The returned posterior mean and
+        credible intervals retain uncertainty from fragmented observations.
+        """
+        f = np.asarray(fragment_alleles, dtype=float)
+        if f.ndim != 2 or not len(f):
+            raise ValueError("fragment_alleles must be a non-empty 2D matrix")
+        observed = np.isfinite(f) & (f >= 0)
+        bits = np.where(observed, (f >= .5).astype(int), 0)
+        candidates = _haplotype_candidates(bits, observed)
+        if len(candidates) == 1:
+            candidates = np.vstack([candidates, 1 - candidates])
+        weights = np.full(len(candidates), 1 / len(candidates))
+        eps = .02
+        for iteration in range(1, max_iter + 1):
+            mismatch = ((bits[:, None, :] != candidates[None, :, :]) & observed[:, None, :]).sum(-1)
+            seen = observed.sum(-1)[:, None]
+            likelihood = (1-eps)**(seen-mismatch) * eps**mismatch
+            resp = likelihood * weights
+            resp /= np.maximum(resp.sum(1, keepdims=True), 1e-300)
+            new = (resp.sum(0) + alpha) / (len(f) + alpha * len(candidates))
+            if np.max(np.abs(new - weights)) < tol:
+                weights = new; break
+            weights = new
+        order = np.argsort(-weights)
+        out = []
+        total = len(f) + alpha * len(candidates)
+        for j in order:
+            p = float(weights[j]); se = np.sqrt(max(p*(1-p)/max(total, 1), 0))
+            out.append({"haplotype": "".join(map(str, candidates[j])),
+                        "posterior_mean": round(p, 8),
+                        "credible_interval_95": [round(max(0, p-1.96*se), 8),
+                                                   round(min(1, p+1.96*se), 8)]})
+>       return {"haplotypes": out, "iterations": iteration, "error_probability": eps,
+                "model": "Dirichlet finite mixture with missing-data likelihood"}
+E       UnboundLocalError: local variable 'iteration' referenced before assignment
+
+src/sugarcode/modules/liquid_biopsy/core.py:244: UnboundLocalError
+______________ test_inference_configuration_is_validated[kwargs3] ______________
+
+kwargs = {'max_iter': True}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:11: Failed
+______________ test_inference_configuration_is_validated[kwargs4] ______________
+
+kwargs = {'tol': -1}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:11: Failed
+______________ test_inference_configuration_is_validated[kwargs5] ______________
+
+kwargs = {'tol': nan}
+
+    @pytest.mark.parametrize('kwargs',[{'alpha':-1},{'alpha':np.nan},{'max_iter':0},{'max_iter':True},{'tol':-1},{'tol':np.nan}])
+    def test_inference_configuration_is_validated(kwargs):
+>       with pytest.raises(ValueError): infer([[0,1],[1,0]],**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_haplotype_truth_canaries.py:11: Failed
+_________ test_long_fragments_use_log_likelihood_not_underflow_to_zero _________
+
+    def test_long_fragments_use_log_likelihood_not_underflow_to_zero():
+        # Every candidate differs at about 500 sites. Direct eps**mismatch underflows.
+        rng=np.random.default_rng(9)
+        data=rng.integers(0,2,(6,1500))
+        result=infer(data,max_iter=30)
+        assert sum(x['posterior_mean'] for x in result['haplotypes'])==pytest.approx(1,abs=1e-6)
+>       assert result['numerical_method']=='log-space responsibilities'
+E       KeyError: 'numerical_method'
+
+tests/test_haplotype_truth_canaries.py:19: KeyError
+__________ test_fitted_em_weights_are_not_bayesian_credible_intervals __________
+
+    def test_fitted_em_weights_are_not_bayesian_credible_intervals():
+        result=infer([[0,0],[0,1],[1,1]])
+>       assert all('credible_interval_95' not in x for x in result['haplotypes'])
+E       assert False
+E        +  where False = all(<generator object test_fitted_em_weights_are_not_bayesian_credible_intervals.<locals>.<genexpr> at 0x7f2af9573a00>)
+
+tests/test_haplotype_truth_canaries.py:23: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data0]
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data1]
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data2]
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data3]
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data4]
+FAILED tests/test_haplotype_truth_canaries.py::test_only_binary_or_explicit_missing_alleles_are_accepted[data5]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs0]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs1]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs2]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs3]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs4]
+FAILED tests/test_haplotype_truth_canaries.py::test_inference_configuration_is_validated[kwargs5]
+FAILED tests/test_haplotype_truth_canaries.py::test_long_fragments_use_log_likelihood_not_underflow_to_zero
+FAILED tests/test_haplotype_truth_canaries.py::test_fitted_em_weights_are_not_bayesian_credible_intervals
+14 failed in 0.23s

@@ -8,6 +8,28 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 haplotype-mixture numerical build-out
+
+14 new cases, **14 reproduced before failures**, now passing. Targeted mixture /
+liquid-biopsy tests: **23 passed**. Full tests/ across 329 files, four isolated
+batches: **2,397 passed, 15 skipped, 0 failed**. Evidence in
+`docs/audit-evidence/haplotype-*`.
+
+Built out log-space EM responsibilities, preventing long-fragment likelihood
+underflow from silently producing mixture weights that do not sum to one.
+Inputs must be binary alleles or explicit -1/NaN missing values; infinite and
+fractional entries rejected. Positive finite regularization/tolerance and integer
+iterations checked. Symmetric read error is now an explicit parameter, not hidden
+.02. Convergence, maximum weight change and observed-data log likelihood reported.
+
+Named retraction: EM fitted weights are NOT a full Bayesian posterior, and normal
+weight approximations are NOT posterior credible intervals. `posterior_mean` is
+retained only as a labeled compatibility alias for `mixture_weight`;
+`credible_interval_95` removed. Approximate normal intervals explicitly ignore
+latent/candidate uncertainty. At <=12 loci candidates are exhaustive; above that
+candidate completion remains a disclosed heuristic. These changes do not establish
+clinical tumor haplotypes, independent assay calibration or reliable uncertainty.
+
 ## 2026-10-07 allele-signal statistical caller
 
 9 new cases, **9 reproduced before failures**, now passing. Targeted caller /
