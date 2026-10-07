@@ -2,6 +2,15 @@ from __future__ import annotations
 from ...bio.sequence import clean_dna, reverse_complement, tm_wallace, gc_content
 from ..crispr_opt.core import pam_sites, score_off_targets
 
+def _oligo(sequence):
+    if not isinstance(sequence, str):
+        raise ValueError('sequence must be text')
+    sequence = ''.join(sequence.split()).upper()
+    if not sequence or set(sequence) - set('ACGT'):
+        raise ValueError('nonempty unambiguous DNA (ACGT) required')
+    return sequence
+
+
 PBS_RANGE = (10, 16)   # PBS lengths (nt) per Anzalone et al.; the published PBS/RTT boundary leaves a 16 nt flap on the spacer, so longer PBS needs genomic context this function does not receive
 RTT_RANGE = (10, 20)   # reverse-transcriptase template lengths (nt)
 
@@ -20,10 +29,10 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
     position 17 (1-based). PBS length is chosen by Wallace-Tm targeting
     ~30-34 C within 10-16 nt; RTT within 10-20 nt.
     """
-    spacer = clean_dna(spacer)
+    spacer = _oligo(spacer)
     if len(spacer) != 20:
         raise ValueError("spacer must be 20 nt")
-    edit_seq = clean_dna(edit_seq)
+    edit_seq = _oligo(edit_seq)
     rc_edit = reverse_complement(edit_seq)
 
     if pbs_len is None:
@@ -34,12 +43,14 @@ def design_pegrna(spacer: str, edit_seq: str, pbs_len: int | None = None,
             if d < best_d:
                 best, best_d = L, d
         pbs_len = best
-    if not PBS_RANGE[0] <= pbs_len <= PBS_RANGE[1]:
+    if isinstance(pbs_len, bool) or not isinstance(pbs_len, int) or not PBS_RANGE[0] <= pbs_len <= PBS_RANGE[1]:
         raise ValueError(f"PBS length must be {PBS_RANGE[0]}-{PBS_RANGE[1]} nt")
-    rtt_len = rtt_len or min(RTT_RANGE[1], max(RTT_RANGE[0], len(edit_seq)))
-    if not RTT_RANGE[0] <= rtt_len <= RTT_RANGE[1]:
+    rtt_len = min(RTT_RANGE[1], len(edit_seq)) if rtt_len is None else rtt_len
+    if isinstance(rtt_len, bool) or not isinstance(rtt_len, int) or not RTT_RANGE[0] <= rtt_len <= RTT_RANGE[1]:
         raise ValueError(f"RTT length must be {RTT_RANGE[0]}-{RTT_RANGE[1]} nt")
 
+    if rtt_len > len(edit_seq):
+        raise ValueError('edited context is shorter than requested RTT; supply more verified context')
     pbs = reverse_complement(spacer[16 - pbs_len:16])
     # the RTT templates from the nick: its 3' end pairs with the nick-proximal
     # base, so truncation must keep the LAST rtt_len bases of the reverse
@@ -70,15 +81,27 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
     Finds PAMs near the edit, designs pegRNAs on each strand, finds PE3
     nicking sgRNAs 40-120 nt on the opposite strand, runs off-target scans.
     """
-    region = clean_dna(target_region)
-    pos = edit["position"]
-    if not 0 <= pos < len(region):
-        raise ValueError("edit position outside target region")
-    etype = edit["type"]
-    ref = clean_dna(edit["ref"]) if edit.get("ref") else ""
-    alt = clean_dna(edit["alt"]) if edit.get("alt") else ""
-    if etype == "substitution" and region[pos:pos + len(ref)] != ref:
-        raise ValueError("ref does not match target region at position")
+    region = _oligo(target_region)
+    if not isinstance(edit, dict):
+        raise ValueError('edit must be a mapping')
+    pos = edit.get('position')
+    etype = edit.get('type')
+    if etype not in ('substitution', 'insertion', 'deletion'):
+        raise ValueError('unknown edit type')
+    if isinstance(pos, bool) or not isinstance(pos, int) or not 0 <= pos <= len(region):
+        raise ValueError('edit position must be an integer within target boundaries')
+    ref = _oligo(edit['ref']) if edit.get('ref') else ''
+    alt = _oligo(edit['alt']) if edit.get('alt') else ''
+    if etype == 'insertion':
+        if ref or not alt:
+            raise ValueError('insertion requires empty ref and nonempty alt')
+    else:
+        if not ref or pos+len(ref) > len(region) or region[pos:pos+len(ref)] != ref:
+            raise ValueError('nonempty ref must exactly match target span')
+        if etype == 'deletion' and alt:
+            raise ValueError('deletion requires empty alt')
+        if etype == 'substitution' and (not alt or len(alt) != len(ref) or alt == ref):
+            raise ValueError('substitution requires changed alt of equal length')
 
     if etype == "substitution":
         edited = region[:pos] + alt + region[pos + len(ref):]
@@ -102,7 +125,7 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
             # RT template = edited strand 3' of the nick; the PBS/RTT
             # boundary is 4 nt upstream of the PAM per the published convention
             nick = site["position"] - 4
-            if nick < 0 or edited[nick:nick + 20] == region[nick:nick + 20]:
+            if nick < 0 or pos < nick or edited[nick:nick + 20] == region[nick:nick + 20]:
                 continue  # RT template would not encode the edit
             rtt_source = edited[nick:nick + 20]
         else:
@@ -110,14 +133,29 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
             if g_start + 20 > len(region):
                 continue
             spacer = reverse_complement(region[g_start:g_start + 20])
-            nick = site["position"] + 4
-            if nick > len(region) or edited[max(0, nick - 20):nick] == region[max(0, nick - 20):nick]:
-                continue  # RT template would not encode the edit
-            rtt_source = reverse_complement(edited[max(0, nick - 20):nick])
+            nick = site["position"] + 7
+            if nick > len(region) or pos >= nick:
+                continue  # reverse-strand template extends left of the nick
+            # Indels left of the nick shift its coordinate in the edited allele.
+            # A deletion spanning the nick removes the PBS boundary: skip it.
+            if pos+len(ref) > nick:
+                continue
+            edited_nick = nick + len(alt)-len(ref)
+            rtt_source = reverse_complement(edited[max(0, edited_nick-20):edited_nick])
+            if rtt_source == reverse_complement(region[max(0,nick-20):nick]):
+                continue
         try:
             peg = design_pegrna(spacer, rtt_source[:20] if len(rtt_source) >= 10 else rtt_source)
         except ValueError:
             continue
+        # Require complete edit plus 3 nt distal context. This explicit design
+        # constraint is not a validated efficiency threshold.
+        required = (pos-nick+len(alt)+3 if site['strand']=='+' else
+                    nick-(pos+len(ref))+len(alt)+3)
+        if required < 3 or len(peg['rt_template']) < required:
+            continue
+        peg['distal_homology_min_nt'] = 3
+        peg["nick_position"] = nick
         peg["pam_strand"] = site["strand"]
         peg["pam_position"] = site["position"]
         peg["distance_to_edit"] = dist
@@ -127,12 +165,33 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
 
     designs.sort(key=lambda d: d["distance_to_edit"])
     nicking = []
-    for site in pam_sites(region, "NGG"):
-        if designs and site["strand"] != designs[0]["pam_strand"]:
-            d = abs(site["position"] - designs[0]["pam_position"])
-            if 40 <= d <= 120:
-                nicking.append({"strand": site["strand"], "position": site["position"],
-                                "distance_from_primary": d})
+    # PE3 nick is the canonical Cas9 nick site, not the PAM coordinate.
+    # Retain the primary association so candidates are not mixed across designs.
+    if designs:
+        primary = designs[0]
+        for site in pam_sites(region, 'NGG'):
+            if site['strand'] == primary['pam_strand']:
+                continue
+            if site['strand'] == '+':
+                p = site['position']; start = p-20
+                if start < 0:
+                    continue
+                spacer = region[start:p]; nick = p-3
+            else:
+                start = site['position']+3
+                if start+20 > len(region):
+                    continue
+                spacer = reverse_complement(region[start:start+20]); nick = start+3
+            distance = abs(nick-primary['nick_position'])
+            if 40 <= distance <= 120:
+                candidate = {'strand':site['strand'],'position':site['position'],
+                             'pam':site['pam'],'spacer':spacer,'nick_position':nick,
+                             'distance_from_primary':distance,
+                             'primary_pam_position':primary['pam_position']}
+                if background:
+                    candidate['off_targets'] = score_off_targets(spacer, background, max_mismatches=3)[:5]
+                nicking.append(candidate)
+
     return {
         "edit": edit, "edited_region": edited,
         "pegrna_designs": designs[:5],

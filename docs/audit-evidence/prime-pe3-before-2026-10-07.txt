@@ -1,0 +1,32 @@
+................FF                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_pe3_candidates_are_actual_sgrnas_not_just_pam_positions _________
+
+    def test_pe3_candidates_are_actual_sgrnas_not_just_pam_positions():
+        from sugarcode.bio.sequence import reverse_complement
+        region = 'CCTGGGTCAATCCTTGGGGCCCAGACTGAGCACGTGATGGCAGAGGAAAG'+'ATAT'*15+'CCA'+'ACGT'*10
+        result = design_edit(region, {'type':'insertion','position':34,'ref':'','alt':'CTT'})
+        assert result['nicking_sgrna_candidates']
+        primary = result['pegrna_designs'][0]
+        for nick in result['nicking_sgrna_candidates']:
+>           assert len(nick['spacer']) == 20
+E           KeyError: 'spacer'
+
+tests/test_prime_truth_canaries.py:42: KeyError
+____ test_plus_and_minus_insertion_designs_are_reverse_complement_symmetric ____
+
+    def test_plus_and_minus_insertion_designs_are_reverse_complement_symmetric():
+        from sugarcode.bio.sequence import reverse_complement
+        region = 'CCTGGGTCAATCCTTGGGGCCCAGACTGAGCACGTGATGGCAGAGGAAAG'
+        plus = design_edit(region, {'type':'insertion','position':34,'ref':'','alt':'CTT'})
+        minus = design_edit(reverse_complement(region), {'type':'insertion','position':len(region)-34,'ref':'','alt':'AAG'})
+        target=plus['pegrna_designs'][0]
+        matches=[d for d in minus['pegrna_designs'] if d['spacer']==target['spacer']]
+>       assert matches
+E       assert []
+
+tests/test_prime_truth_canaries.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_prime_truth_canaries.py::test_pe3_candidates_are_actual_sgrnas_not_just_pam_positions
+FAILED tests/test_prime_truth_canaries.py::test_plus_and_minus_insertion_designs_are_reverse_complement_symmetric
+2 failed, 16 passed in 0.15s
