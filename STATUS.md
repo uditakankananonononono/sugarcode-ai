@@ -8,6 +8,23 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 registry truth and metric contracts
+
+10 new cases: **9 reproduced before failures, 1 already passing** (NaN signal was
+already rejected during histogram computation). Targeted: **19 passed**. Full
+tests/ across 334 files, four isolated batches: **2,439 passed, 15 skipped,
+0 failed**. Evidence in `docs/audit-evidence/registry-current-*`, `liquid-metrics-*`.
+
+Registry summaries now match the implemented RNA/ViennaRNA, hand-set cell-fate,
+anchored STR and supplied-model/liquid statistical paths instead of calling them
+mRNA optimization, causal genetic recipes, biomarkers or beta-binomial detection.
+These are explicit corrections, not completion of missing original model claims.
+Metric arrays require finite values, positive fragment lengths and valid methylation
+fractions. Lag-one autocorrelation checks variance in each actual lagged array,
+not just the whole array, avoiding NaN on a constant prefix. Undefined constant-lag
+correlation uses the explicit zero convention. `high_confidence_variant_count` ->
+`high_evidence_score_count`: count of heuristic score >=.9, NOT diagnostic confidence.
+
 ## 2026-10-07 longitudinal evidence regression
 
 9 new cases: **8 reproduced before failures, 1 already passing** (NaN time was

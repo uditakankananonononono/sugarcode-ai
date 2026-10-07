@@ -1,0 +1,40 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+____________________ test_registry_tracks_actual_rna_scope _____________________
+
+    def test_registry_tracks_actual_rna_scope():
+        summary=REGISTRY['rna_decoder'].summary
+>       assert 'ViennaRNA' in summary and 'functional-effect models Missing' in summary
+E       AssertionError: assert ('ViennaRNA' in 'Epitranscriptomics: m6A site scoring from the DRACH motif plus hand-set region priors and a GC exposure proxy (not a trained or deep model); modification maps, mRNA optimization.')
+
+tests/test_registry_truth_current.py:5: AssertionError
+_____ test_registry_does_not_call_handset_fate_graph_causal_or_recipe_real _____
+
+    def test_registry_does_not_call_handset_fate_graph_causal_or_recipe_real():
+        summary=REGISTRY['cellfatenet'].summary
+>       assert 'hand-set GRN simulation' in summary and 'not causal identification' in summary
+E       AssertionError: assert ('hand-set GRN simulation' in 'Causal regulatory-network visualization of differentiation; stepwise genetic recipes for transformation.')
+
+tests/test_registry_truth_current.py:10: AssertionError
+_________ test_registry_labels_liquid_models_fitted_only_when_supplied _________
+
+    def test_registry_labels_liquid_models_fitted_only_when_supplied():
+        summary=REGISTRY['liquid_biopsy'].summary
+>       assert 'supplied-label logistic training' in summary and 'not validated cancer diagnosis' in summary
+E       AssertionError: assert ('supplied-label logistic training' in 'ctDNA detection with error-rate-aware statistical filters (beta-binomial floor, smoothing); biomarker selection, raw vs filtered signal.')
+
+tests/test_registry_truth_current.py:15: AssertionError
+_______________ test_registry_str_no_diagnostic_biomarker_claim ________________
+
+    def test_registry_str_no_diagnostic_biomarker_claim():
+        summary=REGISTRY['str_scope'].summary
+>       assert 'anchored sequence tracts' in summary and 'not validated disease prediction' in summary
+E       AssertionError: assert ('anchored sequence tracts' in 'Short tandem repeat analytics by repeat scanning and transparent stochastic models (no trained model): repeat-expansion biomarkers, diagnostic potential index.')
+
+tests/test_registry_truth_current.py:19: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_registry_truth_current.py::test_registry_tracks_actual_rna_scope
+FAILED tests/test_registry_truth_current.py::test_registry_does_not_call_handset_fate_graph_causal_or_recipe_real
+FAILED tests/test_registry_truth_current.py::test_registry_labels_liquid_models_fitted_only_when_supplied
+FAILED tests/test_registry_truth_current.py::test_registry_str_no_diagnostic_biomarker_claim
+4 failed in 0.06s

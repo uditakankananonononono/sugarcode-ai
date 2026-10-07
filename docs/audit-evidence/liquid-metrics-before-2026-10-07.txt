@@ -1,0 +1,79 @@
+F.FFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_constant_prefix_nonconstant_signal_autocorrelation_not_nan ________
+
+    def test_constant_prefix_nonconstant_signal_autocorrelation_not_nan():
+        result=enhancement_features([0,0,0,1])
+>       assert np.isfinite(result['signal_autocorrelation_lag1'])
+E       AssertionError: assert np.False_
+E        +  where np.False_ = <ufunc 'isfinite'>(nan)
+E        +    where <ufunc 'isfinite'> = np.isfinite
+
+tests/test_liquid_metric_canaries.py:7: AssertionError
+___________ test_metric_arrays_reject_invalid_measurements[kwargs1] ____________
+
+kwargs = {'signal': [0, 1], 'fragment_lengths': [-1]}
+
+    @pytest.mark.parametrize('kwargs',[{'signal':[0,np.nan]}, {'signal':[0,1],'fragment_lengths':[-1]}, {'signal':[0,1],'methylation':[2]}, {'signal':[0,1],'proteins':[np.inf]}])
+    def test_metric_arrays_reject_invalid_measurements(kwargs):
+>       with pytest.raises(ValueError): enhancement_features(**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_metric_canaries.py:12: Failed
+___________ test_metric_arrays_reject_invalid_measurements[kwargs2] ____________
+
+kwargs = {'signal': [0, 1], 'methylation': [2]}
+
+    @pytest.mark.parametrize('kwargs',[{'signal':[0,np.nan]}, {'signal':[0,1],'fragment_lengths':[-1]}, {'signal':[0,1],'methylation':[2]}, {'signal':[0,1],'proteins':[np.inf]}])
+    def test_metric_arrays_reject_invalid_measurements(kwargs):
+>       with pytest.raises(ValueError): enhancement_features(**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_metric_canaries.py:12: Failed
+___________ test_metric_arrays_reject_invalid_measurements[kwargs3] ____________
+
+kwargs = {'signal': [0, 1], 'proteins': [inf]}
+
+    @pytest.mark.parametrize('kwargs',[{'signal':[0,np.nan]}, {'signal':[0,1],'fragment_lengths':[-1]}, {'signal':[0,1],'methylation':[2]}, {'signal':[0,1],'proteins':[np.inf]}])
+    def test_metric_arrays_reject_invalid_measurements(kwargs):
+>       with pytest.raises(ValueError): enhancement_features(**kwargs)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_metric_canaries.py:12: Failed
+____________ test_high_evidence_score_not_called_confident_variant _____________
+
+    def test_high_evidence_score_not_called_confident_variant():
+        result=enhancement_features([.1,.2],calls=[{'allele_fraction':.2,'evidence_score':.95}])
+>       assert 'high_confidence_variant_count' not in result
+E       AssertionError: assert 'high_confidence_variant_count' not in {'signal_q05': 0.10500000000000001, 'signal_q10': 0.11000000000000001, 'signal_q25': 0.125, 'signal_median': 0.15000000000000002, ...}
+
+tests/test_liquid_metric_canaries.py:16: AssertionError
+=============================== warnings summary ===============================
+tests/test_liquid_metric_canaries.py::test_constant_prefix_nonconstant_signal_autocorrelation_not_nan
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[:, None]
+
+tests/test_liquid_metric_canaries.py::test_constant_prefix_nonconstant_signal_autocorrelation_not_nan
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+    c /= stddev[None, :]
+
+tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs3]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:4653: RuntimeWarning: invalid value encountered in subtract
+    diff_b_a = subtract(b, a)
+
+tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs3]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/_methods.py:191: RuntimeWarning: invalid value encountered in subtract
+    x = asanyarray(arr - arrmean)
+
+tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs3]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/liquid_biopsy/core.py:413: RuntimeWarning: invalid value encountered in subtract
+    f"{prefix}_mad": float(np.median(np.abs(a-np.median(a))))}
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_liquid_metric_canaries.py::test_constant_prefix_nonconstant_signal_autocorrelation_not_nan
+FAILED tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs1]
+FAILED tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs2]
+FAILED tests/test_liquid_metric_canaries.py::test_metric_arrays_reject_invalid_measurements[kwargs3]
+FAILED tests/test_liquid_metric_canaries.py::test_high_evidence_score_not_called_confident_variant
+5 failed, 1 passed, 5 warnings in 0.32s
