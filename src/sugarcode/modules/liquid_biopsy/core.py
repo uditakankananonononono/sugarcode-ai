@@ -268,6 +268,44 @@ def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
             'compatibility_status':'posterior_mean is a legacy alias for fitted mixture weight, not a full posterior mean'}
 
 
+def bootstrap_haplotype_weights(fragment_alleles, *, replicates=200, seed=0,
+                                alpha=.5, error_probability=.02, max_iter=200, tol=1e-9):
+    """Resample supplied fragment rows and refit exhaustive <=12-locus mixture.
+
+    Intervals are empirical percentiles conditional on the read-error/candidate
+    model. Row independence, assay validity and interval coverage are not verified.
+    Above 12 loci the candidate heuristic changes with samples, so this method
+    refuses rather than pretending it covers that uncertainty.
+    """
+    if isinstance(replicates,bool) or not isinstance(replicates,int) or replicates<2:
+        raise ValueError('replicates must be an integer >=2')
+    f=np.asarray(fragment_alleles,float)
+    base=bayesian_haplotype_inference(f,alpha=alpha,error_probability=error_probability,max_iter=max_iter,tol=tol)
+    if f.shape[1]>12:
+        raise ValueError('bootstrap requires exhaustive candidate space at <=12 loci')
+    if not base['converged']:
+        raise RuntimeError('base mixture did not converge')
+    names=[x['haplotype'] for x in base['haplotypes']]
+    rng=np.random.default_rng(seed);weights=[]
+    for rep in range(replicates):
+        sample=f[rng.integers(0,len(f),size=len(f))]
+        fitted=bayesian_haplotype_inference(sample,alpha=alpha,error_probability=error_probability,max_iter=max_iter,tol=tol)
+        if not fitted['converged']:
+            raise RuntimeError('bootstrap replicate '+str(rep)+' did not converge; no interval reported')
+        mapping={x['haplotype']:x['mixture_weight'] for x in fitted['haplotypes']}
+        weights.append([mapping[name] for name in names])
+    w=np.asarray(weights)
+    return {'haplotypes':[{'haplotype':name,'fitted_weight':base['haplotypes'][i]['mixture_weight'],
+                          'bootstrap_mean':float(w[:,i].mean()),'bootstrap_std':float(w[:,i].std(ddof=1)),
+                          'interval_95':np.quantile(w[:,i],[.025,.975]).tolist()} for i,name in enumerate(names)],
+            'replicates_requested':replicates,'replicates_completed':replicates,'seed':seed,
+            'sampling_unit':'supplied fragment row',
+            'interval_method':'empirical percentile fragment bootstrap; not Bayesian posterior',
+            'assumptions':['fragment rows independent/exchangeable','fixed symmetric read-error model',
+                           'exhaustive haplotype candidate space','percentile interval coverage not independently verified'],
+            'base_fit':base}
+
+
 def reconstruct_tumor_architecture(variants, fragment_alleles,
                                    coverage=None, methylation=None, *,
                                    normal_coverage=None, junction_evidence=None) -> dict:
