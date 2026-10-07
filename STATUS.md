@@ -8,6 +8,31 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 source-pinned PRIDICT2 assay loader
+
+11 initial missing-loader canaries failed before implementation; 12 additional
+join/fold validation cases added after. Targeted prime: **123 passed, 2 skipped**.
+Full tests/ across 343 files, four isolated batches: **2,533 passed, 15 skipped,
+0 failed**. Evidence in `docs/audit-evidence/prime-assay-*`.
+
+Offline loader verifies SHA256-pinned processed CSV and supplementary workbook,
+checks all 22,956 sequence/group row alignments, sequence lengths and PE2-NGG
+context, and preserves cell-specific group test folds. Real-source execution
+confirmed 11,953 groups with zero group fold conflicts. All-zero triples remain
+missing (337 HEK; 204 K562), with missing folds, never normalized or used as
+measured zero outcomes. Location conventions are retained as source indices.
+Synthetic fixtures exercise invalid labels, contexts, schema and fold leakage.
+No remote code, workbook formulas, macros or pickle artifacts are executed.
+
+**Fitting and data redistribution remain gated: actual dataset reuse terms are
+UNVERIFIED.** Paper data availability states that editing rates and sequencing
+are available, but Rights and permissions states exclusive article rights and
+provides no clear data-specific permissive grant. MIT on model code is not a
+blanket data license. Only loader code, synthetic tests and aggregate execution
+evidence ship; no assay CSV/workbook records or fitted weights are redistributed.
+No clinical/spec validation or biological mechanism fit is claimed. Three-way
+labels cannot identify the existing five-way repair/outcome surrogate pathways.
+
 ## 2026-10-07 repair/outcome numerical domains
 
 28 initial canaries: **22 reproduced before failures, 6 already passing**.

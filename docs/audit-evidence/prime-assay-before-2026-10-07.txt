@@ -1,0 +1,254 @@
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+____________________ test_zero_triple_preserved_as_missing _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_zero_triple_preserved_as_0')
+
+    def test_zero_triple_preserved_as_missing(tmp_path):
+>       p=write_table(tmp_path,[row()]);r=loader()(p, verify_source=False)[0]
+
+tests/test_prime_assay_loader.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+_____________________ test_source_hash_required_by_default _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_source_hash_required_by_d0')
+
+    def test_source_hash_required_by_default(tmp_path):
+        p=write_table(tmp_path,[row()])
+        with pytest.raises(ValueError, match='SHA256'):
+>           loader()(p)
+
+tests/test_prime_assay_loader.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates0] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update0')
+updates = {'HEKaverageedited_clamped': nan}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates1] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update1')
+updates = {'HEKaverageedited_clamped': -0.1}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates2] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update2')
+updates = {'HEKaverageedited_clamped': 0.9}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates3] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update3')
+updates = {'wide_initial_target': 'ACGTNACGT'}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates4] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update4')
+updates = {'PBSlocation': '__import__("os").system("true")'}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates5] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update5')
+updates = {'PBSlocation': '[4, 20]'}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+______________________ test_bad_table_rejected[updates6] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_bad_table_rejected_update6')
+updates = {'RTlength': 0}
+
+    @pytest.mark.parametrize('updates', [
+        {'HEKaverageedited_clamped':float('nan')},
+        {'HEKaverageedited_clamped':-.1},
+        {'HEKaverageedited_clamped':.9},
+        {'wide_initial_target':'ACGTNACGT'},
+        {'PBSlocation':'__import__("os").system("true")'},
+        {'PBSlocation':'[4, 20]'}, {'RTlength':0},
+    ])
+    def test_bad_table_rejected(tmp_path, updates):
+        p=write_table(tmp_path,[dict(row(),**updates)])
+>       with pytest.raises(ValueError):loader()(p, verify_source=False)
+
+tests/test_prime_assay_loader.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+_________________________ test_duplicate_ids_rejected __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_duplicate_ids_rejected0')
+
+    def test_duplicate_ids_rejected(tmp_path):
+        p=write_table(tmp_path,[row(),row()])
+>       with pytest.raises(ValueError):loader()(p,verify_source=False)
+
+tests/test_prime_assay_loader.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+_________________________ test_missing_schema_rejected _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-sandbox/pytest-85/test_missing_schema_rejected0')
+
+    def test_missing_schema_rejected(tmp_path):
+        p=write_table(tmp_path,[{'seq_id':'x'}])
+>       with pytest.raises(ValueError):loader()(p,verify_source=False)
+
+tests/test_prime_assay_loader.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def loader():
+>       from sugarcode.modules.prime_design.assay_data import load_pridict2_csv
+E       ModuleNotFoundError: No module named 'sugarcode.modules.prime_design.assay_data'
+
+tests/test_prime_assay_loader.py:9: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_prime_assay_loader.py::test_zero_triple_preserved_as_missing
+FAILED tests/test_prime_assay_loader.py::test_source_hash_required_by_default
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates0] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates1] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates2] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates3] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates4] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates5] - ...
+FAILED tests/test_prime_assay_loader.py::test_bad_table_rejected[updates6] - ...
+FAILED tests/test_prime_assay_loader.py::test_duplicate_ids_rejected - Module...
+FAILED tests/test_prime_assay_loader.py::test_missing_schema_rejected - Modul...
+11 failed in 1.08s
