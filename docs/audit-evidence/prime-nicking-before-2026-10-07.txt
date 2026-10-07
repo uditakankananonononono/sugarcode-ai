@@ -1,0 +1,146 @@
+FFFFFFFFFFFF.                                                            [100%]
+=================================== FAILURES ===================================
+___________________ test_bad_candidate_rejected[candidate0] ____________________
+
+candidate = {'position': 70.9, 'strand': '-'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate1] ____________________
+
+candidate = {'position': True, 'strand': '-'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate2] ____________________
+
+candidate = {'position': '70', 'strand': '-'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate3] ____________________
+
+candidate = {'position': -1, 'strand': '-'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate4] ____________________
+
+candidate = {'position': 70}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate5] ____________________
+
+candidate = {'position': 70, 'strand': 'x'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate6] ____________________
+
+candidate = {'position': 70, 'strand': '-', 'requires_edit_match': 'no'}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:6: Failed
+___________________ test_bad_candidate_rejected[candidate7] ____________________
+
+candidate = {}
+
+    @pytest.mark.parametrize('candidate',[{'position':70.9,'strand':'-'},{'position':True,'strand':'-'},{'position':'70','strand':'-'},{'position':-1,'strand':'-'},{'position':70},{'position':70,'strand':'x'},{'position':70,'strand':'-','requires_edit_match':'no'},{}])
+    def test_bad_candidate_rejected(candidate):
+>       with pytest.raises(ValueError):nicking_strategy(0,[candidate])
+
+tests/test_prime_nicking_domain.py:6: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+primary_position = 0, candidates = [{}], edited_strand = '+'
+
+    def nicking_strategy(primary_position,candidates,edited_strand='+'):
+        ranked=[]
+        for c in candidates:
+>           distance=abs(int(c['position'])-primary_position); orientation=1 if c.get('strand')!=edited_strand else .3; distance_score=math.exp(-((distance-70)/35)**2); dsb_risk=math.exp(-distance/15) if c.get('strand')!=edited_strand else .05; timing=1-math.exp(-distance/30); score=.5*distance_score+.3*orientation+.2*timing-.4*dsb_risk; ranked.append({**c,"distance":distance,"orientation_score":orientation,"timing_score":timing,"dsb_like_risk":dsb_risk,"score":score,"strategy":"PE3b" if c.get('requires_edit_match') else "PE3"})
+E           KeyError: 'position'
+
+src/sugarcode/modules/prime_design/core.py:398: KeyError
+______________________ test_bad_primary_rejected[True-+] _______________________
+
+primary = True, strand = '+'
+
+    @pytest.mark.parametrize('primary,strand',[(True,'+'),(1.5,'+'),(-1,'+'),(0,'x')])
+    def test_bad_primary_rejected(primary,strand):
+>       with pytest.raises(ValueError):nicking_strategy(primary,[],strand)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:10: Failed
+_______________________ test_bad_primary_rejected[1.5-+] _______________________
+
+primary = 1.5, strand = '+'
+
+    @pytest.mark.parametrize('primary,strand',[(True,'+'),(1.5,'+'),(-1,'+'),(0,'x')])
+    def test_bad_primary_rejected(primary,strand):
+>       with pytest.raises(ValueError):nicking_strategy(primary,[],strand)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:10: Failed
+_______________________ test_bad_primary_rejected[-1-+] ________________________
+
+primary = -1, strand = '+'
+
+    @pytest.mark.parametrize('primary,strand',[(True,'+'),(1.5,'+'),(-1,'+'),(0,'x')])
+    def test_bad_primary_rejected(primary,strand):
+>       with pytest.raises(ValueError):nicking_strategy(primary,[],strand)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:10: Failed
+________________________ test_bad_primary_rejected[0-x] ________________________
+
+primary = 0, strand = 'x'
+
+    @pytest.mark.parametrize('primary,strand',[(True,'+'),(1.5,'+'),(-1,'+'),(0,'x')])
+    def test_bad_primary_rejected(primary,strand):
+>       with pytest.raises(ValueError):nicking_strategy(primary,[],strand)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_nicking_domain.py:10: Failed
+=========================== short test summary info ============================
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate0]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate1]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate2]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate3]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate4]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate5]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate6]
+FAILED tests/test_prime_nicking_domain.py::test_bad_candidate_rejected[candidate7]
+FAILED tests/test_prime_nicking_domain.py::test_bad_primary_rejected[True-+]
+FAILED tests/test_prime_nicking_domain.py::test_bad_primary_rejected[1.5-+]
+FAILED tests/test_prime_nicking_domain.py::test_bad_primary_rejected[-1-+] - ...
+FAILED tests/test_prime_nicking_domain.py::test_bad_primary_rejected[0-x] - F...
+12 failed, 1 passed in 0.18s

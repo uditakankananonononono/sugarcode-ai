@@ -8,6 +8,20 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 PE3 nick ranking coordinate domains
+
+13 canaries: **12 reproduced failures, 1 existing translation/invariance pass**.
+Targeted prime: **183 passed, 2 skipped**. Full tests/ across 348 files, four
+isolated batches: **2,593 passed, 15 skipped, 0 failed**. Evidence retained under
+`docs/audit-evidence/prime-nicking-*`.
+
+Reject fractional/string/boolean/negative nick coordinates, missing or invalid
+strand, invalid primary coordinates/strand and nonboolean edit-match marker.
+No silent integer truncation or missing-strand opposite-orientation credit.
+Return explicit unfitted ranking status. Existing hand-set ranking coefficients
+and coordinate translation behavior remain; risk is NOT measured DSB probability.
+No repair/outcome fit, assay redistribution, clinical/spec validation claimed.
+
 ## 2026-10-07 legacy outcome input domains
 
 10 canaries: **7 reproduced input-domain failures, 3 normalization checks already

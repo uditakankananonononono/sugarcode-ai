@@ -392,11 +392,32 @@ def repair_competition(rt_template, mmr_activity=.7, ber_activity=.2,
                                'fen1': fen1_activity, 'nick_bias': nick_bias},
             'model_status': 'OPEN/unfitted normalized pathway scores; residual indel channel is arbitrary'}
 
-def nicking_strategy(primary_position,candidates,edited_strand='+'):
-    ranked=[]
+def nicking_strategy(primary_position, candidates, edited_strand='+'):
+    """Rank validated nick coordinates using explicitly unfitted score weights."""
+    from collections.abc import Mapping
+    if type(primary_position) is not int or primary_position < 0 or edited_strand not in ('+', '-'):
+        raise ValueError('primary must be nonnegative integer coordinate with +/- strand')
+    if not isinstance(candidates, (list, tuple)):
+        raise ValueError('candidates must be list or tuple')
+    ranked = []
     for c in candidates:
-        distance=abs(int(c['position'])-primary_position); orientation=1 if c.get('strand')!=edited_strand else .3; distance_score=math.exp(-((distance-70)/35)**2); dsb_risk=math.exp(-distance/15) if c.get('strand')!=edited_strand else .05; timing=1-math.exp(-distance/30); score=.5*distance_score+.3*orientation+.2*timing-.4*dsb_risk; ranked.append({**c,"distance":distance,"orientation_score":orientation,"timing_score":timing,"dsb_like_risk":dsb_risk,"score":score,"strategy":"PE3b" if c.get('requires_edit_match') else "PE3"})
-    return sorted(ranked,key=lambda x:(-x['score'],x['distance']))
+        if not isinstance(c, Mapping) or type(c.get('position')) is not int or c['position'] < 0:
+            raise ValueError('candidate position must be nonnegative integer')
+        if c.get('strand') not in ('+', '-'):
+            raise ValueError('candidate strand must be + or -')
+        if type(c.get('requires_edit_match', False)) is not bool:
+            raise ValueError('requires_edit_match must be boolean')
+        distance = abs(c['position']-primary_position)
+        orientation = 1 if c['strand'] != edited_strand else .3
+        distance_score = math.exp(-((distance-70)/35)**2)
+        dsb_risk = math.exp(-distance/15) if c['strand'] != edited_strand else .05
+        timing = -math.expm1(-distance/30)
+        score = .5*distance_score+.3*orientation+.2*timing-.4*dsb_risk
+        ranked.append({**c, 'distance': distance, 'orientation_score': orientation,
+                       'timing_score': timing, 'dsb_like_risk': dsb_risk, 'score': score,
+                       'strategy': 'PE3b' if c.get('requires_edit_match') else 'PE3',
+                       'model_status': 'OPEN/unfitted nick ranking; risk is not measured DSB probability'})
+    return sorted(ranked, key=lambda x: (-x['score'], x['distance']))
 
 def spacer_binding_risk(spacer, background, max_mismatches=3, intended_position=None):
     """Scan spacer homologs with binding hazard highest for exact matches.
