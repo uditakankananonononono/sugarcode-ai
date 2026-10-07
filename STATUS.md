@@ -8,6 +8,30 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 PBS RNA/DNA duplex thermodynamics
+
+18 initial cases: **15 reproduced before failures, 3 already passing**; one
+additional numerical/normalization boundary case added after implementation.
+Targeted prime tests: **70 passed, 2 skipped**. Full tests/ across 341 files,
+four isolated batches: **2,480 passed, 15 skipped, 0 failed**. Evidence retained
+in `docs/audit-evidence/prime-pbs-*`.
+
+Replaced base-composition energy and salt-adjusted Wallace Tm with the oriented
+Sugimoto 1995 RNA/DNA perfect-duplex nearest-neighbor H/S table, initiation,
+temperature-dependent delta G and concentration-dependent melting temperature.
+PBS is the RNA strand in 5'->3' orientation, encoded ACGT (T denotes U).
+Equal-strand equilibrium bound fraction follows mass action and is 0.5 at Tm;
+it is NOT prime-edit efficiency. No RNA/DNA palindrome symmetry correction.
+Strict sequence/finite-condition checks replace silent invalid-base removal.
+
+Sources and assumptions: `docs/audit-evidence/prime-pbs-provenance.md`.
+**PBS remains OPEN/unfitted**. The DNA-derived SantaLucia salt entropy correction
+is an explicit approximation, not a verified hybrid salt calibration. No Mg,
+mismatches, dangling ends, competing folding, tethered effective concentration,
+intracellular fit, repair/outcome fit, clinical validation or spec validation.
+Automatic PBS selection and legacy pbs_tm_c still use the labeled Wallace
+heuristic; this change does not claim they were replaced or fitted.
+
 ## 2026-10-07 numerical attractor evidence
 
 2 new cases, **2 reproduced before failures**, now passing. Targeted fate/attractor:
