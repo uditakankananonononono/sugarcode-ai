@@ -225,7 +225,7 @@ Status per module: **verified** = implemented with passing named tests;
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
 | rna_decoder | DRACH candidate ranking (uncalibrated heuristic), real ViennaRNA thermodynamic ensembles, matched-control nanopore residuals and supplied-rate kinetics. Functional-effect and encapsulation models Missing. |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
-| dark_genome | TF motif scan (IUPAC), enhancer clustering, CpG islands, lncRNA candidates, hypothesis generation |
+| dark_genome | Strand-aware motif/interval annotation, coding-union fraction and merged CpG statistics; short ORFs are NOT lncRNA calls. Regulatory/contact/expression functions remain uncalibrated surrogates, not biological predictions. |
 | virtual_cell | stoichiometric FBA (scipy linprog/HiGHS), gene knockout lethality + flux rerouting, dynamic FBA growth simulation |
 | synbio_studio | Hill-kinetics ODE circuit simulation (solve_ivp), toggle switch bistability, repressilator, truth-table verification |
 | living_computer | boolean expression -> circuit compiler with fidelity scoring, parts registry, stochastic noise analysis (CV) |

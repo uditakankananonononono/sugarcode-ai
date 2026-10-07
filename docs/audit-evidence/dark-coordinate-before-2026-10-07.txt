@@ -1,0 +1,140 @@
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+______________ test_overlapping_coding_spans_count_union_not_sum _______________
+
+    def test_overlapping_coding_spans_count_union_not_sum():
+        result=decode('ACGT'*100,coding_spans=[(0,200),(100,300)])
+>       assert result['dark_matter_fraction']==.25
+E       assert 0.0 == 0.25
+
+tests/test_dark_coordinate_canaries.py:7: AssertionError
+________ test_coding_spans_require_valid_half_open_coordinates[spans0] _________
+
+spans = [(5, 1)]
+
+    @pytest.mark.parametrize('spans',[[(5,1)],[(-1,4)],[(0,405)],[(0.5,4)],[(True,4)]])
+    def test_coding_spans_require_valid_half_open_coordinates(spans):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_dark_coordinate_canaries.py:11: Failed
+________ test_coding_spans_require_valid_half_open_coordinates[spans1] _________
+
+spans = [(-1, 4)]
+
+    @pytest.mark.parametrize('spans',[[(5,1)],[(-1,4)],[(0,405)],[(0.5,4)],[(True,4)]])
+    def test_coding_spans_require_valid_half_open_coordinates(spans):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_dark_coordinate_canaries.py:11: Failed
+________ test_coding_spans_require_valid_half_open_coordinates[spans2] _________
+
+spans = [(0, 405)]
+
+    @pytest.mark.parametrize('spans',[[(5,1)],[(-1,4)],[(0,405)],[(0.5,4)],[(True,4)]])
+    def test_coding_spans_require_valid_half_open_coordinates(spans):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_dark_coordinate_canaries.py:11: Failed
+________ test_coding_spans_require_valid_half_open_coordinates[spans3] _________
+
+spans = [(0.5, 4)]
+
+    @pytest.mark.parametrize('spans',[[(5,1)],[(-1,4)],[(0,405)],[(0.5,4)],[(True,4)]])
+    def test_coding_spans_require_valid_half_open_coordinates(spans):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_dark_coordinate_canaries.py:11: Failed
+________ test_coding_spans_require_valid_half_open_coordinates[spans4] _________
+
+spans = [(True, 4)]
+
+    @pytest.mark.parametrize('spans',[[(5,1)],[(-1,4)],[(0,405)],[(0.5,4)],[(True,4)]])
+    def test_coding_spans_require_valid_half_open_coordinates(spans):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_dark_coordinate_canaries.py:11: Failed
+_______________ test_empty_sequence_has_zero_noncoding_fraction ________________
+
+    def test_empty_sequence_has_zero_noncoding_fraction():
+>       assert decode('')['dark_matter_fraction']==0
+
+tests/test_dark_coordinate_canaries.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/dark_genome/core.py:35: in decode
+    s = clean_dna(seq)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seq = ''
+
+    def clean_dna(seq: str) -> str:
+        """Upper-case DNA; IUPAC ambiguity letters become N (never dropped, so
+        reading frames and coordinates cannot shift); other characters
+        (whitespace, digits, gaps) are removed."""
+        s = "".join("N" if c in _AMBIG else c for c in seq.upper() if c in "ACGTN" or c in _AMBIG)
+        if not s:
+>           raise ValueError("sequence contains no valid DNA bases")
+E           ValueError: sequence contains no valid DNA bases
+
+src/sugarcode/bio/sequence.py:59: ValueError
+_____________ test_motif_overlapping_coding_span_is_not_noncoding ______________
+
+    def test_motif_overlapping_coding_span_is_not_noncoding():
+        result=decode('AAAAATGACTCAAAAA',coding_spans=[(8,12)])
+>       assert not any(x['tf']=='AP-1' for x in result['tf_motif_hits'])
+E       assert not True
+E        +  where True = any(<generator object test_motif_overlapping_coding_span_is_not_noncoding.<locals>.<genexpr> at 0x7f676b332260>)
+
+tests/test_dark_coordinate_canaries.py:19: AssertionError
+________ test_minus_strand_motif_is_reported_with_original_coordinates _________
+
+    def test_minus_strand_motif_is_reported_with_original_coordinates():
+        from sugarcode.bio.sequence import reverse_complement
+        result=decode('AAAAA'+reverse_complement('TGACTCA')+'AAAAA')
+        hits=[x for x in result['tf_motif_hits'] if x['tf']=='AP-1']
+>       assert any(x['position']==5 and x['strand']=='-' and x['end']==12 for x in hits)
+E       assert False
+E        +  where False = any(<generator object test_minus_strand_motif_is_reported_with_original_coordinates.<locals>.<genexpr> at 0x7f676b331d90>)
+
+tests/test_dark_coordinate_canaries.py:25: AssertionError
+_____________________ test_short_orf_is_not_a_lncrna_call ______________________
+
+    def test_short_orf_is_not_a_lncrna_call():
+        result=decode('ATG'+'GCT'*30+'TAA')
+>       assert 'lncrna_candidates' not in result
+E       AssertionError: assert 'lncrna_candidates' not in {'length': 96, 'gc_content': 0.6354, 'tf_motif_hits': [], 'enhancer_clusters': [], ...}
+
+tests/test_dark_coordinate_canaries.py:29: AssertionError
+____________ test_cpg_statistics_are_recomputed_for_merged_interval ____________
+
+    def test_cpg_statistics_are_recomputed_for_merged_interval():
+        seq='CG'*100 + 'CCGG'*25 + 'AT'*50
+        result=decode(seq)
+        for island in result['cpg_islands']:
+            window=seq[island['start']:island['end']]
+            expected=window.count('CG')*len(window)/(window.count('C')*window.count('G'))
+>           assert island['cpg_obs_exp']==pytest.approx(round(expected,3))
+E           assert 2.0 == 1.667 ± 1.7e-06
+E             
+E             comparison failed
+E             Obtained: 2.0
+E             Expected: 1.667 ± 1.7e-06
+
+tests/test_dark_coordinate_canaries.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_dark_coordinate_canaries.py::test_overlapping_coding_spans_count_union_not_sum
+FAILED tests/test_dark_coordinate_canaries.py::test_coding_spans_require_valid_half_open_coordinates[spans0]
+FAILED tests/test_dark_coordinate_canaries.py::test_coding_spans_require_valid_half_open_coordinates[spans1]
+FAILED tests/test_dark_coordinate_canaries.py::test_coding_spans_require_valid_half_open_coordinates[spans2]
+FAILED tests/test_dark_coordinate_canaries.py::test_coding_spans_require_valid_half_open_coordinates[spans3]
+FAILED tests/test_dark_coordinate_canaries.py::test_coding_spans_require_valid_half_open_coordinates[spans4]
+FAILED tests/test_dark_coordinate_canaries.py::test_empty_sequence_has_zero_noncoding_fraction
+FAILED tests/test_dark_coordinate_canaries.py::test_motif_overlapping_coding_span_is_not_noncoding
+FAILED tests/test_dark_coordinate_canaries.py::test_minus_strand_motif_is_reported_with_original_coordinates
+FAILED tests/test_dark_coordinate_canaries.py::test_short_orf_is_not_a_lncrna_call
+FAILED tests/test_dark_coordinate_canaries.py::test_cpg_statistics_are_recomputed_for_merged_interval
+11 failed in 0.18s

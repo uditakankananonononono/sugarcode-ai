@@ -8,6 +8,32 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 dark-genome sequence annotation
+
+12 new canary cases, **12 reproduced before failures**, now passing. Targeted
+annotation/dark-genome/promoter tests: **36 passed**. Four isolated full tests/
+batches across 324 files: **2,329 passed, 15 skipped, 0 failed**. Logs retained in
+`docs/audit-evidence/dark-*`. No trained regulatory model is claimed by this count.
+
+Built out strand-aware motif annotation with original coordinates and motif ends;
+whole-hit coding overlap exclusion; validated half-open coding spans counted as a
+union; defined empty-sequence annotation; recomputed CpG statistics on merged
+intervals; motif clusters bounded by their whole 500-bp span instead of indefinite
+single-linkage chains. These are real sequence/interval computations only, NOT
+proof that a hit is an enhancer or active in a cell. Empty handling applies to
+`decode`, not every downstream regulatory function.
+
+Named retraction: `lncrna_candidates` -> `short_noncoding_orf_candidates`;
+`lncrna_candidate_count` -> `short_noncoding_orf_count`. A short ORF in a supplied
+noncoding interval does not establish transcription or lncRNA identity. The output
+now says expression/transcript evidence is required.
+
+Still OPEN: regulatory potentials, invented default contacts, binding-energy and
+nucleosome proxies, expression noise intervals, intervention ranking and causal
+claims outside controlled measured experiments. They must not be treated as
+validated biological models. This batch fixes annotation, not the dark-genome
+foundation model requested by the spec.
+
 ## 2026-10-07 prime-edit construction pipeline
 
 20 new canary cases retained, **17 reproduced failures across three stages**,
