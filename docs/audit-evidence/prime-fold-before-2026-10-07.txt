@@ -1,0 +1,47 @@
+FF.FF                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_pegrna_secondary_structure_uses_real_thermodynamic_fold _________
+
+    def test_pegrna_secondary_structure_uses_real_thermodynamic_fold():
+        from sugarcode.modules.rna_nussinov import fold_energy
+        seq='GGGAAACCC'
+        expected=fold_energy(seq)
+        result=secondary_structure(seq)
+>       assert result['dot_bracket']==expected['dot_bracket']=='(((...)))'
+E       KeyError: 'dot_bracket'
+
+tests/test_prime_fold_canaries.py:9: KeyError
+____________ test_self_complementarity_cannot_pair_a_base_to_itself ____________
+
+    def test_self_complementarity_cannot_pair_a_base_to_itself():
+        result=secondary_structure('GCGCGCGC')
+>       assert all(j-i>3 for i,j in result['pairs'])
+E       KeyError: 'pairs'
+
+tests/test_prime_fold_canaries.py:17: KeyError
+____________ test_fold_requires_actual_unambiguous_sequence[ACNNGT] ____________
+
+seq = 'ACNNGT'
+
+    @pytest.mark.parametrize('seq',['', 'ACNNGT', 'ACXXGT'])
+    def test_fold_requires_actual_unambiguous_sequence(seq):
+>       with pytest.raises(ValueError): secondary_structure(seq)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_fold_canaries.py:23: Failed
+____________ test_fold_requires_actual_unambiguous_sequence[ACXXGT] ____________
+
+seq = 'ACXXGT'
+
+    @pytest.mark.parametrize('seq',['', 'ACNNGT', 'ACXXGT'])
+    def test_fold_requires_actual_unambiguous_sequence(seq):
+>       with pytest.raises(ValueError): secondary_structure(seq)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_fold_canaries.py:23: Failed
+=========================== short test summary info ============================
+FAILED tests/test_prime_fold_canaries.py::test_pegrna_secondary_structure_uses_real_thermodynamic_fold
+FAILED tests/test_prime_fold_canaries.py::test_self_complementarity_cannot_pair_a_base_to_itself
+FAILED tests/test_prime_fold_canaries.py::test_fold_requires_actual_unambiguous_sequence[ACNNGT]
+FAILED tests/test_prime_fold_canaries.py::test_fold_requires_actual_unambiguous_sequence[ACXXGT]
+4 failed, 1 passed in 0.20s

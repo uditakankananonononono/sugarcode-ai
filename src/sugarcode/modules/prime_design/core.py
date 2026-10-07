@@ -223,12 +223,30 @@ def pbs_thermodynamics(pbs,target_temperature_c=37,salt_mM=50):
     return {"length":len(s),"gc_fraction":gc,"tm_c":tm,"delta_g_kcal_mol":dg,"annealing_probability":anneal,"temperature_c":target_temperature_c,"salt_mM":salt_mM}
 
 def secondary_structure(sequence,min_stem=4):
-    s=clean_dna(sequence); rc=reverse_complement(s); best=0
-    for shift in range(-len(s)+min_stem,len(s)-min_stem+1):
-        run=0
-        for i,b in enumerate(s):
-            j=i+shift; run=run+1 if 0<=j<len(s) and b==rc[j] else 0; best=max(best,run)
-    return {"longest_stem":best,"paired_fraction":min(1,2*best/len(s)),"structure_penalty":min(1,best/10)}
+    """RNA fold of supplied pegRNA sequence; no self-overlap stem shortcut."""
+    from ..rna_nussinov import fold_energy
+    seq=_oligo(sequence)
+    if isinstance(min_stem,bool) or not isinstance(min_stem,int) or min_stem<1:
+        raise ValueError('min_stem must be positive integer')
+    if len(seq)>2000:
+        raise ValueError('RNA fold exceeds 2000-base resource limit')
+    fold=fold_energy(seq)
+    pairs={tuple(pair) for pair in fold['pairs']}
+    longest=0
+    for i,j in pairs:
+        if (i-1,j+1) in pairs:
+            continue
+        length=1
+        while (i+length,j-length) in pairs:
+            length+=1
+        longest=max(longest,length)
+    return {'longest_stem':longest,'paired_fraction':2*len(pairs)/len(seq),
+            'structure_penalty':min(1,longest/10),'min_stem':min_stem,
+            'stems_meeting_min':sum((i-1,j+1) not in pairs and all((i+k,j-k) in pairs for k in range(min_stem)) for i,j in pairs),
+            'pairs':fold['pairs'],'dot_bracket':fold['dot_bracket'],
+            'mfe_kcal_mol':fold['mfe_kcal_mol'],'method':fold['model'],
+            'status':'RNA secondary-structure model; penalty is uncalibrated, not editing efficiency'}
+
 
 def rt_processivity(rt_template,base_processivity=.96):
     s=clean_dna(rt_template)
