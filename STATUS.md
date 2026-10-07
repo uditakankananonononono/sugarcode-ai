@@ -8,6 +8,22 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 legacy outcome input domains
+
+10 canaries: **7 reproduced input-domain failures, 3 normalization checks already
+passing**. Targeted prime: **170 passed, 2 skipped**. Full tests/ across 347 files,
+four isolated batches: **2,580 passed, 15 skipped, 0 failed**. Evidence retained
+under `docs/audit-evidence/prime-legacy-outcome-*`.
+
+Legacy design_edit four-class outcome helper now rejects nonfinite/boolean Tm,
+noninteger/out-of-design-range RTT length, and missing fields with ValueError.
+Its docstring explicitly identifies the unfitted hand-set heuristic. Contrary
+to the starting hypothesis, no rounding-induced unit-mass error was reproduced
+in the sampled supported domain; no arithmetic correction was justified or made.
+Existing rounded hand-set coefficients remain unchanged, NOT empirical repair
+or outcome probabilities. PRIDICT2 reuse/fitting gate remains CLOSED; no assay
+redistribution, clinical validation or spec claims.
+
 ## 2026-10-07 synthetic outcome metric contracts
 
 13 missing-function canaries failed before implementation, now pass. Targeted

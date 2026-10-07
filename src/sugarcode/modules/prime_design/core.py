@@ -202,13 +202,26 @@ def design_edit(target_region: str, edit: dict, background: str | None = None) -
 
 
 def _outcome_distribution(peg: dict) -> dict:
-    """Simplified efficiency/purity estimate from PBS Tm and RTT length."""
-    tm_score = max(0.0, 1.0 - abs(peg["pbs_tm_c"] - 32.0) / 10.0)
-    len_score = 1.0 - 0.02 * abs(peg["rtt_length"] - 14)
+    """Legacy unfitted four-class heuristic; not assay-calibrated outcomes.
+
+    Only the designed RTT range is supported. Input/domain checks are numerical
+    safeguards, not a repair mechanism or validation of these hand-set weights.
+    """
+    from collections.abc import Mapping
+    if not isinstance(peg, Mapping) or 'pbs_tm_c' not in peg or 'rtt_length' not in peg:
+        raise ValueError('peg must include pbs_tm_c and rtt_length')
+    tm = _finite_real(peg['pbs_tm_c'], 'pbs_tm_c')
+    length = peg['rtt_length']
+    if type(length) is not int or not RTT_RANGE[0] <= length <= RTT_RANGE[1]:
+        raise ValueError('rtt_length must be an integer in designed RTT range')
+    tm_score = max(0.0, 1.0 - abs(tm - 32.0) / 10.0)
+    len_score = 1.0 - 0.02 * abs(length - 14)
     eff = round(0.45 * tm_score * len_score, 3)
-    return {"intended_edit": eff, "partial_rt_readthrough": round(0.2 * (1 - tm_score), 3),
-            "indel_byproducts": round(0.1 + 0.15 * (1 - len_score), 3),
-            "unedited": round(max(0.0, 1 - eff - 0.2 * (1 - tm_score) - (0.1 + 0.15 * (1 - len_score))), 3)}
+    return {'intended_edit': eff,
+            'partial_rt_readthrough': round(0.2 * (1 - tm_score), 3),
+            'indel_byproducts': round(0.1 + 0.15 * (1 - len_score), 3),
+            'unedited': round(max(0.0, 1 - eff - 0.2 * (1 - tm_score) -
+                                   (0.1 + 0.15 * (1 - len_score))), 3)}
 
 # Explicit biophysical and repair models. There is no trained sequence model
 # and this module is not clinically validated.
