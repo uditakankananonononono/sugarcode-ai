@@ -1,0 +1,167 @@
+FFFFFFFFFFF                                                              [100%]
+=================================== FAILURES ===================================
+___________ test_sparse_label_ids_do_not_generate_nan_phantom_cells ____________
+
+    def test_sparse_label_ids_do_not_generate_nan_phantom_cells():
+        labels=np.zeros((32,32),int); labels[8:16,8:16]=7
+        cells=morphology_table(image(),{'labels':labels,'pixel_size_um':1})
+>       assert len(cells)==1 and cells[0]['cell_id']==7
+E       AssertionError: assert (7 == 1)
+E        +  where 7 = len([{'cell_id': 1, 'area_um2': 0, 'perimeter_um': 0.0, 'circularity': 0.0, ...}, {'cell_id': 2, 'area_um2': 0, 'perimeter...r_um': 0.0, 'circularity': 0.0, ...}, {'cell_id': 6, 'area_um2': 0, 'perimeter_um': 0.0, 'circularity': 0.0, ...}, ...])
+
+tests/test_bioimage_truth_canaries.py:12: AssertionError
+_______ test_segmentation_labels_must_be_nonnegative_finite_integers[-1] _______
+
+label = -1
+
+    @pytest.mark.parametrize('label',[-1,1.5,np.nan])
+    def test_segmentation_labels_must_be_nonnegative_finite_integers(label):
+        labels=np.zeros((32,32)); labels[8:16,8:16]=label
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:18: Failed
+______ test_segmentation_labels_must_be_nonnegative_finite_integers[1.5] _______
+
+label = 1.5
+
+    @pytest.mark.parametrize('label',[-1,1.5,np.nan])
+    def test_segmentation_labels_must_be_nonnegative_finite_integers(label):
+        labels=np.zeros((32,32)); labels[8:16,8:16]=label
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:18: Failed
+______ test_segmentation_labels_must_be_nonnegative_finite_integers[nan] _______
+
+label = nan
+
+    @pytest.mark.parametrize('label',[-1,1.5,np.nan])
+    def test_segmentation_labels_must_be_nonnegative_finite_integers(label):
+        labels=np.zeros((32,32)); labels[8:16,8:16]=label
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:18: Failed
+__________________ test_pixel_size_is_finite_real_scale[nan] ___________________
+
+pixel_size = nan
+
+    @pytest.mark.parametrize('pixel_size',[np.nan,np.inf,True])
+    def test_pixel_size_is_finite_real_scale(pixel_size):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:23: Failed
+__________________ test_pixel_size_is_finite_real_scale[inf] ___________________
+
+pixel_size = inf
+
+    @pytest.mark.parametrize('pixel_size',[np.nan,np.inf,True])
+    def test_pixel_size_is_finite_real_scale(pixel_size):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:23: Failed
+__________________ test_pixel_size_is_finite_real_scale[True] __________________
+
+pixel_size = True
+
+    @pytest.mark.parametrize('pixel_size',[np.nan,np.inf,True])
+    def test_pixel_size_is_finite_real_scale(pixel_size):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:23: Failed
+_____________ test_morphology_is_not_a_health_or_passage_diagnosis _____________
+
+    def test_morphology_is_not_a_health_or_passage_diagnosis():
+        result=analyze_microscopy(image())
+>       assert result['culture_health']['health_score'] is None
+E       assert 1.0 is None
+
+tests/test_bioimage_truth_canaries.py:28: AssertionError
+_________ test_constant_image_reports_zero_detected_objects_not_crash __________
+
+    def test_constant_image_reports_zero_detected_objects_not_crash():
+>       result=analyze_microscopy(np.zeros((32,32)))
+
+tests/test_bioimage_truth_canaries.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/bioimage_ai/core.py:215: in analyze_microscopy
+    seg=corrected_segmentation(image,pixel_size_um=pixel_size_um,min_area_um2=min_area_um2,threshold_method=threshold_method); cells=morphology_table(image,seg); diag=enhancement_features(image,seg,cells)
+src/sugarcode/modules/bioimage_ai/core.py:171: in corrected_segmentation
+    img=validate_image(image,pixel_size_um=pixel_size_um)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+image = array([[0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+    ... 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]], shape=(32, 32))
+pixel_size_um = 1
+
+    def validate_image(image, *, pixel_size_um: float=1.0) -> np.ndarray:
+        """Validate a 2-D microscopy frame and normalize it to finite float data."""
+        img=np.asarray(image,float)
+        if img.ndim!=2 or min(img.shape)<8: raise ValueError("image must be a 2-D array with each dimension >= 8")
+        if not np.all(np.isfinite(img)): raise ValueError("image contains non-finite pixels")
+        if pixel_size_um<=0: raise ValueError("pixel_size_um must be positive")
+>       if np.ptp(img)==0: raise ValueError("image has no intensity contrast")
+E       ValueError: image has no intensity contrast
+
+src/sugarcode/modules/bioimage_ai/core.py:164: ValueError
+__________ test_legacy_entrypoints_validate_finite_image[count_cells] __________
+
+api = <function count_cells at 0x7f9643b9ba30>
+
+    @pytest.mark.parametrize('api',[count_cells,analyze_image])
+    def test_legacy_entrypoints_validate_finite_image(api):
+        img=image(); img[0,0]=np.nan
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:42: Failed
+_________ test_legacy_entrypoints_validate_finite_image[analyze_image] _________
+
+api = <function analyze_image at 0x7f9643b9bac0>
+
+    @pytest.mark.parametrize('api',[count_cells,analyze_image])
+    def test_legacy_entrypoints_validate_finite_image(api):
+        img=image(); img[0,0]=np.nan
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_bioimage_truth_canaries.py:42: Failed
+=============================== warnings summary ===============================
+tests/test_bioimage_truth_canaries.py::test_sparse_label_ids_do_not_generate_nan_phantom_cells
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/bioimage_ai/core.py:199: RuntimeWarning: Mean of empty slice.
+    mask=labels==j; ys,xs=np.nonzero(mask); area=len(xs); perimeter=_chain_perimeter(mask)*px; cy,cx=ys.mean(),xs.mean(); cov=np.cov(np.column_stack([ys,xs]).T) if area>1 else np.eye(2); eig=np.linalg.eigvalsh(cov); aspect=math.sqrt(max(eig[-1],1e-12)/max(eig[0],1e-12))
+
+tests/test_bioimage_truth_canaries.py::test_sparse_label_ids_do_not_generate_nan_phantom_cells
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/_methods.py:145: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_bioimage_truth_canaries.py::test_sparse_label_ids_do_not_generate_nan_phantom_cells
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/bioimage_ai/core.py:200: RuntimeWarning: Mean of empty slice.
+    rows.append({"cell_id":j,"area_um2":area*px**2,"perimeter_um":float(perimeter),"circularity":float(4*np.pi*area*px**2/max(perimeter**2,1e-12)),"aspect_ratio":float(aspect),"mean_intensity":float(img[mask].mean()),"integrated_intensity":float(img[mask].sum()),"centroid_y_px":float(cy),"centroid_x_px":float(cx),"edge_touching":bool(np.any(ys==0)|np.any(xs==0)|np.any(ys==img.shape[0]-1)|np.any(xs==img.shape[1]-1))})
+
+tests/test_bioimage_truth_canaries.py::test_segmentation_labels_must_be_nonnegative_finite_integers[nan]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/bioimage_ai/core.py:196: RuntimeWarning: invalid value encountered in cast
+    img=validate_image(image,pixel_size_um=segmentation["pixel_size_um"]); labels=np.asarray(segmentation["labels"],int); px=segmentation["pixel_size_um"]; rows=[]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_bioimage_truth_canaries.py::test_sparse_label_ids_do_not_generate_nan_phantom_cells
+FAILED tests/test_bioimage_truth_canaries.py::test_segmentation_labels_must_be_nonnegative_finite_integers[-1]
+FAILED tests/test_bioimage_truth_canaries.py::test_segmentation_labels_must_be_nonnegative_finite_integers[1.5]
+FAILED tests/test_bioimage_truth_canaries.py::test_segmentation_labels_must_be_nonnegative_finite_integers[nan]
+FAILED tests/test_bioimage_truth_canaries.py::test_pixel_size_is_finite_real_scale[nan]
+FAILED tests/test_bioimage_truth_canaries.py::test_pixel_size_is_finite_real_scale[inf]
+FAILED tests/test_bioimage_truth_canaries.py::test_pixel_size_is_finite_real_scale[True]
+FAILED tests/test_bioimage_truth_canaries.py::test_morphology_is_not_a_health_or_passage_diagnosis
+FAILED tests/test_bioimage_truth_canaries.py::test_constant_image_reports_zero_detected_objects_not_crash
+FAILED tests/test_bioimage_truth_canaries.py::test_legacy_entrypoints_validate_finite_image[count_cells]
+FAILED tests/test_bioimage_truth_canaries.py::test_legacy_entrypoints_validate_finite_image[analyze_image]
+11 failed, 4 warnings in 0.29s
