@@ -1,0 +1,51 @@
+.FFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+____ test_stored_model_contract_checked_before_prediction_or_baseline[bad1] ____
+
+bad = {'class_counts': {'a': -1, 'b': 0}}
+
+    @pytest.mark.parametrize('bad',[{'classes':[1,2]}, {'class_counts':{'a':-1,'b':0}}, {'class_counts':{'a':1}}, {'feature_names':['duplicate','duplicate']}])
+    def test_stored_model_contract_checked_before_prediction_or_baseline(bad):
+        m=model();m.update(bad)
+>       with pytest.raises(ValueError): evaluate(m,[[1,1]],['a'])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_fitted_model_contract_canaries.py:11: Failed
+____ test_stored_model_contract_checked_before_prediction_or_baseline[bad2] ____
+
+bad = {'class_counts': {'a': 1}}
+
+    @pytest.mark.parametrize('bad',[{'classes':[1,2]}, {'class_counts':{'a':-1,'b':0}}, {'class_counts':{'a':1}}, {'feature_names':['duplicate','duplicate']}])
+    def test_stored_model_contract_checked_before_prediction_or_baseline(bad):
+        m=model();m.update(bad)
+>       with pytest.raises(ValueError): evaluate(m,[[1,1]],['a'])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_fitted_model_contract_canaries.py:11: Failed
+____ test_stored_model_contract_checked_before_prediction_or_baseline[bad3] ____
+
+bad = {'feature_names': ['duplicate', 'duplicate']}
+
+    @pytest.mark.parametrize('bad',[{'classes':[1,2]}, {'class_counts':{'a':-1,'b':0}}, {'class_counts':{'a':1}}, {'feature_names':['duplicate','duplicate']}])
+    def test_stored_model_contract_checked_before_prediction_or_baseline(bad):
+        m=model();m.update(bad)
+>       with pytest.raises(ValueError): evaluate(m,[[1,1]],['a'])
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_fitted_model_contract_canaries.py:11: Failed
+______________ test_input_serialization_never_loses_feature_order ______________
+
+    def test_input_serialization_never_loses_feature_order():
+        m=model()
+        assert m['feature_names']==['feature_0','feature_1']
+        result=predict(m,[[.1,.1]])
+>       assert result['feature_names']==m['feature_names']
+E       KeyError: 'feature_names'
+
+tests/test_fitted_model_contract_canaries.py:17: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_fitted_model_contract_canaries.py::test_stored_model_contract_checked_before_prediction_or_baseline[bad1]
+FAILED tests/test_fitted_model_contract_canaries.py::test_stored_model_contract_checked_before_prediction_or_baseline[bad2]
+FAILED tests/test_fitted_model_contract_canaries.py::test_stored_model_contract_checked_before_prediction_or_baseline[bad3]
+FAILED tests/test_fitted_model_contract_canaries.py::test_input_serialization_never_loses_feature_order
+4 failed, 2 passed in 0.36s
