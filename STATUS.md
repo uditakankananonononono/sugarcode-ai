@@ -8,6 +8,34 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 repair/outcome numerical domains
+
+28 initial canaries: **22 reproduced before failures, 6 already passing**.
+Two follow-up boundary cases added. Targeted prime: **100 passed, 2 skipped**.
+Full tests/ across 342 files, four isolated batches: **2,510 passed, 15 skipped,
+0 failed**. Evidence in `docs/audit-evidence/prime-probability-*`.
+
+Strict RT template checks, finite nonboolean scalar checks, integer homology
+length, normalized nonnegative supplied repair distributions and bounded nick
+score/risk checks prevent silent invalid sequence cleanup and negative/nonfinite
+outcome weights. An explicitly supplied empty repair mapping is rejected instead
+of silently generating defaults. Negative supported ranking scores clamp the
+intended score before normalization. Homopolymer scan is now linear rather than
+repeated substrings/sets. RT/flap/repair outputs label their unfitted status.
+
+**Repair/outcome fitting remains OPEN**. Existing hand-set coefficients and the
+arbitrary residual indel channel are unchanged; all-zero activities still yield
+100% surrogate indel, not an experimentally supported biological prediction.
+Outcome distribution stays numeric-only for existing consumers; its docstring
+and compiler status identify the unfitted blend. No new repair mechanism,
+clinical validation or spec validation is claimed.
+
+One added long-template test incorrectly required exact underflow to zero;
+first regression found the valid finite subnormal 2.63e-308. Corrected the test
+to a finite bounded near-zero expectation, retained failed evidence, and reran
+all four full-suite batches successfully. No implementation change was needed
+for that test correction.
+
 ## 2026-10-07 PBS RNA/DNA duplex thermodynamics
 
 18 initial cases: **15 reproduced before failures, 3 already passing**; one

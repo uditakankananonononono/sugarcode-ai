@@ -1,0 +1,15 @@
+........................................................................ [ 70%]
+.......F....................ss                                           [100%]
+=================================== FAILURES ===================================
+______ test_long_template_run_scan_completes_without_quadratic_substrings ______
+
+    def test_long_template_run_scan_completes_without_quadratic_substrings():
+        r = rt_processivity('A'*10000)
+        assert r['homopolymer_max'] == 10000
+>       assert r['completion_probability'] == 0
+E       assert 2.628106013009322e-308 == 0
+
+tests/test_prime_probability_domain.py:77: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_prime_probability_domain.py::test_long_template_run_scan_completes_without_quadratic_substrings
+1 failed, 99 passed, 2 skipped in 0.67s

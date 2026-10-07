@@ -1,0 +1,29 @@
+Four-way isolated tests/ regression; batch 1; 86 files
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+........................................................................ [ 36%]
+.s...................................................................... [ 48%]
+........................................................................ [ 60%]
+........................................................................ [ 72%]
+.............................................F.......................... [ 84%]
+........................................................................ [ 97%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+______ test_long_template_run_scan_completes_without_quadratic_substrings ______
+
+    def test_long_template_run_scan_completes_without_quadratic_substrings():
+        r = rt_processivity('A'*10000)
+        assert r['homopolymer_max'] == 10000
+>       assert r['completion_probability'] == 0
+E       assert 2.628106013009322e-308 == 0
+
+tests/test_prime_probability_domain.py:77: AssertionError
+=============================== warnings summary ===============================
+tests/test_microbiome_rx_spec.py::test_real_intervention_optimizer
+  /home/sandbox/v/lib/python3.10/site-packages/scipy/integrate/_ivp/bdf.py:415: RuntimeWarning: invalid value encountered in subtract
+    D[order + 2] = d - D[order + 1]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_prime_probability_domain.py::test_long_template_run_scan_completes_without_quadratic_substrings
+1 failed, 591 passed, 4 skipped, 1 warning in 63.72s (0:01:03)
