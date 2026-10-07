@@ -1,0 +1,13 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_sparse_control_refits_returned_support_and_reports_improvement ______
+
+    def test_sparse_control_refits_returned_support_and_reports_improvement():
+        result=optimal_reprogramming({}, {'TNNT2':2,'MYH6':2},hours=2,max_factors=1)
+>       assert result['sparse_refit_converged'] is True
+E       KeyError: 'sparse_refit_converged'
+
+tests/test_control_sparse_refit_canaries.py:6: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_control_sparse_refit_canaries.py::test_sparse_control_refits_returned_support_and_reports_improvement
+1 failed in 3.71s
