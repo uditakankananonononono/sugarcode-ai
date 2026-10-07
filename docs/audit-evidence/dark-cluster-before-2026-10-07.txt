@@ -1,0 +1,14 @@
+...........F                                                             [100%]
+=================================== FAILURES ===================================
+________ test_enhancer_cluster_does_not_chain_past_claimed_500_bp_span _________
+
+    def test_enhancer_cluster_does_not_chain_past_claimed_500_bp_span():
+        result=decode('TGACTCA'+'A'*430+'GGGCGG'+'A'*430+'CCAAT')
+>       assert all(c['end']-c['start'] <= 500 for c in result['enhancer_clusters'])
+E       assert False
+E        +  where False = all(<generator object test_enhancer_cluster_does_not_chain_past_claimed_500_bp_span.<locals>.<genexpr> at 0x7f6b79bbd230>)
+
+tests/test_dark_coordinate_canaries.py:43: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_dark_coordinate_canaries.py::test_enhancer_cluster_does_not_chain_past_claimed_500_bp_span
+1 failed, 11 passed in 0.15s

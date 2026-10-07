@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ...bio.sequence import clean_dna, find_motif, gc_content, orfs
+from ...bio.sequence import clean_dna, find_motif, gc_content, orfs, reverse_complement
 from ...bio import pwm
 
 TF_MOTIFS = {
@@ -27,35 +27,61 @@ def _cpg_islands(s: str, window: int = 200) -> list[dict]:
             merged[-1]["end"] = isl["end"]
         else:
             merged.append(dict(isl))
+    for island in merged:
+        w = s[island['start']:island['end']]
+        island['gc'] = round(gc_content(w), 3)
+        island['cpg_obs_exp'] = round(w.count('CG')*len(w)/max(1,w.count('C')*w.count('G')), 3)
     return merged
 
 
 def decode(seq: str, coding_spans: list[tuple[int, int]] | None = None) -> dict:
     """Decode the regulatory landscape of a (mostly non-coding) locus."""
-    s = clean_dna(seq)
-    coding_spans = coding_spans or []
+    if not isinstance(seq, str):
+        raise ValueError('sequence must be text')
+    s = ''.join(seq.split()).upper()
+    if set(s)-set('ACGTN'):
+        raise ValueError('unsupported DNA symbols; only ACGTN and whitespace accepted')
+    coding_spans = [] if coding_spans is None else coding_spans
+    checked = []
+    for span in coding_spans:
+        if not isinstance(span, (tuple,list)) or len(span)!=2:
+            raise ValueError('coding spans must be start/end pairs')
+        a,b = span
+        if any(isinstance(x,bool) or not isinstance(x,int) for x in (a,b)) or not 0 <= a <= b <= len(s):
+            raise ValueError('coding spans require integer 0 <= start <= end <= length')
+        if a < b:
+            checked.append((a,b))
+    union = []
+    for a,b in sorted(checked):
+        if union and a <= union[-1][1]:
+            union[-1] = (union[-1][0], max(b,union[-1][1]))
+        else:
+            union.append((a,b))
 
-    def noncoding(pos: int) -> bool:
-        return not any(a <= pos < b for a, b in coding_spans)
+    def noncoding(start, end):
+        return not any(start < b and end > a for a,b in union)
 
     enhancers = []
-    for name, motif in TF_MOTIFS.items():
-        for pos in find_motif(s, motif):
-            if noncoding(pos):
-                enhancers.append({"tf": name, "position": pos,
-                                  "motif": s[pos:pos + len(motif)]})
+    for strand, scan in (('+',s),('-',reverse_complement(s))):
+        for name,motif in TF_MOTIFS.items():
+            for pos in find_motif(scan,motif) if scan else []:
+                start = pos if strand=='+' else len(s)-pos-len(motif)
+                end = start+len(motif)
+                if noncoding(start,end):
+                    enhancers.append({'tf':name,'position':start,'end':end,
+                                      'strand':strand,'motif':scan[pos:pos+len(motif)]})
     # enhancer clusters: >=3 TF hits within 500 bp
     enhancers.sort(key=lambda e: e["position"])
     clusters = []
     for e in enhancers:
-        if clusters and e["position"] - clusters[-1]["end"] < 500:
+        if clusters and e["end"] - clusters[-1]["start"] <= 500:
             clusters[-1]["hits"].append(e)
-            clusters[-1]["end"] = e["position"]
+            clusters[-1]["end"] = max(clusters[-1]["end"], e["end"])
         else:
-            clusters.append({"start": e["position"], "end": e["position"], "hits": [e]})
+            clusters.append({"start": e["position"], "end": e["end"], "hits": [e]})
     enh_clusters = [c for c in clusters if len(c["hits"]) >= 3]
 
-    nc_orfs = [o for o in orfs(s, min_aa=20) if noncoding(o["start"])]
+    nc_orfs = [o for o in (orfs(s, min_aa=20) if s else []) if noncoding(o["start"],o["end"])]
     lnc_candidates = [{"start": o["start"], "end": o["end"], "strand": o["strand"]}
                       for o in nc_orfs if o["aa_length"] < 100]
 
@@ -65,13 +91,14 @@ def decode(seq: str, coding_spans: list[tuple[int, int]] | None = None) -> dict:
     ]
     return {
         "length": len(s),
-        "gc_content": round(gc_content(s), 4),
+        "gc_content": round(gc_content(s), 4) if s else 0.,
         "tf_motif_hits": enhancers,
         "enhancer_clusters": formatted_clusters,
         "cpg_islands": _cpg_islands(s),
-        "lncrna_candidates": lnc_candidates,
-        "dark_matter_fraction": round(1 - sum(b - a for a, b in coding_spans) / len(s), 4)
-        if coding_spans else 1.0,
+        "short_noncoding_orf_candidates": lnc_candidates,
+        "annotation_status": "Sequence features only, not transcript or enhancer identity. lncRNA requires expression/transcript evidence.",
+        "coding_spans_union": [list(x) for x in union],
+        "dark_matter_fraction": round(1 - sum(b - a for a, b in union) / len(s), 4) if s else 0.,
         "hypotheses": _hypotheses(formatted_clusters, lnc_candidates),
     }
 
@@ -82,8 +109,8 @@ def _hypotheses(clusters: list[dict], lnc: list[dict]) -> list[str]:
         out.append(f"Putative enhancer at {c['start']}-{c['end']} with {c['n_motifs']} TF motifs "
                    f"({', '.join(c['tfs'])}): test by reporter assay + CRISPRi of the element.")
     for l in lnc[:3]:
-        out.append(f"lncRNA candidate at {l['start']}-{l['end']} ({l['strand']}): "
-                   "validate by RT-PCR and subcellular fractionation.")
+        out.append(f"Short ORF in supplied noncoding interval at {l['start']}-{l['end']} ({l['strand']}): "
+                   "DNA sequence alone does not establish a transcript; obtain expression and transcript evidence.")
     return out
 
 # Multi-scale probabilistic inference using explicit biophysical/statistical
@@ -198,7 +225,7 @@ def regulatory_blueprint(seq,cell_state=None):
     decoded=decode(seq); graph=chromatin_graph(seq); field=coordinate_field(seq,cell_state); return {"elements":decoded,"coordinate_field":field,"causal_graph":graph,"propagated_state":graph_propagate(graph),"prioritized_interventions":perturbation_blueprint(seq[:min(len(clean_dna(seq)),60)],.05,cell_state,3),"model_status":"Transparent biophysical/statistical surrogates; no trained foundation model and not clinically validated.","validation":["Test enhancer causality with matched perturbation and expression readouts.","Compare predicted contacts against cell-state Hi-C or Micro-C.","Feed count-level perturbation effects back into uncertainty updates."]}
 
 def dark_genome_diagnostics(seq,cell_state=None):
-    s=clean_dna(seq); d=decode(s); field=coordinate_field(s,cell_state)['field']; graph=chromatin_graph(s,bin_size=max(25,min(100,len(s)))); occ=nucleosome_positioning(s); potentials=np.array([x['regulatory_potential'] for x in field]); densities=np.array([x['motif_density'] for x in field]); occupancy=np.array([x['occupancy'] for x in occ]); out={"length":float(len(s)),"gc_fraction":gc_content(s),"at_fraction":1-gc_content(s),"dark_matter_fraction":float(d['dark_matter_fraction']),"tf_motif_count":float(len(d['tf_motif_hits'])),"enhancer_cluster_count":float(len(d['enhancer_clusters'])),"cpg_island_count":float(len(d['cpg_islands'])),"lncrna_candidate_count":float(len(d['lncrna_candidates'])),"regulatory_potential_mean":float(potentials.mean()),"regulatory_potential_std":float(potentials.std()),"regulatory_potential_min":float(potentials.min()),"regulatory_potential_max":float(potentials.max()),"motif_density_mean":float(densities.mean()),"motif_density_max":float(densities.max()),"graph_node_count":float(len(graph['nodes'])),"graph_edge_count":float(len(graph['edges'])),"graph_mean_degree":2*len(graph['edges'])/max(1,len(graph['nodes'])),"nucleosome_mean":float(occupancy.mean()),"nucleosome_std":float(occupancy.std()),"nucleosome_min":float(occupancy.min()),"nucleosome_max":float(occupancy.max()),"sequence_entropy":float(-sum((s.count(b)/len(s))*math.log2(s.count(b)/len(s)) for b in 'ACGT' if s.count(b)))}
+    s=clean_dna(seq); d=decode(s); field=coordinate_field(s,cell_state)['field']; graph=chromatin_graph(s,bin_size=max(25,min(100,len(s)))); occ=nucleosome_positioning(s); potentials=np.array([x['regulatory_potential'] for x in field]); densities=np.array([x['motif_density'] for x in field]); occupancy=np.array([x['occupancy'] for x in occ]); out={"length":float(len(s)),"gc_fraction":gc_content(s),"at_fraction":1-gc_content(s),"dark_matter_fraction":float(d['dark_matter_fraction']),"tf_motif_count":float(len(d['tf_motif_hits'])),"enhancer_cluster_count":float(len(d['enhancer_clusters'])),"cpg_island_count":float(len(d['cpg_islands'])),"short_noncoding_orf_count":float(len(d['short_noncoding_orf_candidates'])),"regulatory_potential_mean":float(potentials.mean()),"regulatory_potential_std":float(potentials.std()),"regulatory_potential_min":float(potentials.min()),"regulatory_potential_max":float(potentials.max()),"motif_density_mean":float(densities.mean()),"motif_density_max":float(densities.max()),"graph_node_count":float(len(graph['nodes'])),"graph_edge_count":float(len(graph['edges'])),"graph_mean_degree":2*len(graph['edges'])/max(1,len(graph['nodes'])),"nucleosome_mean":float(occupancy.mean()),"nucleosome_std":float(occupancy.std()),"nucleosome_min":float(occupancy.min()),"nucleosome_max":float(occupancy.max()),"sequence_entropy":float(-sum((s.count(b)/len(s))*math.log2(s.count(b)/len(s)) for b in 'ACGT' if s.count(b)))}
     for b in 'ACGT': out[f'base_fraction.{b}']=s.count(b)/len(s)
     for tf,motif in TF_MOTIFS.items(): out[f'binding_energy.{tf}']=float(motif_binding_energy(s,motif)['energy_kcal_mol'])
     return out
