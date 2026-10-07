@@ -1,0 +1,25 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_report_calls_are_positions_not_duplicate_fragment_rows __________
+
+    def test_report_calls_are_positions_not_duplicate_fragment_rows():
+        x=np.zeros((3,8,4));x[:,:,1:]=.9;x[:,3,0]=.12
+        result=analyze_liquid_biopsy(x,[[0,1],[0,1],[1,0]],[])
+>       calls=result['position_evidence']
+E       KeyError: 'position_evidence'
+
+tests/test_variant_fragment_aggregation_canaries.py:7: KeyError
+____________ test_classifier_inference_connected_to_end_to_end_path ____________
+
+    def test_classifier_inference_connected_to_end_to_end_path():
+        from sugarcode.modules.liquid_biopsy import fit_multiomics_classifier
+        model=fit_multiomics_classifier([[0,0,0,0],[.1,.1,.1,.1],[.9,.9,.9,.9],[1,1,1,1]],['low','low','high','high'],feature_names=['ctDNA','methylation','proteomics','metabolomics'])
+        x=np.ones((2,8,4))*.95
+>       result=analyze_liquid_biopsy(x,[[0],[1]],[],methylation=[1],proteins=[1],metabolites=[1],multiomics_model=model)
+E       TypeError: analyze_liquid_biopsy() got an unexpected keyword argument 'multiomics_model'
+
+tests/test_variant_fragment_aggregation_canaries.py:19: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_variant_fragment_aggregation_canaries.py::test_report_calls_are_positions_not_duplicate_fragment_rows
+FAILED tests/test_variant_fragment_aggregation_canaries.py::test_classifier_inference_connected_to_end_to_end_path
+2 failed in 0.47s

@@ -138,7 +138,7 @@ def _softmax(x, axis=-1):
 
 
 def consensus_denoise(fragment_features, *, error_prior: float = 1e-3) -> dict:
-    """Evidence-based somatic-call filtering. No neural network, no random weights.
+    """Uncalibrated fragment-feature scoring. No neural network, no random weights.
 
     ``fragment_features`` is ``[fragments, positions, channels]``; channels are
     allele support, base quality (0..1), mapping quality (0..1), strand balance
@@ -474,18 +474,34 @@ def enhancement_features(signal, calls=(), fragment_lengths=(), methylation=(),
 
 def analyze_liquid_biopsy(fragment_features, fragment_alleles, variants, *, coverage=(),
                            fragment_lengths=(), methylation=(), proteins=(), metabolites=(),
-                           longitudinal=()) -> dict:
+                           longitudinal=(), multiomics_model=None,
+                           normal_coverage=None, junction_evidence=None) -> dict:
     """Research evidence summary; not a clinical or specification-complete pipeline."""
     denoised = consensus_denoise(fragment_features)
-    arch = reconstruct_tumor_architecture(variants, fragment_alleles, coverage, methylation)
-    raw = np.asarray(fragment_features, float)[...,0].ravel()
-    calls = [{"locus_index": i, "allele_fraction": float(v), "evidence_score": float(c)}
-             for i,(v,c) in enumerate(zip(raw, np.asarray(denoised["evidence_score"]).ravel())) if c >= .5]
-    fusion = integrate_multiomics([c["allele_fraction"] for c in calls], methylation, proteins, metabolites)
+    arch = reconstruct_tumor_architecture(variants, fragment_alleles, coverage, methylation,
+                                         normal_coverage=normal_coverage,junction_evidence=junction_evidence)
+    x=np.asarray(fragment_features,float)
+    if x.ndim==2:
+        x=x[None,...]
+    support=x[...,0]; raw=support.ravel()
+    scores=np.asarray(denoised['evidence_score'])
+    means=support.mean(0); mean_scores=scores.mean(0)
+    support_threshold=max(5*float(np.median(support)),.01)
+    calls=[]
+    for pos,(value,score) in enumerate(zip(means,mean_scores)):
+        if score>=.5:
+            calls.append({'position_index':pos,'mean_allele_support':float(value),
+                          'allele_fraction':float(value),'evidence_score':float(score),
+                          'fragments_total':support.shape[0],
+                          'fragments_supporting':int(np.sum(support[:,pos]>support_threshold)),
+                          'support_threshold':support_threshold,
+                          'status':'Position-index heuristic feature summary, not variant allele counts, genomic identity or somatic origin'})
+    fusion = integrate_multiomics([c['mean_allele_support'] for c in calls], methylation, proteins, metabolites,
+                                 model=multiomics_model)
     trajectory = longitudinal_trajectory(longitudinal)
     enhancements = enhancement_features(raw, calls, fragment_lengths, methylation,
                                         proteins, metabolites, longitudinal)
-    return {"denoising": denoised, "tumor_architecture": arch,
+    return {"position_evidence":calls,"denoising": denoised, "tumor_architecture": arch,
             "multiomics": fusion, "longitudinal": trajectory,
             "enhancement_features": enhancements,
             "enhancement_feature_count": len(enhancements),
