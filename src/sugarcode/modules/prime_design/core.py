@@ -216,11 +216,78 @@ import math
 import json
 import numpy as np
 
-def pbs_thermodynamics(pbs,target_temperature_c=37,salt_mM=50):
-    s=clean_dna(pbs)
-    if not 8<=len(s)<=25 or salt_mM<=0: raise ValueError("PBS must be 8-25 nt and salt_mM positive")
-    tm=tm_wallace(s)+16.6*math.log10(salt_mM/1000); gc=gc_content(s); dg=-1.7*(s.count('G')+s.count('C'))-1.0*(s.count('A')+s.count('T'))+3.4; anneal=1/(1+math.exp(-(tm-target_temperature_c)/4))
-    return {"length":len(s),"gc_fraction":gc,"tm_c":tm,"delta_g_kcal_mol":dg,"annealing_probability":anneal,"temperature_c":target_temperature_c,"salt_mM":salt_mM}
+# Sugimoto et al. (1995) RNA/DNA hybrid nearest neighbors. Keys denote the
+# 5'->3' RNA strand, with T used as the serialized representation of U.
+# H: kcal/mol; S: cal/(mol K). Source table R_DNA_NN1:
+# https://biopython.org/docs/latest/api/Bio.SeqUtils.MeltingTemp.html
+_PBS_RNA_DNA_NN = {
+    'AA': (-7.8, -21.9), 'AC': (-5.9, -12.3),
+    'AG': (-9.1, -23.5), 'AT': (-8.3, -23.9),
+    'CA': (-9.0, -26.1), 'CC': (-9.3, -23.2),
+    'CG': (-16.3, -47.1), 'CT': (-7.0, -19.7),
+    'GA': (-5.5, -13.5), 'GC': (-8.0, -17.1),
+    'GG': (-12.8, -31.9), 'GT': (-7.8, -21.6),
+    'TA': (-7.8, -23.2), 'TC': (-8.6, -22.9),
+    'TG': (-10.4, -28.4), 'TT': (-11.5, -36.4),
+}
+
+
+def pbs_thermodynamics(pbs, target_temperature_c=37, salt_mM=50,
+                       strand_concentration_nM=25):
+    """Perfect RNA PBS / complementary DNA duplex, not editing efficiency.
+
+    PBS is encoded as ACGT in RNA 5'->3' orientation. Equal free strand
+    totals are assumed, each strand_concentration_nM. Sugimoto 1995 hybrid
+    H/S parameters plus the SantaLucia entropy salt correction (a DNA-derived
+    approximation, NOT a fitted hybrid/intracellular salt model). No mismatches,
+    dangling ends, magnesium, competing fold or effective tether concentration.
+    """
+    from numbers import Real
+    s = _oligo(pbs)
+    if not 8 <= len(s) <= 25:
+        raise ValueError('PBS must be 8-25 nt')
+    for value, name in ((target_temperature_c, 'temperature'),
+                        (salt_mM, 'salt_mM'),
+                        (strand_concentration_nM, 'strand_concentration_nM')):
+        if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value):
+            raise ValueError(f'{name} must be a finite number')
+    if target_temperature_c <= -273.15 or salt_mM <= 0 or strand_concentration_nM <= 0:
+        raise ValueError('positive absolute temperature, salt and concentration required')
+    # General initiation only; this hybrid table has no symmetry or terminal
+    # correction. RNA/DNA strands are distinct even for palindromic sequence.
+    dh, ds = 1.9, -3.9
+    for i in range(len(s)-1):
+        h, entropy = _PBS_RNA_DNA_NN[s[i:i+2]]
+        dh += h
+        ds += entropy
+    salt_entropy = .368 * (len(s)-1) * (math.log(salt_mM)-math.log(1000))
+    ds += salt_entropy
+    temperature_k = target_temperature_c + 273.15
+    gas_constant = 1.987
+    log_concentration = math.log(strand_concentration_nM)-math.log(1e9)
+    denominator = ds + gas_constant*(log_concentration-math.log(2))
+    if denominator >= 0:
+        raise ValueError('conditions outside positive melting-temperature model domain')
+    tm = 1000*dh/denominator-273.15
+    dg = dh-temperature_k*ds/1000
+    # Equal strand totals C: f = K*C*(1-f)^2. Stable quadratic form
+    # avoids exp overflow/catastrophic cancellation at strong association.
+    log_q = -1000*dg/(gas_constant*temperature_k) + log_concentration
+    if log_q >= 0:
+        inverse_q = math.exp(-log_q)
+        anneal = 2/(2+inverse_q+math.sqrt(inverse_q*inverse_q+4*inverse_q))
+    else:
+        q = math.exp(log_q)
+        anneal = 2*q/(1+2*q+math.sqrt(1+4*q))
+    return {'length': len(s), 'gc_fraction': gc_content(s), 'tm_c': tm,
+            'delta_h_kcal_mol': dh, 'delta_s_cal_mol_k': ds,
+            'salt_entropy_correction_cal_mol_k': salt_entropy,
+            'delta_g_kcal_mol': dg, 'annealing_probability': anneal,
+            'temperature_c': target_temperature_c, 'salt_mM': salt_mM,
+            'strand_concentration_nM': strand_concentration_nM,
+            'model': 'Sugimoto1995_RNA_DNA_perfect_duplex',
+            'salt_model': 'SantaLucia1998_DNA_entropy_approximation',
+            'status': 'OPEN/unfitted PBS context: equal-strand equilibrium, not editing efficiency'}
 
 def secondary_structure(sequence,min_stem=4):
     """RNA fold of supplied pegRNA sequence; no self-overlap stem shortcut."""

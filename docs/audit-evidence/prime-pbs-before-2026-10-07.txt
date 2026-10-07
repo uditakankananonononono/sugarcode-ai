@@ -1,0 +1,224 @@
+FFFFFF.F.FF.FFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_________________________ test_hand_summed_acgt_hybrid _________________________
+
+    def test_hand_summed_acgt_hybrid():
+        # RNA AC, CG, GU, UA repeats: Sugimoto 1995 parameters (T denotes U).
+        h = 1.9 + 3*(-5.9-16.3-7.8) + 2*(-7.8)
+        s = -3.9 + 3*(-12.3-47.1-21.6) + 2*(-23.2)
+        r = pbs_thermodynamics('ACGT'*3, salt_mM=1000)
+>       assert r['delta_h_kcal_mol'] == pytest.approx(h)
+E       KeyError: 'delta_h_kcal_mol'
+
+tests/test_prime_pbs_duplex.py:12: KeyError
+_____________________ test_order_and_rna_direction_matter ______________________
+
+    def test_order_and_rna_direction_matter():
+        a = pbs_thermodynamics('AAAACCCCGGGGTTTT')
+        b = pbs_thermodynamics('ACGT'*4)
+>       assert a['delta_g_kcal_mol'] != pytest.approx(b['delta_g_kcal_mol'])
+E       assert -18.200000000000003 != -18.200000000000003 ± 1.8e-05
+E        +  where -18.200000000000003 ± 1.8e-05 = <function approx at 0x7f297fb4f250>(-18.200000000000003)
+E        +    where <function approx at 0x7f297fb4f250> = pytest.approx
+
+tests/test_prime_pbs_duplex.py:21: AssertionError
+_____________ test_concentration_and_mass_action_half_bound_at_tm ______________
+
+    def test_concentration_and_mass_action_half_bound_at_tm():
+>       low = pbs_thermodynamics('ACGT'*4, strand_concentration_nM=25)
+E       TypeError: pbs_thermodynamics() got an unexpected keyword argument 'strand_concentration_nM'
+
+tests/test_prime_pbs_duplex.py:26: TypeError
+_________________ test_salt_entropy_and_temperature_consistent _________________
+
+    def test_salt_entropy_and_temperature_consistent():
+        a = pbs_thermodynamics('ACGT'*3, salt_mM=50)
+        b = pbs_thermodynamics('ACGT'*3, salt_mM=1000)
+>       assert a['delta_s_cal_mol_k']-b['delta_s_cal_mol_k'] == pytest.approx(.368*11*math.log(.05))
+E       KeyError: 'delta_s_cal_mol_k'
+
+tests/test_prime_pbs_duplex.py:38: KeyError
+____________ test_invalid_sequence_not_silently_cleaned[ACGTACGTN] _____________
+
+seq = 'ACGTACGTN'
+
+    @pytest.mark.parametrize('seq', ['ACGTACGTN', 'ACGTACGT!', '', None, 'ACGUACGU'])
+    def test_invalid_sequence_not_silently_cleaned(seq):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:48: Failed
+____________ test_invalid_sequence_not_silently_cleaned[ACGTACGT!] _____________
+
+seq = 'ACGTACGT!'
+
+    @pytest.mark.parametrize('seq', ['ACGTACGTN', 'ACGTACGT!', '', None, 'ACGUACGU'])
+    def test_invalid_sequence_not_silently_cleaned(seq):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:48: Failed
+_______________ test_invalid_sequence_not_silently_cleaned[None] _______________
+
+seq = None
+
+    @pytest.mark.parametrize('seq', ['ACGTACGTN', 'ACGTACGT!', '', None, 'ACGUACGU'])
+    def test_invalid_sequence_not_silently_cleaned(seq):
+        with pytest.raises(ValueError):
+>           pbs_thermodynamics(seq)
+
+tests/test_prime_pbs_duplex.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/prime_design/core.py:220: in pbs_thermodynamics
+    s=clean_dna(pbs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seq = None
+
+    def clean_dna(seq: str) -> str:
+        """Upper-case DNA; IUPAC ambiguity letters become N (never dropped, so
+        reading frames and coordinates cannot shift); other characters
+        (whitespace, digits, gaps) are removed."""
+>       s = "".join("N" if c in _AMBIG else c for c in seq.upper() if c in "ACGTN" or c in _AMBIG)
+E       AttributeError: 'NoneType' object has no attribute 'upper'
+
+src/sugarcode/bio/sequence.py:57: AttributeError
+__________________ test_invalid_conditions_rejected[kwargs0] ___________________
+
+kwargs = {'salt_mM': nan}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs1] ___________________
+
+kwargs = {'salt_mM': inf}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs3] ___________________
+
+kwargs = {'salt_mM': True}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs4] ___________________
+
+kwargs = {'target_temperature_c': nan}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs5] ___________________
+
+kwargs = {'target_temperature_c': -273.15}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs6] ___________________
+
+kwargs = {'target_temperature_c': True}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_pbs_duplex.py:59: Failed
+__________________ test_invalid_conditions_rejected[kwargs7] ___________________
+
+kwargs = {'strand_concentration_nM': 0}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+        with pytest.raises(ValueError):
+>           pbs_thermodynamics('ACGT'*3, **kwargs)
+E           TypeError: pbs_thermodynamics() got an unexpected keyword argument 'strand_concentration_nM'
+
+tests/test_prime_pbs_duplex.py:60: TypeError
+__________________ test_invalid_conditions_rejected[kwargs8] ___________________
+
+kwargs = {'strand_concentration_nM': inf}
+
+    @pytest.mark.parametrize('kwargs', [
+        {'salt_mM':float('nan')}, {'salt_mM':float('inf')}, {'salt_mM':0},
+        {'salt_mM':True}, {'target_temperature_c':float('nan')},
+        {'target_temperature_c':-273.15}, {'target_temperature_c':True},
+        {'strand_concentration_nM':0}, {'strand_concentration_nM':float('inf')},
+    ])
+    def test_invalid_conditions_rejected(kwargs):
+        with pytest.raises(ValueError):
+>           pbs_thermodynamics('ACGT'*3, **kwargs)
+E           TypeError: pbs_thermodynamics() got an unexpected keyword argument 'strand_concentration_nM'
+
+tests/test_prime_pbs_duplex.py:60: TypeError
+=========================== short test summary info ============================
+FAILED tests/test_prime_pbs_duplex.py::test_hand_summed_acgt_hybrid - KeyErro...
+FAILED tests/test_prime_pbs_duplex.py::test_order_and_rna_direction_matter - ...
+FAILED tests/test_prime_pbs_duplex.py::test_concentration_and_mass_action_half_bound_at_tm
+FAILED tests/test_prime_pbs_duplex.py::test_salt_entropy_and_temperature_consistent
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_sequence_not_silently_cleaned[ACGTACGTN]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_sequence_not_silently_cleaned[ACGTACGT!]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_sequence_not_silently_cleaned[None]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs0]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs1]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs3]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs4]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs5]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs6]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs7]
+FAILED tests/test_prime_pbs_duplex.py::test_invalid_conditions_rejected[kwargs8]
+15 failed, 3 passed in 0.22s
