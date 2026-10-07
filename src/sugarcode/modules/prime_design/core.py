@@ -315,23 +315,69 @@ def secondary_structure(sequence,min_stem=4):
             'status':'RNA secondary-structure model; penalty is uncalibrated, not editing efficiency'}
 
 
-def rt_processivity(rt_template,base_processivity=.96):
-    s=clean_dna(rt_template)
-    if not 0<base_processivity<=1: raise ValueError("base_processivity must be in (0,1]")
-    gc=gc_content(s); homopolymer=max((j-i for i in range(len(s)) for j in range(i+1,len(s)+1) if len(set(s[i:j]))==1),default=1); pause_penalty=.03*max(0,homopolymer-3)+.2*abs(gc-.5); completion=base_processivity**len(s)*math.exp(-pause_penalty)
-    return {"length":len(s),"gc_fraction":gc,"homopolymer_max":homopolymer,"pause_penalty":pause_penalty,"completion_probability":completion}
+def _finite_real(value, name, minimum=None, maximum=None):
+    from numbers import Real
+    if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value):
+        raise ValueError(f'{name} must be a finite number')
+    if (minimum is not None and value < minimum) or (maximum is not None and value > maximum):
+        raise ValueError(f'{name} outside supported range')
+    return float(value)
 
-def flap_resolution(rt_template,homology_length=10,fen1_activity=.8):
-    s=clean_dna(rt_template)
-    if homology_length<1 or not 0<=fen1_activity<=1: raise ValueError("invalid flap parameters")
-    equilibration=1-math.exp(-homology_length/8); structure=secondary_structure(s)['structure_penalty']; resolution=fen1_activity*equilibration*(1-.5*structure)
-    return {"equilibration":equilibration,"structure_penalty":structure,"resolution_probability":resolution}
 
-def repair_competition(rt_template,mmr_activity=.7,ber_activity=.2,fen1_activity=.8,nick_bias=.5):
-    for v,n in ((mmr_activity,'mmr'),(ber_activity,'ber'),(fen1_activity,'fen1'),(nick_bias,'nick_bias')):
-        if not 0<=v<=1: raise ValueError(f"{n} must be in [0,1]")
-    completion=rt_processivity(rt_template)['completion_probability']; flap=flap_resolution(rt_template,fen1_activity=fen1_activity)['resolution_probability']; raw=np.array([completion*flap*(.4+.6*nick_bias),mmr_activity*(1-nick_bias)*.35,ber_activity*.15,(1-completion)*.5+.05]); raw=raw/raw.sum()
-    return {"intended":float(raw[0]),"reverted":float(raw[1]),"partial_edit":float(raw[2]),"indel":float(raw[3]),"pathway_inputs":{"mmr":mmr_activity,"ber":ber_activity,"fen1":fen1_activity,"nick_bias":nick_bias}}
+def rt_processivity(rt_template, base_processivity=.96):
+    """Unfitted processivity/pause heuristic, not measured RT completion."""
+    s = _oligo(rt_template)
+    probability = _finite_real(base_processivity, 'base_processivity', 0, 1)
+    if probability == 0:
+        raise ValueError('base_processivity must be in (0,1]')
+    # Linear run scan replaces cubic repeated substring/set construction.
+    longest = run = 1
+    for i in range(1, len(s)):
+        run = run+1 if s[i] == s[i-1] else 1
+        longest = max(longest, run)
+    gc = gc_content(s)
+    pause = .03*max(0, longest-3)+.2*abs(gc-.5)
+    completion = probability**len(s)*math.exp(-pause)
+    return {'length': len(s), 'gc_fraction': gc, 'homopolymer_max': longest,
+            'pause_penalty': pause, 'completion_probability': completion,
+            'model_status': 'OPEN/unfitted RT processivity heuristic'}
+
+
+def flap_resolution(rt_template, homology_length=10, fen1_activity=.8):
+    """Unfitted flap score with sequence and probability domain checks."""
+    s = _oligo(rt_template)
+    if isinstance(homology_length, bool) or not isinstance(homology_length, int) or homology_length < 1:
+        raise ValueError('homology_length must be a positive integer')
+    activity = _finite_real(fen1_activity, 'fen1_activity', 0, 1)
+    equilibration = -math.expm1(-homology_length/8)
+    structure = secondary_structure(s)['structure_penalty']
+    resolution = activity*equilibration*(1-.5*structure)
+    return {'equilibration': equilibration, 'structure_penalty': structure,
+            'resolution_probability': resolution,
+            'model_status': 'OPEN/unfitted flap-resolution heuristic'}
+
+
+def repair_competition(rt_template, mmr_activity=.7, ber_activity=.2,
+                       fen1_activity=.8, nick_bias=.5):
+    """Normalize hand-set pathway scores; NOT assay-fitted repair frequencies.
+
+    The residual indel score is arbitrary, including with all activities zero.
+    Such output is a surrogate assumption, not a biological zero-activity result.
+    """
+    for value, name in ((mmr_activity, 'mmr'), (ber_activity, 'ber'),
+                        (fen1_activity, 'fen1'), (nick_bias, 'nick_bias')):
+        _finite_real(value, name, 0, 1)
+    completion = rt_processivity(rt_template)['completion_probability']
+    flap = flap_resolution(rt_template, fen1_activity=fen1_activity)['resolution_probability']
+    raw = np.array([completion*flap*(.4+.6*nick_bias),
+                    mmr_activity*(1-nick_bias)*.35, ber_activity*.15,
+                    (1-completion)*.5+.05])
+    raw /= raw.sum()
+    return {'intended': float(raw[0]), 'reverted': float(raw[1]),
+            'partial_edit': float(raw[2]), 'indel': float(raw[3]),
+            'pathway_inputs': {'mmr': mmr_activity, 'ber': ber_activity,
+                               'fen1': fen1_activity, 'nick_bias': nick_bias},
+            'model_status': 'OPEN/unfitted normalized pathway scores; residual indel channel is arbitrary'}
 
 def nicking_strategy(primary_position,candidates,edited_strand='+'):
     ranked=[]
@@ -372,8 +418,42 @@ def edit_window_score(edit_distance,rtt_length,optimal=(4,15)):
     if rtt_length<1 or edit_distance<0: raise ValueError("distance non-negative and RTT length positive")
     inside=optimal[0]<=edit_distance<=min(optimal[1],rtt_length); center=sum(optimal)/2; return {"inside_optimal_window":inside,"distance_score":math.exp(-((edit_distance-center)/5)**2),"partial_edit_risk":min(1,max(0,edit_distance-rtt_length+3)/5)}
 
-def outcome_distribution(peg,repair=None,nick=None):
-    repair=repair or repair_competition(peg['rt_template']); tm=max(0,1-abs(peg['pbs_tm_c']-32)/15); process=rt_processivity(peg['rt_template'])['completion_probability']; nick_gain=.15*(nick or {}).get('score',0); intended=min(1,repair['intended']*.5+.3*tm+.2*process+nick_gain); partial=repair['partial_edit']*(1-intended); indel=min(.5,repair['indel']+.2*(nick or {}).get('dsb_like_risk',0)); reverted=repair['reverted']; raw=np.array([intended,partial,indel,reverted,max(0,1-intended-partial-indel-reverted)]); raw=raw/raw.sum(); return {"intended_edit":float(raw[0]),"partial_edit":float(raw[1]),"indel":float(raw[2]),"reverted":float(raw[3]),"unedited":float(raw[4])}
+def outcome_distribution(peg, repair=None, nick=None):
+    """Unfitted outcome score blend; validated domains are not biological fit.
+
+    Supplied repair must be a normalized nonnegative distribution. Negative
+    nick scores from the ranking heuristic are allowed in [-1,1]; the intended
+    score is clamped before blending so it cannot become a negative weight.
+    """
+    from collections.abc import Mapping
+    if not isinstance(peg, Mapping) or 'pbs_tm_c' not in peg or 'rt_template' not in peg:
+        raise ValueError('peg must include pbs_tm_c and rt_template')
+    tm_c = _finite_real(peg['pbs_tm_c'], 'pbs_tm_c')
+    process = rt_processivity(peg['rt_template'])['completion_probability']
+    if repair is None:
+        repair = repair_competition(peg['rt_template'])
+    keys = ('intended', 'partial_edit', 'indel', 'reverted')
+    if not isinstance(repair, Mapping) or any(key not in repair for key in keys):
+        raise ValueError('repair must include all four pathway probabilities')
+    values = {key: _finite_real(repair[key], key, 0, 1) for key in keys}
+    if not math.isclose(sum(values.values()), 1, rel_tol=0, abs_tol=1e-8):
+        raise ValueError('repair probabilities must sum to one')
+    if nick is None:
+        nick = {}
+    if not isinstance(nick, Mapping):
+        raise ValueError('nick must be a mapping')
+    score = _finite_real(nick.get('score', 0), 'nick score', -1, 1)
+    risk = _finite_real(nick.get('dsb_like_risk', 0), 'dsb_like_risk', 0, 1)
+    tm = max(0, 1-abs(tm_c-32)/15)
+    intended = max(0, min(1, values['intended']*.5+.3*tm+.2*process+.15*score))
+    partial = values['partial_edit']*(1-intended)
+    indel = min(.5, values['indel']+.2*risk)
+    reverted = values['reverted']
+    raw = np.array([intended, partial, indel, reverted,
+                    max(0, 1-intended-partial-indel-reverted)])
+    raw /= raw.sum()
+    return dict(zip(('intended_edit', 'partial_edit', 'indel', 'reverted', 'unedited'),
+                    map(float, raw)))
 
 def architecture_variants(spacer,edit_seq,pbs_lengths=range(10,17),rtt_lengths=range(10,21)):
     designs=[]

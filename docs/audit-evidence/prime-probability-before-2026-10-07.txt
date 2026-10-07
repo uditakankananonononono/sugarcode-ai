@@ -1,0 +1,311 @@
+...FFFF..FFFFFFFFFFFFFFFFFF.                                             [100%]
+=================================== FAILURES ===================================
+________ test_templates_not_silently_cleaned[ACGT!ACGT-rt_processivity] ________
+
+function = <function rt_processivity at 0x7ffa2ab213f0>, sequence = 'ACGT!ACGT'
+
+    @pytest.mark.parametrize('function', [rt_processivity, flap_resolution, repair_competition])
+    @pytest.mark.parametrize('sequence', ['', 'ACGT!ACGT', 'ACGTNACGT'])
+    def test_templates_not_silently_cleaned(function, sequence):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:15: Failed
+________ test_templates_not_silently_cleaned[ACGT!ACGT-flap_resolution] ________
+
+function = <function flap_resolution at 0x7ffa2ab21480>, sequence = 'ACGT!ACGT'
+
+    @pytest.mark.parametrize('function', [rt_processivity, flap_resolution, repair_competition])
+    @pytest.mark.parametrize('sequence', ['', 'ACGT!ACGT', 'ACGTNACGT'])
+    def test_templates_not_silently_cleaned(function, sequence):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:15: Failed
+______ test_templates_not_silently_cleaned[ACGT!ACGT-repair_competition] _______
+
+function = <function repair_competition at 0x7ffa2ab21510>
+sequence = 'ACGT!ACGT'
+
+    @pytest.mark.parametrize('function', [rt_processivity, flap_resolution, repair_competition])
+    @pytest.mark.parametrize('sequence', ['', 'ACGT!ACGT', 'ACGTNACGT'])
+    def test_templates_not_silently_cleaned(function, sequence):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:15: Failed
+________ test_templates_not_silently_cleaned[ACGTNACGT-rt_processivity] ________
+
+function = <function rt_processivity at 0x7ffa2ab213f0>, sequence = 'ACGTNACGT'
+
+    @pytest.mark.parametrize('function', [rt_processivity, flap_resolution, repair_competition])
+    @pytest.mark.parametrize('sequence', ['', 'ACGT!ACGT', 'ACGTNACGT'])
+    def test_templates_not_silently_cleaned(function, sequence):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:15: Failed
+___ test_nonfinite_boolean_or_noninteger_conditions[rt_processivity-kwargs0] ___
+
+function = <function rt_processivity at 0x7ffa2ab213f0>
+kwargs = {'base_processivity': True}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+___ test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs1] ___
+
+function = <function flap_resolution at 0x7ffa2ab21480>
+kwargs = {'homology_length': True}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+___ test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs2] ___
+
+function = <function flap_resolution at 0x7ffa2ab21480>
+kwargs = {'homology_length': 1.5}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+___ test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs3] ___
+
+function = <function flap_resolution at 0x7ffa2ab21480>
+kwargs = {'homology_length': nan}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+___ test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs4] ___
+
+function = <function flap_resolution at 0x7ffa2ab21480>
+kwargs = {'fen1_activity': True}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+_ test_nonfinite_boolean_or_noninteger_conditions[repair_competition-kwargs5] __
+
+function = <function repair_competition at 0x7ffa2ab21510>
+kwargs = {'nick_bias': True}
+
+    @pytest.mark.parametrize('function,kwargs', [
+        (rt_processivity, {'base_processivity':True}),
+        (flap_resolution, {'homology_length':True}),
+        (flap_resolution, {'homology_length':1.5}),
+        (flap_resolution, {'homology_length':float('nan')}),
+        (flap_resolution, {'fen1_activity':True}),
+        (repair_competition, {'nick_bias':True}),
+    ])
+    def test_nonfinite_boolean_or_noninteger_conditions(function, kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:28: Failed
+________ test_external_repair_must_be_probability_distribution[repair0] ________
+
+repair = {}
+
+    @pytest.mark.parametrize('repair', [{}, dict(REPAIR, intended=-.1),
+        dict(REPAIR, intended=float('nan')), dict(REPAIR, intended=True),
+        dict(REPAIR, intended=.9)])
+    def test_external_repair_must_be_probability_distribution(repair):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:36: Failed
+________ test_external_repair_must_be_probability_distribution[repair1] ________
+
+repair = {'intended': -0.1, 'reverted': 0.2, 'partial_edit': 0.1, 'indel': 0.3}
+
+    @pytest.mark.parametrize('repair', [{}, dict(REPAIR, intended=-.1),
+        dict(REPAIR, intended=float('nan')), dict(REPAIR, intended=True),
+        dict(REPAIR, intended=.9)])
+    def test_external_repair_must_be_probability_distribution(repair):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:36: Failed
+________ test_external_repair_must_be_probability_distribution[repair2] ________
+
+repair = {'intended': nan, 'reverted': 0.2, 'partial_edit': 0.1, 'indel': 0.3}
+
+    @pytest.mark.parametrize('repair', [{}, dict(REPAIR, intended=-.1),
+        dict(REPAIR, intended=float('nan')), dict(REPAIR, intended=True),
+        dict(REPAIR, intended=.9)])
+    def test_external_repair_must_be_probability_distribution(repair):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:36: Failed
+________ test_external_repair_must_be_probability_distribution[repair3] ________
+
+repair = {'intended': True, 'reverted': 0.2, 'partial_edit': 0.1, 'indel': 0.3}
+
+    @pytest.mark.parametrize('repair', [{}, dict(REPAIR, intended=-.1),
+        dict(REPAIR, intended=float('nan')), dict(REPAIR, intended=True),
+        dict(REPAIR, intended=.9)])
+    def test_external_repair_must_be_probability_distribution(repair):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:36: Failed
+________ test_external_repair_must_be_probability_distribution[repair4] ________
+
+repair = {'intended': 0.9, 'reverted': 0.2, 'partial_edit': 0.1, 'indel': 0.3}
+
+    @pytest.mark.parametrize('repair', [{}, dict(REPAIR, intended=-.1),
+        dict(REPAIR, intended=float('nan')), dict(REPAIR, intended=True),
+        dict(REPAIR, intended=.9)])
+    def test_external_repair_must_be_probability_distribution(repair):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:36: Failed
+_____ test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick0] _____
+
+nick = {'score': -100}
+
+    @pytest.mark.parametrize('nick', [{'score':-100}, {'score':float('nan')},
+        {'dsb_like_risk':-1}, {'dsb_like_risk':float('inf')}, {'score':True}])
+    def test_invalid_nick_never_yields_negative_or_nonfinite_outcomes(nick):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:43: Failed
+_____ test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick1] _____
+
+nick = {'score': nan}
+
+    @pytest.mark.parametrize('nick', [{'score':-100}, {'score':float('nan')},
+        {'dsb_like_risk':-1}, {'dsb_like_risk':float('inf')}, {'score':True}])
+    def test_invalid_nick_never_yields_negative_or_nonfinite_outcomes(nick):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:43: Failed
+_____ test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick2] _____
+
+nick = {'dsb_like_risk': -1}
+
+    @pytest.mark.parametrize('nick', [{'score':-100}, {'score':float('nan')},
+        {'dsb_like_risk':-1}, {'dsb_like_risk':float('inf')}, {'score':True}])
+    def test_invalid_nick_never_yields_negative_or_nonfinite_outcomes(nick):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:43: Failed
+_____ test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick3] _____
+
+nick = {'dsb_like_risk': inf}
+
+    @pytest.mark.parametrize('nick', [{'score':-100}, {'score':float('nan')},
+        {'dsb_like_risk':-1}, {'dsb_like_risk':float('inf')}, {'score':True}])
+    def test_invalid_nick_never_yields_negative_or_nonfinite_outcomes(nick):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:43: Failed
+_____ test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick4] _____
+
+nick = {'score': True}
+
+    @pytest.mark.parametrize('nick', [{'score':-100}, {'score':float('nan')},
+        {'dsb_like_risk':-1}, {'dsb_like_risk':float('inf')}, {'score':True}])
+    def test_invalid_nick_never_yields_negative_or_nonfinite_outcomes(nick):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:43: Failed
+___________________________ test_invalid_tm_rejected ___________________________
+
+    def test_invalid_tm_rejected():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prime_probability_domain.py:48: Failed
+_______ test_zero_activities_explicit_surrogate_not_biological_assertion _______
+
+    def test_zero_activities_explicit_surrogate_not_biological_assertion():
+        r = repair_competition('ACGT'*3, mmr_activity=0, ber_activity=0, fen1_activity=0)
+        assert r['intended'] == r['reverted'] == r['partial_edit'] == 0
+        assert r['indel'] == 1  # Existing arbitrary residual channel, NOT observed biology.
+>       assert 'unfitted' in r['model_status']
+E       KeyError: 'model_status'
+
+tests/test_prime_probability_domain.py:56: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_prime_probability_domain.py::test_templates_not_silently_cleaned[ACGT!ACGT-rt_processivity]
+FAILED tests/test_prime_probability_domain.py::test_templates_not_silently_cleaned[ACGT!ACGT-flap_resolution]
+FAILED tests/test_prime_probability_domain.py::test_templates_not_silently_cleaned[ACGT!ACGT-repair_competition]
+FAILED tests/test_prime_probability_domain.py::test_templates_not_silently_cleaned[ACGTNACGT-rt_processivity]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[rt_processivity-kwargs0]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs1]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs2]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs3]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[flap_resolution-kwargs4]
+FAILED tests/test_prime_probability_domain.py::test_nonfinite_boolean_or_noninteger_conditions[repair_competition-kwargs5]
+FAILED tests/test_prime_probability_domain.py::test_external_repair_must_be_probability_distribution[repair0]
+FAILED tests/test_prime_probability_domain.py::test_external_repair_must_be_probability_distribution[repair1]
+FAILED tests/test_prime_probability_domain.py::test_external_repair_must_be_probability_distribution[repair2]
+FAILED tests/test_prime_probability_domain.py::test_external_repair_must_be_probability_distribution[repair3]
+FAILED tests/test_prime_probability_domain.py::test_external_repair_must_be_probability_distribution[repair4]
+FAILED tests/test_prime_probability_domain.py::test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick0]
+FAILED tests/test_prime_probability_domain.py::test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick1]
+FAILED tests/test_prime_probability_domain.py::test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick2]
+FAILED tests/test_prime_probability_domain.py::test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick3]
+FAILED tests/test_prime_probability_domain.py::test_invalid_nick_never_yields_negative_or_nonfinite_outcomes[nick4]
+FAILED tests/test_prime_probability_domain.py::test_invalid_tm_rejected - Fai...
+FAILED tests/test_prime_probability_domain.py::test_zero_activities_explicit_surrogate_not_biological_assertion
+22 failed, 6 passed in 0.25s
