@@ -1,0 +1,4 @@
+Pinned integrity and stricter parser: rows 22956
+Missing HEK/K562: 337 204
+DATA_REUSE_UNVERIFIED: no fitting or redistribution approval
+Source optional beforeafteredit spreadsheet error cells 6237 are missing, not literal labels; required fields separately validated

@@ -8,6 +8,24 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 assay parser malformed-input checks
+
+14 synthetic cases: **11 initial failures, 3 initial passes**, now all passing.
+The optional-error case was revised after reading the actual workbook: 6,237
+optional beforeafteredit cells contain spreadsheet errors. They now remain
+missing rather than literal labels; required sequence/group/fold fields are
+still validated separately. This supersedes the initial blanket rejection of
+spreadsheet error cells, which broke real-source ingestion.
+
+Duplicate CSV/workbook headers, duplicate cell references, out-of-schema cells,
+invalid shared-string indices and nonboolean integrity-check flags fail closed.
+Formula cells remain rejected, never executed. Real-source joined row count and
+missingness remain 22,956 / 337 HEK / 204 K562. No assay data bundled.
+Targeted prime: **137 passed, 2 skipped**. Full tests/ across 344 files in four
+isolated batches: **2,547 passed, 15 skipped, 0 failed**. Evidence retained under
+`docs/audit-evidence/prime-assay-parser-*`. Fitting and redistribution gate stays
+CLOSED (dataset reuse terms unverified); no clinical/spec claims.
+
 ## 2026-10-07 source-pinned PRIDICT2 assay loader
 
 11 initial missing-loader canaries failed before implementation; 12 additional
