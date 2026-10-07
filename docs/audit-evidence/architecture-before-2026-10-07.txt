@@ -1,0 +1,122 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_______ test_unrelated_variant_positions_are_not_rearrangement_evidence ________
+
+    def test_unrelated_variant_positions_are_not_rearrangement_evidence():
+        result=build([{'id':'a','chrom':'1','position':1},{'id':'b','chrom':'2','position':2}],HAP)
+>       assert result['structural_rearrangements']==[]
+E       AssertionError: assert [{'left': 'a'..._breakpoint'}] == []
+E         
+E         Left contains one more item: {'left': 'a', 'right': 'b', 'type': 'candidate_breakpoint'}
+E         Use -v to get more diff
+
+tests/test_architecture_evidence_canaries.py:8: AssertionError
+____ test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage0] _____
+
+coverage = [1, -1]
+
+    @pytest.mark.parametrize('coverage',[[1,-1],[1,np.nan],[0,0],[[1,2]]])
+    def test_coverage_cannot_generate_fake_cnv_from_invalid_inputs(coverage):
+>       with pytest.raises(ValueError): build([],HAP,coverage=coverage)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:15: Failed
+____ test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage1] _____
+
+coverage = [1, nan]
+
+    @pytest.mark.parametrize('coverage',[[1,-1],[1,np.nan],[0,0],[[1,2]]])
+    def test_coverage_cannot_generate_fake_cnv_from_invalid_inputs(coverage):
+>       with pytest.raises(ValueError): build([],HAP,coverage=coverage)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:15: Failed
+____ test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage2] _____
+
+coverage = [0, 0]
+
+    @pytest.mark.parametrize('coverage',[[1,-1],[1,np.nan],[0,0],[[1,2]]])
+    def test_coverage_cannot_generate_fake_cnv_from_invalid_inputs(coverage):
+>       with pytest.raises(ValueError): build([],HAP,coverage=coverage)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:15: Failed
+____ test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage3] _____
+
+coverage = [[1, 2]]
+
+    @pytest.mark.parametrize('coverage',[[1,-1],[1,np.nan],[0,0],[[1,2]]])
+    def test_coverage_cannot_generate_fake_cnv_from_invalid_inputs(coverage):
+>       with pytest.raises(ValueError): build([],HAP,coverage=coverage)
+
+tests/test_architecture_evidence_canaries.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/liquid_biopsy/core.py:276: in reconstruct_tumor_architecture
+    cnv = [{"bin": int(i), "copy_ratio": round(float(r), 4),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <enumerate object at 0x7f39e7901ec0>
+
+>   cnv = [{"bin": int(i), "copy_ratio": round(float(r), 4),
+            "state": "gain" if r > 1.3 else "loss" if r < .7 else "neutral"}
+           for i, r in enumerate(ratio)]
+E   TypeError: only length-1 arrays can be converted to Python scalars
+
+src/sugarcode/modules/liquid_biopsy/core.py:276: TypeError
+_______ test_matched_normal_controls_copy_ratio_instead_of_sample_median _______
+
+    def test_matched_normal_controls_copy_ratio_instead_of_sample_median():
+>       result=build([],HAP,coverage=[200,200,100],normal_coverage=[100,100,100])
+E       TypeError: reconstruct_tumor_architecture() got an unexpected keyword argument 'normal_coverage'
+
+tests/test_architecture_evidence_canaries.py:18: TypeError
+___________ test_measured_junction_support_not_distance_is_required ____________
+
+    def test_measured_junction_support_not_distance_is_required():
+        junction={'left':{'chrom':'1','position':100},'right':{'chrom':'2','position':300},'split_reads':4,'discordant_pairs':3}
+>       result=build([],HAP,junction_evidence=[junction])
+E       TypeError: reconstruct_tumor_architecture() got an unexpected keyword argument 'junction_evidence'
+
+tests/test_architecture_evidence_canaries.py:24: TypeError
+___________ test_methylation_requires_finite_fractions[methylation0] ___________
+
+methylation = [1.5]
+
+    @pytest.mark.parametrize('methylation',[[1.5],[-.1],[np.nan]])
+    def test_methylation_requires_finite_fractions(methylation):
+>       with pytest.raises(ValueError): build([],HAP,methylation=methylation)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:32: Failed
+___________ test_methylation_requires_finite_fractions[methylation1] ___________
+
+methylation = [-0.1]
+
+    @pytest.mark.parametrize('methylation',[[1.5],[-.1],[np.nan]])
+    def test_methylation_requires_finite_fractions(methylation):
+>       with pytest.raises(ValueError): build([],HAP,methylation=methylation)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:32: Failed
+___________ test_methylation_requires_finite_fractions[methylation2] ___________
+
+methylation = [nan]
+
+    @pytest.mark.parametrize('methylation',[[1.5],[-.1],[np.nan]])
+    def test_methylation_requires_finite_fractions(methylation):
+>       with pytest.raises(ValueError): build([],HAP,methylation=methylation)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_architecture_evidence_canaries.py:32: Failed
+=========================== short test summary info ============================
+FAILED tests/test_architecture_evidence_canaries.py::test_unrelated_variant_positions_are_not_rearrangement_evidence
+FAILED tests/test_architecture_evidence_canaries.py::test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage0]
+FAILED tests/test_architecture_evidence_canaries.py::test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage1]
+FAILED tests/test_architecture_evidence_canaries.py::test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage2]
+FAILED tests/test_architecture_evidence_canaries.py::test_coverage_cannot_generate_fake_cnv_from_invalid_inputs[coverage3]
+FAILED tests/test_architecture_evidence_canaries.py::test_matched_normal_controls_copy_ratio_instead_of_sample_median
+FAILED tests/test_architecture_evidence_canaries.py::test_measured_junction_support_not_distance_is_required
+FAILED tests/test_architecture_evidence_canaries.py::test_methylation_requires_finite_fractions[methylation0]
+FAILED tests/test_architecture_evidence_canaries.py::test_methylation_requires_finite_fractions[methylation1]
+FAILED tests/test_architecture_evidence_canaries.py::test_methylation_requires_finite_fractions[methylation2]
+10 failed in 0.30s

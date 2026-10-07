@@ -264,31 +264,65 @@ def bayesian_haplotype_inference(fragment_alleles, *, alpha: float = 0.5,
 
 
 def reconstruct_tumor_architecture(variants, fragment_alleles,
-                                   coverage=None, methylation=None) -> dict:
-    """Joint mutation, haplotype, CNV, rearrangement and methylation assembly."""
-    variants = list(variants)
-    hap = bayesian_haplotype_inference(fragment_alleles)
-    cov = np.asarray(coverage if coverage is not None else [], dtype=float)
-    cnv = []
-    if len(cov):
-        baseline = max(float(np.median(cov)), 1e-9)
-        ratio = cov / baseline
-        cnv = [{"bin": int(i), "copy_ratio": round(float(r), 4),
-                "state": "gain" if r > 1.3 else "loss" if r < .7 else "neutral"}
-               for i, r in enumerate(ratio)]
-    rearrangements = []
-    ordered = sorted(variants, key=lambda v: (v.get("chrom", ""), v.get("position", 0)))
-    for a, b in zip(ordered, ordered[1:]):
-        if a.get("chrom") != b.get("chrom") or b.get("position", 0)-a.get("position", 0) > 1_000_000:
-            rearrangements.append({"left": a.get("id", a.get("position")),
-                                   "right": b.get("id", b.get("position")),
-                                   "type": "candidate_breakpoint"})
-    meth = np.asarray(methylation if methylation is not None else [], dtype=float)
-    return {"somatic_mutations": variants, "haplotype_reconstruction": hap,
-            "copy_number_profile": cnv, "structural_rearrangements": rearrangements,
-            "epigenetic_profile": {"mean_methylation": round(float(meth.mean()), 5),
-                                    "variance": round(float(meth.var()), 5)} if len(meth) else {},
-            "partial_genome": True}
+                                   coverage=None, methylation=None, *,
+                                   normal_coverage=None, junction_evidence=None) -> dict:
+    """Summarize supplied variant, depth and measured junction evidence.
+
+    Not a tumor-origin classifier or absolute copy-number/structural-variant caller.
+    Sample-median ratios without normal are descriptive, not CNV calls.
+    """
+    import copy
+    variants=copy.deepcopy(list(variants))
+    if any(not isinstance(v,dict) for v in variants):
+        raise ValueError('variants must be mappings')
+    hap=bayesian_haplotype_inference(fragment_alleles)
+    cov=np.asarray([] if coverage is None else coverage,float)
+    if cov.ndim!=1 or not np.isfinite(cov).all() or np.any(cov<0) or (cov.size and np.median(cov)<=0):
+        raise ValueError('coverage requires finite nonnegative 1D values with positive median')
+    cnv=[]
+    if normal_coverage is not None:
+        normal=np.asarray(normal_coverage,float)
+        if normal.shape!=cov.shape or not cov.size or not np.isfinite(normal).all() or np.any(normal<=0):
+            raise ValueError('normal coverage must match positive supplied sample depth bins')
+        ratios=cov/normal
+        status='Matched-normal depth ratios; no purity/ploidy or absolute copy-number inference'
+    else:
+        ratios=cov/np.median(cov) if cov.size else cov
+        status='Sample-median relative coverage only; not copy-number gain/loss inference'
+    if not np.isfinite(ratios).all():
+        raise ValueError('copy ratio overflow')
+    for i,value in enumerate(ratios):
+        cnv.append({'bin':i,'copy_ratio':round(float(value),4),
+                    'state':'relative_high' if value>1.3 else 'relative_low' if value<.7 else 'relative_baseline',
+                    'threshold_status':'hand-set 1.3/.7 flags, not calibrated calls'})
+    rearrangements=[]
+    for junction in [] if junction_evidence is None else junction_evidence:
+        if not isinstance(junction,dict):
+            raise ValueError('junction must be a mapping')
+        for side in ('left','right'):
+            endpoint=junction.get(side)
+            if not isinstance(endpoint,dict) or not isinstance(endpoint.get('chrom'),str) or not endpoint['chrom']:
+                raise ValueError('junction endpoints require chromosome and integer position')
+            position=endpoint.get('position')
+            if isinstance(position,bool) or not isinstance(position,int) or position<0:
+                raise ValueError('junction position must be nonnegative integer')
+        counts=[junction.get(name,0) for name in ('split_reads','discordant_pairs')]
+        if any(isinstance(x,bool) or not isinstance(x,int) or x<0 for x in counts) or not sum(counts):
+            raise ValueError('junction requires positive integer read support')
+        item=copy.deepcopy(junction)
+        item.update({'support_reads':sum(counts),'source':'supplied junction evidence',
+                     'type':'supported junction candidate','status':'Evidence supplied, not independently aligned/validated; read overlap/deduplication unverified'})
+        rearrangements.append(item)
+    meth=np.asarray([] if methylation is None else methylation,float)
+    if meth.ndim!=1 or not np.isfinite(meth).all() or np.any(meth<0) or np.any(meth>1):
+        raise ValueError('methylation must be finite 1D fractions in [0,1]')
+    return {'supplied_variants':variants,'variant_origin_status':'Unclassified: somatic/germline/CHIP origin not inferred',
+            'haplotype_reconstruction':hap,'copy_number_profile':cnv,'copy_number_status':status,
+            'structural_rearrangements':rearrangements,
+            'rearrangement_status':'Supplied supported junction candidates, not validated SV calls' if rearrangements else
+                                   'Missing: no supplied split-read or discordant-pair junction evidence',
+            'epigenetic_profile':{'mean_methylation':float(meth.mean()),'variance':float(meth.var())} if meth.size else {},
+            'partial_genome':True,'status':'Supplied evidence summary; not reconstructed tumor genome'}
 
 
 _TISSUE_SIGNATURES = {
