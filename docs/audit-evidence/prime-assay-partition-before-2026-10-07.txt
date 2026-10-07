@@ -1,0 +1,164 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_________ test_group_safe_complete_deterministic_and_missing_excluded __________
+
+    def test_group_safe_complete_deterministic_and_missing_excluded():
+>       d=data();p=partition()(d,'HEK',0)
+
+tests/test_prime_assay_partitions.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+_______________ test_row_order_does_not_change_validation_groups _______________
+
+    def test_row_order_does_not_change_validation_groups():
+>       d=data();a=partition()(d,'HEK',0);d['records'].reverse();b=partition()(d,'HEK',0)
+
+tests/test_prime_assay_partitions.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+__________________ test_bad_partition_parameters[wrong-0-0.1] __________________
+
+cell = 'wrong', fold = 0, fraction = 0.1
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+_________________ test_bad_partition_parameters[HEK-True-0.1] __________________
+
+cell = 'HEK', fold = True, fraction = 0.1
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+___________________ test_bad_partition_parameters[HEK-5-0.1] ___________________
+
+cell = 'HEK', fold = 5, fraction = 0.1
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+____________________ test_bad_partition_parameters[HEK-0-0] ____________________
+
+cell = 'HEK', fold = 0, fraction = 0
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+____________________ test_bad_partition_parameters[HEK-0-1] ____________________
+
+cell = 'HEK', fold = 0, fraction = 1
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+___________________ test_bad_partition_parameters[HEK-0-nan] ___________________
+
+cell = 'HEK', fold = 0, fraction = nan
+
+    @pytest.mark.parametrize('cell,fold,fraction', [('wrong',0,.1),('HEK',True,.1),('HEK',5,.1),('HEK',0,0),('HEK',0,1),('HEK',0,float('nan'))])
+    def test_bad_partition_parameters(cell,fold,fraction):
+>       with pytest.raises(ValueError):partition()(data(),cell,fold,validation_fraction=fraction)
+
+tests/test_prime_assay_partitions.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+___________________ test_mutated_group_fold_leakage_rejected ___________________
+
+    def test_mutated_group_fold_leakage_rejected():
+        d=data();d['records'][1]['test_folds']['HEK']=2
+>       with pytest.raises(ValueError):partition()(d,'HEK',0)
+
+tests/test_prime_assay_partitions.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+_____________________ test_missing_label_cannot_have_fold ______________________
+
+    def test_missing_label_cannot_have_fold():
+        d=data();d['records'][0]['test_folds']['K562']=1
+>       with pytest.raises(ValueError):partition()(d,'K562',0)
+
+tests/test_prime_assay_partitions.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def partition():
+>       from sugarcode.modules.prime_design.assay_data import plan_pridict2_partition
+E       ImportError: cannot import name 'plan_pridict2_partition' from 'sugarcode.modules.prime_design.assay_data' (/home/sandbox/sugarcode-ai/src/sugarcode/modules/prime_design/assay_data.py)
+
+tests/test_prime_assay_partitions.py:6: ImportError
+=========================== short test summary info ============================
+FAILED tests/test_prime_assay_partitions.py::test_group_safe_complete_deterministic_and_missing_excluded
+FAILED tests/test_prime_assay_partitions.py::test_row_order_does_not_change_validation_groups
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[wrong-0-0.1]
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[HEK-True-0.1]
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[HEK-5-0.1]
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[HEK-0-0]
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[HEK-0-1]
+FAILED tests/test_prime_assay_partitions.py::test_bad_partition_parameters[HEK-0-nan]
+FAILED tests/test_prime_assay_partitions.py::test_mutated_group_fold_leakage_rejected
+FAILED tests/test_prime_assay_partitions.py::test_missing_label_cannot_have_fold
+10 failed in 0.19s

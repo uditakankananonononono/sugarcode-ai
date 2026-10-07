@@ -8,6 +8,22 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 non-fitting assay partition planner
+
+10 missing-planner canaries failed before implementation, now pass. Targeted
+prime: **147 passed, 2 skipped**. Full tests/ across 345 files in four isolated
+batches: **2,557 passed, 15 skipped, 0 failed**. Synthetic evidence retained in
+`docs/audit-evidence/prime-assay-partition-*`.
+
+Planner preserves original cell-specific test folds, excludes missing labels,
+checks duplicate identities and within-cell group-fold leakage, and assigns
+whole non-test groups to a deterministic seeded SHA256 validation holdout.
+Validation fraction is of remaining groups, not rows; this is NOT reproduction
+of the author's training/validation algorithm. Insufficient groups are explicit.
+No real-data fitting or model metrics computed. Planner output always says
+fitting_permitted=False and reuse gate CLOSED. No assay data redistribution,
+calibrated repair/outcome weights, clinical validation or spec claims.
+
 ## 2026-10-07 assay parser malformed-input checks
 
 14 synthetic cases: **11 initial failures, 3 initial passes**, now all passing.
