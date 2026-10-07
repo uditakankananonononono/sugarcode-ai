@@ -301,3 +301,62 @@ def plan_pridict2_partition(assay, cell, test_fold, *, validation_fraction=.1,
                   reuse_status='DATA_REUSE_UNVERIFIED: fitting/redistribution gate CLOSED',
                   method='original cell test folds; stable SHA256 group validation holdout')
     return result
+
+
+def evaluate_outcome_predictions(assay, predictions, cell, indices):
+    """Distribution error arithmetic, not fitting or clinical model validation.
+
+    Intended MAE/RMSE and mean total variation are measured against provided
+    fractions. Squared distribution error sums across classes before averaging.
+    No count likelihood, confidence intervals or calibration claim without
+    denominators/replicate analysis. Caller supplies an explicit evaluation set;
+    this function cannot attest it is held out. Data reuse gate is unchanged.
+    """
+    from collections.abc import Mapping
+    if cell not in CELLS or not isinstance(assay, Mapping) or not isinstance(assay.get('records'), list):
+        raise ValueError('assay records and supported cell required')
+    if not isinstance(predictions, Mapping) or not isinstance(indices, (list, tuple)):
+        raise ValueError('predictions mapping and explicit indices required')
+    rows = assay['records']
+    if any(type(i) is not int or not 0 <= i < len(rows) for i in indices) or len(set(indices)) != len(indices):
+        raise ValueError('indices must be distinct valid integers')
+
+    def distribution(value):
+        if (not isinstance(value, (tuple, list)) or len(value) != 3 or
+                any(isinstance(v, bool) or not isinstance(v, (int, float)) or
+                    not math.isfinite(v) or not 0 <= v <= 1 for v in value) or
+                not math.isclose(sum(value), 1, rel_tol=0, abs_tol=1e-7)):
+            raise ValueError('distribution must be finite bounded normalized triple')
+        return tuple(value)
+
+    observed, missing, seen = {}, 0, set()
+    for i in indices:
+        row = rows[i]
+        if not isinstance(row, Mapping) or not isinstance(row.get('outcomes'), Mapping) or cell not in row['outcomes']:
+            raise ValueError('invalid selected record')
+        identity = row.get('seq_id')
+        if not isinstance(identity, str) or not identity or identity in seen:
+            raise ValueError('selected identities must be distinct nonempty strings')
+        seen.add(identity)
+        if row['outcomes'][cell] is None:
+            missing += 1
+        else:
+            observed[identity] = distribution(row['outcomes'][cell])
+    if set(predictions) != set(observed):
+        raise ValueError('prediction IDs must exactly match observed selected labels')
+    abs_errors, square_errors, tv_errors, distribution_errors = [], [], [], []
+    for identity, actual in observed.items():
+        predicted = distribution(predictions[identity])
+        differences = [p-a for p, a in zip(predicted, actual)]
+        abs_errors.append(abs(differences[0]))
+        square_errors.append(differences[0]**2)
+        tv_errors.append(sum(abs(x) for x in differences)/2)
+        distribution_errors.append(sum(x*x for x in differences))
+    n = len(observed)
+    return {'n_scored': n, 'n_missing': missing,
+            'intended_mae': math.fsum(abs_errors)/n if n else None,
+            'intended_rmse': math.sqrt(math.fsum(square_errors)/n) if n else None,
+            'mean_total_variation': math.fsum(tv_errors)/n if n else None,
+            'mean_squared_distribution_error': math.fsum(distribution_errors)/n if n else None,
+            'status': 'Error arithmetic only; held-out status unverified, not clinical validation',
+            'reuse_status': 'DATA_REUSE_UNVERIFIED: fitting/redistribution gate CLOSED'}
