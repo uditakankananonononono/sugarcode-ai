@@ -403,6 +403,10 @@ def enhancement_features(signal, calls=(), fragment_lengths=(), methylation=(),
     s = np.asarray(signal, float).ravel(); fl = np.asarray(fragment_lengths, float).ravel()
     m = np.asarray(methylation, float).ravel(); p = np.asarray(proteins, float).ravel()
     me = np.asarray(metabolites, float).ravel(); calls = list(calls)
+    if any(not np.isfinite(a).all() for a in (s,fl,m,p,me)):
+        raise ValueError('metric arrays must contain finite measurements')
+    if np.any(fl<=0) or np.any(m<0) or np.any(m>1):
+        raise ValueError('fragment lengths positive and methylation fractions in [0,1] required')
     if not len(s): raise ValueError("signal cannot be empty")
     def stats(a, prefix):
         a = np.asarray(a, float); a = a if len(a) else np.array([0.])
@@ -419,9 +423,9 @@ def enhancement_features(signal, calls=(), fragment_lengths=(), methylation=(),
                 "signal_snr": float(abs(s.mean())/(s.std()+1e-12)),
                 "signal_entropy": float(-(lambda x: x[x>0]@np.log2(x[x>0]))(np.histogram(s, bins=10)[0]/len(s))),
                 "signal_spectral_centroid": float((np.arange(len(fft))*fft).sum()/(fft.sum()+1e-12)),
-                "signal_autocorrelation_lag1": float(np.corrcoef(s[:-1],s[1:])[0,1]) if len(s)>2 and s.std()>0 else 0.,
+                "signal_autocorrelation_lag1": float(np.corrcoef(s[:-1],s[1:])[0,1]) if len(s)>2 and s[:-1].std()>0 and s[1:].std()>0 else 0.,
                 "variant_count": len(calls),
-                "high_confidence_variant_count": sum(c.get("confidence",0)>=.9 for c in calls),
+                "high_evidence_score_count": sum(c.get("evidence_score",0)>=.9 for c in calls),
                 "max_allele_fraction": max([c.get("allele_fraction",0) for c in calls] or [0]),
                 "mean_allele_fraction": float(np.mean([c.get("allele_fraction",0) for c in calls] or [0])),
                 "longitudinal_sample_count": len(longitudinal)})
