@@ -271,7 +271,7 @@ Status per module: **verified** = implemented with passing named tests;
 | organoid_screen | organoid drug panel, ranking + hit calling; live combo screen: real ChEMBL potency x co-crystal-pocket resistance folds -> effective IC50; per-compound pockets (allosteric drugs scored on their own site); outside-pocket mutations annotated against UniProt binding sites (accession + range, advisory only) |
 | neuroplan_ai | tumor segmentation volume, corridor optimization around eloquent regions, risk class + surgical plan |
 | neodti_engine | drug-target-pathway-disease graph walk, therapeutic resilience index, disease alias resolution, docking hook |
-| liquid_biopsy | error-rate-aware ctDNA calling (beta-binomial floor), deterministic consensus_denoise (untrained formula), serial-monitoring plan |
+| liquid_biopsy | Exact binomial allele-error-null testing + BH FDR with integer-implied counts; significant variant signal is NOT tumor origin, disease stage or measured sensitivity. Consensus/multiomics remain uncalibrated and not validated diagnostics. |
 | rarenet_ai | phenotype-driven rare-disease matching + unified variant evidence panel (star-tiered ClinVar, gnomAD, splice assessment with U12 GT-AG/AT-AC flags and exon-skip in-frame/out-of-frame context, constraint), ranked differentials |
 | oncocircuit | two-input AND-gate tumor sensing circuits, promoter logic, payload delivery design |
 | pdx_insight | PDX fidelity index (mutation retention, expression concordance, stroma, drift), verdict + CRISPR repair |

@@ -125,16 +125,18 @@ def test_liquid_biopsy_detects_low_af():
     sig = [0.01, 0.008, 0.012, 0.005, 0.011, 0.009, 0.011, 0.007,
            0.01, 0.006, 0.012, 0.008]
     r = detect_ctdna(sig, tumor_type="lung", depth=30000)
-    assert r["ctdna_detected"] is True
+    assert r["variant_signal_detected"] is True
+    assert r["ctdna_detected"] is None
     assert r["candidates"]
-    assert r["estimated_sensitivity"] > 0.0
+    assert r["estimated_sensitivity"] is None
 
 
 def test_liquid_biopsy_clean_sample_negative():
-    sig = [0.00001, 0.0, 0.00002] * 4
+    sig = [0., 0., 1/30000] * 4
     r = detect_ctdna(sig, tumor_type="lung", depth=30000)
-    assert r["ctdna_detected"] is False
-    assert r["estimated_sensitivity"] == 0.0
+    assert r["variant_signal_detected"] is False
+    assert r["ctdna_detected"] is None
+    assert r["estimated_sensitivity"] is None
 
 
 def test_liquid_biopsy_requires_min_trace():
