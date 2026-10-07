@@ -8,6 +8,28 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 supplied architecture evidence pipeline
+
+10 new cases, **10 reproduced before failures**, now passing. Targeted architecture/
+haplotype/liquid-biopsy: **31 passed**. Full tests/ across 330 files, four isolated
+batches: **2,407 passed, 15 skipped, 0 failed**. Evidence retained in
+`docs/audit-evidence/architecture-*`.
+
+Built out matched-normal depth ratios and explicit split-read/discordant-pair
+junction-evidence inputs, with finite depth/methylation and endpoint/count checks.
+Supplied junctions retain original endpoints/support and source labels; no mutation
+of caller evidence. Read overlap/deduplication and alignments are NOT verified.
+Without normal, median-depth ratios are descriptive sample-relative coverage;
+they cannot identify global gains. With normal, ratios still lack library-size,
+GC/mappability/purity/ploidy correction and do not infer absolute copy number.
+Hand-set 1.3/.7 flags say relative high/low, not calibrated CNV calls.
+
+Named retractions: arbitrary far-apart/different-chromosome listed variants no
+longer manufacture rearrangement candidates. No junction evidence means Missing.
+`somatic_mutations` -> `supplied_variants`; tumor/germline/CHIP origin unclassified.
+Output explicitly says supplied evidence summary, not reconstructed tumor genome.
+Clinical SV/CNV calling, tumor-origin validation and assay benchmarking remain OPEN.
+
 ## 2026-10-07 haplotype-mixture numerical build-out
 
 14 new cases, **14 reproduced before failures**, now passing. Targeted mixture /
