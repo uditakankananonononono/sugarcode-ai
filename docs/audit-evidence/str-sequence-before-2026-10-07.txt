@@ -1,0 +1,166 @@
+F.FFFFFFFFFFFFF                                                          [100%]
+=================================== FAILURES ===================================
+________________ test_unknown_bases_are_not_homopolymer_alleles ________________
+
+    def test_unknown_bases_are_not_homopolymer_alleles():
+>       assert find_strs('N'*40)==[]
+E       AssertionError: assert [{'start': 0,...ts': 40, ...}] == []
+E         
+E         Left contains one more item: {'start': 0, 'unit': 'N', 'unit_len': 1, 'repeats': 40, ...}
+E         Use -v to get more diff
+
+tests/test_str_sequence_canaries.py:5: AssertionError
+___________ test_str_search_validates_integer_search_domain[kwargs1] ___________
+
+kwargs = {'min_unit': 4, 'max_unit': 2}
+
+    @pytest.mark.parametrize('kwargs', [{'min_unit':0}, {'min_unit':4,'max_unit':2}, {'max_unit':0}, {'min_repeats':0}, {'min_repeats':True}])
+    def test_str_search_validates_integer_search_domain(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:9: Failed
+___________ test_str_search_validates_integer_search_domain[kwargs2] ___________
+
+kwargs = {'max_unit': 0}
+
+    @pytest.mark.parametrize('kwargs', [{'min_unit':0}, {'min_unit':4,'max_unit':2}, {'max_unit':0}, {'min_repeats':0}, {'min_repeats':True}])
+    def test_str_search_validates_integer_search_domain(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:9: Failed
+___________ test_str_search_validates_integer_search_domain[kwargs3] ___________
+
+kwargs = {'min_repeats': 0}
+
+    @pytest.mark.parametrize('kwargs', [{'min_unit':0}, {'min_unit':4,'max_unit':2}, {'max_unit':0}, {'min_repeats':0}, {'min_repeats':True}])
+    def test_str_search_validates_integer_search_domain(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:9: Failed
+___________ test_str_search_validates_integer_search_domain[kwargs4] ___________
+
+kwargs = {'min_repeats': True}
+
+    @pytest.mark.parametrize('kwargs', [{'min_unit':0}, {'min_unit':4,'max_unit':2}, {'max_unit':0}, {'min_repeats':0}, {'min_repeats':True}])
+    def test_str_search_validates_integer_search_domain(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:9: Failed
+__________________ test_empty_sequence_has_no_repeat_alleles ___________________
+
+    def test_empty_sequence_has_no_repeat_alleles():
+>       assert find_strs('')==[]
+
+tests/test_str_sequence_canaries.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/str_scope/core.py:63: in find_strs
+    s = clean_dna(seq)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seq = ''
+
+    def clean_dna(seq: str) -> str:
+        """Upper-case DNA; IUPAC ambiguity letters become N (never dropped, so
+        reading frames and coordinates cannot shift); other characters
+        (whitespace, digits, gaps) are removed."""
+        s = "".join("N" if c in _AMBIG else c for c in seq.upper() if c in "ACGTN" or c in _AMBIG)
+        if not s:
+>           raise ValueError("sequence contains no valid DNA bases")
+E           ValueError: sequence contains no valid DNA bases
+
+src/sugarcode/bio/sequence.py:59: ValueError
+____________ test_expansion_counts_are_nonnegative_integers[-1-10] _____________
+
+sample = -1, ref = 10
+
+    @pytest.mark.parametrize('sample,ref', [(-1,10),(1.5,10),(True,10),(10,-1)])
+    def test_expansion_counts_are_nonnegative_integers(sample,ref):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:17: Failed
+____________ test_expansion_counts_are_nonnegative_integers[1.5-10] ____________
+
+sample = 1.5, ref = 10
+
+    @pytest.mark.parametrize('sample,ref', [(-1,10),(1.5,10),(True,10),(10,-1)])
+    def test_expansion_counts_are_nonnegative_integers(sample,ref):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:17: Failed
+___________ test_expansion_counts_are_nonnegative_integers[True-10] ____________
+
+sample = True, ref = 10
+
+    @pytest.mark.parametrize('sample,ref', [(-1,10),(1.5,10),(True,10),(10,-1)])
+    def test_expansion_counts_are_nonnegative_integers(sample,ref):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:17: Failed
+____________ test_expansion_counts_are_nonnegative_integers[10--1] _____________
+
+sample = 10, ref = -1
+
+    @pytest.mark.parametrize('sample,ref', [(-1,10),(1.5,10),(True,10),(10,-1)])
+    def test_expansion_counts_are_nonnegative_integers(sample,ref):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:17: Failed
+______________ test_disease_locus_cannot_be_called_on_wrong_motif ______________
+
+    def test_disease_locus_cannot_be_called_on_wrong_motif():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_str_sequence_canaries.py:21: Failed
+__________ test_generic_repeat_delta_is_not_pathogenic_classification __________
+
+    def test_generic_repeat_delta_is_not_pathogenic_classification():
+        result=expansion_call(60,20,'AT')
+>       assert 'pathogenic' not in result['classification']
+E       AssertionError: assert 'pathogenic' not in 'expanded - ...ge candidate'
+E         
+E         'pathogenic' is contained here:
+E           expanded - pathogenic-range candidate
+E         ?            ++++++++++
+
+tests/test_str_sequence_canaries.py:26: AssertionError
+_ test_single_molecule_requires_exact_motif_seed_not_every_one_mismatch_chunk __
+
+    def test_single_molecule_requires_exact_motif_seed_not_every_one_mismatch_chunk():
+        result = reconstruct_repeat_reads(['CAA'*20], 'CAG')
+>       assert result['reads'][0]['repeat_count']==0
+E       assert 20 == 0
+
+tests/test_str_sequence_canaries.py:32: AssertionError
+_______________ test_single_molecule_trims_mismatch_only_flanks ________________
+
+    def test_single_molecule_trims_mismatch_only_flanks():
+        result=reconstruct_repeat_reads(['CAT'+'CAG'*8+'CAA'], 'CAG')
+>       assert result['reads'][0]['repeat_count']==8
+E       assert 10 == 8
+
+tests/test_str_sequence_canaries.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_str_sequence_canaries.py::test_unknown_bases_are_not_homopolymer_alleles
+FAILED tests/test_str_sequence_canaries.py::test_str_search_validates_integer_search_domain[kwargs1]
+FAILED tests/test_str_sequence_canaries.py::test_str_search_validates_integer_search_domain[kwargs2]
+FAILED tests/test_str_sequence_canaries.py::test_str_search_validates_integer_search_domain[kwargs3]
+FAILED tests/test_str_sequence_canaries.py::test_str_search_validates_integer_search_domain[kwargs4]
+FAILED tests/test_str_sequence_canaries.py::test_empty_sequence_has_no_repeat_alleles
+FAILED tests/test_str_sequence_canaries.py::test_expansion_counts_are_nonnegative_integers[-1-10]
+FAILED tests/test_str_sequence_canaries.py::test_expansion_counts_are_nonnegative_integers[1.5-10]
+FAILED tests/test_str_sequence_canaries.py::test_expansion_counts_are_nonnegative_integers[True-10]
+FAILED tests/test_str_sequence_canaries.py::test_expansion_counts_are_nonnegative_integers[10--1]
+FAILED tests/test_str_sequence_canaries.py::test_disease_locus_cannot_be_called_on_wrong_motif
+FAILED tests/test_str_sequence_canaries.py::test_generic_repeat_delta_is_not_pathogenic_classification
+FAILED tests/test_str_sequence_canaries.py::test_single_molecule_requires_exact_motif_seed_not_every_one_mismatch_chunk
+FAILED tests/test_str_sequence_canaries.py::test_single_molecule_trims_mismatch_only_flanks
+14 failed, 1 passed in 0.18s

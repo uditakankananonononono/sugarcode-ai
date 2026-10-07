@@ -8,6 +8,32 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 STR sequence reconstruction
+
+16 new canary cases: **15 reproduced before failures, 1 already passing** (zero
+minimum unit already raised an error). STR/splice targeted subset: **38 passed**.
+Full tests/ in four isolated batches across 325 files: **2,345 passed, 15 skipped,
+0 failed**. Before/after logs retained in `docs/audit-evidence/str-*`.
+
+Built out anchored molecule reconstruction: require two consecutive exact motif
+units, extend across substitution interruptions, trim mismatch-only tract ends.
+A CAA-only read is no longer called a CAG tract. Unknown N breaks a tract rather
+than becoming a biological interruption or homopolymer allele. Exact-repeat search
+now validates its integer search domain and returns no hits on empty sequence.
+This remains sequence-tract reconstruction, NOT read alignment, indel-aware
+long-read calling, quality-aware genotyping, allele phasing or proof of mosaicism.
+Reported `mosaicism_std` is sequence-count dispersion only, explicitly disclosed.
+
+Named retractions: generic expanded counts no longer receive a pathogenic label;
+`instability_risk` is None (no calibrated model). HTT/FMR1 published bands require
+the matching motif/phase/strand class and integer counts. Diagnostics replace
+fabricated `expansion_call_risk` with observed `repeat_delta_vs_reference`.
+
+Still OPEN: diagnostic-potential index, instability simulation, aggregation/RNA
+risk, repair-network and intervention scores remain hand-set surrogates. They are
+not validated disease/therapy predictions. This sequence fix does not complete
+the STR transformer/GNN specification.
+
 ## 2026-10-07 dark-genome sequence annotation
 
 12 new canary cases, **12 reproduced before failures**, now passing. Targeted
