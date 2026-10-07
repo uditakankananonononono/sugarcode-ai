@@ -8,6 +8,21 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 numerical attractor evidence
+
+2 new cases, **2 reproduced before failures**, now passing. Targeted fate/attractor:
+**9 passed**. Full tests/ across 340 files, four isolated batches:
+**2,461 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/fate-attractor-*`.
+
+Build-out: endpoints must satisfy fixed-point residual tolerance and negative
+maximum real Jacobian eigenvalue before being called locally stable numerical
+attractors. Very short unresolved relaxations no longer become 'stable' identities.
+Analytical Jacobian follows the actual hand-set Hill dynamics. Report residual,
+eigenvalue, sample counts and unresolved endpoints. Representative checked fixed
+point retained instead of averaging centers that need not be fixed. Basin fractions
+refer to supplied random starts, not proven global basin volume. Still no biological
+identity validation, limit-cycle analysis or learned cell-fate landscape.
+
 ## 2026-10-07 prime pegRNA thermodynamic secondary structure
 
 5 new cases: **4 reproduced before failures, 1 already passing** (empty sequence
