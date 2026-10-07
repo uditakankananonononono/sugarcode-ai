@@ -8,6 +8,21 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 fixed-support control refit
+
+1 new case, **1 reproduced before failure**, now passing. Targeted control/fate:
+**26 passed**. Full tests/ across 337 files, four isolated batches:
+**2,448 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/control-sparse-*`.
+
+Build-out: after dense support selection, refit only the returned factor support
+rather than merely discarding the other optimized controls. Report truncated and
+refitted objectives plus separate convergence; retain original if refit is not
+finite or better. Simultaneous controls and actual returned-plan objective retained.
+The fixture's selected one-factor control already sits at its bound, so its refit
+objective equals truncation (1.76496); no improvement is claimed for that fixture.
+Still numerical search on a hand-set GRN, not global sparse optimum or biological
+reprogramming. Clinical validation, learned network and sequential timing OPEN.
+
 ## 2026-10-07 end-to-end evidence wiring
 
 2 new cases, **2 reproduced before failures**, now passing. Targeted position/

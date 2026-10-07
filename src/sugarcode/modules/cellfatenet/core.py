@@ -183,13 +183,28 @@ def optimal_reprogramming(source_state,target_state, *, hours=48, max_factors=4)
         final=np.array([r["final_state"][n] for n in nodes]); return np.sum((final-target)**2*specified)+.08*np.sum(u*u)+.04*np.sum(np.abs(u))
     bounds=[(-1,1) if m else (0,0) for m in tf_mask]
     res=minimize(objective,np.zeros(len(nodes)),method="L-BFGS-B",bounds=bounds,options={"maxiter":80,"eps":1e-3})
-    order=np.argsort(-np.abs(res.x))[:max_factors]; selected=[{"factor":nodes[i],"control":float(res.x[i]),"action":"overexpress" if res.x[i]>0 else "repress"} for i in order if abs(res.x[i])>.01]
-    sparse=np.zeros(len(nodes))
-    for item in selected:
-        sparse[nodes.index(item['factor'])]=item['control']
+    order=np.argsort(-np.abs(res.x))[:max_factors]
+    support=[int(i) for i in order if tf_mask[i] and abs(res.x[i])>.01]
+    sparse=np.zeros(len(nodes)); sparse[support]=res.x[support]
+    truncated_objective=float(objective(sparse))
+    refit_success=True
+    if support:
+        def sparse_objective(values):
+            controls=np.zeros(len(nodes)); controls[support]=values
+            return objective(controls)
+        refit=minimize(sparse_objective,sparse[support],method='L-BFGS-B',
+                       bounds=[(-1,1)]*len(support),options={'maxiter':100,'eps':1e-4})
+        refit_success=bool(refit.success)
+        # Keep the original truncated plan if refit is not demonstrably better.
+        if np.isfinite(refit.fun) and refit.fun<=truncated_objective:
+            sparse[support]=refit.x
+    selected=[{'factor':nodes[i],'control':float(sparse[i]),
+               'action':'overexpress' if sparse[i]>0 else 'repress'} for i in support]
     return {"interventions":selected,"objective":float(objective(sparse)),
+            "truncated_objective":truncated_objective,
             "dense_relaxation_objective":float(res.fun),"converged":bool(res.success),
-            "solver":"L-BFGS-B dense relaxation followed by top-factor truncation, not a sparse global optimum",
+            "sparse_refit_converged":refit_success,
+            "solver":"L-BFGS-B dense support selection plus fixed-support sparse refit; not global sparse optimum",
             "execution_schedule":"simultaneous constant controls",
             "recipe":[{"order":i+1,**x,"start_hour":0} for i,x in enumerate(selected)]}
 
