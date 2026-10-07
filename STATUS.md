@@ -8,6 +8,36 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 fitted multiomics classifier path
+
+13 new cases: **12 reproduced before failures, 1 already passing** after the
+initial implementation (four-modality integration of fitted model). Targeted:
+**20 passed**. Full tests/ across 331 files, four isolated batches:
+**2,420 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/multiomics-*`.
+
+Built out a real fit/predict/evaluate pipeline: L2 multinomial logistic regression,
+training-only standardization, explicit feature schema, optimizer convergence,
+serializable fitted parameters, supplied holdout confusion matrix/accuracy/log-loss
+and training-majority baseline. Four-modality means can use an explicitly supplied
+fitted model. Public package exports the training/evaluation functions.
+
+Synthetic mechanism canary ONLY: train 120 / evaluate 40 generated numeric rows,
+accuracy 1.00 versus training-majority baseline 0.55. This verifies that training
+and heldout evaluation run and learn this simple synthetic rule; it is NOT cancer
+accuracy or real assay validation. No real clinical training dataset is bundled
+or verified. Feature selection, batch correction, nested tuning, patient-grouped
+split, prospective validation and calibrated disease probabilities remain OPEN.
+
+Named retractions: invented tissue-signature arrays/cancer sigmoid removed.
+Without a fitted model cancer_probability/tissue_of_origin are None and tissue
+probabilities empty. Even with a model, fitted class scores do not silently become
+cancer/tissue semantics. Consensus `somatic_probability` -> `evidence_score`,
+`denoised_allele_support` -> `score_weighted_allele_support`, explicitly uncalibrated;
+these hand-set scores are NOT somatic-origin probabilities or denoised measurements.
+Nonphysical/empty fragment features and invalid error prior rejected. Report
+language no longer says clinically interpretable/spec-complete. Clinical ctDNA
+models and original full liquid-biopsy spec remain OPEN.
+
 ## 2026-10-07 supplied architecture evidence pipeline
 
 10 new cases, **10 reproduced before failures**, now passing. Targeted architecture/
