@@ -8,6 +8,30 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 allele-signal statistical caller
+
+9 new cases, **9 reproduced before failures**, now passing. Targeted caller /
+therapeutics / liquid-biopsy subset: **38 passed**. Full tests/ across 328 files,
+four isolated batches: **2,383 passed, 15 skipped, 0 failed**. Before/after evidence
+in `docs/audit-evidence/liquid-call-*` and `liquid-regression-*`.
+
+Built out `detect_ctdna` as a real one-sided exact binomial error-null test with
+Benjamini-Hochberg FDR across all supplied loci. Reports integer alt counts, p and
+q values and original fractions; smoothed signal is separate visualization only.
+Fractions must imply integer counts at uniform supplied positive integer depth;
+nonfinite/out-of-range fractions and invalid depth/error/FDR rejected. No silent
+rounding of supplied fractions into invented read counts.
+
+Named retractions: exponential 'confidence' was NOT beta-binomial inference and
+is removed. Variant signal does not establish tumor origin; `ctdna_detected`,
+`estimated_sensitivity` and `stage_hint` are None. New `variant_signal_detected`
+means only significance under the supplied error null. Monitoring advice removed.
+Assumptions: uniform depth and independent identical errors; no overdispersion,
+matched normal/CHIP/germline classification or clinical assay validation. The
+default .001 error rate remains an explicit uncalibrated assumption; defensible
+inference requires matched-control estimation. NOT a validated cancer detector.
+Multiomics and somatic consensus probabilities remain uncalibrated and OPEN.
+
 ## 2026-10-07 cell-fate simulation execution contract
 
 18 new cases: **15 reproduced ordinary failures, 1 solver hang on NaN horizon**

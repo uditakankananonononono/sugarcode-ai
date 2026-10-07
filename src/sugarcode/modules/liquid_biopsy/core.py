@@ -10,47 +10,54 @@ CTDNA_MARKERS = {
 }
 
 
-def detect_ctdna(af_signal: list[float], tumor_type: str = "lung",
-                 depth: int = 30000) -> dict:
-    """Detect ctDNA from allele-frequency traces with statistical filters.
+def detect_ctdna(af_signal: list[float], tumor_type: str = 'lung',
+                 depth: int = 30000, *, error_rate: float = .001,
+                 fdr: float = .05) -> dict:
+    """Test supplied allele counts under an independent binomial error null.
 
-    Pipeline: baseline estimation, error-rate-aware variant calling
-    (beta-binomial), low-pass signal denoise, raw vs filtered comparison.
-    These are deterministic statistical filters, not a learned/deep model.
+    Fractions must imply integer alt counts at the supplied uniform depth.
+    This is NOT ctDNA origin identification, a beta-binomial model, sensitivity
+    measurement, disease staging or a validated diagnostic test. Error rate
+    must be supplied from a matched process control for defensible inference.
     """
-    sig = np.asarray(af_signal, dtype=float)
-    if sig.ndim != 1 or len(sig) < 8:
-        raise ValueError("expecting a 1D allele-frequency trace")
-    # error-aware filter: variants below expected sequencing error are noise
-    error_rate = 0.001 * (30000 / depth)
-    threshold = max(3 * error_rate, np.percentile(sig, 90) * 0.5)
-    filtered = sig.copy()
-    filtered[sig < threshold] = 0.0
-    # smoothing for visualization
-    kernel = np.ones(5) / 5
-    smooth = np.convolve(filtered, kernel, mode="same")
-    candidates = []
-    for i, v in enumerate(filtered):
-        if v > 0:
-            # beta-binomial-ish confidence: higher af and depth = higher conf
-            conf = 1 - np.exp(-v * depth / 100)
-            candidates.append({"locus_index": int(i), "allele_fraction": round(float(v), 5),
-                               "confidence": round(float(conf), 3)})
-    markers = CTDNA_MARKERS.get(tumor_type.lower(), [])
-    sensitivity = round(1 - np.exp(-depth / 50000 * len(candidates)), 3)
-    return {
-        "tumor_type": tumor_type,
-        "suggested_biomarkers": markers,
-        "error_rate_floor": round(error_rate, 5),
-        "candidates": candidates,
-        "ctdna_detected": bool(candidates),
-        "estimated_sensitivity": sensitivity,
-        "raw_signal": [round(float(v), 5) for v in sig],
-        "filtered_signal": [round(float(v), 5) for v in smooth],
-        "stage_hint": ("early-stage detectable" if candidates and max(c["allele_fraction"] for c in candidates) < 0.01
-                       else "established disease burden" if candidates else "below detection"),
-        "monitoring": "serial draws every 4-8 weeks track treatment response",
-    }
+    import math
+    from scipy.stats import binom
+    sig=np.asarray(af_signal,dtype=float)
+    if sig.ndim!=1 or sig.size<8 or not np.isfinite(sig).all() or np.any(sig<0) or np.any(sig>1):
+        raise ValueError('at least 8 finite allele fractions in [0,1] required')
+    if isinstance(depth,bool) or not isinstance(depth,int) or depth <= 0:
+        raise ValueError('depth must be a positive integer')
+    for value,name in ((error_rate,'error_rate'),(fdr,'fdr')):
+        if isinstance(value,bool) or not math.isfinite(value) or not 0 < value < 1:
+            raise ValueError(name+' must be finite in (0,1)')
+    raw_counts=sig*depth
+    counts=np.rint(raw_counts)
+    if not np.allclose(raw_counts,counts,rtol=0,atol=1e-7):
+        raise ValueError('allele fractions must imply integer alt counts at supplied depth; use unrounded counts')
+    counts=counts.astype(np.int64)
+    pvalues=binom.sf(counts-1,depth,error_rate)
+    order=np.argsort(pvalues); ranked=pvalues[order]
+    adjusted=np.minimum(1,np.minimum.accumulate((ranked*len(sig)/np.arange(1,len(sig)+1))[::-1])[::-1])
+    qvalues=np.empty_like(adjusted); qvalues[order]=adjusted
+    candidates=[]
+    filtered=np.zeros_like(sig)
+    for i,(af,count,p,q) in enumerate(zip(sig,counts,pvalues,qvalues)):
+        if q<=fdr and af>error_rate:
+            filtered[i]=af
+            candidates.append({'locus_index':i,'allele_fraction':float(af),'alt_count':int(count),
+                               'depth':depth,'p_value':float(p),'q_value':float(q),
+                               'method':'one-sided exact binomial error-null test with BH FDR'})
+    return {'tumor_type':tumor_type,'suggested_biomarkers':CTDNA_MARKERS.get(tumor_type.lower(),[]),
+            'error_rate_floor':error_rate,'fdr':fdr,'candidates':candidates,
+            'variant_signal_detected':bool(candidates),'ctdna_detected':None,
+            'estimated_sensitivity':None,'stage_hint':None,
+            'raw_signal':sig.tolist(),'filtered_signal':filtered.tolist(),
+            'visualization_smooth':np.convolve(filtered,np.ones(5)/5,mode='same').tolist(),
+            'status':'Independent binomial error-null filtering only; not tumor-origin evidence, disease stage or measured sensitivity',
+            'limitations':['uniform depth assumed','independent identical errors assumed; overdispersion not modeled',
+                           'default error rate is uncalibrated; supply matched-control error rate',
+                           'CHIP/germline/background require separate matched evidence'],
+            'monitoring':None}
 
 
 # --- drop 13: cfDNA fragment-length entropy model -------------------------------

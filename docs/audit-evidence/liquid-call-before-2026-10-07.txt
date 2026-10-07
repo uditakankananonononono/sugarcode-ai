@@ -1,0 +1,116 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+___ test_variant_filter_is_exact_binomial_not_fake_beta_binomial_confidence ____
+
+    def test_variant_filter_is_exact_binomial_not_fake_beta_binomial_confidence():
+        from scipy.stats import binom
+>       result=detect_ctdna([0,0,0,.02,0,0,0,0],depth=1000,error_rate=.001)
+E       TypeError: detect_ctdna() got an unexpected keyword argument 'error_rate'
+
+tests/test_liquid_call_canaries.py:7: TypeError
+______________ test_detection_is_not_disease_stage_or_sensitivity ______________
+
+    def test_detection_is_not_disease_stage_or_sensitivity():
+        result=detect_ctdna([0,0,0,.02,0,0,0,0],depth=1000)
+>       assert result['estimated_sensitivity'] is None
+E       assert np.float64(0.0) is None
+
+tests/test_liquid_call_canaries.py:17: AssertionError
+_ test_variant_filter_requires_valid_fractions_and_integer_depth[signal0-1000] _
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = 1000
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:24: Failed
+_ test_variant_filter_requires_valid_fractions_and_integer_depth[signal1-1000] _
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = 1000
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:24: Failed
+_ test_variant_filter_requires_valid_fractions_and_integer_depth[signal2-1000] _
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = 1000
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:24: Failed
+__ test_variant_filter_requires_valid_fractions_and_integer_depth[signal3-0] ___
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = 0
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+        with pytest.raises(ValueError):
+>           detect_ctdna(signal,depth=depth)
+
+tests/test_liquid_call_canaries.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+af_signal = [0, 0, 0, 0, 0, 0, ...], tumor_type = 'lung', depth = 0
+
+    def detect_ctdna(af_signal: list[float], tumor_type: str = "lung",
+                     depth: int = 30000) -> dict:
+        """Detect ctDNA from allele-frequency traces with statistical filters.
+    
+        Pipeline: baseline estimation, error-rate-aware variant calling
+        (beta-binomial), low-pass signal denoise, raw vs filtered comparison.
+        These are deterministic statistical filters, not a learned/deep model.
+        """
+        sig = np.asarray(af_signal, dtype=float)
+        if sig.ndim != 1 or len(sig) < 8:
+            raise ValueError("expecting a 1D allele-frequency trace")
+        # error-aware filter: variants below expected sequencing error are noise
+>       error_rate = 0.001 * (30000 / depth)
+E       ZeroDivisionError: division by zero
+
+src/sugarcode/modules/liquid_biopsy/core.py:25: ZeroDivisionError
+_ test_variant_filter_requires_valid_fractions_and_integer_depth[signal4-True] _
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = True
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:24: Failed
+_ test_variant_filter_requires_valid_fractions_and_integer_depth[signal5-1.5] __
+
+signal = [0, 0, 0, 0, 0, 0, ...], depth = 1.5
+
+    @pytest.mark.parametrize('signal,depth', [([0]*7+[math.nan],1000),([0]*7+[-.01],1000),([0]*7+[1.01],1000),([0]*8,0),([0]*8,True),([0]*8,1.5)])
+    def test_variant_filter_requires_valid_fractions_and_integer_depth(signal,depth):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:24: Failed
+_______ test_fraction_without_integer_read_count_is_not_silently_rounded _______
+
+    def test_fraction_without_integer_read_count_is_not_silently_rounded():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_liquid_call_canaries.py:28: Failed
+=========================== short test summary info ============================
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_is_exact_binomial_not_fake_beta_binomial_confidence
+FAILED tests/test_liquid_call_canaries.py::test_detection_is_not_disease_stage_or_sensitivity
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal0-1000]
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal1-1000]
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal2-1000]
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal3-0]
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal4-True]
+FAILED tests/test_liquid_call_canaries.py::test_variant_filter_requires_valid_fractions_and_integer_depth[signal5-1.5]
+FAILED tests/test_liquid_call_canaries.py::test_fraction_without_integer_read_count_is_not_silently_rounded
+9 failed in 0.54s
