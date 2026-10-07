@@ -1,0 +1,67 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_____ test_uncertainty_resamples_actual_fragments_and_reports_reproducibly _____
+
+    def test_uncertainty_resamples_actual_fragments_and_reports_reproducibly():
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:6: AssertionError
+_____________ test_uncertainty_refits_not_fixed_score_perturbation _____________
+
+    def test_uncertainty_refits_not_fixed_score_perturbation():
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:19: AssertionError
+_________________ test_uncertainty_config_validation[kwargs0] __________________
+
+kwargs = {'replicates': 0}
+
+    @pytest.mark.parametrize('kwargs',[{'replicates':0},{'replicates':True},{'replicates':1.5}])
+    def test_uncertainty_config_validation(kwargs):
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:27: AssertionError
+_________________ test_uncertainty_config_validation[kwargs1] __________________
+
+kwargs = {'replicates': True}
+
+    @pytest.mark.parametrize('kwargs',[{'replicates':0},{'replicates':True},{'replicates':1.5}])
+    def test_uncertainty_config_validation(kwargs):
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:27: AssertionError
+_________________ test_uncertainty_config_validation[kwargs2] __________________
+
+kwargs = {'replicates': 1.5}
+
+    @pytest.mark.parametrize('kwargs',[{'replicates':0},{'replicates':True},{'replicates':1.5}])
+    def test_uncertainty_config_validation(kwargs):
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:27: AssertionError
+____ test_long_locus_candidate_heuristic_not_given_false_bootstrap_coverage ____
+
+    def test_long_locus_candidate_heuristic_not_given_false_bootstrap_coverage():
+>       assert hasattr(lb,'bootstrap_haplotype_weights')
+E       AssertionError: assert False
+E        +  where False = hasattr(lb, 'bootstrap_haplotype_weights')
+
+tests/test_haplotype_bootstrap_canaries.py:31: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_uncertainty_resamples_actual_fragments_and_reports_reproducibly
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_uncertainty_refits_not_fixed_score_perturbation
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_uncertainty_config_validation[kwargs0]
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_uncertainty_config_validation[kwargs1]
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_uncertainty_config_validation[kwargs2]
+FAILED tests/test_haplotype_bootstrap_canaries.py::test_long_locus_candidate_heuristic_not_given_false_bootstrap_coverage
+6 failed in 0.31s

@@ -12,3 +12,6 @@ __all__ = ["CTDNA_MARKERS", "detect_ctdna", "fragment_length_model",
 
 from .multiomics import fit_multiomics_classifier, predict_multiomics_classifier, evaluate_multiomics_classifier
 __all__ += ["fit_multiomics_classifier", "predict_multiomics_classifier", "evaluate_multiomics_classifier"]
+
+from .core import bootstrap_haplotype_weights
+__all__ += ["bootstrap_haplotype_weights"]

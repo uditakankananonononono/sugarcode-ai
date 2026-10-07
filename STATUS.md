@@ -8,6 +8,24 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 fragment-bootstrap uncertainty build-out
+
+6 new cases, **6 reproduced before failures**, now passing. Targeted bootstrap/
+mixture: **22 passed**. Full tests/ across 335 files, four isolated batches:
+**2,445 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/haplotype-bootstrap-*`.
+
+Built real fragment-row resampling and complete mixture refitting on each replicate,
+with empirical percentile intervals, bootstrap mean/std, seed reproducibility and
+requested/completed counts. Homogeneous samples yield zero sampling spread while
+mixed samples show actual empirical variation, not fixed-score noise. Any failed
+fit stops instead of silently omitting replicates. Only exhaustive <=12-locus
+candidate space supported; heuristic long-locus completion explicitly refused.
+
+Scope: percentile bootstrap conditional on the fixed read-error/candidate model;
+not Bayesian posterior, clinical uncertainty or demonstrated interval coverage.
+Independent/exchangeable fragment rows, calibration and assay validity unverified.
+This is a numerical uncertainty pipeline, not validated patient haplotype calling.
+
 ## 2026-10-07 registry truth and metric contracts
 
 10 new cases: **9 reproduced before failures, 1 already passing** (NaN signal was
