@@ -257,7 +257,7 @@ Status per module: **verified** = implemented with passing named tests;
 | fate_predictor | curated reprogramming factor maps, route scoring, efficiency/risk estimates |
 | cellfatenet | lineage GRN attractor simulation, fate probabilities under perturbation |
 | organoid_ai | organoid differentiation recipes, growth-factor schedules, maturation scoring |
-| bioimage_ai | numpy/scipy image pipeline: segmentation, spot detection, morphology features |
+| bioimage_ai | Classical microscopy segmentation and measured morphology with finite/label/empty-frame guards; shape/coverage are NOT culture health, viability or passage readiness. No trained phenotype classifier or real-image benchmark verified. |
 | cellpainter | Cell Painting channel simulation, morphological profile extraction, perturbation fingerprints |
 | cellpainter_4d | time-lapse event model (division/death/motility), 4D trajectory rendering data |
 | syndroid | patient-cell digital twin: multi-compartment ODE with disease parameters, treatment response |

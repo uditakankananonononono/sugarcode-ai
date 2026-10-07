@@ -8,6 +8,31 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-07 microscopy measurement robustness
+
+11 new cases, **11 reproduced failures**, now passing. Targeted microscopy:
+**18 passed**. Full tests/ in four isolated batches across 326 files:
+**2,356 passed, 15 skipped, 0 failed**. Evidence in `docs/audit-evidence/bioimage-*`.
+
+Built out measurement contracts: sparse supplied label IDs produce only observed
+objects; negative/fractional/nonfinite labels rejected; pixel scale must be finite
+positive/not bool; nonfinite images rejected through legacy entrypoints; constant
+frames yield zero detected objects and defined zero empty-object metrics instead
+of crashing or creating phantom cells. Empty-object statistics are conventions,
+not measured cell properties. Legacy segmentation percent is validated.
+
+Named retraction: morphology does not establish viability, culture stress or
+passage readiness. `health_score` is None and decision is `not assessed`; the
+former `morphology_health_score` metric is `morphology_shape_index` (a descriptive
+shape composite only). Classical segmentation/morphometry is NOT a trained cell
+classifier or a screen-ready clinical result.
+
+Visual check: inspected `bioimage-overlay.png` actual pixels. On the two-peak
+synthetic fixture the two colored masks cover the two bright objects, without an
+extra detected object. This validates that fixture only, NOT accuracy on real
+microscopy, crowded/touching cells or arbitrary cell types. Real annotated image
+benchmarking and trained segmentation/phenotype models remain OPEN.
+
 ## 2026-10-07 STR sequence reconstruction
 
 16 new canary cases: **15 reproduced before failures, 1 already passing** (zero
