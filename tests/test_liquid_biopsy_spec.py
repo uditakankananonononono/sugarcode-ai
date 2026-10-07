@@ -37,8 +37,8 @@ def test_multiomics_has_all_modalities_and_probabilities():
 
 
 def test_longitudinal_response_and_progression():
-    assert longitudinal_trajectory([{"time":0,"burden":.2},{"time":2,"burden":.1}])["trend"]=="response"
-    assert longitudinal_trajectory([{"time":0,"burden":.1},{"time":2,"burden":.2}])["trend"]=="progression"
+    assert longitudinal_trajectory([{"time":0,"burden":.2},{"time":2,"burden":.1}])["trend"]=="decreasing"
+    assert longitudinal_trajectory([{"time":0,"burden":.1},{"time":2,"burden":.2}])["trend"]=="increasing"
 
 
 def test_exactly_sixty_executable_enhancement_features():

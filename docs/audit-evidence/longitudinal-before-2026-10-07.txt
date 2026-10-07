@@ -1,0 +1,106 @@
+.FFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+___________ test_time_and_signal_are_valid_before_regression[rows1] ____________
+
+rows = [{'time': nan, 'burden': 1}]
+
+    @pytest.mark.parametrize('rows', [[{'time':0,'burden':1},{'time':0,'burden':2}], [{'time':np.nan,'burden':1}], [{'time':0,'burden':-1}], [{'time':0,'burden':np.inf}], [{'time':True,'burden':1}]])
+    def test_time_and_signal_are_valid_before_regression(rows):
+>       with pytest.raises(ValueError): track(rows)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_longitudinal_evidence_canaries.py:7: Failed
+___________ test_time_and_signal_are_valid_before_regression[rows2] ____________
+
+rows = [{'time': 0, 'burden': -1}]
+
+    @pytest.mark.parametrize('rows', [[{'time':0,'burden':1},{'time':0,'burden':2}], [{'time':np.nan,'burden':1}], [{'time':0,'burden':-1}], [{'time':0,'burden':np.inf}], [{'time':True,'burden':1}]])
+    def test_time_and_signal_are_valid_before_regression(rows):
+>       with pytest.raises(ValueError): track(rows)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_longitudinal_evidence_canaries.py:7: Failed
+___________ test_time_and_signal_are_valid_before_regression[rows3] ____________
+
+rows = [{'time': 0, 'burden': inf}]
+
+    @pytest.mark.parametrize('rows', [[{'time':0,'burden':1},{'time':0,'burden':2}], [{'time':np.nan,'burden':1}], [{'time':0,'burden':-1}], [{'time':0,'burden':np.inf}], [{'time':True,'burden':1}]])
+    def test_time_and_signal_are_valid_before_regression(rows):
+>       with pytest.raises(ValueError): track(rows)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_longitudinal_evidence_canaries.py:7: Failed
+___________ test_time_and_signal_are_valid_before_regression[rows4] ____________
+
+rows = [{'time': True, 'burden': 1}]
+
+    @pytest.mark.parametrize('rows', [[{'time':0,'burden':1},{'time':0,'burden':2}], [{'time':np.nan,'burden':1}], [{'time':0,'burden':-1}], [{'time':0,'burden':np.inf}], [{'time':True,'burden':1}]])
+    def test_time_and_signal_are_valid_before_regression(rows):
+>       with pytest.raises(ValueError): track(rows)
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_longitudinal_evidence_canaries.py:7: Failed
+______ test_zero_baseline_percent_change_is_undefined_not_billion_percent ______
+
+    def test_zero_baseline_percent_change_is_undefined_not_billion_percent():
+        result=track([{'time':0,'burden':0},{'time':1,'burden':.1}])
+>       assert result['percent_change'] is None
+E       assert 10000000000.0 is None
+
+tests/test_longitudinal_evidence_canaries.py:11: AssertionError
+__________ test_signal_trend_is_not_treatment_response_or_progression __________
+
+    def test_signal_trend_is_not_treatment_response_or_progression():
+        result=track([{'time':0,'burden':.2},{'time':2,'burden':.1}])
+>       assert result['trend']=='decreasing'
+E       AssertionError: assert 'response' == 'decreasing'
+E         
+E         - decreasing
+E         + response
+
+tests/test_longitudinal_evidence_canaries.py:15: AssertionError
+____ test_fit_reports_residual_based_uncertainty_for_three_or_more_samples _____
+
+    def test_fit_reports_residual_based_uncertainty_for_three_or_more_samples():
+        result=track([{'time':0,'burden':1.1},{'time':1,'burden':1.8},{'time':2,'burden':3.2},{'time':3,'burden':3.9}])
+        assert result['slope']==pytest.approx(.98)
+>       assert result['intercept']==pytest.approx(1.03)
+E       KeyError: 'intercept'
+
+tests/test_longitudinal_evidence_canaries.py:22: KeyError
+_____________________ test_single_observation_has_no_trend _____________________
+
+    def test_single_observation_has_no_trend():
+>       assert track([{'time':0,'burden':.3}])['trend']=='insufficient_data'
+E       AssertionError: assert 'stable' == 'insufficient_data'
+E         
+E         - insufficient_data
+E         + stable
+
+tests/test_longitudinal_evidence_canaries.py:29: AssertionError
+=============================== warnings summary ===============================
+tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows0]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/lib/_polynomial_impl.py:665: RuntimeWarning: invalid value encountered in divide
+    lhs /= scale
+
+tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows3]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/liquid_biopsy/core.py:365: RuntimeWarning: invalid value encountered in scalar subtract
+    "percent_change": round(float(100*(burden[-1]-burden[0])/max(abs(burden[0]), 1e-9)), 3),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows1]
+FAILED tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows2]
+FAILED tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows3]
+FAILED tests/test_longitudinal_evidence_canaries.py::test_time_and_signal_are_valid_before_regression[rows4]
+FAILED tests/test_longitudinal_evidence_canaries.py::test_zero_baseline_percent_change_is_undefined_not_billion_percent
+FAILED tests/test_longitudinal_evidence_canaries.py::test_signal_trend_is_not_treatment_response_or_progression
+FAILED tests/test_longitudinal_evidence_canaries.py::test_fit_reports_residual_based_uncertainty_for_three_or_more_samples
+FAILED tests/test_longitudinal_evidence_canaries.py::test_single_observation_has_no_trend
+8 failed, 1 passed, 2 warnings in 0.31s
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
+ ** On entry to DLASCL parameter number  5 had an illegal value
+ ** On entry to DLASCL parameter number  4 had an illegal value
