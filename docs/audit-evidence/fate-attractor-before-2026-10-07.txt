@@ -1,0 +1,27 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_short_relaxation_endpoints_not_automatically_stable_attractors ______
+
+    def test_short_relaxation_endpoints_not_automatically_stable_attractors():
+        r=identify_attractors(starts=2,hours=.001)
+>       assert r['attractors']==[]
+E       AssertionError: assert [{'id': 0, 's...action': 0.5}] == []
+E         
+E         Left contains 2 more items, first extra item: {'id': 0, 'state': {'ASCL1': 0.9427265160396491, 'GATA4': 0.511148768925631, 'MAP2': 0.9768996811522422, 'MEF2C': 0.08132430748535269, ...}, 'basin_fraction': 0.5}
+E         Use -v to get more diff
+
+tests/test_fate_attractor_evidence_canaries.py:6: AssertionError
+__________ test_claimed_attractors_have_checked_residual_and_jacobian __________
+
+    def test_claimed_attractors_have_checked_residual_and_jacobian():
+        r=identify_attractors(starts=4,hours=150)
+        assert r['attractors']
+        for a in r['attractors']:
+>           assert a['fixed_point_residual_inf']<1e-5
+E           KeyError: 'fixed_point_residual_inf'
+
+tests/test_fate_attractor_evidence_canaries.py:14: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_fate_attractor_evidence_canaries.py::test_short_relaxation_endpoints_not_automatically_stable_attractors
+FAILED tests/test_fate_attractor_evidence_canaries.py::test_claimed_attractors_have_checked_residual_and_jacobian
+2 failed in 0.37s

@@ -141,16 +141,50 @@ def simulate_fate(initial, *, hours=72, controls=None, accessibility=None,
             "status":"Simulation only, no experimental fate validation"}
 
 
-def identify_attractors(*, starts=32, hours=150, seed=4):
-    """Find stable cell-identity attractors by multistart dynamical relaxation."""
-    nodes,_=grn_matrix(); rng=np.random.default_rng(seed); finals=[]
-    for _ in range(starts): finals.append(np.array(list(simulate_fate(dict(zip(nodes,rng.random(len(nodes)))),hours=hours)["final_state"].values())))
-    clusters=[]
-    for x in finals:
-        match=next((c for c in clusters if np.linalg.norm(x-c["center"])<.25),None)
-        if match: match["members"].append(x); match["center"]=np.mean(match["members"],0)
-        else: clusters.append({"center":x,"members":[x]})
-    return {"nodes":nodes,"attractors":[{"id":i,"state":dict(zip(nodes,c["center"].tolist())),"basin_fraction":len(c["members"])/starts} for i,c in enumerate(clusters)]}
+def identify_attractors(*, starts=32, hours=150, seed=4,
+                       residual_tol=1e-5, stability_margin=1e-6):
+    """Verify local fixed-point residual and Jacobian stability of endpoints.
+
+    Fractions refer to this random-start experiment, not proven global basins.
+    No biological cell-identity validation or limit-cycle analysis.
+    """
+    if isinstance(starts,bool) or not isinstance(starts,int) or starts<1:
+        raise ValueError('starts must be positive integer')
+    _finite_number(residual_tol,'residual_tol',0)
+    _finite_number(stability_margin,'stability_margin',0)
+    if residual_tol==0:
+        raise ValueError('residual_tol must be positive')
+    nodes,W=grn_matrix();rng=np.random.default_rng(seed);clusters=[];unresolved=[]
+    def rhs(x):
+        h=x*x/(.25+x*x);production=expit(6*(W@h-.5))
+        return production-.35*x
+    def jacobian(x):
+        h=x*x/(.25+x*x);p=expit(6*(W@h-.5))
+        derivative=.5*x/(.25+x*x)**2
+        return (6*p*(1-p))[:,None]*W*derivative[None,:]-.35*np.eye(len(x))
+    for _ in range(starts):
+        sim=simulate_fate(dict(zip(nodes,rng.random(len(nodes)))),hours=hours)
+        x=np.array([sim['final_state'][node] for node in nodes])
+        residual=float(np.max(np.abs(rhs(x))))
+        eig=float(np.max(np.linalg.eigvals(jacobian(x)).real))
+        if residual>residual_tol or eig>=-stability_margin:
+            unresolved.append({'residual_inf':residual,'max_jacobian_real_eigenvalue':eig})
+            continue
+        # Do not average fixed points into a center that may not itself be fixed.
+        match=next((c for c in clusters if np.linalg.norm(x-c['state'])<.25),None)
+        if match:
+            match['count']+=1
+        else:
+            clusters.append({'state':x,'count':1,'residual':residual,'eig':eig})
+    return {'nodes':nodes,'starts':starts,'unresolved_endpoint_count':len(unresolved),
+            'unresolved_endpoints':unresolved,'residual_tolerance':residual_tol,
+            'stability_margin':stability_margin,
+            'basin_scope':'Fraction of supplied random starts, not global basin volume',
+            'attractors':[{'id':i,'state':dict(zip(nodes,c['state'].tolist())),
+                          'basin_fraction':c['count']/starts,'sample_count':c['count'],
+                          'fixed_point_residual_inf':c['residual'],
+                          'max_jacobian_real_eigenvalue':c['eig'],
+                          'stability':'locally asymptotically stable numerical fixed point'} for i,c in enumerate(clusters)]}
 
 
 def graph_message_passing(expression, layers=3):
