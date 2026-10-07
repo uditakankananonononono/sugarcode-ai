@@ -1,6 +1,6 @@
 # SugarCode AI
 
-**Current honest status: see [STATUS.md](STATUS.md)** - what is verified, thin, and Missing, updated each push. The latest prior full-suite result was 2,279 passed / 1 failed; a narrow guard fix now passes 39 targeted tests, but a fresh full-suite result is pending.
+**Current honest status: see [STATUS.md](STATUS.md)** - what is verified, thin, and Missing, updated each push. Recorded full-suite runs and their exact scope are in STATUS.md; test counts do not establish spec completeness.
 
 A multi-omic bio-design platform organized as a network of specialized modules on the
 **Omega OS v7.0** framework. Built line-by-line from the SugarCode AI spec doc
@@ -223,7 +223,7 @@ Status per module: **verified** = implemented with passing named tests;
 | prime_design | pegRNA design (PBS 10-17 nt by Tm, RTT 10-20 nt), PE2/PE3 nicking sgRNA finder, outcome distribution, off-target scan |
 | deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls + a polypyrimidine-tract term for AG acceptors (learned from the harvest, additive with unscaled matrix contribution) calibrated on a 28-gene ClinVar golden set + U12 family goldens, 2,720 unique pathogenic + 86 benign cases after full (gene, notation) dedupe (100% of ALL 2,430 canonical sites called loss: 2,414 U2 GT/GC-AG and 16 AT-AC across five sodium-channel genes), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A, canonical and explicit-transcript maps), exon-skip in-frame/frameshift context + alternative outcomes (intron retention with real intron lengths, cryptic-site-use candidates), cryptic-site activation scan validated on the published CFTR 3849+10kbC>T pseudoexon case |
 | str_scope | tandem-repeat detection 1-6 bp units, expansion classification, diagnostic potential index |
-| rna_decoder | DRACH/m6A site prediction with regional priors + exposure proxy, modification map, mRNA optimization proposals |
+| rna_decoder | DRACH candidate ranking (uncalibrated heuristic), real ViennaRNA thermodynamic ensembles, matched-control nanopore residuals and supplied-rate kinetics. Functional-effect and encapsulation models Missing. |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
 | dark_genome | TF motif scan (IUPAC), enhancer clustering, CpG islands, lncRNA candidates, hypothesis generation |
 | virtual_cell | stoichiometric FBA (scipy linprog/HiGHS), gene knockout lethality + flux rerouting, dynamic FBA growth simulation |

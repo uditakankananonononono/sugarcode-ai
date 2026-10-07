@@ -7,6 +7,45 @@ module's behavior, the module is right and this doc is stale - say so.
 
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
+
+## 2026-10-07 13:30 RNA build-out and explicit retractions
+
+Retained before evidence: `docs/audit-evidence/rna-canary-before-2026-10-07.txt`.
+20 new canary cases: **19 failed before, 1 already passed** (zero window already
+raised ValueError). All 20 pass after. These count test cases, not 19 distinct
+features or completed spec requirements. RNA/energy/Nussinov subset: 61 passed.
+Full tests-directory regression in four isolated batches across 322 files:
+**2,297 passed, 15 skipped, 0 failed**, Python 3.10 with ViennaRNA installed.
+The single-process full run hit the execution timeout at 74%; it is NOT reported
+as a full pass. Batch logs are retained alongside the failing evidence. This
+run covers `tests/`, not the extra package-local PGx tests in pytest defaults.
+
+Built out: `structure_ensemble` now computes real ViennaRNA Turner 2004 MFE,
+partition-function pair probabilities and per-base unpaired probabilities.
+Full-sequence folding is default, allowing cross-window pairs. Explicit windows
+are independent folds and disclose excluded cross-window pairing. It requires
+the free `rna` extra, has no fake-energy fallback and defaults to a 2,000-base
+resource limit. This is a thermodynamic secondary-structure model, not measured
+structure, pseudoknots, modified-nucleotide energetics, or clinical validation.
+
+Named downgrades, replacing fabricated outputs rather than claiming the original
+feature complete:
+- `m6a_probability` -> `heuristic_score`, explicitly untrained/uncalibrated;
+  region priors and local-GC exposure remain hand-set heuristics.
+- Nanopore sigmoid modification probabilities removed; supplied matched-control
+  standardized residuals only, with shape/finite/noise validation.
+- Fabricated translation '+10-25%', unconditional extended half-life, immune
+  activation, stability and GC-derived encapsulation estimates removed. Missing
+  models now return None plus an explicit status, never a guessed effect.
+- `predicted_sites` -> `candidate_sites`; non-m6A short patterns are arbitrary
+  search patterns, NOT modification calls. No actual mRNA redesign is produced.
+- Diagnostics omit unavailable effects rather than laundering them as numbers.
+
+Supplied-rate analytical kinetics now supports zero rates and rejects nonphysical
+inputs. CDS bounds and sequence alphabet are checked. Trained m6A/nanopore models,
+functional-effect validation, experimental delivery and actual sequence redesign
+remain OPEN. This batch does not complete RNA decoder at the spec's strength.
+
 Truth pass (2026-10-07), honest retractions:
 - neodti_engine: the random-weight GCN is gone. `graph_spectral_embeddings` is a deterministic spectral embedding (no weights, no RNG, not neural, not trained).
 - mutdock: ddG/fold output is an uncalibrated class-level heuristic (`uncalibrated_fold_estimate`); it does not reproduce clinical shifts such as T315I.

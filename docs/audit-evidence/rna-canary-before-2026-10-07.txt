@@ -1,0 +1,244 @@
+FFFFFFFFFFFFFFFFFF.F                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_untrained_motif_scores_are_not_probabilities _______________
+
+    def test_untrained_motif_scores_are_not_probabilities():
+        sites = r.predict_m6a(RNA, threshold=0)
+>       assert sites and all('m6a_probability' not in x for x in sites)
+E       AssertionError: assert ([{'position': 2, 'motif': 'GGACT', 'region': 'near-stop CDS', 'exposure': 0.667, ...}, {'position': 21, 'motif': 'AGACT', 'region': 'near-stop CDS', 'exposure': 0.667, ...}] and False)
+E        +  where False = all(<generator object test_untrained_motif_scores_are_not_probabilities.<locals>.<genexpr> at 0x7fae835ccba0>)
+
+tests/test_rna_truth_canaries.py:10: AssertionError
+_____________________ test_no_fabricated_mrna_effect_sizes _____________________
+
+    def test_no_fabricated_mrna_effect_sizes():
+        effects = r.optimize_mrna(RNA)['predicted_effect']
+>       assert effects['translation_efficiency'] is None
+E       AssertionError: assert '+10-25% (CDS de-m6A, GC lift)' is None
+
+tests/test_rna_truth_canaries.py:15: AssertionError
+_____________ test_nanopore_deviation_not_modification_probability _____________
+
+    def test_nanopore_deviation_not_modification_probability():
+        result = r.nanopore_modification([3.], [0.])
+>       assert 'modification_probability' not in result
+E       AssertionError: assert 'modification_probability' not in {'z_scores': [14.999999925], 'modification_probability': [0.9999977396755326], 'mean_probability': 0.9999977396755326, 'status': 'signal-deviation heuristic, not a trained nanopore basecaller'}
+
+tests/test_rna_truth_canaries.py:20: AssertionError
+_________ test_nanopore_rejects_invalid_inputs[signal0-expected0-0.2] __________
+
+signal = [], expected = [], sd = 0.2
+
+    @pytest.mark.parametrize('signal,expected,sd', [([], [], .2), ([1,2], [1], .2), ([math.nan], [1], .2), ([1],[1],0)])
+    def test_nanopore_rejects_invalid_inputs(signal, expected, sd):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:25: Failed
+_________ test_nanopore_rejects_invalid_inputs[signal1-expected1-0.2] __________
+
+signal = [1, 2], expected = [1], sd = 0.2
+
+    @pytest.mark.parametrize('signal,expected,sd', [([], [], .2), ([1,2], [1], .2), ([math.nan], [1], .2), ([1],[1],0)])
+    def test_nanopore_rejects_invalid_inputs(signal, expected, sd):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:25: Failed
+_________ test_nanopore_rejects_invalid_inputs[signal2-expected2-0.2] __________
+
+signal = [nan], expected = [1], sd = 0.2
+
+    @pytest.mark.parametrize('signal,expected,sd', [([], [], .2), ([1,2], [1], .2), ([math.nan], [1], .2), ([1],[1],0)])
+    def test_nanopore_rejects_invalid_inputs(signal, expected, sd):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:25: Failed
+__________ test_nanopore_rejects_invalid_inputs[signal3-expected3-0] ___________
+
+signal = [1], expected = [1], sd = 0
+
+    @pytest.mark.parametrize('signal,expected,sd', [([], [], .2), ([1,2], [1], .2), ([math.nan], [1], .2), ([1],[1],0)])
+    def test_nanopore_rejects_invalid_inputs(signal, expected, sd):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:25: Failed
+________ test_structure_is_actual_pairing_not_palindrome_or_fake_energy ________
+
+    def test_structure_is_actual_pairing_not_palindrome_or_fake_energy():
+        result = r.structure_ensemble('GGGAAACCC', window=9)
+>       assert result['method'] == 'ViennaRNA Turner 2004 partition-function ensemble'
+E       KeyError: 'method'
+
+tests/test_rna_truth_canaries.py:30: KeyError
+_________________ test_empty_structure_does_not_divide_by_zero _________________
+
+    def test_empty_structure_does_not_divide_by_zero():
+>       assert r.structure_ensemble('')['windows'] == []
+
+tests/test_rna_truth_canaries.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sugarcode/modules/rna_decoder/core.py:130: in structure_ensemble
+    s=clean_dna(rna.replace('U','T')); rows=[]
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seq = ''
+
+    def clean_dna(seq: str) -> str:
+        """Upper-case DNA; IUPAC ambiguity letters become N (never dropped, so
+        reading frames and coordinates cannot shift); other characters
+        (whitespace, digits, gaps) are removed."""
+        s = "".join("N" if c in _AMBIG else c for c in seq.upper() if c in "ACGTN" or c in _AMBIG)
+        if not s:
+>           raise ValueError("sequence contains no valid DNA bases")
+E           ValueError: sequence contains no valid DNA bases
+
+src/sugarcode/bio/sequence.py:59: ValueError
+__________ test_kinetics_zero_rates_is_constant_not_division_by_zero ___________
+
+    def test_kinetics_zero_rates_is_constant_not_division_by_zero():
+>       assert r.modification_kinetics(initial=.3, writer=0, eraser=0)['occupancy'] == pytest.approx([.3]*121)
+
+tests/test_rna_truth_canaries.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+initial = 0.3, writer = 0, eraser = 0, hours = 24
+
+    def modification_kinetics(initial=.1,writer=1,eraser=.2,hours=24):
+>    t=np.linspace(0,hours,121); equilibrium=writer/(writer+eraser); occ=equilibrium+(initial-equilibrium)*np.exp(-(writer+eraser)*t); return {'time_h':t.tolist(),'occupancy':occ.tolist(),'equilibrium':equilibrium}
+E    ZeroDivisionError: division by zero
+
+src/sugarcode/modules/rna_decoder/core.py:135: ZeroDivisionError
+______________ test_kinetics_rejects_nonphysical_inputs[kwargs0] _______________
+
+kwargs = {'initial': 2}
+
+    @pytest.mark.parametrize('kwargs', [{'initial':2}, {'writer':-1}, {'hours':-1}])
+    def test_kinetics_rejects_nonphysical_inputs(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:44: Failed
+______________ test_kinetics_rejects_nonphysical_inputs[kwargs1] _______________
+
+kwargs = {'writer': -1}
+
+    @pytest.mark.parametrize('kwargs', [{'initial':2}, {'writer':-1}, {'hours':-1}])
+    def test_kinetics_rejects_nonphysical_inputs(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:44: Failed
+______________ test_kinetics_rejects_nonphysical_inputs[kwargs2] _______________
+
+kwargs = {'hours': -1}
+
+    @pytest.mark.parametrize('kwargs', [{'initial':2}, {'writer':-1}, {'hours':-1}])
+    def test_kinetics_rejects_nonphysical_inputs(kwargs):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:44: Failed
+_____ test_functional_impact_does_not_fabricate_effects_from_motif_counts ______
+
+    def test_functional_impact_does_not_fabricate_effects_from_motif_counts():
+        impact = r.functional_impact(RNA, {'psi':[1,2], 'm6A':[3]})
+>       assert impact['translation_efficiency_relative'] is None
+E       assert 1.04 is None
+
+tests/test_rna_truth_canaries.py:49: AssertionError
+_________________ test_no_gc_derived_encapsulation_prediction __________________
+
+    def test_no_gc_derived_encapsulation_prediction():
+>       assert r.design_rna(RNA)['delivery']['encapsulation_proxy'] is None
+E       assert 0.7625000000000001 is None
+
+tests/test_rna_truth_canaries.py:54: AssertionError
+________________________ test_cds_bounds_are_validated _________________________
+
+    def test_cds_bounds_are_validated():
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:57: Failed
+_______ test_structure_reports_cross_window_pairs_in_full_sequence_mode ________
+
+    def test_structure_reports_cross_window_pairs_in_full_sequence_mode():
+>       result = r.structure_ensemble('GGGAAACCC', window=None)
+
+tests/test_rna_truth_canaries.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rna = 'GGGAAACCC', window = None
+
+    def structure_ensemble(rna,window=20):
+     s=clean_dna(rna.replace('U','T')); rows=[]
+>    for i in range(0,len(s),window):
+E    TypeError: 'NoneType' object cannot be interpreted as an integer
+
+src/sugarcode/modules/rna_decoder/core.py:131: TypeError
+____________ test_structure_rejects_bad_sequence_and_window[ACX-20] ____________
+
+seq = 'ACX', window = 20
+
+    @pytest.mark.parametrize('seq,window', [('ACX',20), ('ACGU',0), ('ACGU',-1)])
+    def test_structure_rejects_bad_sequence_and_window(seq, window):
+>       with pytest.raises(ValueError):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_rna_truth_canaries.py:67: Failed
+___________ test_structure_rejects_bad_sequence_and_window[ACGU--1] ____________
+
+seq = 'ACGU', window = -1
+
+    @pytest.mark.parametrize('seq,window', [('ACX',20), ('ACGU',0), ('ACGU',-1)])
+    def test_structure_rejects_bad_sequence_and_window(seq, window):
+        with pytest.raises(ValueError):
+>           r.structure_ensemble(seq, window=window)
+
+tests/test_rna_truth_canaries.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rna = 'ACGU', window = -1
+
+    def structure_ensemble(rna,window=20):
+     s=clean_dna(rna.replace('U','T')); rows=[]
+     for i in range(0,len(s),window):
+      w=s[i:i+window]; pair=sum(a==b for a,b in zip(w,w[::-1]))/max(1,len(w)); dg=-2*(w.count('G')+w.count('C'))-.5*(w.count('A')+w.count('T')); rows.append({'start':i,'pairing_probability':pair,'folding_dg_proxy':dg})
+>    return {'windows':rows,'mean_pairing':sum(x['pairing_probability'] for x in rows)/len(rows),'total_dg_proxy':sum(x['folding_dg_proxy'] for x in rows)}
+E    ZeroDivisionError: division by zero
+
+src/sugarcode/modules/rna_decoder/core.py:133: ZeroDivisionError
+=============================== warnings summary ===============================
+tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal0-expected0-0.2]
+  /home/sandbox/sugarcode-ai/src/sugarcode/modules/rna_decoder/core.py:122: RuntimeWarning: Mean of empty slice.
+    a=np.asarray(signal,float); e=np.asarray(expected,float); z=(a-e)/(noise_sd+1e-9); p=1/(1+np.exp(-(np.abs(z)-2))); return {'z_scores':z.tolist(),'modification_probability':p.tolist(),'mean_probability':float(p.mean()),'status':'signal-deviation heuristic, not a trained nanopore basecaller'}
+
+tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal0-expected0-0.2]
+  /home/sandbox/v/lib/python3.10/site-packages/numpy/_core/_methods.py:145: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_rna_truth_canaries.py::test_untrained_motif_scores_are_not_probabilities
+FAILED tests/test_rna_truth_canaries.py::test_no_fabricated_mrna_effect_sizes
+FAILED tests/test_rna_truth_canaries.py::test_nanopore_deviation_not_modification_probability
+FAILED tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal0-expected0-0.2]
+FAILED tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal1-expected1-0.2]
+FAILED tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal2-expected2-0.2]
+FAILED tests/test_rna_truth_canaries.py::test_nanopore_rejects_invalid_inputs[signal3-expected3-0]
+FAILED tests/test_rna_truth_canaries.py::test_structure_is_actual_pairing_not_palindrome_or_fake_energy
+FAILED tests/test_rna_truth_canaries.py::test_empty_structure_does_not_divide_by_zero
+FAILED tests/test_rna_truth_canaries.py::test_kinetics_zero_rates_is_constant_not_division_by_zero
+FAILED tests/test_rna_truth_canaries.py::test_kinetics_rejects_nonphysical_inputs[kwargs0]
+FAILED tests/test_rna_truth_canaries.py::test_kinetics_rejects_nonphysical_inputs[kwargs1]
+FAILED tests/test_rna_truth_canaries.py::test_kinetics_rejects_nonphysical_inputs[kwargs2]
+FAILED tests/test_rna_truth_canaries.py::test_functional_impact_does_not_fabricate_effects_from_motif_counts
+FAILED tests/test_rna_truth_canaries.py::test_no_gc_derived_encapsulation_prediction
+FAILED tests/test_rna_truth_canaries.py::test_cds_bounds_are_validated - Fail...
+FAILED tests/test_rna_truth_canaries.py::test_structure_reports_cross_window_pairs_in_full_sequence_mode
+FAILED tests/test_rna_truth_canaries.py::test_structure_rejects_bad_sequence_and_window[ACX-20]
+FAILED tests/test_rna_truth_canaries.py::test_structure_rejects_bad_sequence_and_window[ACGU--1]
+19 failed, 1 passed, 2 warnings in 0.21s
