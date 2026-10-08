@@ -24,7 +24,7 @@ class Queue:
         if not r:raise KeyError(job_id)
         return dict(r)
     def status(self,*,state=None,limit=100):
-        """Bounded operational metadata, no scripts or captured output."""
+        """Row-limited operational metadata, no scripts or captured output."""
         states={'pending','running','uncertain','succeeded','failed','timed_out','cancelled'}
         if type(limit) is not int or not 1<=limit<=1000:raise ValueError('invalid status limit')
         if state is not None and (not isinstance(state,str) or state not in states):raise ValueError('invalid status state')

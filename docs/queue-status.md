@@ -8,3 +8,5 @@ id, sha256, state, timeout, heartbeat, exit_code. No code, stdout or stderr.
 This is metadata minimization, NOT anonymization or an access-control boundary.
 Job IDs can themselves contain private values. CLI opens SQLite in mode=ro;
 missing databases are refused, never created or migrated. No actions/retries.
+
+Metadata is not validated/anonymized/authenticated; IDs and poisoned metadata may contain private values; row limit is not a per-field byte bound; legacy DB metadata is untrusted; no size-bounded claim.
