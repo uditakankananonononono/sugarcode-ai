@@ -19,3 +19,11 @@ def test_cancel_and_failure(tmp_path):
  assert invoke(tmp_path,'cancel','cancel').returncode==0
  assert json.loads(invoke(tmp_path,'show','cancel').stdout)['state']=='cancelled'
  assert invoke(tmp_path,'show','missing').returncode!=0
+
+def test_invalid_script_and_db_are_structured_failures(tmp_path):
+ script=tmp_path/'invalid';script.write_bytes(b'\xff')
+ p=invoke(tmp_path,'submit','bad','--script',str(script))
+ assert p.returncode==1 and json.loads(p.stdout)['status']=='failed' and 'Traceback' not in p.stderr
+ (tmp_path/'q').write_text('not SQLite')
+ p=invoke(tmp_path,'show','bad')
+ assert p.returncode==1 and json.loads(p.stdout)['status']=='failed' and 'Traceback' not in p.stderr
