@@ -37,3 +37,14 @@ def test_invalid_timeout_refuses(tmp_path,timeout):
  from sugarcode.runtime.job_queue import Queue
  q=Queue(tmp_path/'q')
  with pytest.raises(ValueError):q.submit('invalid','print(1)',timeout=timeout)
+
+@pytest.mark.parametrize('field,value',[('timeout','invalid'),('timeout',float('inf')),('timeout',None),('sha256','bad'),('sha256',None),('code',None),('code',b'not text'),('code',123)])
+def test_corrupt_persisted_job_never_launches(tmp_path,monkeypatch,field,value):
+ from sugarcode.runtime import job_queue as module
+ q=module.Queue(tmp_path/'q');q.submit('corrupt','print(1)')
+ with sqlite3.connect(q.path) as db:db.execute('UPDATE jobs SET '+field+'=? WHERE id=?',(value,'corrupt'))
+ calls=[]
+ monkeypatch.setattr(module.subprocess,'Popen',lambda *a,**kw:calls.append(a) or pytest.fail('launched corrupted job'))
+ assert q.run_next()=='corrupt'
+ result=q.get('corrupt');assert result['state']=='failed' and len(result['stderr'])<=160 and not calls
+ assert q.run_next() is None
