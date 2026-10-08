@@ -1076,6 +1076,8 @@ def main(argv: list[str] | None = None) -> int:
     sub = p.add_subparsers(dest="cmd", required=True)
     from .runtime.queue_cli import register as register_queue
     register_queue(sub)
+    from .runtime.status_cli import register as register_queue_status
+    register_queue_status(sub)
 
     sp = sub.add_parser("splice", help="deepsplice splice assessment")
     ssub = sp.add_subparsers(dest="sub", required=True)
