@@ -32,3 +32,36 @@ def test_catalog_and_unknown_schema_refuse(monkeypatch):
  monkeypatch.setattr(tools,'catalog',fail);assert 'error' in checked_call('x',{})
  monkeypatch.setattr(tools,'catalog',lambda:{'x':Tool('x','x','x','x',{'properties':{'x':{'type':'mystery'}},'required':['x']})})
  assert 'error' in checked_call('x',{'x':1})
+
+@pytest.mark.parametrize('schema,args',[
+ ({'properties':{'x':{'type':'string','enum':['ok']}},'required':[]},{}),
+ ({'properties':{'x':{'type':'array','items':{'type':'string','enum':['ok']}}},'required':['x']},{'x':[]}),
+ ({'properties':{'x':{'type':'object','additionalProperties':{'type':'string','enum':['ok']}}},'required':['x']},{'x':{}}),
+])
+def test_schema_preflight_refuses_unknown_even_absent_values(monkeypatch,schema,args):
+ from sugarcode.llm.tool_boundary import checked_call
+ from sugarcode.llm import tools
+ calls=[]
+ monkeypatch.setattr(tools,'catalog',lambda:{'x':Tool('x','x','x','spy',schema)})
+ monkeypatch.setattr(tools,'call_tool',lambda name,value:calls.append(value) or {'result':'SIDE EFFECT SPY'})
+ result=checked_call('x',args)
+ assert calls==[] and 'error' in result
+
+@pytest.mark.parametrize('error',[RecursionError,MemoryError,UnicodeDecodeError,OSError])
+def test_boundary_handles_catalog_exceptions(monkeypatch,error):
+ from sugarcode.llm.tool_boundary import checked_call
+ from sugarcode.llm import tools
+ def fail():
+  if error is UnicodeDecodeError:raise error('utf8',b'x',0,1,'invalid')
+  raise error('instrumented fault')
+ monkeypatch.setattr(tools,'catalog',fail)
+ assert error.__name__ in checked_call('x',{})['error']
+
+def test_boundary_recursive_schema_and_deep_json(monkeypatch):
+ from sugarcode.llm.tool_boundary import checked_call
+ from sugarcode.llm import tools
+ s={'type':'array'};s['items']=s;calls=[]
+ monkeypatch.setattr(tools,'catalog',lambda:{'x':Tool('x','x','x','x',{'properties':{'x':s},'required':[]})})
+ monkeypatch.setattr(tools,'call_tool',lambda *a:calls.append(a))
+ assert 'error' in checked_call('x',{}) and not calls
+ assert 'error' in checked_call('x','['*5000+']'*5000)
