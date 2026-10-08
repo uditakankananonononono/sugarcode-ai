@@ -1,0 +1,9 @@
+Reported exact CI failures from authenticated log review:
+37767058744, all Python matrix jobs: bubblewrap executable unavailable.
+Four tests: isolated_dispatch real/private path and timeout;
+isolation real containment and timeout/failure.
+Local bubblewrap version: 0.6.1. Local selection: 70 passed, 0 skipped.
+Fix only installs bubblewrap in Ubuntu CI, logs version, keeps test command unchanged.
+Workflow YAML parsed and install/test order + matrix asserted locally.
+Not proof of apt success or namespace capability on GitHub. Remote rerun required.
+No test skips, no fallback, no production code changes; existing containment limits stand.
