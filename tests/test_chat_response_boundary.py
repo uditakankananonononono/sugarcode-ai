@@ -26,13 +26,14 @@ def test_actual_http_message_still_returns(endpoint):
 
 def test_actual_http_connection_reset_is_provider_error():
  import socket,struct
- class Reset(BaseHTTPRequestHandler):
-  def do_POST(self):
-   self.send_response(200);self.end_headers();self.wfile.write(b'x'*1000);self.wfile.flush()
-   self.connection.setsockopt(socket.SOL_SOCKET,socket.SO_LINGER,struct.pack('ii',1,0))
-  def log_message(self,*args):pass
- server=HTTPServer(('127.0.0.1',0),Reset);thread=threading.Thread(target=server.serve_forever);thread.start()
+ listener=socket.socket();listener.bind(('127.0.0.1',0));listener.listen(1)
+ def reset():
+  connection,_=listener.accept()
+  connection.recv(4096)
+  connection.setsockopt(socket.SOL_SOCKET,socket.SO_LINGER,struct.pack('ii',1,0))
+  connection.close()
+ thread=threading.Thread(target=reset);thread.start()
  try:
-  client=ChatClient('test',f'http://127.0.0.1:{server.server_port}','test','local')
+  client=ChatClient('test',f'http://127.0.0.1:{listener.getsockname()[1]}','test','local')
   with pytest.raises(ProviderError,match='unreachable'):client.chat([])
- finally:server.shutdown();thread.join();server.server_close()
+ finally:thread.join(timeout=3);listener.close()
