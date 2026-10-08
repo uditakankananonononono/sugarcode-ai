@@ -115,9 +115,20 @@ class Router:
 
     @classmethod
     def load(cls, path: Path) -> "Router":
-        z = np.load(path, allow_pickle=False)
-        vec = Vectorizer([str(t) for t in z["vocab"]], z["idf"])
-        return cls(vec, z["W"], z["b"], [str(s) for s in z["labels"]])
+        with np.load(path, allow_pickle=False) as z:
+            required={"vocab","idf","W","b","labels"}
+            if set(z.files)!=required:raise ValueError("router asset fields invalid")
+            vocab,idf,W,b,labels=(z[key] for key in ("vocab","idf","W","b","labels"))
+            if vocab.ndim!=1 or labels.ndim!=1 or not len(vocab) or not len(labels):raise ValueError("router text axes invalid")
+            for axis in (vocab,labels):
+                if axis.dtype.kind not in {"U"} or any(not str(x).strip() for x in axis) or len(set(axis.tolist()))!=len(axis):raise ValueError("router text axis invalid")
+            if idf.shape!=(len(vocab),) or W.shape!=(len(vocab),len(labels)) or b.shape!=(len(labels),):raise ValueError("router weight shape invalid")
+            for axis in (idf,W,b):
+                if axis.dtype.kind not in {"f","i","u"} or not np.isfinite(axis).all():raise ValueError("router numeric values invalid")
+            if not (idf>0).all():raise ValueError("router idf invalid")
+            vec=Vectorizer([str(t) for t in vocab],idf)
+            return cls(vec,W,b,[str(s) for s in labels])
+
 
 
 @lru_cache(maxsize=1)
