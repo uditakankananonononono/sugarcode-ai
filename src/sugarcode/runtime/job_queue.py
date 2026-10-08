@@ -23,6 +23,16 @@ class Queue:
         with self._db() as db:r=db.execute('SELECT * FROM jobs WHERE id=?',(job_id,)).fetchone()
         if not r:raise KeyError(job_id)
         return dict(r)
+    def status(self,*,state=None,limit=100):
+        """Bounded operational metadata, no scripts or captured output."""
+        states={'pending','running','uncertain','succeeded','failed','timed_out','cancelled'}
+        if type(limit) is not int or not 1<=limit<=1000:raise ValueError('invalid status limit')
+        if state is not None and (not isinstance(state,str) or state not in states):raise ValueError('invalid status state')
+        query='SELECT id,sha256,state,timeout,heartbeat,exit_code FROM jobs'
+        params=[]
+        if state is not None:query+=' WHERE state=?';params.append(state)
+        query+=' ORDER BY rowid LIMIT ?';params.append(limit)
+        with self._db() as db:return [dict(row) for row in db.execute(query,params)]
     def cancel(self,job_id):
         with self._db() as db:return db.execute("UPDATE jobs SET state='cancelled' WHERE id=? AND state='pending'",(job_id,)).rowcount==1
     def claim(self):
