@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from sugarcode.self_improve.registry import FeatureRegistry
 
-def test_real_isolated_dispatch_and_private_path(tmp_path):
+def test_real_isolated_dispatch_and_private_path(tmp_path, real_containment):
  from sugarcode.self_improve.isolated_dispatch import dispatch
  r=FeatureRegistry('tools',tmp_path/'state');secret=tmp_path/'secret';secret.write_text('OWNER CANARY')
  code=f'''def run(items,params=None):
@@ -26,7 +26,7 @@ def test_tamper_refused(tmp_path):
  Path(entry['file']).write_text('tamper')
  with pytest.raises(ValueError):dispatch(r,'x',[])
 
-def test_timeout_refused(tmp_path):
+def test_timeout_refused(tmp_path, real_containment):
  from sugarcode.self_improve.isolated_dispatch import dispatch
  r=FeatureRegistry('tools',tmp_path);r.save_proposal('x',name='x',kind='text_transform',code='def run(items,params=None):\n import time\n time.sleep(10)',test_code='',gap_signature='x');r.activate('x',approval_id='test')
  with pytest.raises(TimeoutError):dispatch(r,'x',[],timeout_seconds=.5)
