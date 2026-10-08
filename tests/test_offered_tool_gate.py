@@ -27,5 +27,7 @@ def test_per_response_dispatch_budget(monkeypatch):
  import sugarcode.modules.acmg_bayesian as module
  calls=[];monkeypatch.setattr(module,'classify_points',lambda **kw:calls.append(kw) or 'called')
  tool=catalog()['acmg_bayesian__classify_points'];client=Client(tool.name,100)
- _run(client,'question',[tool],2)
- assert len(calls)<=24
+ import pytest
+ from sugarcode.llm.providers import ProviderError
+ with pytest.raises(ProviderError,match='call list'):_run(client,'question',[tool],2)
+ assert calls==[]
