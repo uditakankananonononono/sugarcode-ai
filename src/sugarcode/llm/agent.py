@@ -40,6 +40,7 @@ class AskResult:
 
 
 def _run(client: ChatClient, question: str, tools, max_steps: int) -> tuple[str, list[dict]]:
+    offered={t.name for t in tools}
     schemas = [t.openai_schema() for t in tools] if client.supports_tools else None
     messages: list[dict] = [{"role": "system", "content": SYSTEM},
                             {"role": "user", "content": question}]
@@ -54,9 +55,15 @@ def _run(client: ChatClient, question: str, tools, max_steps: int) -> tuple[str,
         if not calls:
             return (msg.get("content") or "").strip(), trace
         messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
-        for c in calls:
+        for index,c in enumerate(calls):
             fn = c.get("function", {})
-            result = call_tool(fn.get("name", ""), fn.get("arguments") or "{}")
+            name=fn.get("name", "")
+            if index>=24:
+                result={"error":"per-response tool call limit exceeded"}
+            elif name not in offered:
+                result={"error":"tool was not offered for this request"}
+            else:
+                result = call_tool(name, fn.get("arguments") or "{}")
             trace.append({"tool": fn.get("name"), "arguments": fn.get("arguments"),
                           "ok": "error" not in result})
             messages.append({"role": "tool", "tool_call_id": c.get("id", ""),
