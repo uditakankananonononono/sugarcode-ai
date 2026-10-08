@@ -41,7 +41,8 @@ def _read(path):
         if not isinstance(record[field],str) or not re.fullmatch('[0-9a-f]{64}',record[field]):raise ValueError('receipt hash invalid')
     for field in ('stdout','stderr'):
         if record[field] is not None and not isinstance(record[field],str):raise ValueError('receipt output type invalid')
-        data=(record[field] or '').encode()
+        try:data=(record[field] or '').encode()
+        except UnicodeEncodeError as exc:raise ValueError('receipt output encoding invalid') from exc
         if type(record[field+'_bytes']) is not int or record[field+'_bytes']!=len(data) or record[field+'_sha256']!=hashlib.sha256(data).hexdigest():raise ValueError('receipt output checksum mismatch')
     digest=record.pop('receipt_sha256')
     if hashlib.sha256(_canonical(record).encode()).hexdigest()!=digest:raise ValueError('receipt checksum mismatch')
