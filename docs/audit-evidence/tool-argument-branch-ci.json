@@ -1,0 +1,23 @@
+{
+  "head_sha": "2728fbd20fed0736d28cb5a16fff82b42dfff1c5",
+  "run_url": "https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37785267526",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "test (3.10)",
+      "conclusion": "success",
+      "url": "https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37785267526/job/113338283238"
+    },
+    {
+      "name": "test (3.11)",
+      "conclusion": "success",
+      "url": "https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37785267526/job/113338283453"
+    },
+    {
+      "name": "test (3.12)",
+      "conclusion": "success",
+      "url": "https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37785267526/job/113338283767"
+    }
+  ],
+  "counts": "API conclusions do not expose pytest counts"
+}

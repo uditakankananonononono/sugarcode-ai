@@ -8,6 +8,25 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 reviewed tool JSON argument gate integration
+
+Merged replacement peer eef7bbba (exact peer base f3cf25f) into published
+queue/status combined main a50f03e7 without conflicts. Actual combined
+selection: **47 passed, 0 skipped**. Full tests/ across 357 files in four
+isolated Python 3.10 processes: **2,664 passed, 15 skipped, 0 failed**.
+Prior peer or old-tip counts do not cover this candidate. Independent combined-tree re-review: PASS-WITH-NOTES, separate 50-node
+selections and 14 controls on 3.10 and 3.12. The 2,664/15 full-suite
+count is builder evidence, not a reviewer full-suite rerun. Exact 2728fbd2
+branch full-matrix CI passed:
+https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37785267526.
+Main merge prepared locally pending publication/readback. API conclusions
+do not expose pytest counts. Remaining-tests-green, not runner containment.
+Evidence: audit-evidence/tool-argument-combined-*.
+
+Not full JSON Schema, no auth/semantic/sandbox/size/time proof; untyped object nested custom values accepted (declared limit); typed top-level dict fields only, no universal JSON recursion claim.
+No module algorithm, model acceptance, clinical/spec or production clearance
+claim. Queue/status restrictions remain unchanged.
+
 ## 2026-10-08 reviewed queue-status combined integration
 
 Replacement peer tip 297d068a on published main f3cf25f retains both queue
