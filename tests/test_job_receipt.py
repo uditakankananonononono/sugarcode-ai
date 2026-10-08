@@ -39,3 +39,10 @@ def test_rehashed_invalid_shape_still_refuses(tmp_path):
  r=json.loads(p.read_text());r.pop('receipt_sha256');r['state']='pending'
  r['receipt_sha256']=hashlib.sha256(json.dumps(r,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest();p.write_text(json.dumps(r))
  with pytest.raises(ValueError):export_json(p)
+
+def test_escaped_surrogate_controlled_refusal(tmp_path):
+ from sugarcode.runtime.job_receipt import capture,export_json
+ q=Queue(tmp_path/'q');q.submit('real','print(42)');q.run_next();p=tmp_path/'r';capture(q,'real',p)
+ r=json.loads(p.read_text());r['stdout']='\ud800';p.write_text(json.dumps(r))
+ with pytest.raises(ValueError) as caught:export_json(p)
+ assert type(caught.value) is ValueError
