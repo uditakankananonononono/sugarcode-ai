@@ -1,0 +1,19 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 32%]
+s....................................................................... [ 43%]
+........................................................................ [ 54%]
+........................................................................ [ 65%]
+........................................................................ [ 76%]
+........ss.............................................................. [ 87%]
+......................................................................ss [ 98%]
+.......                                                                  [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_bio_restriction.py:82: Biopython oracle not installed
+SKIPPED [1] tests/test_bio_proteinprops.py:90: Biopython oracle not installed
+SKIPPED [1] tests/test_de_deseq2.py:6: could not import 'pydeseq2': No module named 'pydeseq2'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:8: could not import 'Bio.SeqUtils.MeltingTemp': No module named 'Bio'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:15: could not import 'primer3': No module named 'primer3'
+SKIPPED [1] tests/test_vina_real.py:10: vina/openbabel not installed
+SKIPPED [1] tests/test_vina_real.py:30: vina not installed
+650 passed, 7 skipped in 78.66s (0:01:18)
