@@ -136,6 +136,20 @@ def _jsonable(x, depth: int = 0):
     return str(x)
 
 
+def _argument_valid(value, schema, depth=0):
+    if depth>16:return False
+    if value is None:return bool(schema.get("nullable"))
+    kind=schema.get("type")
+    if kind=="string":return isinstance(value,str)
+    if kind=="integer":return type(value) is int
+    if kind=="number":return type(value) in (int,float) and (type(value) is int or math.isfinite(value))
+    if kind=="boolean":return type(value) is bool
+    if kind=="array":return isinstance(value,list) and ("items" not in schema or all(_argument_valid(x,schema["items"],depth+1) for x in value))
+    if kind=="object":
+        return isinstance(value,dict) and all(isinstance(k,str) for k in value) and (not isinstance(schema.get("additionalProperties"),dict) or all(_argument_valid(x,schema["additionalProperties"],depth+1) for x in value.values()))
+    return False
+
+
 def call_tool(name: str, arguments: dict | str) -> dict:
     """Execute one catalog tool. Never raises: errors come back as {"error": ...}."""
     cat = catalog()
@@ -145,8 +159,10 @@ def call_tool(name: str, arguments: dict | str) -> dict:
     if isinstance(arguments, str):
         try:
             arguments = json.loads(arguments or "{}")
-        except json.JSONDecodeError as e:
+        except (json.JSONDecodeError,RecursionError) as e:
             return {"error": f"arguments are not valid JSON: {e}"}
+    if not isinstance(arguments,dict) or not all(isinstance(k,str) for k in arguments):
+        return {"error":"arguments must be a JSON object"}
     allowed = set(t.parameters["properties"])
     extra = set(arguments) - allowed
     if extra:
@@ -154,6 +170,9 @@ def call_tool(name: str, arguments: dict | str) -> dict:
     missing = [r for r in t.parameters["required"] if r not in arguments]
     if missing:
         return {"error": f"missing required arguments {missing}"}
+    for key,value in arguments.items():
+        if not _argument_valid(value,t.parameters["properties"][key]):
+            return {"error":f"invalid argument {key}: expected {t.parameters['properties'][key]['type']}"}
     fn = getattr(importlib.import_module(f"sugarcode.modules.{t.module}"), t.function)
     try:
         result = fn(**arguments)
