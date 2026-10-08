@@ -1,4 +1,4 @@
-"""Read-only bounded operational view of an existing queue DB."""
+"""Read-only row-limited operational view of an existing queue DB."""
 import json,sqlite3
 from pathlib import Path
 from .job_queue import Queue

@@ -8,6 +8,22 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 queue-status combined candidate, review pending
+
+Replacement peer tip 297d068a on published main f3cf25f retains both queue
+and queue-status registration pairs in that order. Earlier old-tip greens do
+not cover this candidate. Claims-only edits replace bounded metadata wording
+with row-limited. New combined marker test proves submit/status do not execute,
+status returns only projected fields without DB-byte changes, explicit run
+executes, and receipt/verify remain usable. Selection: **33 passed, 0 skipped**.
+Actual replacement tree full tests/ across 356 files in four processes:
+**2,650 passed, 15 skipped, 0 failed** (Python 3.10). Re-review and branch-tip
+CI still pending; no publication or main integration claim. Evidence under
+ audit-evidence/queue-status-rebased-*.
+
+Metadata is not validated/anonymized/authenticated; IDs and poisoned metadata may contain private values; row limit is not a per-field byte bound; legacy DB metadata is untrusted; no size-bounded claim.
+No clinical/spec, isolation, authority, or production-clearance claim.
+
 ## 2026-10-08 trusted queue product CLI integration gate
 
 Reviewed peer tip 3a1c69a on exact base 9e243cee adds explicit
