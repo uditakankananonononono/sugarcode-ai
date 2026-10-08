@@ -1,0 +1,15 @@
+Parent-provided authenticated evidence for run 37768781185:
+Bubblewrap installs, but real containment probe refuses loopback RTM_NEWADDR
+with Operation not permitted. Four real-containment tests fail across matrix.
+Exact per-job 3.11/3.12 log separation remains ambiguous in parent retrieval.
+
+Patch scope: test-only fixture probes no candidate code. Capability refusal yields
+loud pytest skip REAL CONTAINMENT NOT VERIFIED, includes probe stderr. Only four
+real-isolation test functions opt in. Existing unavailable refusal/tamper/invalid
+input tests are still exercised, as are queue and receipt execution tests.
+pytest -q -rs exposes skip reasons in GitHub CI. No production code modification.
+Local 75 receipt/queue/self_improve tests pass with 0 skipped (real bwrap 0.6.1).
+Five preflight unit cases cover successful probe, missing executable, permission
+refusal, loud skip text and propagation of programming ValueError.
+No inference that this closes CI containment proof. Remote success, if achieved,
+means remaining tests pass; skipped containment is explicitly not verified there.
