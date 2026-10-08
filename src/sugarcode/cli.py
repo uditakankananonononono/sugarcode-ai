@@ -220,7 +220,7 @@ def _cmd_tool(args) -> int:
 def _cmd_ask(args) -> int:
     from .llm.agent import ask
     res = ask(args.question, profile=args.profile, route=args.route, model=args.model,
-              allow_paid=args.allow_paid or None)
+              allow_paid=args.allow_paid or None, private=args.private)
     _emit(res.to_dict())
     return 0 if res.answer else 1
 
@@ -1572,6 +1572,7 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--route", default=None, help="ordered fallback, e.g. inkling-local,ollama,inkling")
     k.add_argument("--model", default=None)
     k.add_argument("--allow-paid", action="store_true", help="permit hosted_paid profiles (Fugu)")
+    k.add_argument("--private", action="store_true", help="permit local-kind profiles only, no hosted fallback")
     k.set_defaults(func=_cmd_ask)
 
     sh = sub.add_parser("shared", help="shared model layer (instinct_models): ask | dataset")

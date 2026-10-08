@@ -284,10 +284,14 @@ def parse_route(env: dict | None = None, route: str | None = None) -> list[str]:
 
 
 def resolve_route(env: dict | None = None, route: str | None = None,
-                  allow_paid: bool | None = None) -> tuple[list[ChatClient], list[str]]:
+                  allow_paid: bool | None = None, private: bool = False) -> tuple[list[ChatClient], list[str]]:
     """Clients for each usable profile in route order, plus reasons for the skipped ones."""
     clients, skipped = [], []
+    profiles = load_profiles(env)
     for n in parse_route(env, route):
+        if private and profiles[n].kind != "local":
+            skipped.append(f"private mode refused non-local profile {n}")
+            continue
         try:
             clients.append(resolve(n, env=env, allow_paid=allow_paid))
         except ProviderError as e:
