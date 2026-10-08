@@ -8,6 +8,27 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 repaired response boundary combined candidate
+
+Repaired peer f1bdc728 (fa37292a plus two test-only fixture repairs) merged
+without conflict into published input-cap/wording 03585df9, descendant of
+89ac9575. Actual combined selection: **72 passed, 0 skipped**. Full tests/
+across 362 files, four isolated Python 3.10 batches: **2,689 passed,
+15 skipped, 0 failed**. Batch 3 was interrupted by the outer command timeout
+before summary and rerun in full; incomplete output was not counted. Builder
+evidence, not independent reviewer full-suite rerun. Fresh combined review
+and branch CI pending; no main integration/publication claim.
+Evidence: audit-evidence/boundary-combined-*.
+
+Exact repaired peer matrix CI green at run 37809480795. Earlier fa37292a
+3.11 failure remains recorded, not overwritten. Fixture repair diagnosis is
+plausible, not proved historical causation; RST control matches unreachable
+category only, fixture thread lacks accept timeout. Successful-response byte
+cap excludes HTTP error-body reads/health/request size; no live provider,
+wall-clock/resource/nested-schema proof. Offered/input-cap/JSON/router/queue
+limits unchanged. Refusal remains response-local; prior effects may survive
+and fallback may follow them. No clinical/spec or production-clearance claim.
+
 ## 2026-10-08 offered-tool dispatch combined candidate
 
 Peer fab876ee from exact base a50f03e7 cherry-picked onto published router

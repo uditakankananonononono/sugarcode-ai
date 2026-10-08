@@ -1,0 +1,23 @@
+............................................................s........... [ 11%]
+........................................s............................... [ 22%]
+......................................s................................. [ 34%]
+........................................................................ [ 45%]
+........................................................................ [ 57%]
+........................................................................ [ 68%]
+..............................................ss........................ [ 80%]
+........................................................................ [ 91%]
+.....................................................                    [100%]
+=============================== warnings summary ===============================
+tests/test_virtual_cell_realdata.py:46
+  /tmp/boundary-combined-worktree/tests/test_virtual_cell_realdata.py:46: DeprecationWarning: invalid escape sequence '\['
+    with pytest.raises(ValueError, match="within \[0, 1\]"):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_bio_proteinprops.py:90: Biopython oracle not installed
+SKIPPED [1] tests/test_bio_orf.py:39: could not import 'Bio': No module named 'Bio'
+SKIPPED [1] tests/test_cellpainter_4d_realdata.py:42: BBBC001 not cached
+SKIPPED [1] tests/test_de_deseq2.py:6: could not import 'pydeseq2': No module named 'pydeseq2'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:8: could not import 'Bio.SeqUtils.MeltingTemp': No module named 'Bio'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:15: could not import 'primer3': No module named 'primer3'
+624 passed, 6 skipped, 1 warning in 30.69s
