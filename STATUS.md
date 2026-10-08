@@ -8,6 +8,33 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 trusted queue product CLI integration gate
+
+Reviewed peer tip 3a1c69a on exact base 9e243cee adds explicit
+submit/run/show/cancel/receipt/verify commands. Queue selection: **29 passed,
+0 skipped**; metadata-preserving selection including repository hygiene:
+**31 passed, 0 skipped**. Full tests/ across 354 files in four isolated
+Python 3.10 batches: **2,646 passed, 15 skipped, 0 failed**.
+An initial git-archive harness run failed test_drop59.py because git ls-files
+had no .git; the full worktree rerun above resolves that harness issue.
+The earlier report naming test_provenance_scan.py was wrong: actual failing
+test was test_drop59.py::test_no_egg_info_or_build_dirs_in_tree.
+
+CI push triggers now include wip-unaudited/* so unmerged candidate tips can
+run the unchanged 3.10/3.11/3.12 matrix. Branch-tip CI is green at b036e3bb on all three Python jobs:
+https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37777950769.
+This proves remaining-tests-green, not real containment on GitHub runners.
+API conclusions do not expose pytest counts; local counts above stay separate.
+Main merge is prepared locally pending publication and remote readback. Workflow parsed and
+verified: only the push branch allowlist changes. Evidence: audit-evidence/
+queue-cli-*.txt. This record does not claim reviewer counts as our own.
+
+Submit never executes; run is an explicit operator action. Trusted scripts
+only; resource caps are not isolation. Receipts are not authenticity or
+verified effects. No effects-exactly-once, no automatic retry; crashes can
+leave uncertain effects. Local operator paths. No clinical/spec or production
+clearance claim.
+
 ## 2026-10-08 reviewed queue/receipt/isolation integration
 
 Selectively imported 9 reviewed files onto ea9ca407: queue/runtime init and queue

@@ -1074,6 +1074,8 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="sugarcode",
                                 description="SugarCode AI - multi-omic bio-design platform")
     sub = p.add_subparsers(dest="cmd", required=True)
+    from .runtime.queue_cli import register as register_queue
+    register_queue(sub)
 
     sp = sub.add_parser("splice", help="deepsplice splice assessment")
     ssub = sp.add_subparsers(dest="sub", required=True)
