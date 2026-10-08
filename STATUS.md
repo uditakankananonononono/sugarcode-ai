@@ -8,6 +8,25 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 offered-tool dispatch combined candidate
+
+Peer fab876ee from exact base a50f03e7 cherry-picked onto published router
+main 54d35492 without conflict. Combined selection: **58 passed, 0 skipped**.
+New composition pin proves offered-invalid boolean refuses at argument gate,
+unoffered-valid integer refuses at offered-name gate, and offered-valid
+integer executes exactly once in the protocol harness. Full tests/ across
+360 files in four isolated Python 3.10 processes: **2,675 passed, 15 skipped,
+0 failed**. Builder evidence, not independent reviewer full-suite rerun.
+Fresh combined-tree review and branch CI pending, no main landing claim.
+Evidence: audit-evidence/offered-combined-*.
+
+Local model-protocol harness, not live provider acceptance. Offered-set gate
+is not owner authorization or isolation; offered tools may have side effects.
+Per-response 24 executed-call limit and max_steps are not wall-clock/resource
+budgets. Response list/trace bytes are uncapped. JSON declared-type limits,
+router structural-only limits and trusted-queue limits remain unchanged.
+No clinical/spec or production-clearance claim.
+
 ## 2026-10-08 reviewed router asset integration
 
 Peer 2bcd4f32 rebased by cherry-pick onto published ffa46175. Actual combined
