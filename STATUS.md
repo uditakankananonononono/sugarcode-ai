@@ -8,6 +8,27 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 reviewed queue/receipt/isolation integration
+
+Selectively imported 9 reviewed files onto ea9ca407: queue/runtime init and queue
+ tests from ff068952; isolated_dispatch/isolation and their tests from 233c6153;
+final receipt and receipt tests from 26695366 (including f287 shape hardening).
+No other peer branch files imported. Selection including all self_improve tests:
+**70 passed, 0 skipped** with real bwrap execution. Full tests/ across 352 files,
+four isolated batches: **2,629 passed, 15 skipped, 0 failed**. These are local
+Python 3.10 results, not remote multi-version CI. Evidence in audit-evidence.
+
+Queue is opt-in trusted-script execution with full host filesystem/network,
+NOT isolation or exactly-once effects. Crash reconciliation is uncertain, no
+automatic retry. Current DB trust and cooperative parent remain assumptions;
+no hostile-DB authenticity, power-loss, fencing lease or legacy wiring claim.
+Separate bwrap adapter is opt-in, trusted runtime, not kernel/cgroup/fork-bomb,
+version-race or action-authority clearance. Receipt checksums are NOT signatures;
+API refuses overwrite but cannot guarantee external immutability. Escaped lone
+surrogate repair contains encoding errors only, not authenticity/effects proof.
+No earned authority, new push grant or clinical/spec validation created by code.
+
+
 ## 2026-10-07 PE3 nick ranking coordinate domains
 
 13 canaries: **12 reproduced failures, 1 existing translation/invariance pass**.

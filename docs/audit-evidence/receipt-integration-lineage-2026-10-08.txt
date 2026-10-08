@@ -1,0 +1,24 @@
+Current-main base: ea9ca4077c4cd067a9b36dc4876d26ec3a17f708
+Selected final contents only, not wholesale ancestry:
+ff068952458ce05fb8a220f9b7ae03178f700d92:
+ src/sugarcode/runtime/__init__.py
+ src/sugarcode/runtime/job_queue.py
+ tests/test_job_queue.py
+233c61536b5682b04d4fcbc1c38eedcf636ab03c:
+ src/sugarcode/self_improve/isolation.py
+ src/sugarcode/self_improve/isolated_dispatch.py
+ tests/self_improve/test_isolation.py
+ tests/self_improve/test_isolated_dispatch.py
+26695366d05a2d58d058eb3e685872096d0e1aa2:
+ src/sugarcode/runtime/job_receipt.py
+ tests/test_job_receipt.py
+Reviewed lineage: isolation d9fbd474; original dispatch d587b5ec;
+queue 9fd468b -> edd48431 -> dispatch timeout 233c6153 -> row ff068952;
+receipt 1246b7c5 -> shape f2872932 -> surrogate 26695366.
+Sources read; final imported file bytes checked against specified object trees.
+70 selection passes; 2629 full tests/ passes, 15 skips, 0 failures, 352 files.
+Local Python 3.10 only; no remote CI result claimed here.
+Limits: queue trusted script full FS/network, no exactly-once, hostile DB,
+power loss, legacy wiring, authority grant. bwrap trusted runtime opt-in,
+no kernel/cgroup/fork-bomb/version race guarantee. Receipt hash not signature;
+no external immutability/authenticity/effects proof; encoding error containment only.
