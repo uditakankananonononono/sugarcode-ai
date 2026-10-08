@@ -67,7 +67,7 @@ def _run(client: ChatClient, question: str, tools, max_steps: int) -> tuple[str,
 
 def ask(question: str, profile: str | None = None, route: str | None = None,
         model: str | None = None, allow_paid: bool | None = None, k_modules: int = 3,
-        max_tools: int = 24, max_steps: int = 4, env: dict | None = None) -> AskResult:
+        max_tools: int = 24, max_steps: int = 4, env: dict | None = None, private: bool = False) -> AskResult:
     """Answer with module tools. `profile` pins one profile; otherwise the route is tried in order."""
     mods = route_modules(question, k=k_modules)
     tools = tools_for_modules([m["module"] for m in mods], limit=max_tools)
@@ -78,9 +78,12 @@ def ask(question: str, profile: str | None = None, route: str | None = None,
         except ProviderError as e:
             return AskResult(None, None, mods, names, skipped=[str(e)], error=str(e))
     else:
-        clients, skipped = resolve_route(env=env, route=route, allow_paid=allow_paid)
+        clients, skipped = resolve_route(env=env, route=route, allow_paid=allow_paid, **({"private": True} if private else {}))
     errors = list(skipped)
     for c in clients:
+        if private and getattr(c, "kind", None) != "local":
+            errors.append(f"private mode refused non-local profile {c.profile}")
+            continue
         try:
             answer, trace = _run(c, question, tools, max_steps)
             return AskResult(answer, c.profile, mods, names, trace, errors)
