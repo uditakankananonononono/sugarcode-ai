@@ -8,7 +8,8 @@ def endpoint():
  class Handler(BaseHTTPRequestHandler):
   payload=b'{}'
   def do_POST(self):
-   self.send_response(200);self.end_headers();self.wfile.write(self.payload)
+   self.rfile.read(int(self.headers.get("Content-Length", "0")))
+   self.send_response(200);self.send_header("Content-Length", str(len(self.payload)));self.end_headers();self.wfile.write(self.payload)
   def log_message(self,*args):pass
  server=HTTPServer(('127.0.0.1',0),Handler);thread=threading.Thread(target=server.serve_forever);thread.start()
  yield Handler,ChatClient('test',f'http://127.0.0.1:{server.server_port}','test','local')
@@ -22,3 +23,16 @@ def test_actual_http_bad_response_is_provider_refusal(endpoint,payload):
 def test_actual_http_message_still_returns(endpoint):
  handler,client=endpoint;handler.payload=b'{"choices":[{"message":{"content":"42"}}]}'
  assert client.chat([])=={'content':'42'}
+
+def test_actual_http_connection_reset_is_provider_error():
+ import socket,struct
+ class Reset(BaseHTTPRequestHandler):
+  def do_POST(self):
+   self.send_response(200);self.end_headers();self.wfile.write(b'x'*1000);self.wfile.flush()
+   self.connection.setsockopt(socket.SOL_SOCKET,socket.SO_LINGER,struct.pack('ii',1,0))
+  def log_message(self,*args):pass
+ server=HTTPServer(('127.0.0.1',0),Reset);thread=threading.Thread(target=server.serve_forever);thread.start()
+ try:
+  client=ChatClient('test',f'http://127.0.0.1:{server.server_port}','test','local')
+  with pytest.raises(ProviderError,match='unreachable'):client.chat([])
+ finally:server.shutdown();thread.join();server.server_close()
