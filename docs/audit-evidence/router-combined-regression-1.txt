@@ -1,0 +1,18 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+.....................s.................................................. [ 31%]
+........................................................................ [ 42%]
+........................................................................ [ 52%]
+........................................................................ [ 63%]
+........................................................................ [ 74%]
+.................................ss..................................... [ 84%]
+........................................................................ [ 95%]
+.......................ss.......                                         [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_bio_primer.py:95: Biopython oracle not installed
+SKIPPED [1] tests/test_chemgpt_engine_spec.py:82: could not import 'rdkit.Chem': No module named 'rdkit'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:8: could not import 'Bio.SeqUtils.MeltingTemp': No module named 'Bio'
+SKIPPED [1] tests/test_primer_oracle_nn4.py:15: could not import 'primer3': No module named 'primer3'
+SKIPPED [1] tests/test_vina_real.py:10: vina/openbabel not installed
+SKIPPED [1] tests/test_vina_real.py:30: vina not installed
+675 passed, 6 skipped in 45.75s

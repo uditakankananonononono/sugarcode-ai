@@ -8,6 +8,22 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 reviewed router asset integration
+
+Peer 2bcd4f32 rebased by cherry-pick onto published ffa46175. Actual combined
+selection: **54 passed, 0 skipped**. Full tests/ across 358 files in four
+isolated Python 3.10 processes: **2,671 passed, 15 skipped, 0 failed**.
+These are builder evidence, not an independent reviewer full-suite rerun.
+Independent combined-tree re-review: PASS-WITH-NOTES. Exact 0ca3f4dc
+branch full Python 3.10/3.11/3.12 matrix CI passed:
+https://github.com/uditakankananonononono/sugarcode-ai/actions/runs/37790899445.
+Main merge prepared locally pending publication/readback; API conclusions
+do not expose pytest counts. Remaining-tests-green, runner containment
+not verified. Evidence: audit-evidence/router-combined-*.
+
+Shape/structure only - not quality/authenticity/license/resource/semantics; structurally valid huge finite bad weights ACCEPTED (declared); NPZ decompression uncapped, no adversarial CPU/memory boundary.
+No model evaluation, clinical/spec or production-clearance claim.
+
 ## 2026-10-08 reviewed tool JSON argument gate integration
 
 Merged replacement peer eef7bbba (exact peer base f3cf25f) into published
