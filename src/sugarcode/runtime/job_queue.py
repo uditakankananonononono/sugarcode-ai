@@ -4,7 +4,7 @@ Single SQLite claim, cancelled pending jobs never execute. A process crash
 can leave effects partly done; explicit stale reconciliation marks uncertain,
 never retries. This is NOT isolation: only trusted scripts belong here.
 """
-import hashlib,os,signal,sqlite3,subprocess,sys,tempfile,time
+import hashlib,math,os,signal,sqlite3,subprocess,sys,tempfile,time
 from pathlib import Path
 
 class Queue:
@@ -14,7 +14,7 @@ class Queue:
     def _db(self):
         db=sqlite3.connect(self.path,timeout=5);db.row_factory=sqlite3.Row;return db
     def submit(self,job_id,code,*,timeout=30):
-        if not isinstance(job_id,str) or not job_id or not isinstance(code,str) or len(code.encode())>1_048_576 or timeout<=0:raise ValueError('invalid bounded job')
+        if not isinstance(job_id,str) or not job_id or not isinstance(code,str) or len(code.encode())>1_048_576 or type(timeout) not in (int,float) or not math.isfinite(timeout) or timeout<=0:raise ValueError('invalid bounded job')
         with self._db() as db:
             try:db.execute('INSERT INTO jobs VALUES (?,?,?,\'pending\',?,NULL,NULL,NULL,NULL)',(job_id,code,hashlib.sha256(code.encode()).hexdigest(),timeout))
             except sqlite3.IntegrityError as exc:raise ValueError('job id already exists, no retries') from exc
