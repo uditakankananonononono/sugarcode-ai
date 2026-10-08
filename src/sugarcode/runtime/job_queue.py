@@ -4,7 +4,7 @@ Single SQLite claim, cancelled pending jobs never execute. A process crash
 can leave effects partly done; explicit stale reconciliation marks uncertain,
 never retries. This is NOT isolation: only trusted scripts belong here.
 """
-import hashlib,math,os,signal,sqlite3,subprocess,sys,tempfile,time
+import hashlib,math,os,re,signal,sqlite3,subprocess,sys,tempfile,time
 from pathlib import Path
 
 class Queue:
@@ -36,8 +36,14 @@ class Queue:
     def run_next(self):
         job=self.claim()
         if not job:return None
-        if hashlib.sha256(job['code'].encode()).hexdigest()!=job['sha256']:
-            with self._db() as db:db.execute("UPDATE jobs SET state='failed',stderr='stored script checksum mismatch' WHERE id=?",(job['id'],))
+        reason=None
+        if not isinstance(job['code'],str):reason='stored code must be text'
+        elif len(job['code'].encode())>1_048_576:reason='stored code cap exceeded'
+        elif not isinstance(job['sha256'],str) or not re.fullmatch('[0-9a-f]{64}',job['sha256']):reason='stored checksum invalid'
+        elif hashlib.sha256(job['code'].encode()).hexdigest()!=job['sha256']:reason='stored code checksum mismatch'
+        elif type(job['timeout']) not in (int,float) or not math.isfinite(job['timeout']) or job['timeout']<=0:reason='stored timeout invalid'
+        if reason:
+            with self._db() as db:db.execute("UPDATE jobs SET state='failed',stderr=? WHERE id=? AND state='running'",(reason[:160],job['id']))
             return job['id']
         with tempfile.TemporaryDirectory(prefix='sugar-job-') as directory,tempfile.TemporaryFile() as out,tempfile.TemporaryFile() as err:
             script=Path(directory)/'job.py';script.write_text(job['code'])
