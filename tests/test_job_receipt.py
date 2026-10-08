@@ -25,3 +25,17 @@ def test_receipt_corruption_refused(tmp_path):
  q=Queue(tmp_path/'q');q.submit('real','print(42)');q.run_next();out=tmp_path/'receipt'
  capture(q,'real',out);r=json.loads(out.read_text());r['stdout']='altered';out.write_text(json.dumps(r))
  with pytest.raises(ValueError):verify(q,out)
+
+@pytest.mark.parametrize('content',['null','42','[]','{broken}','['*50000+']'*50000])
+def test_shape_and_deep_json_controlled_refusal(tmp_path,content):
+ from sugarcode.runtime.job_receipt import export_json
+ p=tmp_path/'receipt';p.write_text(content)
+ with pytest.raises(ValueError):export_json(p)
+
+def test_rehashed_invalid_shape_still_refuses(tmp_path):
+ from sugarcode.runtime.job_receipt import capture,export_json
+ import hashlib
+ q=Queue(tmp_path/'q');q.submit('real','print(42)');q.run_next();p=tmp_path/'r';capture(q,'real',p)
+ r=json.loads(p.read_text());r.pop('receipt_sha256');r['state']='pending'
+ r['receipt_sha256']=hashlib.sha256(json.dumps(r,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest();p.write_text(json.dumps(r))
+ with pytest.raises(ValueError):export_json(p)

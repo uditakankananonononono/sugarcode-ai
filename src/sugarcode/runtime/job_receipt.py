@@ -4,7 +4,7 @@ Captures current trusted DB content, not cryptographic authenticity or proof
 of effects. A malicious writer can alter DB and receipt together. No queue
 mutation, automatic retry, effects completion or exactly-once guarantee.
 """
-import hashlib,json,os,tempfile
+import hashlib,json,math,os,re,tempfile
 from pathlib import Path
 _FIELDS=('id','sha256','state','timeout','stdout','stderr','exit_code')
 _TERMINAL={'succeeded','failed','timed_out','cancelled'}
@@ -27,7 +27,23 @@ def _record(queue,job_id):
 def _read(path):
     path=Path(path)
     if path.is_symlink() or not path.is_file() or path.stat().st_size>3_000_000:raise ValueError('real bounded receipt required')
-    record=json.loads(path.read_text());digest=record.pop('receipt_sha256',None)
+    try:
+        with path.open('rb') as stream:raw=stream.read(3_000_001)
+        if len(raw)>3_000_000:raise ValueError('receipt size cap exceeded')
+        record=json.loads(raw)
+    except (RecursionError,UnicodeDecodeError,MemoryError) as exc:raise ValueError('receipt JSON resource/encoding refusal') from exc
+    expected=set(_FIELDS)|{'stdout_bytes','stdout_sha256','stderr_bytes','stderr_sha256','effects_verified','receipt_sha256'}
+    if not isinstance(record,dict) or set(record)!=expected:raise ValueError('receipt field shape mismatch')
+    if not isinstance(record['id'],str) or not record['id'] or not isinstance(record['state'],str) or record['state'] not in _TERMINAL or record['effects_verified'] is not False:raise ValueError('receipt identity/state mismatch')
+    if type(record['timeout']) not in (int,float) or not math.isfinite(record['timeout']) or record['timeout']<=0:raise ValueError('receipt timeout invalid')
+    if record['exit_code'] is not None and type(record['exit_code']) is not int:raise ValueError('receipt exit code invalid')
+    for field in ('sha256','stdout_sha256','stderr_sha256','receipt_sha256'):
+        if not isinstance(record[field],str) or not re.fullmatch('[0-9a-f]{64}',record[field]):raise ValueError('receipt hash invalid')
+    for field in ('stdout','stderr'):
+        if record[field] is not None and not isinstance(record[field],str):raise ValueError('receipt output type invalid')
+        data=(record[field] or '').encode()
+        if type(record[field+'_bytes']) is not int or record[field+'_bytes']!=len(data) or record[field+'_sha256']!=hashlib.sha256(data).hexdigest():raise ValueError('receipt output checksum mismatch')
+    digest=record.pop('receipt_sha256')
     if hashlib.sha256(_canonical(record).encode()).hexdigest()!=digest:raise ValueError('receipt checksum mismatch')
     record['receipt_sha256']=digest
     return record
