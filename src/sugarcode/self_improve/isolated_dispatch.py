@@ -4,7 +4,7 @@ Legacy in-process dispatch unchanged. Reads/hash-checks once, executes copied
 bytes in disposable namespace, no source reload TOCTOU. Does not close gate,
 registry transaction/crash/revoke races; no host effect authorization claim.
 """
-import hashlib,json,os,signal,subprocess,sys,tempfile
+import hashlib,json,math,os,signal,subprocess,sys,tempfile
 from pathlib import Path
 from .isolation import IsolatedRunner,IsolationUnavailable
 
@@ -23,7 +23,7 @@ print(json.dumps({'result':result},allow_nan=False))
 
 def dispatch(registry,name,items,params=None,*,timeout_seconds=10):
     if not isinstance(items,list) or (params is not None and not isinstance(params,dict)):raise ValueError('JSON list/object required')
-    if timeout_seconds<=0:raise ValueError('positive timeout required')
+    if type(timeout_seconds) not in (int,float) or not math.isfinite(timeout_seconds) or timeout_seconds<=0:raise ValueError('positive timeout required')
     entry=registry._active_entry(name);path=registry._contained(Path(entry['file']))
     code=path.read_bytes()
     if hashlib.sha256(code).hexdigest()!=entry['sha256']:raise ValueError('active feature checksum mismatch')

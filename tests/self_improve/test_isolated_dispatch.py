@@ -30,3 +30,10 @@ def test_timeout_refused(tmp_path):
  from sugarcode.self_improve.isolated_dispatch import dispatch
  r=FeatureRegistry('tools',tmp_path);r.save_proposal('x',name='x',kind='text_transform',code='def run(items,params=None):\n import time\n time.sleep(10)',test_code='',gap_signature='x');r.activate('x',approval_id='test')
  with pytest.raises(TimeoutError):dispatch(r,'x',[],timeout_seconds=.5)
+
+@pytest.mark.parametrize('timeout',[float('nan'),float('inf'),True,'bad'])
+def test_invalid_timeout_rejected_before_registry_access(timeout):
+ from sugarcode.self_improve.isolated_dispatch import dispatch
+ class NeverAccess:
+  def _active_entry(self,name):raise AssertionError('validation must precede access')
+ with pytest.raises(ValueError):dispatch(NeverAccess(),'x',[],timeout_seconds=timeout)
