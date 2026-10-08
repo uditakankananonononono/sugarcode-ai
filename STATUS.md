@@ -8,6 +8,18 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-08 router asset combined candidate
+
+Peer 2bcd4f32 rebased by cherry-pick onto published ffa46175. Actual combined
+selection: **54 passed, 0 skipped**. Full tests/ across 358 files in four
+isolated Python 3.10 processes: **2,671 passed, 15 skipped, 0 failed**.
+These are builder evidence, not an independent reviewer full-suite rerun.
+Fresh combined-tree re-review and exact-tip branch CI pending, no main
+landing claim. Evidence: audit-evidence/router-combined-*.
+
+Shape/structure only - not quality/authenticity/license/resource/semantics; structurally valid huge finite bad weights ACCEPTED (declared); NPZ decompression uncapped, no adversarial CPU/memory boundary.
+No model evaluation, clinical/spec or production-clearance claim.
+
 ## 2026-10-08 reviewed tool JSON argument gate integration
 
 Merged replacement peer eef7bbba (exact peer base f3cf25f) into published

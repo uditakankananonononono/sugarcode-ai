@@ -9,3 +9,5 @@ This validates shape/content only, not authenticity, model quality, source
 licensing, accuracy or a safe NPZ resource boundary. NPZ decompression/read size
 is not capped. Structurally valid malicious weights can still pass. This is
 not a model evaluation result or provider acceptance claim.
+
+Shape/structure only - not quality/authenticity/license/resource/semantics; structurally valid huge finite bad weights ACCEPTED (declared); NPZ decompression uncapped, no adversarial CPU/memory boundary.
