@@ -31,3 +31,9 @@ def test_actual_crashed_worker_reconciles_uncertain(tmp_path):
  assert p.returncode==7 and q.get('crash')['state']=='running'
  assert q.reconcile(stale_before=time.time()+1)==1 and q.get('crash')['state']=='uncertain'
  assert q.run_next() is None
+
+@pytest.mark.parametrize('timeout',[float('nan'),float('inf'),True,'bad'])
+def test_invalid_timeout_refuses(tmp_path,timeout):
+ from sugarcode.runtime.job_queue import Queue
+ q=Queue(tmp_path/'q')
+ with pytest.raises(ValueError):q.submit('invalid','print(1)',timeout=timeout)
