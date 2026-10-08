@@ -51,7 +51,10 @@ def _run(client: ChatClient, question: str, tools, max_steps: int) -> tuple[str,
     trace: list[dict] = []
     for _ in range(max_steps):
         msg = client.chat(messages, tools=schemas)
-        calls = msg.get("tool_calls") or []
+        calls = msg.get("tool_calls")
+        if calls is None:calls=[]
+        if not isinstance(calls,list) or len(calls)>24:
+            raise ProviderError("tool call list must contain at most 24 calls")
         if not calls:
             return (msg.get("content") or "").strip(), trace
         messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
