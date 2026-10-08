@@ -1,15 +1,19 @@
-Parent-provided authenticated evidence for run 37768781185:
-Bubblewrap installs, but real containment probe refuses loopback RTM_NEWADDR
-with Operation not permitted. Four real-containment tests fail across matrix.
-Exact per-job 3.11/3.12 log separation remains ambiguous in parent retrieval.
+Original remote run 37768781185 retained: four containment tests failed because
+bwrap loopback RTM_NEWADDR Operation not permitted, as reported by authenticated
+parent log retrieval. Never reclassified as passing containment.
 
-Patch scope: test-only fixture probes no candidate code. Capability refusal yields
-loud pytest skip REAL CONTAINMENT NOT VERIFIED, includes probe stderr. Only four
-real-isolation test functions opt in. Existing unavailable refusal/tamper/invalid
-input tests are still exercised, as are queue and receipt execution tests.
-pytest -q -rs exposes skip reasons in GitHub CI. No production code modification.
-Local 75 receipt/queue/self_improve tests pass with 0 skipped (real bwrap 0.6.1).
-Five preflight unit cases cover successful probe, missing executable, permission
-refusal, loud skip text and propagation of programming ValueError.
-No inference that this closes CI containment proof. Remote success, if achieved,
-means remaining tests pass; skipped containment is explicitly not verified there.
+Initial unpublished abe0ee44 preflight was HOLD: blanket nonzero/OSError/timeout
+classification could hide startup regressions. Revised policy:
+- exact IsolationUnavailable('bubblewrap executable unavailable') may skip;
+- exact stderr bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted,
+  returncode 1, empty stdout may skip, preserving bounded byte evidence;
+- any other IsolationUnavailable, OSError subclass, timeout or nonzero raises.
+  Slow startup is NOT proof of unavailable capability.
+Only four test functions opt in. Runtime unchanged and fail-closed.
+pytest -q -rs exposes NOT VERIFIED reasons.
+
+Local queue/receipt/all self_improve selection: 84 passed, 0 skipped, including
+real bwrap. Fourteen preflight cases cover allowlisted refusal, positive probe,
+missing bwrap, loud reason, programming ValueError, three unexplained nonzero
+failures, three OSError subclasses, timeout, unsafe mount and wrong returncode.
+Remaining-tests-green on remote would NOT establish containment there.

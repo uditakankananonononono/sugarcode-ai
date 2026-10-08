@@ -1,8 +1,11 @@
-"""Explicit test-only containment capability check, not a production fallback."""
+"""Narrow test-only capability refusal classification, never runtime fallback."""
 import subprocess
 import sys
 import pytest
 from sugarcode.self_improve.isolation import IsolatedRunner, IsolationUnavailable
+
+
+_ALLOWED_STDERR = 'bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted'
 
 
 def containment_unavailable_reason(work):
@@ -10,14 +13,20 @@ def containment_unavailable_reason(work):
     try:
         command = runner._command(work)
     except IsolationUnavailable as exc:
-        return str(exc)
-    try:
-        probe = subprocess.run(command+[sys.executable, '-I', '-c', 'pass'],
-                               capture_output=True, timeout=5)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        return f'containment preflight failed: {type(exc).__name__}'
+        if str(exc) == 'bubblewrap executable unavailable':
+            return str(exc)
+        raise
+    # OSError (including missing interpreter/argv), timeout and unexpected runner
+    # errors fail the test. A slow probe is not evidence of unavailable capability.
+    probe = subprocess.run(command+[sys.executable, '-I', '-c', 'pass'],
+                           capture_output=True, timeout=5)
     if probe.returncode:
-        return 'containment preflight refused: '+probe.stderr.decode(errors='replace')[-1000:]
+        stderr = probe.stderr.decode(errors='replace')
+        evidence = (f'returncode={probe.returncode}; stdout={probe.stdout[:4096]!r}; '
+                    f'stderr={probe.stderr[:4096]!r}')
+        if probe.returncode == 1 and stderr.strip() == _ALLOWED_STDERR and not probe.stdout:
+            return 'allowlisted loopback capability refusal: '+evidence
+        raise RuntimeError('unexplained containment startup failure: '+evidence)
     return None
 
 

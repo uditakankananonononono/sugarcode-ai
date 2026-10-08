@@ -11,7 +11,7 @@ def module():
 
 def test_preflight_permission_refusal_is_explicit(tmp_path,monkeypatch):
     m=module();monkeypatch.setattr(m.IsolatedRunner,'_command',lambda *a:['bwrap'])
-    monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=1,stderr=b'Failed RTM_NEWADDR: Operation not permitted'))
+    monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=1,stdout=b'',stderr=b'bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted'))
     assert 'Operation not permitted' in m.containment_unavailable_reason(tmp_path)
 
 
@@ -40,3 +40,39 @@ def test_missing_binary_refusal(tmp_path,monkeypatch):
     def unavailable(*args):raise m.IsolationUnavailable('bubblewrap executable unavailable')
     monkeypatch.setattr(m.IsolatedRunner,'_command',unavailable)
     assert m.containment_unavailable_reason(tmp_path)=='bubblewrap executable unavailable'
+
+
+@pytest.mark.parametrize('stderr', [b'python: cannot open file', b'bwrap: invalid option', b'unknown startup failure'])
+def test_non_environment_nonzero_fails(tmp_path,monkeypatch,stderr):
+    m=module();monkeypatch.setattr(m.IsolatedRunner,'_command',lambda *a:['invalid'])
+    monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=1,stdout=b'',stderr=stderr))
+    with pytest.raises(RuntimeError,match='unexplained containment startup failure'):
+        m.containment_unavailable_reason(tmp_path)
+
+
+@pytest.mark.parametrize('error',[FileNotFoundError('bad interpreter'),PermissionError('bad executable permissions'),OSError('unknown OS failure')])
+def test_os_errors_fail_not_skip(tmp_path,monkeypatch,error):
+    m=module();monkeypatch.setattr(m.IsolatedRunner,'_command',lambda *a:['invalid'])
+    def fail(*a,**k):raise error
+    monkeypatch.setattr(m.subprocess,'run',fail)
+    with pytest.raises(type(error)):m.containment_unavailable_reason(tmp_path)
+
+
+def test_probe_timeout_fails_not_skip(tmp_path,monkeypatch):
+    m=module();monkeypatch.setattr(m.IsolatedRunner,'_command',lambda *a:['bwrap'])
+    def fail(*a,**k):raise m.subprocess.TimeoutExpired('bwrap',5)
+    monkeypatch.setattr(m.subprocess,'run',fail)
+    with pytest.raises(m.subprocess.TimeoutExpired):m.containment_unavailable_reason(tmp_path)
+
+
+def test_unsafe_runtime_refusal_fails_not_skip(tmp_path,monkeypatch):
+    m=module()
+    def fail(*a):raise m.IsolationUnavailable('unsafe Python runtime mount root')
+    monkeypatch.setattr(m.IsolatedRunner,'_command',fail)
+    with pytest.raises(m.IsolationUnavailable):m.containment_unavailable_reason(tmp_path)
+
+
+def test_allowlist_requires_exact_status_and_output(tmp_path,monkeypatch):
+    m=module();monkeypatch.setattr(m.IsolatedRunner,'_command',lambda *a:['bwrap'])
+    monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=2,stdout=b'',stderr=m._ALLOWED_STDERR.encode()))
+    with pytest.raises(RuntimeError):m.containment_unavailable_reason(tmp_path)
