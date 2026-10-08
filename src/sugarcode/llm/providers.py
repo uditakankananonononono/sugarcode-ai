@@ -171,7 +171,11 @@ class ChatClient:
                                      method="POST")
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:
-                data = json.loads(r.read().decode())
+                raw = r.read(1_000_001)
+                if len(raw)>1_000_000:raise ProviderError("chat response byte cap exceeded")
+                try:data=json.loads(raw.decode("utf-8"))
+                except (ValueError,RecursionError) as exc:
+                    raise ProviderError("chat response JSON/encoding invalid") from exc
         except urllib.error.HTTPError as e:
             raise ProviderError(f"{self.profile} HTTP {e.code}: {e.read().decode(errors='replace')[:400]}") from e
         except (urllib.error.URLError, TimeoutError, OSError) as e:
@@ -179,10 +183,12 @@ class ChatClient:
                     f"then `ollama pull {self.model}`.") if self.kind == "local" else ""
             raise ProviderError(f"{self.profile} unreachable at {self.base_url}: "
                                 f"{getattr(e, 'reason', e)}.{hint}") from e
-        choices = data.get("choices") or []
-        if not choices:
-            raise ProviderError(f"{self.profile} returned no choices: {str(data)[:300]}")
-        return choices[0].get("message") or {}
+        if not isinstance(data,dict):raise ProviderError("chat response must be an object")
+        choices=data.get("choices")
+        if not isinstance(choices,list) or not choices:raise ProviderError("chat response choices invalid")
+        first=choices[0]
+        if not isinstance(first,dict) or not isinstance(first.get("message"),dict):raise ProviderError("chat response message invalid")
+        return first["message"]
 
     def health(self) -> dict:
         """Zero-token probe: GET {base_url}/models (plus an HF token check on the HF router). Never raises."""
