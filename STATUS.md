@@ -8,6 +8,55 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-09 current main regression and scoped repairs
+
+Exact published main a71e31ea9a5c727587ba4c2378ef6026e6b13e68 was checked
+in four disjoint file batches in separate detached git worktrees, Python 3.10,
+with core and dev dependencies installed. Builder result: **2,735 passed,
+14 skip occurrences, zero failures/errors**. The selections cover all 363
+tracked configured test files, including the PG directory outside tests/.
+This is complete disjoint file coverage, not one monolithic run, independent
+reviewer full-suite execution, remote matrix CI or spec/model acceptance.
+The 14 skips include repeated proteinprops collection failure through the CLI
+import, not 14 unique dependency gaps. Earlier missing-dependency failures and
+an incomplete 100-second monolithic run remain non-green earlier probes.
+
+New scoped repairs were independently reviewed before publication:
+- 554a9bf: strict JSON telemetry/sample boundaries; SCOPED PASS. Exact builtin
+  values only, cycle/depth/expansion checks, invalid historical rows fail closed.
+  No historical migration. Duplicate JSON keys still use last-key-wins;
+  oversized integers can raise plain ValueError rather than the typed error.
+- 87270fb: compile-time SyntaxError normalization; SCOPED PASS on original
+  candidate 0ccf6415, unchanged reparented patch. Other compiler errors propagate.
+- 949a207: task-distinct gap evidence preview; SCOPED PASS on original candidate
+  1b6db931. Read-only, hand-set ranking of caller-reported evidence, not learned
+  confidence, authenticated task independence or measured repair effectiveness.
+- 5b05be8: post-hook refiner output contract; SCOPED PASS on original candidate
+  4aaf9170. Hook remains trusted Python; no sandbox or parameter semantic proof.
+- a71e31e: review count/residual-limit record; docs-only PASS. Earlier builder
+  quote "27 new tests" corrected to 26 in docs/decisions/strict-gap-json.md.
+
+Final combined self_improve selection: builder **115 passed**, counting
+58 baseline + 26 strict JSON + 7 compile + 12 preview + 12 refiner tests.
+Full configured-file counts above are a different scope, not additive.
+Raw/JUnit/selection receipts: archive SHA256
+807d21f713b4246769f69c42138767f9515f33defa2cbe2e3a98875977f8e579.
+That hash verifies the newly created regression package, not lost historical
+packages or any unrecorded original execution.
+
+Historical-publication wording correction: sections below retain these original
+statements, now stale:
+- Router: "Main merge prepared locally pending publication/readback; API conclusions"
+- Tool arguments: "Main merge prepared locally pending publication/readback. API conclusions"
+- Queue status: "Main merge prepared locally pending publication/readback. API conclusions"
+
+The current main history includes merge commits 54d35492, ffa46175 and
+a50f03e7 for those integrations respectively. Their original test counts remain
+historical evidence, not current acceptance. No lost peer candidate is implied
+landed by this correction. All clinical, spec-completeness, model-quality,
+activation-authority and production-containment questions remain separate.
+
+
 ## 2026-10-08 reviewed router asset integration
 
 Peer 2bcd4f32 rebased by cherry-pick onto published ffa46175. Actual combined
