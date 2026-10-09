@@ -8,6 +8,25 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-09 reviewed dataset length histogram
+
+Peer candidate 22b7c462382988fabd6e1ccf3ffb49f490cbc2a3 on published
+03518f02 adds only the histogram utility and its tests. Archive SHA256
+498a61de5799f0b3dff19d29f9d3eb01dea5bb1566b97dd9f5389bbc55f091b3
+and every internal manifest entry verified before integration.
+Independent gate verdict: **SCOPED PASS**, 11 tests reproduced. Integration
+selection: builder **136 passed**, comprising the 11 histogram tests, 115
+self_improve tests and ten shared-layer tests. Not a full-suite rerun.
+
+Counts Python Unicode codepoints, not bytes or grapheme clusters. Output is a
+sorted frozen histogram detached from input. Exact list/string input and
+positive exact-integer caps are required; entry/per-string caps are enforced.
+No normalization, quality inference, dataset rights, model fitting or clinical
+acceptance claim. Credit: peer SugarCode builder, delivered through the other-account coordination
+lane; original candidate author metadata is retained in the merge parent.
+The separate e6de32e5 contract question remains held.
+
+
 ## 2026-10-09 current main regression and scoped repairs
 
 Exact published main a71e31ea9a5c727587ba4c2378ef6026e6b13e68 was checked
