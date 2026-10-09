@@ -16,6 +16,7 @@ from typing import Any
 from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
+from .evidence import GapObservation, preview_evidence
 from .gate import APPROVED, ApprovalGate, ManualApprovalGate
 from .plans import Candidate, FeaturePlan
 from .planner import FeaturePlanner
@@ -68,6 +69,10 @@ class SelfImprovementEngine:
         with self._ledger_lock:
             lines = self._ledger_path.read_text(encoding="utf-8").splitlines()
         return [json.loads(l) for l in lines if l.strip()]
+
+    def preview_gap_evidence(self, observations: list[GapObservation]) -> list[dict]:
+        """Read-only experimental priority preview. Does not plan or activate."""
+        return preview_evidence(self.module_slug, observations)
 
     # -- pipeline stages -------------------------------------------------------
     def record_gap(self, signature: str, *, kind: str = "capability_miss",
