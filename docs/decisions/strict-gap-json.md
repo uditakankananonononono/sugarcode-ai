@@ -30,3 +30,18 @@ activation permission, model quality or scientific acceptance is claimed.
 Depth/value limits bound traversal after JSON decoding, not decoding memory.
 JSON serialization may still refuse excessively large integers under the
 interpreter's own limits. Old activation/synthesis defects are separate work.
+
+## Independent review and count correction
+
+The independent review returned SCOPED PASS on candidate 554a9bf. It ran the
+self_improve selection: base 58 passed, candidate 84 passed, 26 new tests.
+The earlier builder report "27 new tests" was incorrect; the exact increase
+is 26. The builder's broader selection passed 105 tests, a different scope,
+not additive to the reviewer's count. Main landing preserved exact candidate
+554a9bf; the broader 105-test selection was rerun before publication.
+
+Two non-blocking limits observed by the reviewer remain open. Historical JSON
+objects with duplicate keys use the decoder's last-key-wins behavior; duplicate
+keys are not rejected. Integers above the interpreter's decimal conversion
+limit (typically 4,300 digits) fail closed with plain ValueError, not the typed
+InvalidTelemetryValue. No duplicate-key or universal typed-error claim is made.
