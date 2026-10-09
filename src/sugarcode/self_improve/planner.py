@@ -5,7 +5,7 @@ import re
 from typing import Protocol
 
 from .detector import CapabilityGap
-from .plans import CAPABILITY_KINDS, FeaturePlan
+from .plans import FeaturePlan
 
 _STOPWORDS = frozenset({
     "the", "a", "an", "and", "or", "of", "to", "in", "for", "on", "with",
@@ -96,6 +96,12 @@ class FeaturePlanner:
             description=f"Auto-built {kind} for recurring gap: {gap.signature}",
             params=params,
         )
-        if plan.kind not in CAPABILITY_KINDS:  # a hostile refiner cannot widen the whitelist
-            raise ValueError(f"refiner returned illegal kind {plan.kind!r}")
-        return self._refiner.refine(plan, gap)
+        expected_identity = (plan.module_slug, plan.gap_signature, plan.name, plan.kind)
+        refined = self._refiner.refine(plan, gap)
+        if type(refined) is not FeaturePlan:
+            raise ValueError("refiner must return a FeaturePlan")
+        # Recheck after the hook, including objects mutated despite frozen=True.
+        FeaturePlan.__post_init__(refined)
+        if (refined.module_slug, refined.gap_signature, refined.name, refined.kind) != expected_identity:
+            raise ValueError("refiner cannot change plan identity or kind")
+        return refined
