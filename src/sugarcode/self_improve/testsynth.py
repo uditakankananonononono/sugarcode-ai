@@ -6,6 +6,7 @@ empty input, wrong-type tolerance, and determinism.
 """
 from __future__ import annotations
 
+from .json_values import snapshot_json
 from .plans import FeaturePlan
 from .safety import validate_source
 
@@ -87,6 +88,9 @@ def test_field_extractor_pulls_named_fields():
 
 
 def synthesize_tests(plan: FeaturePlan, sample_items: list) -> str:
+    sample_items = snapshot_json(sample_items)
+    if type(sample_items) is not list:
+        raise ValueError("test samples must be an array")
     if plan.kind not in _KIND_CASES:
         raise ValueError(f"no test template for kind {plan.kind!r}")
     header = "from feature import FEATURE, run\n" + _COMMON.format(
