@@ -43,5 +43,8 @@ def validate_source(source: str, *, allowed_imports: frozenset[str] = ALLOWED_IM
             raise SafetyViolation("dunder attribute access is not allowed in generated features")
         elif isinstance(node, (ast.Delete,)):
             raise SafetyViolation("del statements are not allowed in generated features")
-    compile(tree, "<generated-feature>", "exec")
+    try:
+        compile(tree, "<generated-feature>", "exec")
+    except SyntaxError as exc:
+        raise SafetyViolation(f"generated code does not compile: {exc}") from exc
     return tree
