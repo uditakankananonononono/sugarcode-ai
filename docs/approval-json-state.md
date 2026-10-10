@@ -33,3 +33,18 @@ ValueError-with-message expectation: 36 FAIL, 2 PASS, with failure due to accept
 bad data, mutation or wrong errors, not an ImportError. This adaptation is in the
 review packet; it is not claimed byte-identical test execution on base.
 These are builder counts, not independent acceptance/full-suite/CI/spec completion.
+
+## Independent stored-read verdict and next-unit risk
+
+Independent verdict relayed 2026-10-10: VERIFIED for stored-read scope; SCOPED
+on counts. Verifier reproduced 38 new PASS, 167 archived self_improve PASS,
+and adapted base 36 FAIL/2 PASS. The extra 17 tests in builder's 184 selection
+were not archived: shared-layer 10 + router-asset 7, receipt-level only.
+Commit/base identity remained archive-unverified; builder verifies publication.
+
+PROMINENT REMAINING RISK: a fresh NaN request payload can SELF-LOCK OUT the gate:
+existing _save writes it successfully, then this repaired reader rejects the
+whole file until manual repair. Write-side snapshot/allow_nan=False validation
+is the next separate unit, not fixed by this stored-read candidate. Unknown IDs
+still raise KeyError and nonobject entries TypeError. Engine/wiring fail-closed
+caller behavior was not independently tested by this unit.
