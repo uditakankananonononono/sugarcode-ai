@@ -35,7 +35,10 @@ class GapDetector:
         self._min = min_occurrences
 
     def detect(self, module_slug: str) -> list[CapabilityGap]:
-        events = self._store.all(module_slug)
+        return self._detect_events(module_slug, self._store.all(module_slug))
+
+    def _detect_events(self, module_slug, events) -> list[CapabilityGap]:
+        """Internal computation from already-read events, no new store read."""
         groups: dict[str, list] = {}
         for ev in events:
             groups.setdefault(ev.signature, []).append(ev)
