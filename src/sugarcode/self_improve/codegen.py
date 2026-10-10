@@ -11,8 +11,11 @@ so hostile gap text cannot break out of the template.
 from __future__ import annotations
 
 import textwrap
+from dataclasses import replace
 from typing import Any
 
+from .domain_source import GENERATED_VALIDATOR_SOURCE
+from .parameter_domains import validate_parameters
 from .plans import Candidate, FeaturePlan
 from .safety import validate_source
 
@@ -37,6 +40,15 @@ def _meta(plan: FeaturePlan) -> dict[str, Any]:
         "description": plan.description, "gap_signature": plan.gap_signature,
         "version": 1, "generated_by": "sugarcode-self-improve",
     }
+
+
+def _assemble(plan: FeaturePlan, body: str) -> str:
+    body = body.replace('    params = params or {}',
+                        '    params = validate_parameters(_KIND, _PARAMETERS, params)\n'
+                        '    validate_runtime_items(_KIND, items, params)')
+    return (_HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature,
+                           feature_meta=_meta(plan)) + GENERATED_VALIDATOR_SOURCE +
+            f"\n_KIND = {plan.kind!r}\n_PARAMETERS = {plan.params!r}\n" + body)
 
 
 def _keyword_filter(plan: FeaturePlan) -> str:
@@ -65,7 +77,7 @@ def run(items, params=None):
         (kept if (hit if mode == "keep" else not hit) else removed).append(item)
     return {{"items": kept, "removed": removed, "count": len(kept)}}
 '''.format(keywords=list(plan.params.get("keywords", [])), mode=plan.params.get("mode", "keep"))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 def _scoring_rule(plan: FeaturePlan) -> str:
@@ -81,7 +93,7 @@ def _text_of(item):
 
 
 def score_item(item, weights=None):
-    weights = weights or _WEIGHTS
+    weights = validate_parameters(_KIND, _PARAMETERS,\n        None if weights is None else {{"weights": weights}})["weights"]
     low = _text_of(item).lower()
     return sum(float(w) for kw, w in weights.items() if str(kw).lower() in low)
 
@@ -98,7 +110,7 @@ def run(items, params=None):
     return {{"scored": scored, "selected": [r["item"] for r in scored if r["selected"]],
             "threshold": threshold}}
 '''.format(weights=dict(plan.params.get("weights", {})), threshold=float(plan.params.get("threshold", 1.0)))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 def _text_transform(plan: FeaturePlan) -> str:
@@ -123,7 +135,7 @@ def run(items, params=None):
             out.append(item)
     return {{"items": out, "changed": changed}}
 '''.format(pattern=str(plan.params.get("pattern", r"\s+")), replacement=str(plan.params.get("replacement", " ")))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 def _aggregator(plan: FeaturePlan) -> str:
@@ -162,7 +174,7 @@ def run(items, params=None):
             "ungrouped": len(items) - sum(len(v) for v in groups.values())}}
 '''.format(group_by=str(plan.params.get("group_by", "category")), op=str(plan.params.get("op", "count")),
            value_field=str(plan.params.get("value_field", "value")))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 def _threshold_alert(plan: FeaturePlan) -> str:
@@ -199,7 +211,7 @@ def run(items, params=None):
             "field": field, "threshold": threshold, "direction": direction}}
 '''.format(field=str(plan.params.get("field", "value")), threshold=float(plan.params.get("threshold", 0.0)),
            direction=str(plan.params.get("direction", "above")))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 def _field_extractor(plan: FeaturePlan) -> str:
@@ -226,7 +238,7 @@ def run(items, params=None):
         records.append({{"text": item, "extracted": extracted}})
     return {{"records": records, "matched_count": matched}}
 '''.format(fields=dict(plan.params.get("fields", {})))
-    return _HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature, feature_meta=_meta(plan)) + body
+    return _assemble(plan, body)
 
 
 _BUILDERS = {
@@ -240,6 +252,7 @@ _BUILDERS = {
 
 
 def synthesize_code(plan: FeaturePlan) -> str:
+    plan = replace(plan, params=validate_parameters(plan.kind, plan.params))
     source = textwrap.dedent(_BUILDERS[plan.kind](plan))
     validate_source(source)
     return source
