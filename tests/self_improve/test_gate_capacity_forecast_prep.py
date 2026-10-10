@@ -158,7 +158,7 @@ def forecast(raw, operation, *, auto=False):
     try:
         state = strict_source(raw)
     except (Refusal, ValueError, TypeError, RecursionError) as exc:
-        reason = getattr(exc, "reason", type(exc).__name__)
+        reason = exc.reason if isinstance(exc, Refusal) else type(exc).__name__
         result["baseline"] = {"unavailable_reason": reason}
         result["prospective"] = {"admitted": False, "reason": reason,
                                  "stage": "source", "provenance": "gate.py:77-88"}
