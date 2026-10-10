@@ -8,6 +8,36 @@ module's behavior, the module is right and this doc is stale - say so.
 Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
 
 
+## 2026-10-10 landed repair units H11-H19 (documentary ledger, no code)
+
+Documentary rows only. Nothing here was run by the author of this entry. Every
+verdict quoted below is the peer's raw Batch A status text, copied exactly as
+stored in the peer file 04-h17-evidence-status-13762a02.md (the peer file has
+its own missing spaces; they are kept). Test counts are the peer's reports, not
+independently authenticated and not re-run here. No PASS is upgraded and no raw
+FAIL is erased: a raw FAIL stays a FAIL in the original validation, and the
+repair row records only what the landed commit changes.
+
+| Unit | Landed SHA | ORIGINAL raw verdict (verbatim) | Repair |
+|---|---|---|---|
+| H11 | 427afd1a95e91d3ef1c4ef02cb09861b8d876719, 4c6038a15ef94b02cc8bd1d640076f449b1b2908 (H11f), 5c21515122c679408bd306886b2903ae428b4f2c (H11g) | GAP: no raw validation verdict for neohunter exists in the Batch A status file. Origin was a source-read lead (trainer fits metrics on ~80% then refits all rows, so stored held-out r/AUC describe the 80%-fit model, not the shipped all-row weights), per CONTRACT_H11.md. | Provenance metadata and metrics_caveat only; no weight or per-allele numeric change. Stored r/AUC are stored source values, not validated performance. |
+| H12 | 465d7684db06c866646feb0f3036912f26b8c5e4 | "evofold_4d: ProDy2.6.1 ANM first6 frequency/fluctuations PASS; transition_trace mode mismatch exploratory finding, H12 independently frozen oracle delivered for separate repair." | transition_trace j>i Hessian loop (diagonal double-count) with frozen ProDy oracle tests. Not a biological validation. |
+| H13 | 387c8f59ddb41f2767013710d567f18b6b28c8fa | "virtual_cell: real COBRApy textbook FBA WT/anaerobic PASS and zeroglucoseinfeasibilityPASS; pFBAdefault1.0 FAIL (rounded stage1 target). H13 independent oracle delivered for separate repair. Relaxed fraction diagnostic does not replace failure." | pFBA stage 2 uses the unrounded stage-1 optimum, frozen COBRApy oracle tests (own-raw 6dp predicate). Fallback path untested; optimum_fraction<1 floor shift untested. |
+| H14 | 4d5292004feff70fc896be1bae774158e95eb215 | "bioimage_ai: defaultcount_cells6BBBC001fields FAIL89.2249%mean deviation vs11%frozen target. No API substitution." | count_cells/analyze_image default to Otsu + seeded watershed; explicit threshold_pct keeps the legacy path. analyze_image QC text still says "opening"; the catalog does not expose count_cells or analyze_image. |
+| H15 | 2ed698b044dd37c11462829f51517062f9bf7c04 (h15c) | "microbiome_exp analyticalzero-counttaxonrichnessFAIL(singleAPI), cohortdiversity/Braycorrect; realcompatiblecountsblocked." | analyze_16s richness counts positive-support taxa only. Negative counts are outside the valid domain. Peer-reported: 6 new + 26 adjacent = 32 PASS. Superseded, never landed: 88f1ae7f, cc09a8f7. |
+| H16 | ea586991bad79824470f156578095992d2f69610 (h16b) | GAP: no raw validation verdict for this label exists in the Batch A status file. Origin was a source read of hla_binding routing (9-mers with standard letters use the ridge PSSM, other lengths the anchor heuristic), per CONTRACT_H16.md. | One-string label change for binding_model_status in _neo_diagnostics. The wording is the builder's reading of the ruling. Peer-reported: 4 new + 24 adjacent = 28 PASS. 7126fe4d never landed. |
+| H17 | f1931559be238a132612ae764575892458b8b223 | "chemgpt_engine:148returned supportedfragment cases allvalid/exactheavyatoms;8explicitrefusals.3massboundary0.05000000000001137 cases ambiguousfloating-point comparison, rawFAILretained. ADMET/logP/HBD/HBA heuristic differences recorded, no biologicalPASS." | Test/contract only: chemgpt_engine mass contract tests against frozen RDKit evidence. No source change. Peer-reported: 7 new + 35 adjacent PASS, 1 RDKit skip. |
+| H18 | a6d07e1e7ea2cb95972bf1badd2433ff8ede6e82 | "str_scope rawTRFparityFAILonHBB due TRFmissing6true shorthomopolymers; all8analyticalboundariesmatch. Comparisoncoveragegap, notsourcefalsepositiveevidence." | Test/contract only: str_scope exact-repeat characterization vs the frozen TRF. The raw TRF parity FAIL is not removed. Peer-reported: 6 new + 38 adjacent PASS. |
+| H19 | 1f28e65c940af4c04b5e81b4b779b295a9f435f4 | "crispr_opt RS2 full/nopos947upstreammodelpredictionfixturePASS, CFD520parameter/productcasesPASS; noassaygeneralization. StalePROVENANCEsaysRS2missingthoughportsourcepresent." (H19 has no contract file; this stale-PROVENANCE note is its only original.) | Documentary correction: Rule Set 2 is vendored (PROVENANCE.md, Doench2014 docstring, rule_set_2 docstring text); no executable change. Audited by AST criterion, not run by the author. |
+
+OPEN items, carried verbatim from the contracts and the peer status file:
+- H12: cutoff 10 Angstrom / round boundary. core uses d < cutoff (strict); the ProDy convention at exactly 10.0 A is not verified. Rounded-to-rounded 0.00050001 can in principle fail if a raw value sits within ~1e-12 of a rounding boundary (CONTRACT_H12.md).
+- cellpainter: "Visuallyinspectedpreview shows splitbrightnuclei, no segmentationaccuracyclaim." Preview-mask question stays open.
+- neuro_pipeline and promoter_lib recognition: MEASURED-NOT-VALIDATED per the peer's parent ruling. alpha_fold_ui exposed-protein DSSP 1CRN Q3 = 17/46 = .369565: "descriptiveMEASURED-NOT-VALIDATED exposedprotein".
+
+Neither the H11 nor the H16 row is a validation result. Neither row may be read as a PASS or as a clinical or accuracy claim.
+
+
 ## 2026-10-09 reviewed dataset length histogram
 
 Peer candidate 22b7c462382988fabd6e1ccf3ffb49f490cbc2a3 on published
@@ -787,7 +817,7 @@ Codon optimizer input guard (2026-09-27): strict protein-residue and GC-bound va
 
 | Module | What is verified | Source (live this project) |
 |---|---|---|
-| crispr_opt | Off-target = published CFD (Doench 2016), on-target = Doench 2014 Rule Set 1; both vendored verbatim, cross-validated 500/500 vs CRISPOR reference | CRISPOR distribution (maximilianh/crisporWebsite) |
+| crispr_opt | Off-target = published CFD (Doench 2016), on-target = Doench 2014 Rule Set 1; both vendored verbatim, cross-validated 500/500 vs CRISPOR reference. Post-H19 pointer (1f28e65c): the Rule Set 2 provenance note in PROVENANCE.md was stale and is corrected there; see the 2026-10-10 H11-H19 section | CRISPOR distribution (maximilianh/crisporWebsite) |
 | crispr_cargo, phageforge | CFD scan inherited from crispr_opt for real guides | same provenance |
 | openclinvar | Live ClinVar exact-variant evidence; near-miss titles rejected; conflicting classifications weight 0. BRCA1 c.5266dup -> Pathogenic, expert panel. Plus gnomAD gene constraint (pLI/LOEUF): supports LOF evidence only in truly constrained genes (SCN1A LOEUF 0.107 yes, TP53 0.418 honestly no) | NCBI ClinVar, gnomAD r4 |
 | neohunter specificity | gnomAD population frequency as second tumor-specificity check (when a GRCh38 variant_id is supplied; skipped honestly otherwise) | gnomAD r4 |
@@ -874,7 +904,7 @@ Codon optimizer input guard (2026-09-27): strict protein-residue and GC-bound va
 | neodti_engine | Live ChEMBL measured potency: sirolimus IC50 0.1 nM/mTOR, simvastatin Ki 2.6 nM/HMGCR, aspirin IC50 62.5 uM/COX2 | ChEMBL REST |
 | gene_analysis | Live PubMed yearly literature counts + trend call | NCBI PubMed |
 | bio_copilot | Gene route grounded in live UniProt, sources named | UniProt |
-| chemgpt_engine | Live ChEMBL similarity endpoint wired; 2026-09-24 audit re-check: aspirin's top hit was CHEMBL2296002 (phase 0), so the earlier '100% self-match, phase 4' result did not reproduce; novel molecules report no neighbors | ChEMBL similarity endpoint |
+| chemgpt_engine | Live ChEMBL similarity endpoint wired; 2026-09-24 audit re-check: aspirin's top hit was CHEMBL2296002 (phase 0), so the earlier '100% self-match, phase 4' result did not reproduce; novel molecules report no neighbors. Post-H17 pointer (f1931559): chemgpt_engine mass contract tests against frozen RDKit evidence now exist; the raw mass-boundary FAIL record is kept in the 2026-10-10 H11-H19 section | ChEMBL similarity endpoint |
 | codon_opt | Published codon tables (E. coli, human, yeast) vendored with PROVENANCE.md; cross-validated vs legacy (Arg tie documented) | Edinburgh Genome Foundry codon-usage-tables |
 | liquid_biopsy | cfDNA fragment model anchored to published peaks (166 bp healthy / 134-144 bp ctDNA; Snyder 2016, Underhill 2016); monotone in tumor fraction | literature anchors (labeled) |
 | neuroplan_ai | A* over eloquent-region risk field; 33% risk reduction on obstructed entries live-verified | internal verification |
