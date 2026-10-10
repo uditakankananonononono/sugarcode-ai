@@ -38,9 +38,9 @@ Reference implementation exists INSIDE TESTS ONLY, never in package code.
 
 Capacity is admission, not authority/authentication, clinical validity, binding,
 write completion or installed recovery policy. The raw `_load` boundary and the
-full `_save` boundary are separate (`gate.py:77-99`). Refusal reason priority follows
-actual staged checks when comparing real methods, not a universal order across
-independent constraints. Reference measure visits can distinguish depth/count;
+full `_save` boundary are separate (`gate.py:77-99`). Source refusal carries stage=source and gate.py:77-88 provenance.
+Single-fault probes permit reason comparison; mixed-domain reference reason is
+diagnostic, not guaranteed product first-error priority across entry order. Reference measure visits can distinguish depth/count;
 product wraps both with one InvalidTelemetryValue size/depth message.
 
 Positive value/byte headroom alone does not approve a prospective operation.
@@ -64,3 +64,12 @@ synthetic temp directories, inspect cause chains, execute wrong-reference mutati
 and review acceptance coverage before landing. Mutant sentinels in the authored
 test file distinguish key-count/dedup/UTF8/indent/sort variants; they do not establish
 an executed mutation score. No archive/delete/TTL/cap raise or reserve installed.
+
+Repair scope: source refusal is returned rather than thrown. A byte source that
+fails raw admission/strict decode supplies baseline unavailable_reason and a
+prospective refusal; it never attempts operation simulation. Baseline unsavable
+state can be repaired by UUID collision replacement in actual request code;
+no baseline error is a universal write-impossibility proof. Collision is not a
+safe recovery recommendation or archive authority. Bundle transports HEAD only;
+explicit prerequisite and commit hash establish delta identity, not branch label.
+Actual mutation reproduction and unchanged oracle checks are in report/test file.

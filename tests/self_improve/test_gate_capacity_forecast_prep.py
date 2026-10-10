@@ -7,6 +7,8 @@ Auditor executes in isolated synthetic temp directories, never live state.
 import hashlib
 import json
 import math
+import inspect
+import os
 from types import SimpleNamespace
 
 import pytest
@@ -151,9 +153,16 @@ def forecast(raw, operation, *, auto=False):
     result = {"base": BASE, "source_sha256": hashlib.sha256(raw).hexdigest(),
               "live_usage": "UNKNOWN", "archive_eligibility": 0,
               "uncertainty": ["synthetic exact shapes only", "no I/O durability forecast"]}
-    state = strict_source(raw)
     result["raw_bytes"] = len(raw)
     result["raw_headroom"] = LIMIT - len(raw)
+    try:
+        state = strict_source(raw)
+    except (Refusal, ValueError, TypeError, RecursionError) as exc:
+        reason = getattr(exc, "reason", type(exc).__name__)
+        result["baseline"] = {"unavailable_reason": reason}
+        result["prospective"] = {"admitted": False, "reason": reason,
+                                 "stage": "source", "provenance": "gate.py:77-88"}
+        return result
     try:
         normalized, count, depth = measure(state)
         encoded = canonical(normalized)
@@ -394,16 +403,27 @@ def test_unknown_action_payload_is_not_request_binding_validation(tmp_path, monk
     # gate.request calls validate_record, not validate_payload/check_binding.
 
 
-def test_repeat_shape_count_is_exact_not_generic_guarantee():
+def test_repeat_shape_count_is_exact_not_generic_guarantee(tmp_path):
     # Exact empty-payload envelope: 9 visits per record, root consumes 1.
     # IDs have a fixed unique 12-lowercase-hex suffix; timestamps exactly 1000.0.
     # No actor until decision; not a random UUID/timestamp average.
     state = {f"si-{i:012x}": request_record() for i in range(1111)}
     assert measure(state)[1] == 10000
-    assert len(canonical(state)) < LIMIT
+    # Indented entry contributes 223 bytes plus comma/newline overhead;
+    # root/newline accounting gives 225*n + 2 for this exact nonempty shape.
+    assert len(canonical(state)) == 225 * 1111 + 2
+    gate, path = gate_at(tmp_path)
+    gate._save(state)
+    assert path.read_bytes() == canonical(state)
+    original = path.read_bytes()
     state["si-000000000457"] = request_record()  # 1111 decimal, new unique ID
+    assert len(canonical(state)) == 225 * 1112 + 2
     with pytest.raises(Refusal, match="expanded_values"):
         measure(state)
+    with pytest.raises(InvalidApprovalState) as error:
+        gate._save(state)
+    assert isinstance(error.value.__cause__, InvalidTelemetryValue)
+    assert path.read_bytes() == original
 
 
 def test_uuid_collision_overwrites_instead_of_adding(tmp_path, monkeypatch):
@@ -431,18 +451,71 @@ def test_terminal_age_does_not_grant_archive_capacity():
 
 @pytest.mark.parametrize("mutant", ["count_keys", "deduplicate_alias", "utf8", "drop_indent", "drop_sort"])
 def test_wrong_reference_mutants_are_detected(mutant):
+    # Auditor chooses one actual function-source mutation via a synthetic test
+    # environment selector. Mutant run MUST fail this oracle assertion.
+    selected = os.environ.get("GATE_FORECAST_MUTANT")
+    namespace = dict(globals())
+    count_fn, bytes_fn = measure, canonical
+    if selected == mutant:
+        if mutant == "count_keys":
+            source = inspect.getsource(measure).replace(
+                "children = list(item.items())", "count += len(item); children = list(item.items())")
+            exec(source, namespace)
+            count_fn = namespace["measure"]
+        elif mutant == "deduplicate_alias":
+            source = inspect.getsource(measure).replace("active.remove(item)", "pass").replace(
+                'raise Refusal("cycle")', 'parent[slot] = []; continue')
+            exec(source, namespace)
+            count_fn = namespace["measure"]
+        else:
+            source = inspect.getsource(canonical)
+            if mutant == "utf8":
+                source = source.replace("allow_nan=False", "allow_nan=False, ensure_ascii=False")
+            elif mutant == "drop_indent":
+                source = source.replace("indent=2, ", "")
+            else:
+                source = source.replace("sort_keys=True, ", "")
+            exec(source, namespace)
+            bytes_fn = namespace["canonical"]
     shared = [0]
     state = {"z": shared, "a": shared, "u": "é"}
-    good_bytes = canonical(state)
-    good_count = measure(state)[1]
-    assert good_count == 6
-    if mutant == "count_keys":
-        assert good_count + len(state) != good_count
-    elif mutant == "deduplicate_alias":
-        assert good_count - 2 != good_count
-    elif mutant == "utf8":
-        assert json.dumps(state, indent=2, sort_keys=True, ensure_ascii=False).encode() != good_bytes
-    elif mutant == "drop_indent":
-        assert json.dumps(state, sort_keys=True, allow_nan=False).encode() != good_bytes
-    else:
-        assert json.dumps(state, indent=2, allow_nan=False).encode() != good_bytes
+    assert count_fn(state)[1] == 6
+    expected = b'{\n  "a": [\n    0\n  ],\n  "u": "\\u00e9",\n  "z": [\n    0\n  ]\n}'
+    assert bytes_fn(state) == expected
+
+
+@pytest.mark.parametrize("raw,reason", [
+    (b"{}" + b" " * (LIMIT - 1), "raw_file_bytes"),
+    (b'{"x":0,"x":1}', "duplicate_key"),
+    (b'{"x":NaN}', "nonfinite"),
+    (b'{"x":1e999}', "nonfinite"),
+    (b"[]", "root_not_object"),
+    (b"\xff", "UnicodeDecodeError"),
+    (b"{", "JSONDecodeError"),
+])
+def test_forecast_source_refusals_return_contract(tmp_path, raw, reason):
+    report = forecast(raw, {"kind": "decision", "id": "missing", "status": "approved",
+                            "timestamp": STAMP, "actor": None})
+    assert report["baseline"] == {"unavailable_reason": reason}
+    assert report["prospective"] == {"admitted": False, "reason": reason,
+                                     "stage": "source", "provenance": "gate.py:77-88"}
+    assert report["source_sha256"] == hashlib.sha256(raw).hexdigest()
+    gate, path = gate_at(tmp_path, raw)
+    with pytest.raises(InvalidApprovalState):
+        gate._load()
+    assert path.read_bytes() == raw
+
+
+def test_collision_replacement_can_repair_unsavable_baseline(tmp_path, monkeypatch):
+    seams(monkeypatch)
+    approval = "si-" + HEX[:12]
+    state = {approval: {"status": "pending", "oversize": [0] * 10000}}
+    raw = json.dumps(state, separators=(",", ":")).encode()
+    gate, path = gate_at(tmp_path, raw)
+    assert gate._load() == state
+    op = {"kind": "request", "id": approval, "record": request_record()}
+    report = forecast(raw, op)
+    assert report["baseline"]["unavailable_reason"] == "expanded_values"
+    assert report["prospective"]["admitted"] is True
+    gate.request(module_id=1, module_slug="synthetic", action_type="generic", summary="x", payload={})
+    assert path.read_bytes() == canonical({approval: request_record()})
