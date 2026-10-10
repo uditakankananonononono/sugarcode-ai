@@ -727,3 +727,8 @@ history counts against the existing 16 MiB limit; no ceiling relief or retention
 Postreplace durability/logging errors may follow committed state; no blind retry.
 The reserved `engine_consumed_approvals` extension must now have the strict map
 shape; malformed present records refuse, absent legacy map remains supported.
+
+Process start-barrier tests are real-process smoke checks, not proof of every race
+window. Additional forced-lock tests hold a parent sidecar until the child reports
+a test-only 0.2-second timeout; production default is separately checked at 5s.
+Filesystem open/fstat/IO itself remains outside that acquisition deadline.

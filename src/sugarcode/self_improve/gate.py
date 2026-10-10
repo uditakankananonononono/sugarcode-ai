@@ -11,7 +11,7 @@ import json
 import math
 import time
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, ContextManager
 from uuid import uuid4
 
 from contextlib import contextmanager
@@ -54,6 +54,7 @@ class ApprovalGate(Protocol):
                 summary: str, payload: dict[str, Any]) -> str: ...
     def decision(self, approval_id: str) -> str: ...
     def record(self, approval_id: str) -> dict[str, Any]: ...
+    def coordinated_record(self, approval_id: str) -> ContextManager[tuple[str, dict[str, Any]]]: ...
 
 
 class ManualApprovalGate:

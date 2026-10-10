@@ -28,7 +28,7 @@ Policy:
 
 Non-claims: single file only. No cross-file transaction, no exactly-once, no
 locking between processes (callers keep their own lock, as gate/registry do
-with threading.Lock). Durability depends on OS/filesystem honoring fsync; on
+with shared path-keyed reentrant locks and POSIX advisory sidecars). Durability depends on OS/filesystem honoring fsync; on
 Windows directory fsync is skipped and os.replace atomicity is as documented
 by the platform. Stale ``.tmp`` files can remain after a hard crash (power
 loss/kill); they are never read as state.

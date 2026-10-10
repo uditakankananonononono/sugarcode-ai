@@ -121,3 +121,61 @@ def test_two_object_registry_barrier_no_lost_updates(tmp_path):
  for t in threads:t.start()
  for t in threads:t.join(10);assert not t.is_alive()
  assert not errors and len(a.proposals())==20
+
+
+def forced_worker(root,operation,ready,start,queue):
+ # Test-only shortened acquisition deadline. Production default tested separately.
+ from sugarcode.self_improve import gate as gm,registry as rm
+ from sugarcode.self_improve.state_lock import shared_state_lock as real_lock
+ gm.shared_state_lock=lambda path:real_lock(path,timeout=.2)
+ rm.shared_state_lock=lambda path:real_lock(path,timeout=.2)
+ try:
+  root=Path(root)
+  if operation=='gate_init':
+   ready.set();start.wait(10);ManualApprovalGate(root/'forced-gate')
+  elif operation=='registry_init':
+   ready.set();start.wait(10);FeatureRegistry('m',root)
+  elif operation=='gate_request':
+   g=ManualApprovalGate(root/'forced-gate');ready.set();start.wait(10)
+   g.request(module_id=1,module_slug='m',action_type='generic',summary='t',payload={})
+  elif operation=='registry_proposal':
+   r=FeatureRegistry('m',root);ready.set();start.wait(10)
+   r.save_proposal('child',name='demo',kind='generic',code='code',test_code='',gap_signature='')
+  else:
+   from sugarcode.self_improve.engine import SelfImprovementEngine
+   e=SelfImprovementEngine(module_id=1,module_slug='m',state_dir=root,gate=ManualApprovalGate(root/'forced-gate',auto_approve=True))
+   aid=e.request_rollback('demo');ready.set();start.wait(10)
+   e.rollback('demo',approval_id=aid)
+  queue.put('completed')
+ except StateLockTimeout:queue.put('lock-timeout')
+ except BaseException as exc:queue.put(type(exc).__name__+':'+str(exc))
+
+
+@pytest.mark.parametrize('operation',['gate_init','registry_init','gate_request','registry_proposal','engine_gate','engine_registry'])
+def test_forced_process_contention_prevents_operation_while_parent_holds_lock(tmp_path,operation):
+ from sugarcode.self_improve import gate as gm,registry as rm
+ ctx=mp.get_context('spawn');ready=ctx.Event();start=ctx.Event();queue=ctx.Queue()
+ # Build prerequisites in a child too, avoiding parent pool timeout conflicts.
+ if operation in ('engine_gate','engine_registry'):
+  root=tmp_path/'prepared';root.mkdir()
+  # Parent initializes using production defaults, then use an independently named
+  # lock instance with .2 test deadline for parent hold (same sidecar).
+  g=ManualApprovalGate(root/'forced-gate',auto_approve=True);r=FeatureRegistry('m',root)
+  r.save_proposal('seed',name='demo',kind='generic',code='code',test_code='',gap_signature='g');r.activate('seed',approval_id='seed')
+ else:root=tmp_path
+ target=root/'forced-gate' if operation in ('gate_init','gate_request','engine_gate') else root/'modules'/'m'/'registry.json'
+ target.parent.mkdir(parents=True,exist_ok=True)
+ from sugarcode.self_improve.state_lock import StateLock
+ held=StateLock(str(target.resolve()),.2)
+ p=ctx.Process(target=forced_worker,args=(str(root),operation,ready,start,queue))
+ p.start();assert ready.wait(10)
+ with held:
+  start.set()
+  # Must return timeout WHILE parent continues holding, not after release.
+  result=queue.get(timeout=10)
+  assert result=='lock-timeout'
+  p.join(10);assert p.exitcode==0
+
+
+def test_production_default_lock_deadline_is_five_seconds(tmp_path):
+ assert shared_state_lock(tmp_path/'production').timeout==5.0
