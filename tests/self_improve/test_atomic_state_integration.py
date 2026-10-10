@@ -24,7 +24,8 @@ def test_real_state_save_failure_keeps_old_bytes(tmp_path,monkeypatch,kind,failu
     before=state._path.read_bytes()
     def fail(*args,**kwargs): raise OSError('injected '+failure)
     monkeypatch.setattr(af.ops,failure,fail)
-    with pytest.raises(OSError): state._save({'new':1})
+    replacement = {'new':1} if kind=='gate' else {'module':'m','features':{},'proposals':{},'new':1}
+    with pytest.raises(OSError): state._save(replacement)
     assert state._path.read_bytes()==before
     assert not list(state._path.parent.glob('.*.tmp'))
 

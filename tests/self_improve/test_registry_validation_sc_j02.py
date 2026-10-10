@@ -1,4 +1,4 @@
-"""SC-J02 authored-not-run tests. Production registry remains unwired."""
+"""Peer J02 authored cases now locally run; production wiring assessed separately."""
 import json
 from copy import deepcopy
 
