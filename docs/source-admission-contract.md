@@ -75,4 +75,4 @@ unwired. Test suite results/denominators in packet; independent verdict required
 
 Production caller integration is now described in source-snapshot-wiring.md.
 Historical base/unwired/proposed-only statements above describe original helper
-landing, not the later integration. Approved caller code/test caps are1MiB each.
+landing, not the later integration. Approved caller code/test caps are 1 MiB each.

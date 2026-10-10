@@ -111,3 +111,14 @@ def test_utf8_bom_preserved_and_executed(tmp_path):
  e=r.activate('key',approval_id='local')
  assert Path(e['file']).read_bytes().startswith(b'\xef\xbb\xbf')
  assert r.dispatch('demo',[3])=={'items':[3]}
+
+
+def test_engine_synthesize_refuses_before_candidate_registration(tmp_path,monkeypatch):
+ from sugarcode.self_improve import engine as module
+ engine=SelfImprovementEngine(module_id=1,module_slug='m',state_dir=tmp_path)
+ monkeypatch.setattr(module,'synthesize_code',lambda plan:'x'*(SOURCE_CODE_BYTES+1))
+ before=engine._ledger_path.read_bytes() if engine._ledger_path.exists() else None
+ with pytest.raises(InputLimitExceeded):
+  engine.synthesize(FeaturePlan('m','demo','keyword_filter','d','g'))
+ assert engine._candidates=={}
+ assert (engine._ledger_path.read_bytes() if engine._ledger_path.exists() else None)==before
