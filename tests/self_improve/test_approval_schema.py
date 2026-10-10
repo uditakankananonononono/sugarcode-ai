@@ -16,9 +16,12 @@ def act_payload():
             "gap_signature": "gap1"}
 
 
-def record(action=ACTIVATION_ACTION, payload=None, status="approved", **over):
+_UNSET = object()
+
+
+def record(action=ACTIVATION_ACTION, payload=_UNSET, status="approved", **over):
     base = {"module_id": 7, "module_slug": "mod", "action_type": action,
-            "summary": "s", "payload": payload if payload is not None else act_payload(),
+            "summary": "s", "payload": act_payload() if payload is _UNSET else payload,
             "status": status, "requested_at": 1.5,
             "decided_at": None if status == "pending" else 2.5}
     if status != "pending":
@@ -41,7 +44,7 @@ def rb_exp(**over):
 
 
 def rb_record(**over):
-    return record(ROLLBACK_ACTION, {"feature": "feat"}, **over)
+    return record(ROLLBACK_ACTION, over.pop("payload", {"feature": "feat"}), **over)
 
 
 def err(code):
