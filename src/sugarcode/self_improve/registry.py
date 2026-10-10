@@ -9,13 +9,13 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import shutil
 import threading
 import time
 from pathlib import Path
 from typing import Any
 
 
+from .source_admission import read_source_snapshot, SOURCE_CODE_BYTES
 from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .proposal_preflight_r01 import preflight_proposal
 from .registry_validation import decode_registry_json, validate_registry_state, RegistryValidationError
@@ -126,18 +126,21 @@ class FeatureRegistry:
     # -- activation ----------------------------------------------------------
     def activate(self, proposal_key: str, *, approval_id: str) -> dict[str, Any]:
         proposal = self.get_proposal(proposal_key)
-        code_path = self._contained(Path(proposal["code_file"]))
-        code = code_path.read_text(encoding="utf-8")
-        digest = hashlib.sha256(code.encode()).hexdigest()
-        if digest != proposal["code_sha256"]:
-            raise RegistryError("candidate code changed since proposal; refusing activation")
+        code_path = Path(proposal["code_file"])
+        self._contained(code_path)
+        try:
+            snapshot = read_source_snapshot(code_path, max_bytes=SOURCE_CODE_BYTES,
+                                            expected_sha256=proposal["code_sha256"])
+        except (ValueError, OSError) as exc:
+            raise RegistryError("candidate code changed since proposal or source admission failed; refusing activation") from exc
+        digest = snapshot.sha256
         name = proposal["name"]
         with self._lock:
             data = self._load()
             feature = data["features"].setdefault(name, {"versions": [], "active_version": None})
             version = len(feature["versions"]) + 1
             dest = self._contained(self._ext_dir / f"{name}_v{version}.py")
-            shutil.copyfile(code_path, dest)
+            dest.write_bytes(snapshot.content)
             entry = {
                 "version": version, "file": str(dest), "sha256": digest,
                 "kind": proposal["kind"], "gap_signature": proposal["gap_signature"],
@@ -178,17 +181,19 @@ class FeatureRegistry:
 
     def dispatch(self, name: str, items: list, params: dict | None = None) -> dict:
         entry = self._active_entry(name)
-        path = self._contained(Path(entry["file"]))
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        if digest != entry["sha256"]:
-            raise RegistryError(
-                f"feature file {path.name} failed its integrity check; refusing to run")
+        path = Path(entry["file"])
+        self._contained(path)
+        try:
+            snapshot = read_source_snapshot(path, max_bytes=SOURCE_CODE_BYTES,
+                                            expected_sha256=entry["sha256"])
+        except (ValueError, OSError) as exc:
+            raise RegistryError("feature integrity check or source admission failed; refusing dispatch") from exc
         spec = importlib.util.spec_from_file_location(
             f"atlas_ext_{self.module_slug.replace('-', '_')}_{name}_v{entry['version']}", path)
         if spec is None or spec.loader is None:
             raise RegistryError(f"cannot load feature module {path}")
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        exec(compile(snapshot.content, str(path), "exec"), module.__dict__)
         run = getattr(module, "run", None)
         if not callable(run):
             raise RegistryError(f"feature {name!r} exposes no callable run()")

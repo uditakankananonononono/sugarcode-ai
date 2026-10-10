@@ -11,6 +11,7 @@ import re
 import stat
 from dataclasses import dataclass
 from pathlib import Path
+from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .capped_readers import read_capped_bytes, REGISTRY_FILE_BYTES
 from typing import Any, Protocol
 
@@ -106,8 +107,9 @@ def preflight_proposal(
     code = _text(code, "code")
     test_code = _text(test_code, "test_code")
     try:
-        code_bytes = code.encode("utf-8", errors="strict")
-        test_bytes = test_code.encode("utf-8", errors="strict")
+        admitted = admit_candidate_text(code, test_code, limits=PRODUCTION_SOURCE_LIMITS)
+        code_bytes = admitted.code.content
+        test_bytes = admitted.tests.content
     except UnicodeEncodeError as exc:
         raise ProposalPreflightError("candidate is not UTF-8 encodable") from exc
 

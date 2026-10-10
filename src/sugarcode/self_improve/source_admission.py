@@ -9,6 +9,9 @@ import stat
 
 from .capped_readers import InputLimitExceeded
 
+SOURCE_CODE_BYTES = 1024 * 1024
+SOURCE_TEST_BYTES = 1024 * 1024
+
 
 @dataclass(frozen=True)
 class SourceLimits:
@@ -20,6 +23,9 @@ class SourceLimits:
         for value in (self.code_bytes, self.test_bytes):
             if type(value) is not int or value < 0:
                 raise ValueError("source limits must be exact nonnegative integers")
+
+
+PRODUCTION_SOURCE_LIMITS = SourceLimits(SOURCE_CODE_BYTES, SOURCE_TEST_BYTES)
 
 
 @dataclass(frozen=True)

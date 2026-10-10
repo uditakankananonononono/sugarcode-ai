@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .sandbox import SandboxResult
 
 class IsolationUnavailable(RuntimeError):
@@ -49,11 +50,12 @@ class IsolatedRunner:
         return cmd
 
     def run(self,candidate):
+        snapshot=admit_candidate_text(candidate.code,candidate.test_code,limits=PRODUCTION_SOURCE_LIMITS)
         start=time.monotonic()
         with tempfile.TemporaryDirectory(prefix='sugarcode-isolated-') as tmp:
             work=Path(tmp)
-            (work/'feature.py').write_text(candidate.code)
-            (work/'test_feature.py').write_text(candidate.test_code)
+            (work/'feature.py').write_bytes(snapshot.code.content)
+            (work/'test_feature.py').write_bytes(snapshot.tests.content)
             cmd=self._command(work)
             # Verify namespace/mount setup before running any candidate code.
             try:

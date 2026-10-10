@@ -13,6 +13,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .plans import Candidate
 
 
@@ -42,9 +43,10 @@ class SandboxRunner:
         return env
 
     def run(self, candidate: Candidate) -> SandboxResult:
+        snapshot = admit_candidate_text(candidate.code, candidate.test_code, limits=PRODUCTION_SOURCE_LIMITS)
         workdir = Path(tempfile.mkdtemp(prefix="sugarcode-si-sandbox-"))
-        (workdir / "feature.py").write_text(candidate.code, encoding="utf-8")
-        (workdir / "test_feature.py").write_text(candidate.test_code, encoding="utf-8")
+        (workdir / "feature.py").write_bytes(snapshot.code.content)
+        (workdir / "test_feature.py").write_bytes(snapshot.tests.content)
         start = time.monotonic()
         try:
             proc = subprocess.run(
