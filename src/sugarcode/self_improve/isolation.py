@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from .bounded_process import run_bounded_process
 from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .sandbox import SandboxResult
 
@@ -68,18 +69,13 @@ class IsolatedRunner:
             # Limit ordinary resource use in the child before pytest. Hard
             # limits cannot be raised by the candidate after capabilities drop.
             launcher="import resource,os,sys; resource.setrlimit(resource.RLIMIT_AS,(536870912,536870912)); resource.setrlimit(resource.RLIMIT_CPU,(10,10)); resource.setrlimit(resource.RLIMIT_FSIZE,(1048576,1048576)); resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); os.execv(sys.executable,[sys.executable,'-m','pytest','-q','-x','--no-header','-p','no:cacheprovider','/work'])"
-            with tempfile.TemporaryFile() as out,tempfile.TemporaryFile() as err:
-                proc=subprocess.Popen(cmd+[sys.executable,'-I','-c',launcher],
-                                      stdout=out,stderr=err,start_new_session=True)
-                timed=False
-                try:proc.wait(timeout=self.timeout_seconds)
-                except subprocess.TimeoutExpired:
-                    timed=True
-                    try:os.killpg(proc.pid,signal.SIGKILL)
-                    except ProcessLookupError:pass
-                    proc.wait()
-                out.seek(0);err.seek(0)
-                stdout=out.read(1048576).decode(errors='replace')[-4000:]
-                stderr=err.read(1048576).decode(errors='replace')[-4000:]
-            return SandboxResult(not timed and proc.returncode==0,proc.returncode,
-                                 stdout,stderr,round(time.monotonic()-start,3),timed)
+            proc=run_bounded_process(cmd+[sys.executable,'-I','-c',launcher],
+                                     timeout_seconds=self.timeout_seconds)
+            stdout=proc.stdout.decode('utf-8',errors='replace')
+            stderr=proc.stderr.decode('utf-8',errors='replace')
+            if proc.overflow_stream is not None:
+                stderr=f"output byte limit exceeded on {proc.overflow_stream}\n"+stderr[-3800:]
+            return SandboxResult(proc.exit_code==0 and not proc.timed_out and proc.overflow_stream is None,
+                                 proc.exit_code,stdout,stderr,round(time.monotonic()-start,3),
+                                 proc.timed_out, output_limit_exceeded=proc.overflow_stream is not None,
+                                 output_limit_stream=proc.overflow_stream)
