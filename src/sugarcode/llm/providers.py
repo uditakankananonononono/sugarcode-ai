@@ -38,6 +38,11 @@ def error_text(exc: BaseException) -> str:
     return f"{type(exc).__name__}: model provider error (details withheld)"
 
 
+def setup_error_text(class_name: str) -> str:
+    """H10 AUTHORED, NOT RUN. Fixed text for a config/setup failure: class name only, never exception text."""
+    return f"{class_name}: provider setup error (details withheld)"
+
+
 @dataclass(frozen=True)
 class ModelProfile:
     name: str
