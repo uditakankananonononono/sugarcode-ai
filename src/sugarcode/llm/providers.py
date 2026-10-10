@@ -16,8 +16,10 @@ import json
 import os
 import urllib.error
 import urllib.request
-from dataclasses import asdict, dataclass
+from dataclasses import MISSING, asdict, dataclass
 from pathlib import Path
+
+from .tool_call_codec import DEFAULT_MAX_CHARS, DEFAULT_MAX_DEPTH, ToolCallDecodeError, decode_strict_json
 
 KINDS = ("local", "self_hosted", "hosted_free", "hosted_paid")
 TRANSPORTS = ("openai", "transformers")
@@ -126,18 +128,50 @@ def load_profiles(env: dict | None = None) -> dict[str, ModelProfile]:
     profiles = dict(BUILTIN_PROFILES)
     raw = (env.get("SUGARCODE_MODEL_PROFILES") or "").strip()
     if raw:
-        text = raw if raw.startswith("[") else Path(raw).expanduser().read_text()
+        if raw.startswith("["):
+            text = raw
+        else:
+            try:
+                text = Path(raw).expanduser().read_text()
+            except (OSError, ValueError) as e:  # missing/unreadable file, bad bytes, NUL in the path
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES file could not be read ({type(e).__name__})") from None
         try:
-            items = json.loads(text)
-        except json.JSONDecodeError as e:
-            raise ProviderError(f"SUGARCODE_MODEL_PROFILES is not valid JSON: {e}") from e
+            items = decode_strict_json(text, DEFAULT_MAX_CHARS, DEFAULT_MAX_DEPTH, root="array")
+        except ToolCallDecodeError as e:  # reason only; the input is never echoed
+            raise ProviderError(f"SUGARCODE_MODEL_PROFILES is not a valid strict JSON list: {e.reason}") from None
         allowed = set(ModelProfile.__dataclass_fields__)
-        for it in items:
+        required = sorted(n for n, f in ModelProfile.__dataclass_fields__.items()
+                          if f.default is MISSING and f.default_factory is MISSING)
+        for i, it in enumerate(items):
+            if not isinstance(it, dict):
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i} must be a JSON object")
             unknown = set(it) - allowed
             if unknown:
-                raise ProviderError(f"custom profile {it.get('name')!r}: unknown fields {sorted(unknown)}")
-            p = ModelProfile(**it)
-            profiles[p.name] = p
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i}: unknown fields {sorted(unknown)}")
+            missing = [n for n in required if n not in it]
+            if missing:
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i}: missing fields {missing}")
+            # Failures are recorded inside the except blocks and raised AFTER them, so the raised
+            # ProviderError has no __context__/__cause__ holding the constructor's exception (whose
+            # message can carry the profile name).
+            p, shadows, failure = None, False, None
+            try:
+                p = ModelProfile(**it)
+                shadows = p.name in BUILTIN_PROFILES
+            except ProviderError:  # __post_init__ messages include self.name; never forwarded
+                failure = "invalid kind or transport"
+            except TypeError:
+                failure = "invalid field values"
+            if failure is not None:
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i}: {failure}")
+            if shadows:
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i}: {p.name!r} is a built-in profile name and cannot be replaced")
+            try:
+                profiles[p.name] = p
+            except TypeError:
+                failure = "invalid profile name"
+            if failure is not None:
+                raise ProviderError(f"SUGARCODE_MODEL_PROFILES item {i}: {failure}")
     return profiles
 
 
