@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any, Protocol
 from uuid import uuid4
 
+from .json_values import snapshot_json
+
 PENDING, APPROVED, REJECTED = "pending", "approved", "rejected"
 
 
@@ -77,7 +79,12 @@ class ManualApprovalGate:
             raise InvalidApprovalState("invalid stored approval JSON; repair required") from exc
 
     def _save(self, data: dict[str, Any]) -> None:
-        self._path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+        try:
+            snapshot = snapshot_json(data)
+            encoded = json.dumps(snapshot, indent=2, sort_keys=True, allow_nan=False)
+        except (ValueError, TypeError, RecursionError) as exc:
+            raise InvalidApprovalState("invalid approval JSON write; state unchanged") from exc
+        self._path.write_text(encoded, encoding="utf-8")
 
     def request(self, *, module_id: int, module_slug: str, action_type: str,
                 summary: str, payload: dict[str, Any]) -> str:
