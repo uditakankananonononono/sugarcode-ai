@@ -67,9 +67,9 @@ def central_carbon_model() -> MetabolicModel:
     return MetabolicModel(mets, rxns, S, lb, ub)
 
 
-def fba(model: MetabolicModel, objective: str | None = None,
-        bounds_override: dict[str, tuple[float, float]] | None = None) -> dict:
-    """Flux balance analysis maximizing the objective reaction."""
+def _fba_with_raw(model: MetabolicModel, objective: str | None = None,
+                  bounds_override: dict[str, tuple[float, float]] | None = None) -> tuple[dict, float | None]:
+    """fba() plus the UNROUNDED optimum (None when not optimal); pfba stage 2 needs the raw value (H13)."""
     obj_name = objective or model.objective
     c = np.zeros(len(model.reactions))
     c[model.rxn_index(obj_name)] = -1.0  # maximize -> minimize negative
@@ -81,11 +81,17 @@ def fba(model: MetabolicModel, objective: str | None = None,
     res = linprog(c, A_eq=model.S, b_eq=np.zeros(len(model.metabolites)),
                   bounds=list(zip(lb, ub)), method="highs")
     if not res.success:
-        return {"status": "infeasible", "objective": 0.0, "objective_reaction": obj_name,
-                "fluxes": {r: 0.0 for r in model.reactions}}
+        return ({"status": "infeasible", "objective": 0.0, "objective_reaction": obj_name,
+                 "fluxes": {r: 0.0 for r in model.reactions}}, None)
     fluxes = {r: round(float(v), 6) for r, v in zip(model.reactions, res.x)}
-    return {"status": "optimal", "objective": round(float(-res.fun), 6),
-            "objective_reaction": obj_name, "fluxes": fluxes}
+    return ({"status": "optimal", "objective": round(float(-res.fun), 6),
+             "objective_reaction": obj_name, "fluxes": fluxes}, float(-res.fun))
+
+
+def fba(model: MetabolicModel, objective: str | None = None,
+        bounds_override: dict[str, tuple[float, float]] | None = None) -> dict:
+    """Flux balance analysis maximizing the objective reaction."""
+    return _fba_with_raw(model, objective, bounds_override)[0]
 
 
 def pfba(model: MetabolicModel, objective: str | None = None,
@@ -98,7 +104,7 @@ def pfba(model: MetabolicModel, objective: str | None = None,
     """
     if not 0 < optimum_fraction <= 1:
         raise ValueError("optimum_fraction must be in (0, 1]")
-    first = fba(model, objective, bounds_override)
+    first, raw_optimum = _fba_with_raw(model, objective, bounds_override)
     if first["status"] != "optimal":
         return first
     obj_name = objective or model.objective
@@ -106,7 +112,7 @@ def pfba(model: MetabolicModel, objective: str | None = None,
     for name, (lo, hi) in (bounds_override or {}).items():
         i = model.rxn_index(name); lb[i], ub[i] = lo, hi
     j = model.rxn_index(obj_name)
-    lb[j] = max(lb[j], first["objective"] * optimum_fraction - 1e-9)
+    lb[j] = max(lb[j], raw_optimum * optimum_fraction - 1e-9)  # unrounded stage-1 optimum (H13); rounding is display only
     n = len(model.reactions)
     # split v = vp - vn so |v| is linear for reversible reactions
     c = np.ones(2 * n)
