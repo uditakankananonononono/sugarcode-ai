@@ -1,7 +1,6 @@
 """Strict decoder for the isolated-dispatch child result (SC-J03 PREP).
 
-STATUS: authored, NOT run, NOT wired. Reconciled by reading main 35998c7 isolated_dispatch.py.
-self_improve/isolated_dispatch.py (base ba0eb275 was not available to the author).
+STATUS: peer PREP integrated by local builder; tests and real-dispatch checks separate.
 
 Contract (as documented by the author, pending peer confirmation):
   * input: the child's complete stdout as bytes (untrusted).
@@ -11,11 +10,11 @@ Contract (as documented by the author, pending peer confirmation):
   * text: strict UTF-8, no lone surrogates anywhere (keys or values).
   * JSON: exactly one document; top level is an object whose keys are exactly
     {"result"}; no duplicate keys at any depth; no NaN/Infinity/-Infinity; no
-    float that overflows to inf; integers limited to max_int_digits digits;
+    float that overflows to inf; optional integer digit limit; default active interpreter limit;
     nesting depth limited to max_depth.
   * output: the value of "result" (plain dict/list/str/int/float/bool/None).
   * every failure raises ResultProtocolError (single exception type, with a
-    short .reason code). Nothing else escapes for malformed input.
+    short .reason code). Resource/IO failures are not a universal typed-error guarantee.
 This does not prove isolation/containment; it only validates bytes.
 """
 import json
@@ -23,7 +22,7 @@ import math
 
 DEFAULT_MAX_BYTES = 1024 * 1024
 DEFAULT_MAX_DEPTH = 64
-DEFAULT_MAX_INT_DIGITS = 64
+DEFAULT_MAX_INT_DIGITS = None
 RESULT_KEY = "result"
 
 
@@ -50,9 +49,12 @@ def _reject_constant(name):
 def _make_parse_int(max_digits):
     def parse_int(text):
         digits = text.lstrip("-")
-        if len(digits) > max_digits:
+        if max_digits is not None and len(digits) > max_digits:
             raise ResultProtocolError("int_overflow", f"{len(digits)} digits")
-        return int(text)
+        try:
+            return int(text)
+        except ValueError as exc:
+            raise ResultProtocolError("int_overflow", "interpreter conversion limit") from exc
     return parse_int
 
 
@@ -75,7 +77,7 @@ def _check_string(s):
 
 def _walk(root, max_depth):
     """Iterative validation: depth, string validity, exact builtin types."""
-    stack = [(root, 1)]
+    stack = [(root, 0)]
     while stack:
         node, depth = stack.pop()
         if depth > max_depth:
@@ -105,6 +107,11 @@ def decode_child_result(raw, *, max_bytes=DEFAULT_MAX_BYTES,
                         max_depth=DEFAULT_MAX_DEPTH,
                         max_int_digits=DEFAULT_MAX_INT_DIGITS):
     """Return the validated value of the child's {"result": ...} document."""
+    for name, limit in (("max_bytes", max_bytes), ("max_depth", max_depth)):
+        if type(limit) is not int or limit <= 0:
+            raise ResultProtocolError("bad_limit", name)
+    if max_int_digits is not None and (type(max_int_digits) is not int or max_int_digits <= 0):
+        raise ResultProtocolError("bad_limit", "max_int_digits")
     if type(raw) not in (bytes, bytearray):
         raise ResultProtocolError("not_bytes", type(raw).__name__)
     if len(raw) > max_bytes:
