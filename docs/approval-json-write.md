@@ -33,3 +33,22 @@ Builder: 14 new cases PASS; exact same test file on published base 13 FAIL/1 PAS
 Broader self_improve + shared-layer + router-asset selection 198 PASS, no skips
 (184 prior +14 new), not an independent gate/full configured-suite/CI result.
 Archive includes all selected test files and src/sugarcode for reviewer replay.
+
+## Independent verdict and accumulating-history ceiling
+
+Independent verdict relayed 2026-10-10: VERIFIED for write-boundary scope and
+closing new-write NaN self-lockout. Verifier reproduced 14 new PASS, archived
+self_improve 181 PASS, exact base reversal 13 FAIL/1 PASS and hostile-value probes.
+Broader 198 includes 17 builder-receipt-only cases; archive omitted instinct_models
+required by those tests. No independent whole-configured-suite claim.
+
+LARGEST PRACTICAL RESIDUE: the whole-state 10,000-value budget accumulates with
+approval history. Eventually EVERY save, including deciding existing requests,
+can be refused until manual history editing. This is a lifetime accumulating-
+history ceiling, not merely a single-large-payload limit. No automatic retention,
+compaction or migration exists; define one separately before scaling this gate.
+
+"Invalid decided_by" means unsupported/non-encodable values only. None is
+accepted and becomes JSON null; no string/person-identity validation is claimed.
+Missing IDs/nonobject records retain KeyError/TypeError edges. Other JSON readers,
+non-atomic persistence and authority/schema limitations remain unchanged.
