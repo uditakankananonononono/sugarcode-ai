@@ -52,3 +52,12 @@ Hardlink behavior: atomic replacement breaks that directory entry's hardlink
 association. Other names linked to the old inode retain OLD content. Do not use
 hardlinked state as a mirrored/live-update mechanism. Existing ownership/ACL/xattr
 not retained. Original prep test marker corrected to note actual local execution.
+
+Independent amendment verdict relayed2026-10-10: VERIFIED exact orphan-ID fix,
+hardlink note and test provenance correction. Real filesystem request probe
+confirmed persisted ID exposure; successive failed requests create distinct IDs,
+so explicit reconciliation still required. Constructor also replaces '{}' and
+can raise postreplacement durability failure WITHOUT approval_id: file may exist
+though construction failed; inspect actual state before repeating construction.
+Decide durability and auto_approve branches were not re-probed in amendment
+review (earlier decide case is builder evidence); do not inflate its scope.
