@@ -214,3 +214,25 @@ def test_cli_no_answer_payload_still_prints_as_before(monkeypatch, capsys):
     monkeypatch.setattr("sugarcode.llm.shared.shared_ask", lambda *a, **k: payload)
     rc, out, err = run(["shared", "ask", "q"], capsys)
     assert rc == 1 and json.loads(out) == payload
+
+
+# ---- H10b: deliberate semantics fix, `router is None` (old `router or default` discarded a falsy injected router) ----
+class _FalsyRouter:
+    def __init__(self):
+        self.ran = 0
+
+    def __bool__(self):
+        return False
+
+    def run(self, task):
+        self.ran += 1
+        return SimpleNamespace(ok=False, attempts=[RouteAttempt("a", "unavailable")], result=None)
+
+
+def test_falsy_injected_router_is_used_not_replaced_by_config(monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("config must not be loaded when a router is injected, even a falsy one")
+    monkeypatch.setattr(shared, "shared_config", boom)
+    r = _FalsyRouter()
+    out = shared.shared_ask(Q, router=r)
+    assert r.ran == 1 and out["ok"] is False and "config_error_class" not in out
