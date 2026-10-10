@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
-from .providers import ChatClient, ProviderError, resolve, resolve_route
+from .providers import ChatClient, ProviderError, error_text, resolve, resolve_route
 from .router import route as route_modules
 from .tool_call_shape import ToolCallShapeError, tool_call_batch
 from .tools import call_tool, tools_for_modules
@@ -80,7 +80,8 @@ def ask(question: str, profile: str | None = None, route: str | None = None,
         try:
             clients, skipped = [resolve(profile, model=model, env=env, allow_paid=allow_paid)], []
         except ProviderError as e:
-            return AskResult(None, None, mods, names, skipped=[str(e)], error=str(e))
+            text = error_text(e)  # H09: never str(e) (unknown-profile lists, env labels, loader text)
+            return AskResult(None, None, mods, names, skipped=[text], error=text)
     else:
         clients, skipped = resolve_route(env=env, route=route, allow_paid=allow_paid)
     errors = list(skipped)
@@ -89,6 +90,6 @@ def ask(question: str, profile: str | None = None, route: str | None = None,
             answer, trace = _run(c, question, tools, max_steps)
             return AskResult(answer, c.profile, mods, names, trace, errors)
         except ProviderError as e:
-            errors.append(str(e))
+            errors.append(error_text(e))  # H09: HTTP bodies, endpoints and profile prefixes are never recorded
     return AskResult(None, None, mods, names, skipped=errors,
                      error="no model profile answered; the routed modules and tools are listed so you can run them directly")

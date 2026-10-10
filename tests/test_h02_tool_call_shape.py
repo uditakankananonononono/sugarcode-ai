@@ -208,14 +208,15 @@ def test_ask_falls_back_and_records_shape_error(monkeypatch, bad):
     good.profile = "good"
     res = _ask_with(monkeypatch, bad_c, good)
     assert res.profile == "good" and res.answer == "answer"
-    assert any(s.startswith("bad") for s in res.skipped)
+    assert any(s == "ToolCallShapeError: model provider error (details withheld)" for s in res.skipped)  # H09: class only, no profile prefix
+    assert not any("bad" in s for s in res.skipped)
 
 
 def test_ask_with_only_malformed_profile_reports_error_not_exception(monkeypatch):
     bad_c = _Client({"content": "", "tool_calls": [None]})
     bad_c.profile = "bad"
     res = _ask_with(monkeypatch, bad_c)
-    assert res.answer is None and res.error and any(s.startswith("bad") for s in res.skipped)
+    assert res.answer is None and res.error and any(s == "ToolCallShapeError: model provider error (details withheld)" for s in res.skipped)  # H09
 
 
 # ---------------- shared_ask ----------------

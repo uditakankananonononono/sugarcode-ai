@@ -106,7 +106,6 @@ def _emit(obj) -> int:
 # generic text plus the class name and ZERO exception text.
 # Caveat: preflight and the command each read os.environ; if the config changes in between, the worst case
 # is the generic message instead of the loader message. The distinction is message-only, not provenance.
-_PROVIDER_GENERIC = "model provider error (details withheld)"
 
 
 def _provider_preflight() -> str | None:
@@ -121,7 +120,8 @@ def _provider_preflight() -> str | None:
 
 def _provider_failure(exc) -> str:
     """Text for any ProviderError reached AFTER a passing preflight: class name + fixed text, never str(exc)."""
-    return f"{type(exc).__name__}: {_PROVIDER_GENERIC}"
+    from .llm.providers import error_text
+    return error_text(exc)
 
 
 def _cmd_splice_assess(args) -> int:
@@ -224,7 +224,7 @@ def _cmd_models_list(args) -> int:
 
 
 def _cmd_models_check(args) -> int:
-    from .llm.providers import ProviderError, parse_route, resolve
+    from .llm.providers import ProviderError, error_text, parse_route, resolve
     bad = _provider_preflight()
     if bad is not None:  # config failure is top-level, not a fake per-profile row
         _emit({"error": bad})
@@ -239,7 +239,7 @@ def _cmd_models_check(args) -> int:
         try:
             out.append(resolve(n, allow_paid=args.allow_paid or None).health())
         except ProviderError as e:
-            out.append({"profile": n, "ok": False, "error": str(e)})
+            out.append({"profile": n, "ok": False, "error": error_text(e)})  # H09: message withheld, key set unchanged
     _emit(out)
     return 0 if any(r.get("ok") for r in out) else 1
 

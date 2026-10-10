@@ -160,7 +160,9 @@ def test_copilot_falls_back_and_reports(fake_server):
     _FakeOpenAI.tool_name, _FakeOpenAI.tool_args = "no_such__tool", {}
     res = ask("design a synthetic promoter library", route="ollama,openai-compatible", env=env)
     assert res.profile == "openai-compatible"
-    assert any("ollama unreachable" in s for s in res.skipped)
+    # H09: the skip record is generic + class; no profile name, endpoint or reason text
+    assert any(s == "ProviderError: model provider error (details withheld)" for s in res.skipped)
+    assert not any("ollama" in s or "127.0.0.1" in s for s in res.skipped)
     none = ask("design a synthetic promoter library", route="ollama",
                env={"SUGARCODE_OLLAMA_BASE_URL": "http://127.0.0.1:9/v1"})
     assert none.answer is None and none.modules and none.tools and none.error
