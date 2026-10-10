@@ -9,12 +9,13 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import threading
 import time
 from pathlib import Path
 from typing import Any
 
 
+from .state_lock import shared_state_lock
+from .approval_consumption import add_consumption
 from .source_admission import read_source_snapshot, SOURCE_CODE_BYTES
 from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .proposal_preflight_r01 import preflight_proposal
@@ -35,15 +36,17 @@ class FeatureRegistry:
         self._ext_dir = self._dir / "extensions"
         self._ext_dir.mkdir(parents=True, exist_ok=True)
         self._path = self._dir / "registry.json"
-        self._lock = threading.Lock()
-        if not self._path.exists():
-            self._save({"module": module_slug, "features": {}, "proposals": {}})
+        self._lock = shared_state_lock(self._path)
+        with self._lock:
+            if not self._path.exists():
+                self._save({"module": module_slug, "features": {}, "proposals": {}})
 
     def _load(self) -> dict[str, Any]:
-        try:
-            return decode_registry_json(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES), expected_module=self.module_slug)
-        except (RegistryValidationError, InputLimitExceeded) as exc:
-            raise RegistryError("invalid registry state; repair required") from exc
+        with self._lock:
+            try:
+                return decode_registry_json(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES), expected_module=self.module_slug)
+            except (RegistryValidationError, InputLimitExceeded) as exc:
+                raise RegistryError("invalid registry state; repair required") from exc
 
     def _encode_state(self, data: dict[str, Any]) -> str:
         """Validate prospective state without opening or changing any file."""
@@ -57,7 +60,8 @@ class FeatureRegistry:
         return encoded
 
     def _save(self, data: dict[str, Any]) -> None:
-        atomic_write_text(self._path, self._encode_state(data))
+        with self._lock:
+            atomic_write_text(self._path, self._encode_state(data))
 
     def _contained(self, path: Path) -> Path:
         resolved = path.resolve()
@@ -124,23 +128,26 @@ class FeatureRegistry:
             self._save(data)
 
     # -- activation ----------------------------------------------------------
-    def activate(self, proposal_key: str, *, approval_id: str) -> dict[str, Any]:
-        proposal = self.get_proposal(proposal_key)
-        code_path = Path(proposal["code_file"])
-        self._contained(code_path)
-        try:
-            snapshot = read_source_snapshot(code_path, max_bytes=SOURCE_CODE_BYTES,
-                                            expected_sha256=proposal["code_sha256"])
-        except (ValueError, OSError) as exc:
-            raise RegistryError("candidate code changed since proposal or source admission failed; refusing activation") from exc
-        digest = snapshot.sha256
-        name = proposal["name"]
+    def activate(self, proposal_key: str, *, approval_id: str, engine_gate_identity: str | None = None) -> dict[str, Any]:
         with self._lock:
+            proposal = self.get_proposal(proposal_key)
+            code_path = Path(proposal["code_file"])
+            self._contained(code_path)
+            try:
+                snapshot = read_source_snapshot(code_path, max_bytes=SOURCE_CODE_BYTES,
+                                                expected_sha256=proposal["code_sha256"])
+            except (ValueError, OSError) as exc:
+                raise RegistryError("candidate code changed since proposal or source admission failed; refusing activation") from exc
+            digest = snapshot.sha256
+            name = proposal["name"]
             data = self._load()
             feature = data["features"].setdefault(name, {"versions": [], "active_version": None})
             version = len(feature["versions"]) + 1
+            if engine_gate_identity is not None:
+                add_consumption(data, gate_identity=engine_gate_identity, approval_id=approval_id,
+                                action="self_improvement_activation", feature=name,
+                                version=version, consumed_at=time.time())
             dest = self._contained(self._ext_dir / f"{name}_v{version}.py")
-            dest.write_bytes(snapshot.content)
             entry = {
                 "version": version, "file": str(dest), "sha256": digest,
                 "kind": proposal["kind"], "gap_signature": proposal["gap_signature"],
@@ -150,10 +157,12 @@ class FeatureRegistry:
             feature["versions"].append(entry)
             feature["active_version"] = version
             data["proposals"][proposal_key]["status"] = "activated"
+            self._encode_state(data)  # full prospective consumption+effect before file write
+            dest.write_bytes(snapshot.content)
             self._save(data)
         return entry
 
-    def rollback(self, name: str, *, approval_id: str, expected_active_version: int | None = None) -> dict[str, Any]:
+    def rollback(self, name: str, *, approval_id: str, expected_active_version: int | None = None, engine_gate_identity: str | None = None) -> dict[str, Any]:
         with self._lock:
             data = self._load()
             feature = data["features"].get(name)
@@ -162,6 +171,10 @@ class FeatureRegistry:
             current = feature["active_version"]
             if expected_active_version is not None and (type(expected_active_version) is not int or current != expected_active_version):
                 raise PermissionError("rollback approval version does not match active version")
+            if engine_gate_identity is not None:
+                add_consumption(data, gate_identity=engine_gate_identity, approval_id=approval_id,
+                                action="self_improvement_rollback", feature=name,
+                                version=current, consumed_at=time.time())
             earlier = [v["version"] for v in feature["versions"] if v["version"] < current]
             feature["active_version"] = max(earlier) if earlier else None
             for v in feature["versions"]:

@@ -6,6 +6,7 @@ See docs/prep/sc-j02-registry-validation.md before integration.
 from __future__ import annotations
 
 import json
+from .approval_consumption import CONSUMED_KEY, validate_consumptions
 import math
 import re
 from typing import Any
@@ -130,6 +131,11 @@ def validate_registry_state(state: Any, *, expected_module: str) -> dict[str, An
     _identifier(root["module"], "module")
     if root["module"] != expected_module:
         _fail("module", "does not match expected module")
+    if CONSUMED_KEY in root:
+        try:
+            validate_consumptions(root[CONSUMED_KEY])
+        except ValueError as exc:
+            raise RegistryValidationError("invalid engine approval consumption metadata") from exc
     features = _object(root["features"], "features")
     proposals = _object(root["proposals"], "proposals")
 

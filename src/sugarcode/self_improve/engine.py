@@ -189,48 +189,57 @@ class SelfImprovementEngine:
         return approval_id
 
     def activate(self, candidate_key: str, *, approval_id: str) -> dict[str, Any]:
-        proposal = self.registry.get_proposal(candidate_key)
-        if proposal.get("approval_id") != approval_id:
+        # Preserve mismatch refusal before looking up a forged/unknown gate ID.
+        if self.registry.get_proposal(candidate_key).get("approval_id") != approval_id:
             raise PermissionError("approval id does not match this candidate's proposal")
-        source = getattr(self.gate, "record", None)
-        if not callable(source):
-            raise PermissionError("activation requires a full approval record source")
-        try:
-            require_approved(source(approval_id), ActivationExpectation(
-                self.module_id, self.module_slug, candidate_key, proposal["name"],
-                proposal["kind"], proposal["code_sha256"], proposal["gap_signature"]),
-                allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
-        except ApprovalSchemaError as exc:
-            raise PermissionError("activation approval binding mismatch") from exc
-        entry = self.registry.activate(candidate_key, approval_id=approval_id)
-        self._log("feature_activated", key=candidate_key, name=entry["file"],
-                  version=entry["version"], approval_id=approval_id)
-        return entry
+        coordinated = getattr(self.gate, "coordinated_record", None)
+        if not callable(coordinated):
+            raise PermissionError("engine commit requires a full approval record and coordinated gate")
+        with coordinated(approval_id) as (gate_identity, record), self.registry._lock:
+            if type(gate_identity) is not str or not gate_identity:
+                raise PermissionError("coordinated gate requires a stable nonempty identity")
+            proposal = self.registry.get_proposal(candidate_key)
+            if proposal.get("approval_id") != approval_id:
+                raise PermissionError("approval id does not match this candidate's proposal")
+            try:
+                require_approved(record, ActivationExpectation(
+                    self.module_id, self.module_slug, candidate_key, proposal["name"],
+                    proposal["kind"], proposal["code_sha256"], proposal["gap_signature"]),
+                    allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
+            except ApprovalSchemaError as exc:
+                raise PermissionError("activation approval binding mismatch") from exc
+            entry = self.registry.activate(candidate_key, approval_id=approval_id,
+                                                   engine_gate_identity=gate_identity)
+            self._log("feature_activated", key=candidate_key, name=entry["file"],
+                      version=entry["version"], approval_id=approval_id)
+            return entry
 
     def rollback(self, feature_name: str, *, approval_id: str) -> dict[str, Any]:
-        source = getattr(self.gate, "record", None)
-        if not callable(source):
-            raise PermissionError("rollback requires a full approval record source")
-        try:
-            record = source(approval_id)
-            require_approved(record, RollbackExpectation(
-                self.module_id, self.module_slug, feature_name),
-                allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
-        except ApprovalSchemaError as exc:
-            raise PermissionError("rollback approval binding mismatch") from exc
-        pin = record.get("payload", {}).get("active_version_at_request")
-        if type(pin) is not int or pin <= 0:
-            raise PermissionError("rollback requires a positive active version pin")
-        try:
-            validate_rollback_binding(record, module_id=self.module_id,
-                                      module_slug=self.module_slug, feature_name=feature_name,
-                                      current_active_version=pin)
-        except ApprovalBindingError as exc:
-            raise PermissionError("rollback approval version binding mismatch") from exc
-        outcome = self.registry.rollback(feature_name, approval_id=approval_id,
-                                         expected_active_version=pin)
-        self._log("feature_rolled_back", **outcome)
-        return outcome
+        coordinated = getattr(self.gate, "coordinated_record", None)
+        if not callable(coordinated):
+            raise PermissionError("engine commit requires a full approval record and coordinated gate")
+        with coordinated(approval_id) as (gate_identity, record), self.registry._lock:
+            if type(gate_identity) is not str or not gate_identity:
+                raise PermissionError("coordinated gate requires a stable nonempty identity")
+            try:
+                require_approved(record, RollbackExpectation(
+                    self.module_id, self.module_slug, feature_name),
+                    allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
+            except ApprovalSchemaError as exc:
+                raise PermissionError("rollback approval binding mismatch") from exc
+            pin = record.get("payload", {}).get("active_version_at_request")
+            if type(pin) is not int or pin <= 0:
+                raise PermissionError("rollback requires a positive active version pin")
+            try:
+                validate_rollback_binding(record, module_id=self.module_id,
+                                          module_slug=self.module_slug, feature_name=feature_name,
+                                          current_active_version=pin)
+            except ApprovalBindingError as exc:
+                raise PermissionError("rollback approval version binding mismatch") from exc
+            outcome = self.registry.rollback(feature_name, approval_id=approval_id,
+                                             expected_active_version=pin, engine_gate_identity=gate_identity)
+            self._log("feature_rolled_back", **outcome)
+            return outcome
 
     def request_rollback(self, feature_name: str) -> str:
         active = self.registry._active_entry(feature_name)["version"]
