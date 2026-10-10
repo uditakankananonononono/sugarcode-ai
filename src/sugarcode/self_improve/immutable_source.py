@@ -39,7 +39,7 @@ def _sync_directory(directory):
 def publish_source(destination,content,*,candidate_key=None):
     """Absent destination only, complete fsynced bytes become visible via link.
 
-    On failure retains any published file and partial temp for inspection. Never
+    On failure retains any published file; temp retained until successful unlink. Never
     adopts or overwrites. No safe link/fsync -> fail closed, no fallback.
     """
     if type(content) is not bytes:raise TypeError('exact source bytes required')
@@ -58,7 +58,8 @@ def publish_source(destination,content,*,candidate_key=None):
             if count<=0:raise OSError('source write made no progress')
             view=view[count:]
         ops.fsync(fd);checkpoint('temp_fsynced')
-        ops.close(fd);fd=None
+        closing,fd=fd,None
+        ops.close(closing)
         ops.link(temp,path);published=True;checkpoint('name_published')
         _sync_directory(path.parent);checkpoint('published_dir_fsynced')
         ops.unlink(temp);_sync_directory(path.parent);checkpoint('temp_removed_fsynced')
@@ -66,4 +67,7 @@ def publish_source(destination,content,*,candidate_key=None):
         raise SourcePublicationError('extension publication failed; inspect artifacts',
             published=published,destination=path,candidate_key=candidate_key) from exc
     finally:
-        if fd is not None:ops.close(fd)
+        if fd is not None:
+            closing,fd=fd,None
+            try:ops.close(closing)
+            except OSError:pass  # cleanup must never mask primary publication status

@@ -18,8 +18,9 @@ Publication failure before link published=False; after link True. Registry
 postreplace durability failure committed=True (visible but durability uncertain);
 other commit exceptions committed=None (unknown, inspect authoritative JSON).
 No blind retry. Published source ALWAYS retained on failure, no automatic orphan
-or temp deletion/repair/adoption/version skip/journal replay. Temp cleanup only
-on successful publication. Crash can leave unreferenced file or partial hidden
+repair/adoption/version skip/journal replay. Temp retained before successful unlink;
+if final directory sync fails AFTER unlink, only the complete final file remains.
+This is not all-failures temp retention. Crash can leave unreferenced file or partial hidden
 temp; source final name never exposed by this protocol until complete file fsync.
 No ownership/ACL/xattr preservation. Later logger failure remains separate.
 
@@ -59,3 +60,12 @@ reran mutant1FAIL. Initial partial-write test incorrectly assumed pathlib.glob
 hides dot files1FAIL, fixed assertion preserving forced interleaving, no production
 change. Historical incomplete temp/fsync proof not expanded to physical crashproof
 claim. No full configured-suite claim; independent auditor before landing.
+
+Bounded audit corrections: 10,000 maximum is now NON-relaxable through max_entries;
+values above 10,000 refuse. Typed publication error preserved when close fails:
+descriptor ownership cleared before close, cleanup close errors never mask primary
+status, no unsafe double-close. Temp unlink can succeed before final dir fsync fails;
+in that case final file retained, temp absent (not all-failure temp retention).
+25 new final-source cases PASS, selected 1,176 PASS = 1,151 prior + 25, no skips.
+Initial packet unit XML was stale at 20 cases vs 21 source; corrected final unit
+receipt regenerated. Git bundle supplies candidate commit provenance for recheck.

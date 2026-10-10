@@ -755,7 +755,8 @@ The independent auditor's separate run measured 17,628 / 18,068 KiB (440 KiB del
 Activation now publishes complete fsynced source via exclusive POSIX hard link
 before registry commit. Destination must be absent: no overwrite/adoption even
 when bytes match, and an existing next-version orphan blocks activation. Failures
-retain published files and partial temps for inspection, never automatic delete,
+retain published files; temps remain until successful unlink. If final directory
+sync fails after unlink, the complete final file is the retained artifact. No delete,
 repair/replay or version skip. Typed publication errors expose destination,
 candidate, published status and registry commit status (unknown when necessary).
 Read-only `reconcile_extensions()` compares ALL referenced versions, including
