@@ -1,0 +1,63 @@
+diff --git a/src/sugarcode/llm/tools.py b/src/sugarcode/llm/tools.py
+index c35e192..1406877 100644
+--- a/src/sugarcode/llm/tools.py
++++ b/src/sugarcode/llm/tools.py
+@@ -14,6 +14,8 @@ import math
+ from dataclasses import dataclass
+ from functools import lru_cache
+
++from .tool_call_codec import DEFAULT_MAX_CHARS, ToolCallDecodeError, decode_tool_arguments, guarded_call
++
+ _JSON_TYPES = {
+     "str": {"type": "string"}, "int": {"type": "integer"}, "float": {"type": "number"},
+     "bool": {"type": "boolean"}, "list": {"type": "array"}, "dict": {"type": "object"},
+@@ -156,11 +158,12 @@ def call_tool(name: str, arguments: dict | str) -> dict:
+     if name not in cat:
+         return {"error": f"unknown tool {name!r}"}
+     t = cat[name]
+-    if isinstance(arguments, str):
+-        try:
+-            arguments = json.loads(arguments or "{}")
+-        except (json.JSONDecodeError,RecursionError) as e:
+-            return {"error": f"arguments are not valid JSON: {e}"}
++    try:  # text is parsed strictly; a direct dict skips parsing but still gets the depth/node/key walk
++        arguments = decode_tool_arguments(arguments, DEFAULT_MAX_CHARS)
++    except ToolCallDecodeError as e:
++        if e.reason in ("not_object", "not_text"):
++            return {"error": "arguments must be a JSON object"}
++        return {"error": f"arguments are not valid JSON: {e}"}
+     if not isinstance(arguments,dict) or not all(isinstance(k,str) for k in arguments):
+         return {"error":"arguments must be a JSON object"}
+     allowed = set(t.parameters["properties"])
+@@ -173,12 +176,12 @@ def call_tool(name: str, arguments: dict | str) -> dict:
+     for key,value in arguments.items():
+         if not _argument_valid(value,t.parameters["properties"][key]):
+             return {"error":f"invalid argument {key}: expected {t.parameters['properties'][key]['type']}"}
+-    fn = getattr(importlib.import_module(f"sugarcode.modules.{t.module}"), t.function)
+-    try:
+-        result = fn(**arguments)
+-    except Exception as e:  # surface the module's own validation message to the model
+-        return {"error": f"{type(e).__name__}: {e}"}
+-    out = _jsonable(result)
++    def _invoke():
++        return getattr(importlib.import_module(f"sugarcode.modules.{t.module}"), t.function)(**arguments)
++    outcome = guarded_call(_invoke)  # import/lookup failures and module errors come back as {"error": ...}
++    if "error" in outcome:
++        return outcome
++    out = _jsonable(outcome["result"])
+     text = json.dumps(out)
+     if len(text) > 12000:
+         return {"result_truncated": True, "result_preview": text[:12000]}
+diff --git a/src/sugarcode/llm/providers.py b/src/sugarcode/llm/providers.py
+index f93db21..4d50799 100644
+--- a/src/sugarcode/llm/providers.py
++++ b/src/sugarcode/llm/providers.py
+@@ -179,6 +179,8 @@ class ChatClient:
+                     f"then `ollama pull {self.model}`.") if self.kind == "local" else ""
+             raise ProviderError(f"{self.profile} unreachable at {self.base_url}: "
+                                 f"{getattr(e, 'reason', e)}.{hint}") from e
++        except ValueError as e:  # bad JSON / UnicodeDecodeError / int digit limit in the response body
++            raise ProviderError(f"{self.profile} returned an unreadable response: {str(e)[:200]}") from e
+         choices = data.get("choices") or []
+         if not choices:
+             raise ProviderError(f"{self.profile} returned no choices: {str(data)[:300]}")
