@@ -60,6 +60,8 @@ def make_bundle(name: str, artifacts: dict[str, str], *,
     for fn, content in artifacts.items():
         if not isinstance(fn, str) or not fn or "/" in fn or "\\" in fn or fn in (".", ".."):
             raise ValueError(f"unsafe artifact filename {fn!r}")
+        if fn == "MANIFEST.json":
+            raise ValueError("MANIFEST.json is reserved for the bundle manifest")
         if not isinstance(content, str):
             raise TypeError(f"artifact {fn!r} content must be text")
         data = content.encode("utf-8")
@@ -77,6 +79,10 @@ def make_bundle(name: str, artifacts: dict[str, str], *,
 def write_bundle(bundle: dict, out_dir: str | Path) -> dict:
     """Write a bundle to a directory: every artifact plus MANIFEST.json
     carrying checksums, sizes, metadata and creation time."""
+    # Caller-built bundles and mutations after make_bundle must also fail
+    # before mkdir or any write. Exact-name reservation only, not path safety.
+    if "MANIFEST.json" in bundle["artifacts"]:
+        raise ValueError("MANIFEST.json is reserved for the bundle manifest")
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     manifest = {
