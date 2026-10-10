@@ -108,3 +108,13 @@ def test_read_exception_kills_and_reaps_direct_child(monkeypatch,tmp_path):
  monkeypatch.setattr(bounded_process.os,'read',fail)
  with pytest.raises(OSError):run('import os,time;os.write(1,b"ready");time.sleep(30)')
  assert children[0].returncode is not None and children[0].returncode<0
+
+
+def test_overflow_issues_group_sigkill_and_reaps(monkeypatch):
+ from sugarcode.self_improve import bounded_process
+ sent=[];original=bounded_process.os.killpg
+ def kill(pid,sig):sent.append((pid,sig));return original(pid,sig)
+ monkeypatch.setattr(bounded_process.os,'killpg',kill)
+ r=run('import os,time;os.write(1,b"x"*101);time.sleep(.2)',output_bytes=100)
+ assert r.overflow_stream=='stdout' and r.exit_code<0
+ assert len(sent)==1 and sent[0][1]==bounded_process.signal.SIGKILL

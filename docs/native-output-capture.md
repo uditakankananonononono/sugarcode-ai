@@ -24,7 +24,7 @@ pytest intermediate capture/disk storage, setsid-escaped descendants, host effec
 CPU/RSS quota, kernel/slow system IO, exactly-once side effects. In-process/native
 candidate can perform arbitrary effects; this does not contain them or undo them.
 
-22 new cases PASS, selected 1,150 PASS = 1,128 prior + 22, no skips. Actual Python
+23 new cases PASS, selected 1,151 PASS = 1,128 prior + 23, no skips. Actual Python
 os.write infinite floods observed exactly 1,048,577 bytes on flooded stream then
 killed; retained ring <=4,000 per stream. Exact edge, both pipes, short read,
 nonzero/empty, invalidUTF8, inherited pipe after parent exits, direct child read
@@ -40,8 +40,8 @@ stdout overflow, child exit -9. Delta 376 KiB is measured, NOT universal guarant
 Instrumentation + bounded allocation code establish capture storage, not total RSS.
 
 Base real-wiring probes 4 FAIL (old fields/cap absent), candidate 4 PASS. Reusable
-helper did not exist on base, no claim all 22 base probes fail. Mutants: disable
+helper did not exist on base, no claim all 23 base probes fail. Mutants: disable
 cap -> 2 FAIL / 2 exact-edge PASS; disable ring trim -> 1 FAIL; disable overflow
-flag -> 1 FAIL. Kill mutation not run in this packet, no claim proved by mutation;
+flag -> 1 FAIL. disable group kill -> 1 FAIL (finite child, no unbounded hanging mutant);
 real read-failure child reap and same-group timeout probes run. Separate auditor
 before landing, no full configured-suite claim. No paid service or PRIDICT changes.
