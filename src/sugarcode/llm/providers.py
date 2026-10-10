@@ -29,6 +29,15 @@ class ProviderError(RuntimeError):
     """A profile is misconfigured, gated, or its endpoint failed."""
 
 
+def error_text(exc: BaseException) -> str:
+    """H09 AUTHORED, NOT RUN. Text for a ProviderError that is RECORDED OR PRINTED: class name + fixed text, never str(exc).
+
+    ProviderError messages can carry profile/route/custom names, env labels, endpoints and body excerpts (see resolve and
+    ChatClient.chat), and a type or subclass says nothing about the message source, so nothing is passed through.
+    """
+    return f"{type(exc).__name__}: model provider error (details withheld)"
+
+
 @dataclass(frozen=True)
 class ModelProfile:
     name: str
@@ -253,7 +262,8 @@ class ChatClient:
         except urllib.error.HTTPError as e:
             return {"profile": self.profile, "ok": False, "error": f"HTTP {e.code}"}
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
-            return {"profile": self.profile, "ok": False, "error": str(getattr(e, "reason", e))}
+            # H09: OS/network reason text can carry host/endpoint details; class name only (HTTP code above is an int)
+            return {"profile": self.profile, "ok": False, "error": f"unreachable: {type(e).__name__}"}
         if not isinstance(data, dict):  # valid JSON of the wrong shape: an error RESULT, never a raise (chat() raises instead)
             return {"profile": self.profile, "ok": False,
                     "error": f"malformed /models response: body is {type(data).__name__}, expected an object"}
@@ -283,7 +293,7 @@ class ChatClient:
         except urllib.error.HTTPError as e:
             return False if e.code in (401, 403) else f"HTTP {e.code}"
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
-            return f"unreachable: {getattr(e, 'reason', e)}"
+            return f"unreachable: {type(e).__name__}"  # H09: class only, reason text withheld
         if not isinstance(data, dict):
             return _WhoamiMalformed(f"body is {type(data).__name__}, expected an object")
         name = data.get("name")
@@ -370,7 +380,7 @@ def resolve_route(env: dict | None = None, route: str | None = None,
         try:
             clients.append(resolve(n, env=env, allow_paid=allow_paid))
         except ProviderError as e:
-            skipped.append(str(e))
+            skipped.append(error_text(e))  # H09: no profile name / env label / endpoint text
     return clients, skipped
 
 
@@ -387,6 +397,6 @@ def profile_status(env: dict | None = None, probe: bool = False,
             if probe:
                 row["health"] = c.health()
         except ProviderError as e:
-            row.update(ready=False, reason=str(e))
+            row.update(ready=False, reason=error_text(e))  # H09
         rows.append(row)
     return rows

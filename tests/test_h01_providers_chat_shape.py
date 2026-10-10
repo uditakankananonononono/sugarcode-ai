@@ -124,7 +124,8 @@ def test_ask_falls_back_to_next_profile_and_records_the_shape_error(monkeypatch,
                   "http://good.test": {"choices": [{"message": {"content": "answer"}}]}})
     res = A.ask("codon optimize a protein for E. coli expression", route="bad,good", env={})
     assert res.profile == "good" and res.answer == "answer"
-    assert any(s.startswith("bad ") for s in res.skipped)
+    assert any(s == "ProviderError: model provider error (details withheld)" for s in res.skipped)  # H09 generic, no profile prefix
+    assert not any("bad" in s for s in res.skipped)
 
 
 def test_ask_with_only_malformed_profile_reports_error_not_exception(monkeypatch, serve):
@@ -132,4 +133,4 @@ def test_ask_with_only_malformed_profile_reports_error_not_exception(monkeypatch
     monkeypatch.setattr(A, "resolve_route", lambda env=None, route=None, allow_paid=None: ([bad], []))
     serve.by_url({"http://bad.test": ["nope"]})
     res = A.ask("codon optimize a protein for E. coli expression", route="bad", env={})
-    assert res.answer is None and res.error and any(s.startswith("bad ") for s in res.skipped)
+    assert res.answer is None and res.error and any(s == "ProviderError: model provider error (details withheld)" for s in res.skipped)  # H09

@@ -137,9 +137,9 @@ def test_other_http_code_stays_a_string(hf):
 def test_unreachable_stays_a_string(hf):
     hf(urllib.error.URLError("refused"))
     out = _client().health()
-    assert out["token_valid"] == "unreachable: refused" and out["ok"] is False and "error" not in out
+    assert out["token_valid"] == "unreachable: URLError"  # H09: class only and out["ok"] is False and "error" not in out
     hf(TimeoutError("slow"))
-    assert _client().health()["token_valid"] == "unreachable: slow"
+    assert _client().health()["token_valid"] == "unreachable: TimeoutError"  # H09: class only
 
 
 def test_invalid_json_whoami_stays_an_unreachable_string(hf):

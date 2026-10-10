@@ -151,4 +151,4 @@ def test_unreachable_unchanged(monkeypatch):
         raise urllib.error.URLError("refused")
     monkeypatch.setattr(P.urllib.request, "urlopen", fake)
     out = _client().health()
-    assert out["ok"] is False and out["error"] == "refused" and set(out) == {"profile", "ok", "error"}
+    assert out["ok"] is False and out["error"] == "unreachable: URLError" and set(out) == {"profile", "ok", "error"}  # H09: class only, reason text withheld
