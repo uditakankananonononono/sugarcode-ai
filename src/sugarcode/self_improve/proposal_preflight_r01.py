@@ -11,6 +11,7 @@ import re
 import stat
 from dataclasses import dataclass
 from pathlib import Path
+from .capped_readers import read_capped_bytes, REGISTRY_FILE_BYTES
 from typing import Any, Protocol
 
 
@@ -124,7 +125,7 @@ def preflight_proposal(
         name_max = os.pathconf(directory, "PC_NAME_MAX")
         if name_max > 0 and any(len(os.fsencode(path.name)) > name_max for path in (code_path, test_path)):
             raise ProposalPreflightError("candidate filename exceeds filesystem limit")
-        raw = registry_path.read_bytes()
+        raw = read_capped_bytes(registry_path, max_file_bytes=REGISTRY_FILE_BYTES)
     except OSError as exc:
         raise ProposalPreflightError("cannot inspect existing registry") from exc
 

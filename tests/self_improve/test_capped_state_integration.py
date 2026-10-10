@@ -102,7 +102,8 @@ def test_combined_registry_exact_cap_then_strict_duplicate_refusal(tmp_path,monk
 def test_combined_registry_preflight_overcap_no_candidate_mutation(tmp_path,monkeypatch):
     from sugarcode.self_improve import registry
     obj=FeatureRegistry('m',tmp_path)
-    monkeypatch.setattr(registry,'REGISTRY_FILE_BYTES',10)
+    from sugarcode.self_improve import proposal_preflight_r01
+    monkeypatch.setattr(proposal_preflight_r01,'REGISTRY_FILE_BYTES',10)
     before=obj._path.read_bytes()
     with pytest.raises(InputLimitExceeded):obj.save_proposal('key',name='name',kind='generic',code='code',test_code='test',gap_signature='gap')
     assert not (obj._dir/'candidates').exists()
