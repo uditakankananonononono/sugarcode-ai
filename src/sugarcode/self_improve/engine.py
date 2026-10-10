@@ -15,6 +15,7 @@ from typing import Any
 
 from .approval_schema import (ActivationExpectation, RollbackExpectation,
                               ApprovalSchemaError, require_approved)
+from .approval_binding import validate_rollback_binding, ApprovalBindingError
 from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
@@ -200,21 +201,33 @@ class SelfImprovementEngine:
         if not callable(source):
             raise PermissionError("rollback requires a full approval record source")
         try:
-            require_approved(source(approval_id), RollbackExpectation(
+            record = source(approval_id)
+            require_approved(record, RollbackExpectation(
                 self.module_id, self.module_slug, feature_name),
                 allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
         except ApprovalSchemaError as exc:
             raise PermissionError("rollback approval binding mismatch") from exc
-        outcome = self.registry.rollback(feature_name, approval_id=approval_id)
+        pin = record.get("payload", {}).get("active_version_at_request")
+        if type(pin) is not int or pin <= 0:
+            raise PermissionError("rollback requires a positive active version pin")
+        try:
+            validate_rollback_binding(record, module_id=self.module_id,
+                                      module_slug=self.module_slug, feature_name=feature_name,
+                                      current_active_version=pin)
+        except ApprovalBindingError as exc:
+            raise PermissionError("rollback approval version binding mismatch") from exc
+        outcome = self.registry.rollback(feature_name, approval_id=approval_id,
+                                         expected_active_version=pin)
         self._log("feature_rolled_back", **outcome)
         return outcome
 
     def request_rollback(self, feature_name: str) -> str:
+        active = self.registry._active_entry(feature_name)["version"]
         approval_id = self.gate.request(
             module_id=self.module_id, module_slug=self.module_slug,
             action_type="self_improvement_rollback",
             summary=f"Roll back self-built feature {feature_name} on {self.module_slug}",
-            payload={"feature": feature_name})
+            payload={"feature": feature_name, "active_version_at_request": active})
         self._log("rollback_proposed", feature=feature_name, approval_id=approval_id)
         return approval_id
 

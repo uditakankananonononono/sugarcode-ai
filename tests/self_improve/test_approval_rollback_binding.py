@@ -293,9 +293,8 @@ class TestEngineWiringCanaries:
     def test_rollback_approval_from_other_module_cannot_roll_back(self, tmp_path):
         gate = ManualApprovalGate(tmp_path / "approvals.json", auto_approve=True)
         engine, _ = _engine_with_active_feature(tmp_path / "a", gate=gate)
-        other_engine = SelfImprovementEngine(module_id=MODULE_ID + 1,
-                                             module_slug="other-module",
-                                             state_dir=tmp_path / "b", gate=gate)
+        other_engine, _ = _engine_with_active_feature(tmp_path / "b", module_id=MODULE_ID+1,
+                                                      module_slug="other-module", gate=gate)
         foreign_id = other_engine.request_rollback(FEATURE)
         gate.decide(foreign_id, APPROVED)
         with pytest.raises(PermissionError):
@@ -320,17 +319,13 @@ class TestEngineWiringCanaries:
 
     def test_rollback_of_missing_feature_raises_keyerror(self, tmp_path):
         engine, gate = _engine_with_active_feature(tmp_path)
-        approval_id = engine.request_rollback("no_such_feature")
-        gate.decide(approval_id, APPROVED)
         with pytest.raises(KeyError):
-            engine.rollback("no_such_feature", approval_id=approval_id)
+            engine.request_rollback("no_such_feature")
 
     def test_rollback_of_inactive_feature_raises_keyerror(self, tmp_path):
         engine, gate = _engine_with_active_feature(tmp_path)
         first = engine.request_rollback(FEATURE)
         gate.decide(first, APPROVED)
         engine.rollback(FEATURE, approval_id=first)
-        second = engine.request_rollback(FEATURE)
-        gate.decide(second, APPROVED)
         with pytest.raises(KeyError):
-            engine.rollback(FEATURE, approval_id=second)
+            engine.request_rollback(FEATURE)
