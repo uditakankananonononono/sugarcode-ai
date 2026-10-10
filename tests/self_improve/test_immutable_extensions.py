@@ -132,3 +132,39 @@ def test_actual_report_10000_entry_bound_refuses_10001(tmp_path):
  for i in range(10001):(r._ext_dir/f'orphan{i}.py').touch()
  with pytest.raises(ValueError,match='entry cap'):r.reconcile_extensions()
  assert len(list(r._ext_dir.iterdir()))==10001
+
+
+def test_caller_cannot_relax_reconciliation_10000_cap(tmp_path):
+ r=seed(tmp_path)
+ with pytest.raises(ValueError,match='1..10000'):r.reconcile_extensions(max_entries=10001)
+
+
+def test_failed_close_preserves_typed_status_without_double_close(tmp_path,monkeypatch):
+ calls=[];original=source.ops.close
+ def fail(fd):
+  calls.append(fd);original(fd);raise OSError('close failed after closing descriptor')
+ monkeypatch.setattr(source.ops,'close',fail)
+ with pytest.raises(SourcePublicationError) as caught:publish_source(tmp_path/'final',b'complete')
+ assert caught.value.published is False and isinstance(caught.value.__cause__,OSError)
+ assert len(calls)==1
+
+
+def test_cleanup_close_error_cannot_mask_write_error(tmp_path,monkeypatch):
+ original=source.ops.close;calls=[]
+ def badwrite(*a):raise OSError('primary write refusal')
+ def badclose(fd):calls.append(fd);original(fd);raise OSError('cleanup refusal')
+ monkeypatch.setattr(source.ops,'write',badwrite);monkeypatch.setattr(source.ops,'close',badclose)
+ with pytest.raises(SourcePublicationError) as caught:publish_source(tmp_path/'final',b'complete')
+ assert str(caught.value.__cause__)=='primary write refusal' and len(calls)==1
+
+
+def test_final_dir_sync_failure_keeps_final_without_temp(tmp_path,monkeypatch):
+ original=source._sync_directory;calls=[]
+ def sync(directory):
+  calls.append(directory)
+  if len(calls)==2:raise OSError('final directory sync refused')
+  return original(directory)
+ monkeypatch.setattr(source,'_sync_directory',sync)
+ with pytest.raises(SourcePublicationError) as caught:publish_source(tmp_path/'final',b'complete')
+ assert caught.value.published and (tmp_path/'final').read_bytes()==b'complete'
+ assert not list(tmp_path.glob('.*.tmp'))

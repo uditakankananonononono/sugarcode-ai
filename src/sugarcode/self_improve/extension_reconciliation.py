@@ -9,8 +9,8 @@ RECONCILIATION_ENTRIES=10000
 
 
 def inspect_extensions(directory,state,*,registry_sha256,max_entries=RECONCILIATION_ENTRIES):
-    if type(max_entries) is not int or max_entries<1:
-        raise ValueError('positive exact reconciliation count required')
+    if type(max_entries) is not int or not 1<=max_entries<=RECONCILIATION_ENTRIES:
+        raise ValueError('reconciliation count must be exact int in 1..10000')
     refs={}
     for feature in state['features'].values():
         for version in feature['versions']:
