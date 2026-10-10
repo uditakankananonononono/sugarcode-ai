@@ -65,3 +65,23 @@ def test_permission_preservation_failure_keeps_old_state(tmp_path,monkeypatch):
     with pytest.raises(OSError): af.atomic_write_text(path,'new')
     assert path.read_text()=='old'
     assert not list(tmp_path.glob('.*.tmp'))
+
+
+def test_request_directory_failure_exposes_persisted_id(tmp_path,monkeypatch):
+    gate=ManualApprovalGate(tmp_path/'gate')
+    def fail(directory): raise OSError('dir sync failed')
+    monkeypatch.setattr(af,'_fsync_dir',fail)
+    with pytest.raises(af.AtomicDurabilityError) as caught:
+        gate.request(module_id=1,module_slug='m',action_type='activate',summary='x',payload={})
+    assert caught.value.replaced is True
+    approval_id=caught.value.approval_id
+    assert gate.decision(approval_id)==PENDING
+    assert list(gate._load())==[approval_id]
+
+
+def test_hardlink_other_name_keeps_old_inode(tmp_path):
+    path=tmp_path/'target';other=tmp_path/'other'
+    path.write_text('old');os.link(path,other)
+    af.atomic_write_text(path,'new')
+    assert path.read_text()=='new'
+    assert other.read_text()=='old'

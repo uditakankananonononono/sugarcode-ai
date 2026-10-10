@@ -1,4 +1,4 @@
-"""AUTHORED, NOT RUN. Tests for self_improve.atomic_file (SC-F01 prep)."""
+"""Peer-authored PREP tests, now run by integration builder. Tests for self_improve.atomic_file (SC-F01 prep)."""
 from __future__ import annotations
 
 import os

@@ -34,3 +34,21 @@ by injected failure tests. No live approval authority added.
 Tests verify helper old/new contents, private mode, injected open/write/fsync/
 close/replace failures, short writes, symlinks, encoding, cleanup, postreplace
 error and gate/registry actual save/init wiring. Independent verdict required.
+
+## Independent findings and amendment
+
+Independent reviewer reproduced34 atomic cases and232 selected cases on POSIX.
+Code verified, peer lineage not independently established from archive contents;
+retained git parent is builder evidence, not reviewer lineage authentication.
+
+ORPHAN-ID correction: gate.request catches postreplacement AtomicDurabilityError
+and adds .approval_id, the exact persisted newly generated request ID, then rethrows.
+Caller must inspect replaced=True and this ID, read the stored request and reconcile;
+do not blindly retry. This does NOT return normal success or suppress durability
+failure. Other operations keep propagating state-already-replaced uncertainty.
+Pre-replacement failures have no persisted request ID guarantee.
+
+Hardlink behavior: atomic replacement breaks that directory entry's hardlink
+association. Other names linked to the old inode retain OLD content. Do not use
+hardlinked state as a mirrored/live-update mechanism. Existing ownership/ACL/xattr
+not retained. Original prep test marker corrected to note actual local execution.
