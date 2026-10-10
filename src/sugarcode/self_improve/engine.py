@@ -17,6 +17,7 @@ from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
 from .evidence import GapObservation, preview_evidence
+from .json_values import snapshot_json
 from .gate import APPROVED, ApprovalGate, ManualApprovalGate
 from .plans import Candidate, FeaturePlan
 from .planner import FeaturePlanner
@@ -36,6 +37,19 @@ _KIND_SAMPLES: dict[str, list] = {
     "field_extractor": ["contact me at prof@uni.edu on 2026-09-25, score 91.5",
                         "no fields here", None, 7],
 }
+
+
+class InvalidLedgerValue(ValueError):
+    """Ledger JSON is unsupported, ambiguous or bound to another module."""
+
+
+def _ledger_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise InvalidLedgerValue("duplicate ledger object key")
+        result[key] = value
+    return result
 
 
 class SelfImprovementEngine:
@@ -59,16 +73,33 @@ class SelfImprovementEngine:
     # -- ledger --------------------------------------------------------------
     def _log(self, event: str, **fields: Any) -> None:
         record = {"at": time.time(), "module": self.module_slug, "event": event, **fields}
+        try:
+            if type(record["module"]) is not str or record["module"] != self.module_slug:
+                raise InvalidLedgerValue("ledger write module mismatch")
+            encoded = json.dumps(snapshot_json(record), sort_keys=True, allow_nan=False)
+        except (ValueError, TypeError, RecursionError) as exc:
+            raise InvalidLedgerValue("invalid ledger write; no append") from exc
         with self._ledger_lock:
             with self._ledger_path.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps(record, sort_keys=True, default=str) + "\n")
+                fh.write(encoded + "\n")
 
     def ledger(self) -> list[dict[str, Any]]:
         if not self._ledger_path.exists():
             return []
         with self._ledger_lock:
             lines = self._ledger_path.read_text(encoding="utf-8").splitlines()
-        return [json.loads(l) for l in lines if l.strip()]
+        records: list[dict[str, Any]] = []
+        for number, line in enumerate(lines, 1):
+            if not line.strip():
+                continue
+            try:
+                record = snapshot_json(json.loads(line, object_pairs_hook=_ledger_object))
+                if type(record) is not dict or record.get("module") != self.module_slug:
+                    raise InvalidLedgerValue("invalid ledger module or record")
+            except (ValueError, TypeError, KeyError, RecursionError) as exc:
+                raise InvalidLedgerValue(f"invalid ledger row {number}; repair required") from exc
+            records.append(record)
+        return records
 
     def preview_gap_evidence(self, observations: list[GapObservation]) -> list[dict]:
         """Read-only experimental priority preview. Does not plan or activate."""
