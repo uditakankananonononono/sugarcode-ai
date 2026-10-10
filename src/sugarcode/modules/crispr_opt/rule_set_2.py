@@ -7,8 +7,8 @@ This is a portable, dependency-light port of the published model from
     BSD-3-Clause, (c) Microsoft).
 
 The original ships a scikit-learn 0.17 pickled GradientBoostingRegressor that
-cannot be loaded on modern stacks (this gap was listed under "Missing" in
-STATUS.md). Here the trained model (100 depth-3 regression trees over 630
+cannot be loaded on modern stacks (an earlier status note listed this as
+missing; that note is superseded). Here the trained model (100 depth-3 regression trees over 630
 sequence/gene-position features) is extracted from the pickle into
 framework-free JSON (data/rule_set_2_model.json) and evaluated with a small
 pure-NumPy tree-walking engine, so the published model runs anywhere.

@@ -280,8 +280,8 @@ def doench2014_ontarget(seq30: str) -> float:
     vendored verbatim from CRISPOR - see data/PROVENANCE.md).
 
     Input: 30-mer = 4 bp 5' flank + 20 bp guide + 3 bp PAM + 3 bp 3' flank.
-    Returns activity 0-1 (logistic). Rule Set 2 is NOT vendored (see
-    PROVENANCE.md) - this is RS1, labeled as such.
+    Returns activity 0-1 (logistic). This is Rule Set 1; Rule Set 2 (Azimuth
+    V3) is vendored separately - see score_on_target_rs2 and data/PROVENANCE.md.
     """
     seq = seq30.upper()
     if len(seq) != 30:
