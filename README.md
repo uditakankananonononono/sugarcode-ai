@@ -749,3 +749,18 @@ stdout bytes, 4,000-byte retained diagnostic ring, child exit -9. These are one
 environment's measurements, not a total RSS guarantee or a general memory quota.
 The independent auditor's separate run measured 17,628 / 18,068 KiB (440 KiB delta,
 9 samples); it is a different run, not the builder packet's historical evidence.
+
+### Immutable extension publication and orphan evidence
+
+Activation now publishes complete fsynced source via exclusive POSIX hard link
+before registry commit. Destination must be absent: no overwrite/adoption even
+when bytes match, and an existing next-version orphan blocks activation. Failures
+retain published files and partial temps for inspection, never automatic delete,
+repair/replay or version skip. Typed publication errors expose destination,
+candidate, published status and registry commit status (unknown when necessary).
+Read-only `reconcile_extensions()` compares ALL referenced versions, including
+inactive ones, with actual files and reports missing/mismatch/unreferenced/temp/
+nonregular/refused reads, bound at 10,000 entries. Evidence-now is not permission.
+No all-files-atomic, no exact-once, no tamperproof registry. This is not a cross-
+file recovery journal, Windows route or hostile-editor/ancestor-race protection.
+Real process-kill stage tests do not prove power-loss behavior of every filesystem.
