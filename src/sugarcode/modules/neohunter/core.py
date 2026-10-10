@@ -341,7 +341,7 @@ def _neo_diagnostics(cands,panel,escape):
     "clonality_weighted_score":float(np.mean([c["immunogenicity"]*c["clonal_fraction"] for c in cands] or [0])),"panel_min_immunogenicity":float(min([c["immunogenicity"] for c in x] or [0])),
     "panel_mean_immunogenicity":float(np.mean([c["immunogenicity"] for c in x] or [0])),"panel_affinity_geomean":float(np.exp(np.mean(np.log([c["predicted_ic50_nM"] for c in x] or [1])))),
     "panel_processing_mean":float(np.mean([c["presentation_probability"] for c in x] or [0])),"vaccine_format":"synthetic long peptide tandem",
-    "escape_model_reproducible":True,"binding_model_status":"deterministic, untrained, not clinically validated","research_use_only":True,
+    "escape_model_reproducible":True,"binding_model_status":"mixed: ridge PSSM trained on IEDB 2013 for 9-mers whose letters are all standard amino acids (after uppercasing), anchor-motif heuristic for other lengths and for non-standard 9-mers; not clinically validated","research_use_only":True,
     "requires_normal_tissue_validation":True,"requires_immunopeptidomics_validation":True}
     assert len(d)>=50; return d
 
