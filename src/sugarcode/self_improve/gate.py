@@ -9,12 +9,13 @@ from __future__ import annotations
 
 import json
 import math
-import threading
 import time
 from pathlib import Path
 from typing import Any, Protocol
 from uuid import uuid4
 
+from contextlib import contextmanager
+from .state_lock import shared_state_lock
 from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
                             JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
@@ -67,31 +68,34 @@ class ManualApprovalGate:
         self._path = Path(path)
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._auto = auto_approve
-        self._lock = threading.Lock()
-        if not self._path.exists():
-            atomic_write_text(self._path, "{}")
+        self._lock = shared_state_lock(self._path)
+        with self._lock:
+            if not self._path.exists():
+                atomic_write_text(self._path, "{}")
 
     def _load(self) -> dict[str, Any]:
-        try:
-            data = json.loads(read_capped_bytes(self._path, max_file_bytes=APPROVAL_FILE_BYTES).decode("utf-8"),
-                              object_pairs_hook=_unique_object,
-                              parse_constant=_reject_constant,
-                              parse_float=_finite_float)
-            if type(data) is not dict:
-                raise InvalidApprovalState("approval state must be an object")
-            return data
-        except (ValueError, TypeError, RecursionError) as exc:
-            raise InvalidApprovalState("invalid stored approval JSON; repair required") from exc
+        with self._lock:
+            try:
+                data = json.loads(read_capped_bytes(self._path, max_file_bytes=APPROVAL_FILE_BYTES).decode("utf-8"),
+                                  object_pairs_hook=_unique_object,
+                                  parse_constant=_reject_constant,
+                                  parse_float=_finite_float)
+                if type(data) is not dict:
+                    raise InvalidApprovalState("approval state must be an object")
+                return data
+            except (ValueError, TypeError, RecursionError) as exc:
+                raise InvalidApprovalState("invalid stored approval JSON; repair required") from exc
 
     def _save(self, data: dict[str, Any]) -> None:
-        try:
-            snapshot = snapshot_json(data)
-            encoded = json.dumps(snapshot, indent=2, sort_keys=True, allow_nan=False)
-        except (ValueError, TypeError, RecursionError) as exc:
-            raise InvalidApprovalState("invalid approval JSON write; state unchanged") from exc
-        if len(encoded.encode("utf-8")) > APPROVAL_FILE_BYTES:
-            raise InputLimitExceeded("file", APPROVAL_FILE_BYTES)
-        atomic_write_text(self._path, encoded)
+        with self._lock:
+            try:
+                snapshot = snapshot_json(data)
+                encoded = json.dumps(snapshot, indent=2, sort_keys=True, allow_nan=False)
+            except (ValueError, TypeError, RecursionError) as exc:
+                raise InvalidApprovalState("invalid approval JSON write; state unchanged") from exc
+            if len(encoded.encode("utf-8")) > APPROVAL_FILE_BYTES:
+                raise InputLimitExceeded("file", APPROVAL_FILE_BYTES)
+            atomic_write_text(self._path, encoded)
 
     def request(self, *, module_id: int, module_slug: str, action_type: str,
                 summary: str, payload: dict[str, Any]) -> str:
@@ -149,3 +153,12 @@ class ManualApprovalGate:
 
     def decision(self, approval_id: str) -> str:
         return self.record(approval_id)["status"]
+
+    @contextmanager
+    def coordinated_record(self, approval_id: str):
+        """Hold shared gate lock until cooperating engine commit completes.
+
+        Returns canonical gate identity plus detached record. Not authentication.
+        """
+        with self._lock:
+            yield self._lock.identity, self.record(approval_id)
