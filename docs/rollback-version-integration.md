@@ -35,3 +35,7 @@ fixtures assert refusal at request; foreign fixture now has real active feature.
 new activation and between-check/commit race, sequential reuse, absent/bool/zero/
 negative/string/float pin, correct newer rollback, missing request/no gate mutation.
 Independent verdict required, J05 dependency still pending.
+
+Independent VERIFIED version-pin verdict478PASS reproduced; replay after manual
+restoration of same active version confirmed possible by verifier probe. No
+consumption store, version drift protection only, not once-only authorization.
