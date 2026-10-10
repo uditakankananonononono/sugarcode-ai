@@ -2,6 +2,11 @@
  "source": "IEDB MHC-I binding benchmark 2013 (bdata.20130222.mhci.txt), measured IC50 nM",
  "target": "1 - ln(IC50 nM)/ln(50000), clipped 0..1",
  "method": "ridge(lambda=5.0) on one-hot 9-mer",
+ "fit_all_rows": true,
+ "metrics_describe_model": "80pct-fit",
+ "split_description": "about 20% held out; exact split not reproducible from available artifacts",
+ "n_train_total_semantics": "n_train_total counts ALL rows including the n_heldout held-out rows; the stored held-out r/AUC come from a fit on the remaining rows, while the shipped weights are refit on all rows",
+ "near_neighbour_note": "STATUS.md:750 states that about 12% of A*02:01 held-out peptides have a training peptide within 2 mismatches, so r/AUC are optimistic for novel peptides; stated there, not reproduced here",
  "alleles": {
   "HLA-A*02:01": {
    "n_train_total": 6038,
