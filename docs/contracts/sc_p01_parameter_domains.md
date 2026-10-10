@@ -1,7 +1,8 @@
 # SC-P01 parameter domains, candidate contract v1
 
-PREP ONLY. Tests authored, not run. Base: ba0eb275f182e77a4f24530b668e3e17f2528df5.
-No existing path changed. No integration, repair verdict, model or quality claim.
+Historical PREP contract, now integrated and independently verified for newly synthesized modules.
+573 tests passed in builder and independent environments. codegen.py and planner.py changed;
+see sc_p01_integration.md for caller paths, narrowings and limits. No model/quality claim.
 
 ## Explicit helper API
 
@@ -53,7 +54,7 @@ Threshold accepts finite exact int/float and finite numeric exact strings;
 missing/None and nonnumeric strings skip; bool/custom values and nonfinite
 numeric strings fail. No item is changed by this helper.
 
-## Mandatory integration seams (peer-owned, not implemented here)
+## Integration seams (implemented, see integration record)
 
 1. Validate post-refiner plan parameters, then validate again before synthesis.
 2. Generated modules must carry a self-contained equivalent of this validation,
@@ -74,7 +75,7 @@ numeric strings fail. No item is changed by this helper.
 The integration owner must accept or revise the exact builtin-only narrowing,
 empty override semantics, lower()-duplicate policy, literal-field policy and
 collision-failure policy before wiring. These are candidate v1 decisions, not an
-agreed shared API freeze. No change to plans/planner/codegen has occurred.
+agreed shared API freeze. Planner/codegen integration now exists; see sc_p01_integration.md.
 The six output tests use real synthesize_code and exec only inside authored test
 functions; they cover ordinary behavior, not integrated invalid-input refusal.
 Regex compilation/substitution validation is not runtime containment: hostile
