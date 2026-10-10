@@ -1,4 +1,4 @@
-"""SC-F02 authored-not-run canaries; integration owner must execute/review."""
+"""Peer SC-F02 authored canaries, now run by integration builder."""
 import io
 from pathlib import Path
 

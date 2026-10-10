@@ -7,6 +7,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+JSONL_FILE_BYTES = 16 * 1024 * 1024
+JSONL_LINE_BYTES = 1024 * 1024
+APPROVAL_FILE_BYTES = 4 * 1024 * 1024
+REGISTRY_FILE_BYTES = 16 * 1024 * 1024
+
 
 class InputLimitExceeded(ValueError):
     """A physical byte budget was exceeded; source bytes were not changed."""
