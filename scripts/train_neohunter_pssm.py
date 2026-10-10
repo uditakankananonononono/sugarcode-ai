@@ -36,7 +36,13 @@ def main(path):
         if sp == "human" and mhc in ALLELES and L == "9" and ineq == "=" and set(seq) <= set(AA):
             data[mhc].append((seq, float(meas)))
     out = {"source": "IEDB MHC-I binding benchmark 2013 (bdata.20130222.mhci.txt), measured IC50 nM",
-           "target": "1 - ln(IC50 nM)/ln(50000), clipped 0..1", "method": f"ridge(lambda={LAM}) on one-hot 9-mer", "alleles": {}}
+           "target": "1 - ln(IC50 nM)/ln(50000), clipped 0..1", "method": f"ridge(lambda={LAM}) on one-hot 9-mer",
+           # H11 provenance (AUTHORED, NOT RUN; only affects a FUTURE regeneration)
+           "fit_all_rows": True, "metrics_describe_model": "80pct-fit",
+           "split_description": "held out where md5(peptide) % 5 == 0 (about 20%)",
+           "n_train_total_semantics": "n_train_total counts ALL rows including the n_heldout held-out rows; "
+                                      "metric_fit_size is the size of the 80% fit the metrics come from",
+           "alleles": {}}
     for al, rows in data.items():
         X = np.array([onehot(s) for s, _ in rows]); ic = np.array([m for _, m in rows])
         y = np.clip(1 - np.log(np.clip(ic, 1, None)) / math.log(50000), 0, 1)
@@ -47,7 +53,8 @@ def main(path):
         w = fit(X[~test], y[~test]); pred = np.hstack([X[test], np.ones((test.sum(), 1))]) @ w
         pear = float(np.corrcoef(pred, y[test])[0, 1]); a = auc(ic[test] < 500, pred)
         wf = fit(X, y)
-        out["alleles"][al] = {"n_train_total": len(rows), "n_heldout": int(test.sum()), "heldout_pearson_r": round(pear, 4),
+        out["alleles"][al] = {"n_train_total": len(rows), "metric_fit_size": int((~test).sum()),
+                              "n_heldout": int(test.sum()), "heldout_pearson_r": round(pear, 4),
                               "heldout_auc_ic50_lt_500nM": round(a, 4), "bias": float(wf[-1]),
                               "weights": {str(i): {AA[j]: round(float(wf[i * 20 + j]), 5) for j in range(20)} for i in range(9)}}
         print(al, len(rows), "r=%.3f auc=%.3f" % (pear, a))

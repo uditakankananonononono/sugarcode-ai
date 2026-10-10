@@ -12,6 +12,8 @@ HYDROPHOBIC = set("AILMFWVY")
 
 
 _RIDGE = None
+_METRICS_CAVEAT = ("stored held-out r/AUC describe the 80%-fit model, not the shipped all-row model; "
+                  "stored source values, not validated performance")
 
 
 def hla_binding_trained(peptide: str, hla: str) -> dict:
@@ -20,6 +22,9 @@ def hla_binding_trained(peptide: str, hla: str) -> dict:
     Fitted by scripts/train_neohunter_pssm.py on the IEDB 2013 MHC-I benchmark
     (human, 9-mers, '=' measurements). Held-out Pearson r and AUC per allele are stored
     with the weights (data_pssm_iedb2013.json). Predicted IC50 = 50000**(1-score) nM.
+
+    WARNING (H11): the stored held-out r/AUC describe the 80%-fit model, NOT the shipped all-row
+    model whose weights make these predictions. They are stored source values, not validated performance. See "metrics_caveat" in the result and the top-level provenance in the JSON.
     """
     import json, math
     from pathlib import Path
@@ -39,7 +44,8 @@ def hla_binding_trained(peptide: str, hla: str) -> dict:
     cls = "strong binder" if ic50 < 50 else "weak binder" if ic50 < 500 else "non-binder"
     return {"peptide": p, "hla": hla, "score": round(score, 3), "predicted_ic50_nM": round(ic50, 1), "class": cls,
             "method": "ridge PSSM trained on IEDB 2013 measured IC50 (9-mers)",
-            "heldout_pearson_r": m["heldout_pearson_r"], "heldout_auc_ic50_lt_500nM": m["heldout_auc_ic50_lt_500nM"]}
+            "heldout_pearson_r": m["heldout_pearson_r"], "heldout_auc_ic50_lt_500nM": m["heldout_auc_ic50_lt_500nM"],
+            "metrics_caveat": _METRICS_CAVEAT}
 
 
 def hla_binding(peptide: str, hla: str) -> dict:
