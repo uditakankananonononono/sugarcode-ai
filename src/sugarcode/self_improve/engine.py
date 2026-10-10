@@ -44,6 +44,27 @@ _KIND_SAMPLES: dict[str, list] = {
 }
 
 
+class CommittedEffectAuditError(RuntimeError):
+    """Effect completed but its ledger append failed. Never blindly retry.
+
+    outcome contains bounded operation metadata. result_reference, for dispatch,
+    is the exact in-memory return object, not a serializable or durable receipt.
+    No source/result repr, conversion or serialization is attempted here.
+    """
+    committed = True
+    retry_safe = False
+
+    def __init__(self, *, operation, subject, approval_id, version, outcome,
+                 result_reference=None):
+        super().__init__("effect completed but audit append failed; do not retry")
+        self.operation = operation
+        self.subject = subject
+        self.approval_id = approval_id
+        self.version = version
+        self.outcome = outcome
+        self.result_reference = result_reference
+
+
 class InvalidLedgerValue(ValueError):
     """Ledger JSON is unsupported, ambiguous or bound to another module."""
 
@@ -207,8 +228,13 @@ class SelfImprovementEngine:
                 raise PermissionError("activation approval binding mismatch") from exc
             entry = self.registry.activate(candidate_key, approval_id=approval_id,
                                                    engine_gate_identity=gate_identity)
-            self._log("feature_activated", key=candidate_key, name=entry["file"],
-                      version=entry["version"], approval_id=approval_id)
+            try:
+                self._log("feature_activated", key=candidate_key, name=entry["file"],
+                          version=entry["version"], approval_id=approval_id)
+            except Exception as exc:
+                raise CommittedEffectAuditError(operation="activate", subject=candidate_key,
+                    approval_id=approval_id, version=entry["version"],
+                    outcome=dict(entry)) from exc
             return entry
 
     def rollback(self, feature_name: str, *, approval_id: str) -> dict[str, Any]:
@@ -235,7 +261,12 @@ class SelfImprovementEngine:
                 raise PermissionError("rollback approval version binding mismatch") from exc
             outcome = self.registry.rollback(feature_name, approval_id=approval_id,
                                              expected_active_version=pin, engine_gate_identity=gate_identity)
-            self._log("feature_rolled_back", **outcome)
+            try:
+                self._log("feature_rolled_back", **outcome)
+            except Exception as exc:
+                raise CommittedEffectAuditError(operation="rollback", subject=feature_name,
+                    approval_id=approval_id, version=outcome["rolled_back_from"],
+                    outcome=dict(outcome)) from exc
             return outcome
 
     def request_rollback(self, feature_name: str) -> str:
@@ -249,8 +280,15 @@ class SelfImprovementEngine:
         return approval_id
 
     def dispatch(self, feature_name: str, items: list, params: dict | None = None) -> dict:
-        result = self.registry.dispatch(feature_name, items, params)
-        self._log("feature_dispatched", feature=feature_name, item_count=len(items))
+        result, version = self.registry._dispatch_with_receipt(feature_name, items, params)
+        try:
+            self._log("feature_dispatched", feature=feature_name, item_count=len(items))
+        except Exception as exc:
+            raise CommittedEffectAuditError(operation="dispatch", subject=feature_name,
+                approval_id=None, version=version,
+                outcome={"feature": feature_name, "version": version,
+                         "result_available": True, "result_storage": "in_memory_only"},
+                result_reference=result) from exc
         return result
 
     # -- the autonomous loop ---------------------------------------------------
