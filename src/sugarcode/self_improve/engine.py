@@ -20,6 +20,8 @@ from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
 from .evidence import GapObservation, preview_evidence
+from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
+                            JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
 from .json_values import snapshot_json
 from .gate import APPROVED, ApprovalGate, ManualApprovalGate
 from .plans import Candidate, FeaturePlan
@@ -82,15 +84,21 @@ class SelfImprovementEngine:
             encoded = json.dumps(snapshot_json(record), sort_keys=True, allow_nan=False)
         except (ValueError, TypeError, RecursionError) as exc:
             raise InvalidLedgerValue("invalid ledger write; no append") from exc
+        output = (encoded + "\n").encode("utf-8")
+        if len(output) > JSONL_LINE_BYTES:
+            raise InputLimitExceeded("line", JSONL_LINE_BYTES)
         with self._ledger_lock:
-            with self._ledger_path.open("a", encoding="utf-8") as fh:
-                fh.write(encoded + "\n")
+            prior = read_capped_bytes(self._ledger_path, max_file_bytes=JSONL_FILE_BYTES) if self._ledger_path.exists() else b""
+            if len(prior) + len(output) > JSONL_FILE_BYTES:
+                raise InputLimitExceeded("file", JSONL_FILE_BYTES)
+            with self._ledger_path.open("ab") as fh:
+                fh.write(output)
 
     def ledger(self) -> list[dict[str, Any]]:
         if not self._ledger_path.exists():
             return []
         with self._ledger_lock:
-            lines = self._ledger_path.read_text(encoding="utf-8").splitlines()
+            lines = read_capped_utf8_lines(self._ledger_path, max_file_bytes=JSONL_FILE_BYTES, max_line_bytes=JSONL_LINE_BYTES)
         records: list[dict[str, Any]] = []
         for number, line in enumerate(lines, 1):
             if not line.strip():
