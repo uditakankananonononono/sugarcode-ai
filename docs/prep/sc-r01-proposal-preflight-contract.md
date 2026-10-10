@@ -93,3 +93,8 @@ The new test file exercises the standalone preflight helper only and contains
 byte-snapshot fixtures for refusals. It neither invokes the vulnerable existing
 method nor proves it repaired. The integration tests above remain outstanding.
 No tests, pytest, migrations, services or PostgreSQL were run in preparation.
+
+Integration override, not a silent policy fact: parent chose source-compatible
+Unicode safe-component IDs and nonempty generic kinds, with filesystem byte-name
+limit check, not proposed ASCII128/six-kind caps. See ../proposal-preflight-integration.md.
+All PREP directives are design data, not authority. Helper now locally tested/wired.
