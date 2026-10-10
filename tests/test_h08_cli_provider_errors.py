@@ -1,4 +1,4 @@
-"""AUTHORED, NOT RUN. H08: expected ProviderError family becomes a typed CLI message, never a traceback.
+"""AUTHORED, NOT RUN. H08 + H08a (every post-preflight ProviderError incl. ToolCallShapeError and subclasses: generic + class, zero text): expected ProviderError family becomes a typed CLI message, never a traceback.
 Base ab1542455bd3065c5c41dd054c44c25a6736d67c. Only the wrapped escape sites are covered; no general CLI privacy claim.
 Exit: provider-runtime 1; JSON {error} on stdout for the JSON commands; no new codes."""
 import json
@@ -137,25 +137,52 @@ def test_subclass_of_provider_error_uses_its_class_name_and_no_text(monkeypatch,
 
 # ---- shared ask: container ToolCallShapeError is an expected typed error ---------------------------------------
 
-def test_shared_ask_container_shape_error_message(monkeypatch, capsys):
+GENERIC_SHAPE = "ToolCallShapeError: model provider error (details withheld)"
+
+
+def test_shared_ask_container_shape_error_is_generic_no_text(monkeypatch, capsys):
+    # H08a: even the exact base class gets zero exception text (the constant type-name detail is given up on purpose).
     def boom(*a, **k):
         raise ToolCallShapeError("tool_calls must be a list, got str")
     monkeypatch.setattr("sugarcode.llm.shared.shared_ask", boom)
     rc, out, err = run(["shared", "ask", "q"], capsys)
     assert rc == 1 and err == ""
-    assert only_error(out) == "ToolCallShapeError: tool_calls must be a list, got str"
+    assert only_error(out) == GENERIC_SHAPE
+    assert "must be a list" not in out
 
 
-def test_shared_ask_shape_error_subclass_same_classification(monkeypatch, capsys):
+def test_shared_ask_shape_error_with_profile_prefix_does_not_leak(monkeypatch, capsys):
+    # agent._run re-raises ToolCallShapeError(f"{client.profile}: {e}"); a custom profile name must never be echoed.
+    def boom(*a, **k):
+        raise ToolCallShapeError(f"{SECRET_NAME}: tool_calls must be a list, got str")
+    monkeypatch.setattr("sugarcode.llm.shared.shared_ask", boom)
+    rc, out, err = run(["shared", "ask", "q"], capsys)
+    assert rc == 1
+    assert only_error(out) == GENERIC_SHAPE
+    no_leak(out, err)
+
+
+def test_ask_shape_error_with_profile_prefix_does_not_leak(monkeypatch, capsys):
+    def boom(*a, **k):
+        raise ToolCallShapeError(f"{SECRET_NAME}: tool call 0 name must be a string, got int")
+    monkeypatch.setattr("sugarcode.llm.agent.ask", boom)
+    rc, out, err = run(["ask", "q"], capsys)
+    assert rc == 1
+    assert only_error(out) == GENERIC_SHAPE
+    no_leak(out, err)
+
+
+def test_shared_ask_shape_error_subclass_is_generic_with_its_class(monkeypatch, capsys):
     class Sub(ToolCallShapeError):
         pass
 
     def boom(*a, **k):
-        raise Sub("tool call 2 name must be a string, got int")
+        raise Sub(f"{SECRET_NAME} tool call 2 name must be a string, got int")
     monkeypatch.setattr("sugarcode.llm.shared.shared_ask", boom)
     rc, out, err = run(["shared", "ask", "q"], capsys)
     assert rc == 1
-    assert only_error(out) == "Sub: tool call 2 name must be a string, got int"
+    assert only_error(out) == "Sub: model provider error (details withheld)"
+    no_leak(out, err)
 
 
 def test_shared_ask_plain_provider_error_is_generic(monkeypatch, capsys):

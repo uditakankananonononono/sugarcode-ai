@@ -96,15 +96,14 @@ def _emit(obj) -> int:
     return 0
 
 
-# H08 AUTHORED, NOT RUN. CLI-only handling of the expected ProviderError family from the model layer.
+# H08/H08a AUTHORED, NOT RUN. CLI-only handling of the expected ProviderError family from the model layer.
 # Disclosure rule (same as H04): echoable = field names, missing-field names, built-in constants, the item
-# index, the exception CLASS name, codec reasons. Never a profile/route/custom name, endpoint, env label or
-# body excerpt. A message is passed through (str) ONLY from these two classified sources:
-#   SAFE   _provider_preflight(): load_profiles() failures (the H04 loader boundary strings).
-#   SAFE   ToolCallShapeError (and subclasses): text is built only from constants, the index and
-#          type(x).__name__ (tool_call_shape.py 36-55).
-# Everything else (unknown route/profile, resolve errors, env labels, any ambiguous source) gets the fixed
-# generic text plus the class name, never the exception text.
+# index, the exception CLASS name, codec reasons. Never a profile/route name, custom name, endpoint, env label
+# or body excerpt. str(e) is passed through at EXACTLY ONE site:
+#   SAFE   _provider_preflight(): load_profiles() failures (the H04 loader's own boundary strings).
+# Every other ProviderError, INCLUDING ToolCallShapeError and any subclass (agent._run re-raises the exact base
+# class with a client.profile prefix, so class membership proves nothing about the text), gets the fixed
+# generic text plus the class name and ZERO exception text.
 # Caveat: preflight and the command each read os.environ; if the config changes in between, the worst case
 # is the generic message instead of the loader message. The distinction is message-only, not provenance.
 _PROVIDER_GENERIC = "model provider error (details withheld)"
@@ -121,10 +120,7 @@ def _provider_preflight() -> str | None:
 
 
 def _provider_failure(exc) -> str:
-    """Text for a ProviderError reached AFTER a passing preflight (or from the shared container check)."""
-    from .llm.tool_call_shape import ToolCallShapeError
-    if isinstance(exc, ToolCallShapeError):
-        return f"{type(exc).__name__}: {exc}"
+    """Text for any ProviderError reached AFTER a passing preflight: class name + fixed text, never str(exc)."""
     return f"{type(exc).__name__}: {_PROVIDER_GENERIC}"
 
 
@@ -288,7 +284,7 @@ def _cmd_shared(args) -> int:
         from .llm.providers import ProviderError
         try:
             res = shared.shared_ask(args.question, private=args.private, execute=not args.no_execute)
-        except ProviderError as exc:  # container ToolCallShapeError (SAFE text); any other subclass: generic
+        except ProviderError as exc:  # any ProviderError incl. ToolCallShapeError: generic + class
             _emit({"error": _provider_failure(exc)})
             return 1
         _emit(res)
