@@ -242,7 +242,17 @@ class ChatClient:
             return {"profile": self.profile, "ok": False, "error": f"HTTP {e.code}"}
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
             return {"profile": self.profile, "ok": False, "error": str(getattr(e, "reason", e))}
-        ids = [m.get("id", "") for m in data.get("data", [])]
+        if not isinstance(data, dict):  # valid JSON of the wrong shape: an error RESULT, never a raise (chat() raises instead)
+            return {"profile": self.profile, "ok": False,
+                    "error": f"malformed /models response: body is {type(data).__name__}, expected an object"}
+        members = data.get("data", [])
+        if not isinstance(members, list):
+            return {"profile": self.profile, "ok": False,
+                    "error": f"malformed /models response: data is {type(members).__name__}, expected a list"}
+        if not all(isinstance(m, dict) for m in members):
+            return {"profile": self.profile, "ok": False,
+                    "error": "malformed /models response: data has a member that is not an object"}
+        ids = [m.get("id", "") for m in members]
         out = {"profile": self.profile, "ok": True, "model": self.model,
                "model_listed": self.model in ids, "models_available": len(ids)}
         if "huggingface.co" in self.base_url:
