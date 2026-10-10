@@ -16,7 +16,8 @@ from pathlib import Path
 from typing import Any
 
 
-from .atomic_file import atomic_write_text
+from .atomic_file import AtomicDurabilityError, atomic_write_text
+from .proposal_preflight_r01 import preflight_proposal
 from .registry_validation import decode_registry_json, validate_registry_state, RegistryValidationError
 
 
@@ -60,24 +61,42 @@ class FeatureRegistry:
     # -- proposals ---------------------------------------------------------
     def save_proposal(self, key: str, *, name: str, kind: str, code: str,
                       test_code: str, gap_signature: str) -> dict[str, Any]:
-        cand_dir = self._contained(self._dir / "candidates")
-        cand_dir.mkdir(parents=True, exist_ok=True)
-        code_path = self._contained(cand_dir / f"{key}.py")
-        test_path = self._contained(cand_dir / f"{key}.test.py")
-        code_path.write_text(code, encoding="utf-8")
-        test_path.write_text(test_code, encoding="utf-8")
-        record = {
-            "name": name, "kind": kind, "gap_signature": gap_signature,
-            "code_sha256": hashlib.sha256(code.encode()).hexdigest(),
-            "test_sha256": hashlib.sha256(test_code.encode()).hexdigest(),
-            "code_file": str(code_path), "test_file": str(test_path),
-            "approval_id": None, "status": "proposed", "created_at": time.time(),
-        }
         with self._lock:
+            plan = preflight_proposal(self._dir, module_slug=self.module_slug,
+                key=key, name=name, kind=kind, code=code, test_code=test_code,
+                gap_signature=gap_signature, validate_registry=decode_registry_json)
             data = self._load()
-            data["proposals"][key] = record
-            self._save(data)
-        return record
+            if hashlib.sha256(self._path.read_bytes()).hexdigest() != plan.registry_sha256:
+                raise RegistryError("registry changed during proposal preflight")
+            plan.code_path.parent.mkdir(exist_ok=True)
+            created: list[Path] = []
+            committed = False
+            try:
+                for path, content in ((plan.code_path, plan.code_bytes), (plan.test_path, plan.test_bytes)):
+                    with path.open("xb") as stream:
+                        created.append(path)
+                        stream.write(content)
+                record = {
+                    "name": name, "kind": kind, "gap_signature": gap_signature,
+                    "code_sha256": plan.code_sha256, "test_sha256": plan.test_sha256,
+                    "code_file": str(plan.code_path), "test_file": str(plan.test_path),
+                    "approval_id": None, "status": "proposed", "created_at": time.time(),
+                }
+                data["proposals"][key] = record
+                try:
+                    self._save(data)
+                except AtomicDurabilityError:
+                    committed = True  # new registry is present; keep its candidate files
+                    raise
+                committed = True
+                return record
+            finally:
+                if not committed:
+                    for path in created:
+                        try:
+                            path.unlink()
+                        except OSError:
+                            pass
 
     def get_proposal(self, key: str) -> dict[str, Any]:
         proposal = self._load()["proposals"].get(key)
