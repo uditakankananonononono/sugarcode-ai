@@ -79,15 +79,39 @@ def _run_shared_call(call, index: int, offered: set) -> dict:
     return call_tool(f.name, f.arguments or {})
 
 
+# H10 AUTHORED, NOT RUN. Config-time failures of shared_config / Router.from_config, caught NARROWLY (not router.run, not chat):
+#   P1 config ValueError (echoes INSTINCT_PRODUCT), P2 lexical-file OSError / JSONDecodeError (ValueError subclass; also
+#   UnicodeDecodeError), P3 fit shape KeyError / TypeError / AttributeError. No catch-all; other classes propagate.
+_CONFIG_ERRORS = (ValueError, OSError, KeyError, TypeError, AttributeError)
+
+# H10: RouteAttempt.detail passes through ONLY for these five (outcome, detail) pairs, each a fixed literal in the vendored
+# router.py (81, 67, 70, 73 + RouteAttempt default at 33, 83). Everything else (every "error" outcome, which carries
+# str(exc)[:300] at router.py 78, and any unknown pair) gets ATTEMPT_DETAIL_WITHHELD alone: no class, no str-derived text.
+ATTEMPT_CONSTANT_PAIRS = (("escalated", "no tool call"), ("skipped", "not a tool-calling task"),
+                          ("skipped", "private task never goes to a hosted route"), ("unavailable", ""), ("ok", ""))
+ATTEMPT_DETAIL_WITHHELD = "details withheld"
+
+
+def _safe_attempt(a) -> dict:
+    d = dict(a.__dict__)
+    if (d.get("outcome"), d.get("detail")) not in ATTEMPT_CONSTANT_PAIRS:
+        d["detail"] = ATTEMPT_DETAIL_WITHHELD
+    return d
+
+
 def shared_ask(question: str, *, private: bool = False, execute: bool = True, router: Router | None = None,
                env: dict | None = None, k: int = 3) -> dict:
     tools, mods = shared_tools(question, k=k)
-    router = router or Router.from_config(shared_config(env))
+    if router is None:
+        try:
+            router = Router.from_config(shared_config(env))
+        except _CONFIG_ERRORS as exc:  # H10: class name only; no message, path, env value or __cause__ text
+            return {"ok": False, "config_error_class": type(exc).__name__}
     messages = [{"role": "system", "content": "You are SugarCode's copilot. Call one of the given tools when it answers the request."},
                 {"role": "user", "content": question}]
     res = router.run(Task(messages=messages, tools=tools, private=private))
     out = {"modules": mods, "tools_offered": [t["name"] for t in tools],
-           "attempts": [a.__dict__ for a in res.attempts], "ok": res.ok}
+           "attempts": [_safe_attempt(a) for a in res.attempts], "ok": res.ok}
     if not res.ok:
         out["error"] = "no configured model answered (see attempts); set INSTINCT_* env or HF_TOKEN"
         return out

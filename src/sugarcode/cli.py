@@ -287,6 +287,11 @@ def _cmd_shared(args) -> int:
         except ProviderError as exc:  # any ProviderError incl. ToolCallShapeError: generic + class
             _emit({"error": _provider_failure(exc)})
             return 1
+        if "config_error_class" in res:  # H10: class name only, H09-style fixed text, exit 1
+            from .llm.providers import setup_error_text
+            cls = res["config_error_class"]
+            _emit({"error": cls, "message": setup_error_text(cls)})
+            return 1
         _emit(res)
         return 0 if res.get("ok") else 1
     try:
