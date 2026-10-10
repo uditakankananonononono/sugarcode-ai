@@ -676,10 +676,17 @@ Vercel currently lists `typesafe-ai/jev` without Free Tier eligibility; the gate
 
 ### Self-improvement proposal commit boundary
 
-Proposal commits validate the complete prospective registry schema and its16MiB
+Proposal commits validate the complete prospective registry schema and its 16 MiB
 encoded byte cap before creating the candidates directory or code/test files.
 Corrupt-registry preflight errors now surface as `RegistryError` with the original
 `RegistryValidationError` cause (a deliberate exception-type change). Capacity or
 schema refusal leaves no new candidate files/directory; later IO failures can
 still leave an empty directory or hard-crash orphan files. This is in-process
 admission, not a cross-file transaction or external-writer race guarantee.
+
+Proposal metadata (`created_at`) is now captured before candidate files are
+written rather than after them, so it records proposal preparation time. The
+independent auditor saw 23 environment-dependent failures identical on base and
+candidate, with no new failures; those did not reproduce in the builder's
+1,065-passing selected run. Counts describe those environments, not universal
+compatibility.
