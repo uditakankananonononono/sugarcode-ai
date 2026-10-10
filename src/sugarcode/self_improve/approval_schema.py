@@ -140,9 +140,14 @@ def validate_payload(action_type: str, payload: Any) -> dict[str, Any]:
         want = ROLLBACK_PAYLOAD_KEYS
     else:
         raise ApprovalSchemaError("action_unknown")
+    if action_type == ROLLBACK_ACTION and "active_version_at_request" in payload:
+        pin = payload["active_version_at_request"]
+        if type(pin) is not int or pin <= 0:
+            raise ApprovalSchemaError("version_pin_type")
+        want = want | {"active_version_at_request"}
     if set(payload) != want:
         raise ApprovalSchemaError("payload_keys")
-    for key in want:
+    for key in want - {"active_version_at_request"}:
         if not _nonempty_str(payload[key]):
             raise ApprovalSchemaError("payload_field_type")
     if action_type == ACTIVATION_ACTION and not _SHA256.fullmatch(payload["code_sha256"]):
