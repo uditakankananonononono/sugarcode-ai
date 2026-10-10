@@ -107,7 +107,7 @@ def test_non_string_key_refused():
     ("requested_at", math.nan, "requested_at_type"),
     ("requested_at", math.inf, "requested_at_type"),
     ("decided_at", "2", "decided_at_type"), ("decided_at", math.nan, "decided_at_type"),
-    ("decided_by", "", "decided_by_type"), ("decided_by", 3, "decided_by_type"),
+    ("decided_by", "", "decided_by_type"), ("decided_by", False, "decided_by_type"), ("decided_by", 3, "decided_by_type"),
 ])
 def test_field_type_refused(field, value, code):
     with err(code):
@@ -278,3 +278,23 @@ def test_error_message_has_no_payload_values():
         require_approved(record(payload=p), act_exp())
     assert "SECRET-NAME" not in str(info.value)
     assert info.value.code == "name_mismatch"
+
+
+def test_decided_by_null_accepted_per_j04_contract():
+    r = record(decided_by=None)
+    assert validate_record(r) is r
+    require_approved(r, act_exp())
+
+
+def test_pending_with_null_decided_by_key_refused():
+    r = record(status="pending", decided_by=None)
+    with err("pending_has_decision"):
+        validate_record(r)
+
+
+def test_payload_read_back_from_json_roundtrip_still_binds():
+    import json
+    r = json.loads(json.dumps(record()))
+    require_approved(r, act_exp())
+    r2 = json.loads(json.dumps(rb_record()))
+    require_approved(r2, rb_exp())

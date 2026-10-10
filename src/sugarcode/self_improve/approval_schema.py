@@ -10,9 +10,10 @@ Scope: shape, status and action/module/candidate/hash/feature identity.
 This does NOT authenticate a human or whoever edited the file; a matching
 record proves only that the stored fields agree with the requested operation.
 
-Interface assumed from SC-J04 (peer-owned, not defined here): the caller hands
-in values that already passed the strict JSON boundary (exact builtins, finite
-numbers, unique keys). These checks still use exact type tests, so a
+Interface assumed from SC-J04 (peer-owned, read at main 35998c7, not defined
+here): the writer snapshots exact builtins only (tuples become arrays), finite
+numbers, string keys; the reader refuses duplicate keys and nonfinite numbers.
+J04 adds no semantic schema, so this module is the only shape check. These checks still use exact type tests, so a
 non-builtin subclass is refused rather than trusted.
 """
 from __future__ import annotations
@@ -110,7 +111,10 @@ def validate_record(record: Any, *, allow_unrecorded_decision: bool = False) -> 
     decided_at = record["decided_at"]
     if decided_at is not None and not _is_number(decided_at):
         raise ApprovalSchemaError("decided_at_type")
-    if "decided_by" in record and not _nonempty_str(record["decided_by"]):
+    # SC-J04 contract (peer, main 35998c7): decide(decided_by=None) is accepted
+    # and written as null, so null is a valid stored value; other types are not.
+    if ("decided_by" in record and record["decided_by"] is not None
+            and not _nonempty_str(record["decided_by"])):
         raise ApprovalSchemaError("decided_by_type")
     if status == PENDING:
         if decided_at is not None or "decided_by" in record:
