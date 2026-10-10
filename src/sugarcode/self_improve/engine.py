@@ -13,6 +13,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from .approval_schema import (ActivationExpectation, RollbackExpectation,
+                              ApprovalSchemaError, require_approved)
 from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
@@ -147,20 +149,31 @@ class SelfImprovementEngine:
         proposal = self.registry.get_proposal(candidate_key)
         if proposal.get("approval_id") != approval_id:
             raise PermissionError("approval id does not match this candidate's proposal")
-        decision = self.gate.decision(approval_id)
-        if decision != APPROVED:
-            raise PermissionError(
-                f"activation requires an approved gate decision, got {decision!r}")
+        source = getattr(self.gate, "record", None)
+        if not callable(source):
+            raise PermissionError("activation requires a full approval record source")
+        try:
+            require_approved(source(approval_id), ActivationExpectation(
+                self.module_id, self.module_slug, candidate_key, proposal["name"],
+                proposal["kind"], proposal["code_sha256"], proposal["gap_signature"]),
+                allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
+        except ApprovalSchemaError as exc:
+            raise PermissionError("activation approval binding mismatch") from exc
         entry = self.registry.activate(candidate_key, approval_id=approval_id)
         self._log("feature_activated", key=candidate_key, name=entry["file"],
                   version=entry["version"], approval_id=approval_id)
         return entry
 
     def rollback(self, feature_name: str, *, approval_id: str) -> dict[str, Any]:
-        decision = self.gate.decision(approval_id)
-        if decision != APPROVED:
-            raise PermissionError(
-                f"rollback requires an approved gate decision, got {decision!r}")
+        source = getattr(self.gate, "record", None)
+        if not callable(source):
+            raise PermissionError("rollback requires a full approval record source")
+        try:
+            require_approved(source(approval_id), RollbackExpectation(
+                self.module_id, self.module_slug, feature_name),
+                allow_unrecorded_decision=(type(self.gate) is ManualApprovalGate and self.gate._auto is True))
+        except ApprovalSchemaError as exc:
+            raise PermissionError("rollback approval binding mismatch") from exc
         outcome = self.registry.rollback(feature_name, approval_id=approval_id)
         self._log("feature_rolled_back", **outcome)
         return outcome
