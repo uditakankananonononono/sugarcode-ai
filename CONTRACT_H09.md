@@ -32,7 +32,7 @@ Not wrapped here: parse_route/unknown-route (H08 CLI catch), instinct_models Pro
 ## Per-command field table (ruling A)
 | Command | Success output fields | Error output fields (this unit) |
 |---|---|---|
-| models list | per profile: all ModelProfile fields except base_url_env/model_env (incl name, base_url, model) + ready, reason ("configured"), base_url, model, optional health | same key set; ready False, reason = generic. Name/base_url/model are the profile's declared values, as in success. |
+| models list | per profile: all ModelProfile fields except base_url_env/model_env (incl name, base_url, model) + ready, reason ("configured"), base_url, model, optional health | same key set; ready False, reason = generic. Name/base_url/model and api_key_env (an existing field, an env LABEL kept as in success output) are the profile's declared values, unchanged. Secrecy applies to `reason` only. |
 | models check | `profile`, `ok`, `model`, `model_listed`, `models_available` (+`token_valid`) | `profile`, `ok`, `error` (`error` is existing for health errors); error text generic or class-only |
 | ask | AskResult dict: answer, profile, modules, tools_offered, tool_calls, skipped_profiles, error | same keys; skipped_profiles / error carry generic text |
 | shared ask | unchanged (H08) | unchanged |
@@ -55,3 +55,8 @@ Other tests that mention these strings (grep): none beyond the 8 above.
 
 ## Claim limit
 Claimed: the sites in the classification table emit the classified text. Not claimed: runtime behavior, a CLI-wide privacy guarantee, or that anything passes.
+
+## Follow-up (stacked on 1f805f70f17a146f0f2358f708f45c5248ea1658): two test defects found by the peer audit
+1. `test_profile_status_reason_is_generic_and_fields_unchanged` asserted the env label absent from the whole row, but `api_key_env` is a retained success field. Now: reason-only secrecy, and `api_key_env`, `name`, `base_url`, `model` asserted present with their declared values.
+2. In test_h07a `test_unreachable_stays_a_string` my inline `# H09` comment swallowed `and out["ok"] is False and "error" not in out`. Restored as executable assertions.
+Actual chronology: both tests edited FIRST; no source change was needed or made; then this section. Nothing run.
