@@ -37,7 +37,7 @@ required. J02/J05/R01 pending branches not included; integration after their
 landings must preserve byte paths. Source PREP attribution 'J04 peer-owned' is
 historical incorrect text, not authority or current ownership.
 
-Independent VERIFIED caps verdict369PASS reproduced, SCOPED registry reconciliation.
+Combined registry reconciliation applies bounded byte reads before strict decoding.
 Landed reconciliation preserves J02 strict decoder after capped bytes; R01 raw
 preflight/generation reads capped as well. Combined boundary cases exact cap,
 one-over, strict duplicate JSON and oversize proposal preflight/no candidate IO.
@@ -49,3 +49,13 @@ Reconciliation correction: R01 helper itself had an uncapped read_bytes even
 though registry digest/_load were capped. Helper's raw registry acquisition now
 uses capped bytes BEFORE strict decoder too. Combined preflight probe targets
 that exact helper byte budget, no files before refusal. No exception normalization.
+
+Write-side residue: when an initially valid exactly-full registry cannot fit a new
+proposal, save_proposal may leave an EMPTY candidates directory after prospective
+registry byte-cap refusal (no new candidate files retained). The no-files/no-dirs
+probe above covers oversized INPUT before preflight, not prospective WRITE refusal.
+Directory creation/cross-file planning remains nontransactional, no stronger claim.
+Candidate activation read_text and dispatch code read_bytes are unbounded CODE-file
+reads outside declared state-byte scope, an explicit future unit not closed here.
+R01 regular-file lstat refuses registry FIFO before read on proposal-preflight path;
+other readers retain the earlier slow-file/FIFO risk.
