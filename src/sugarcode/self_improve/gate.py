@@ -8,6 +8,7 @@ service, so the file-backed manual gate is the production gate here.
 from __future__ import annotations
 
 import json
+import math
 import threading
 import time
 from pathlib import Path
@@ -15,6 +16,30 @@ from typing import Any, Protocol
 from uuid import uuid4
 
 PENDING, APPROVED, REJECTED = "pending", "approved", "rejected"
+
+
+class InvalidApprovalState(ValueError):
+    """Stored gate JSON is ambiguous or outside the supported JSON domain."""
+
+
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise InvalidApprovalState("duplicate approval object key")
+        result[key] = value
+    return result
+
+
+def _reject_constant(value: str) -> Any:
+    raise InvalidApprovalState("nonfinite approval number")
+
+
+def _finite_float(value: str) -> float:
+    result = float(value)
+    if not math.isfinite(result):
+        raise InvalidApprovalState("nonfinite approval number")
+    return result
 
 
 class ApprovalGate(Protocol):
@@ -40,7 +65,16 @@ class ManualApprovalGate:
             self._path.write_text("{}", encoding="utf-8")
 
     def _load(self) -> dict[str, Any]:
-        return json.loads(self._path.read_text(encoding="utf-8"))
+        try:
+            data = json.loads(self._path.read_text(encoding="utf-8"),
+                              object_pairs_hook=_unique_object,
+                              parse_constant=_reject_constant,
+                              parse_float=_finite_float)
+            if type(data) is not dict:
+                raise InvalidApprovalState("approval state must be an object")
+            return data
+        except (ValueError, TypeError, RecursionError) as exc:
+            raise InvalidApprovalState("invalid stored approval JSON; repair required") from exc
 
     def _save(self, data: dict[str, Any]) -> None:
         self._path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
