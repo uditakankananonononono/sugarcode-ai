@@ -33,3 +33,12 @@ child code writing adversarial stdout directly and exiting0, bypassing launcher:
 NaN/duplicate result/nested duplicate/1e999/BOM/lone-surrogate all refused. This
 reproduces the dispatch boundary here, not a universal production containment
 claim. Independent verdict required. No in-flight F01/ledger changes included.
+
+Independent verdict relayed2026-10-10: VERIFIED parent-stdout boundary; SCOPED
+residue. Verifier reproduced249 PASS/no skips, including actual six hostile-child
+cases and extra decode probes. Default integer bound remains interpreter-dependent:
+older interpreters without conversion limit can parse roughly1MiB of digits with
+quadratic cost, bounded only by read cap, NOT refused early by this decoder.
+Full1MiB is read then decoded; timeouts/IO/MemoryError remain outside typed codec
+errors. str input refused intentionally. Depth-root0 correspondence is documented,
+not an independently derived cross-module schema equivalence claim.
