@@ -72,3 +72,7 @@ cap+1, descriptor closure on limit and IO error, custom strings, independent pai
 caps, no partial output, snapshot survives later path replacement, and six real
 P01-generated code/test pairs with proposed limits. Normal code paths remain
 unwired. Test suite results/denominators in packet; independent verdict required.
+
+Production caller integration is now described in source-snapshot-wiring.md.
+Historical base/unwired/proposed-only statements above describe original helper
+landing, not the later integration. Approved caller code/test caps are 1 MiB each.

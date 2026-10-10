@@ -690,3 +690,16 @@ independent auditor saw 23 environment-dependent failures identical on base and
 candidate, with no new failures; those did not reproduce in the builder's
 1,065-passing selected run. Counts describe those environments, not universal
 compatibility.
+### Source admission and snapshot execution
+
+Self-improvement proposal, evaluation, activation and dispatch source now has a
+1MiB code /1MiB test UTF8 byte admission ceiling. Over-limit or final-symlink/
+nonregular source files refuse. Activation copies verified snapshot bytes;
+dispatch executes the verified snapshot instead of reopening source through the
+loader. It remains in-process execution, not host-effect isolation. Activation's
+hash behavior deliberately changes from newline-normalized text to raw UTF8 bytes,
+matching proposal checksums and preserving CRLF code. Existing LF code keeps its
+hash. Byte admission is not a CPU/RSS/timeout budget; external-writer/ancestor-path
+races and cross-file crash transactions remain outside this boundary. Existing
+source-admission helper was previously unwired; these real caller changes are the
+separate production integration, not retroactive closure of the earlier helper.
