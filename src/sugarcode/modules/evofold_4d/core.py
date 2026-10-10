@@ -89,10 +89,12 @@ def transition_trace(coords: list[list[float]], mode_index: int = 0,
     # rebuild the chosen mode direction
     n = len(C)
     H = np.zeros((3 * n, 3 * n))
+    # Each contact once (j > i), matching anm_modes: ordered pairs visited both
+    # (i, j) and (j, i), doubling every diagonal super-element (H12).
     for i in range(n):
-        for j in range(n):
+        for j in range(i + 1, n):
             kij = K[i, j]
-            if i == j or kij == 0:
+            if kij == 0:
                 continue
             rij = C[j] - C[i]
             dist = np.linalg.norm(rij)
