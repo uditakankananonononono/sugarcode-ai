@@ -765,3 +765,15 @@ nonregular/refused reads, bound at 10,000 entries. Evidence-now is not permissio
 No all-files-atomic, no exact-once, no tamperproof registry. This is not a cross-
 file recovery journal, Windows route or hostile-editor/ancestor-race protection.
 Real process-kill stage tests do not prove power-loss behavior of every filesystem.
+
+### Isolated evaluator output parity
+
+IsolatedRunner now uses the same bounded observed-output pipes as native evaluation:
+1 MiB per stream plus a refusal byte, explicit overflow flags/reason and process-
+group cleanup. Its diagnostic tail deliberately changes from 4,000 Unicode
+characters to 4,000 BYTES. Observed-vs-attempted-bytes distinction: this counts bytes
+read by the parent, not all bytes the child tried to emit. Existing isolated actual
+exit code is preserved on timeout. RLIMIT_FSIZE still applies to candidate regular
+files; namespace/mount/containment probe behavior stays unchanged, no fallback.
+Probe buffering and isolated dispatch files are outside this repair. This is output
+semantic consistency, not full-system containment or a general RSS/CPU guarantee.
