@@ -28,9 +28,12 @@ Not allowlisted: every "error" outcome (router.py:78 `RouteAttempt(p.name, "erro
 Wraps exactly `Router.from_config(shared_config(env))`. Catches `(ValueError, OSError, KeyError, TypeError, AttributeError)`; returns `{"ok": False, "config_error_class": type(exc).__name__}`.
 | site | class | receipt |
 |---|---|---|
-| P1 shared.py `shared_config` product check | ValueError (echoes INSTINCT_PRODUCT); also config.py:47, 56, 58 ValueError/JSONDecodeError | shared.py ~line 45-47; config.py:47 |
-| P2 lexical file read/parse | OSError, JSONDecodeError (ValueError), UnicodeDecodeError | lexical.py `from_jsonl` (read_text, json.loads); router.py:57-58; config.py:51 read_text |
+| P1 shared.py `shared_config` product check | ValueError (echoes INSTINCT_PRODUCT) | shared.py:46 `raise ValueError(f"INSTINCT_PRODUCT is {cfg.product!r}; ...")`; also config.py:47 (`ProductConfig.__post_init__`, `raise ValueError(f"product must be one of ...")`) fires first when INSTINCT_PRODUCT is not in PRODUCTS (config.py:26) |
+| P2 lexical file read/parse | OSError, JSONDecodeError (ValueError), UnicodeDecodeError | lexical.py `from_jsonl` (`Path(path).read_text()`, `json.loads`), reached via router.py:57-58 when INSTINCT_LEXICAL_TRAIN_JSONL is set |
 | P3 `LexicalToolModel.fit` | KeyError (r["query"], ["name"]), TypeError, AttributeError (`.items()`) | lexical.py `fit` |
+
+UNREACHABLE findings (peer-required correction; NOT reachable proofs): the config-FILE routes in config.py `_load_file` - `Path(path).read_text()` (config.py:51), the PyYAML ValueError (config.py:56) and `json.loads(text)` (config.py:58). `shared_ask` -> `shared_config(env)` -> `load_config(e, None)` passes path None, and `load_config` calls `_load_file` only under `if path:`. An earlier version of this contract listed 51/56/58 as P1/P2 receipts; that is withdrawn. Original H10 commit 4eeab7bc is preserved; this is a stacked follow-up (H10f).
+NOTE for the peer (not decided by me): the relay grouped "config.py 47" with the file routes. config.py:47 is the `__post_init__` product check, not a file route, and is reachable via env INSTINCT_PRODUCT by source read (unrun). I kept it as a reachable P1 site beside shared.py:46, per your instruction to keep the product check; say so if you want 47 dropped.
 `router.run` and `chat` are NOT inside the try. A passed router bypasses config.
 
 ## Shapes
@@ -40,7 +43,7 @@ Wraps exactly `Router.from_config(shared_config(env))`. Catches `(ValueError, OS
 ## Behavior changes
 1. Config failures that used to propagate as tracebacks from `shared ask` now return the class shape (API) / JSON + exit 1 (CLI).
 2. Attempt `detail` is withheld for error and unknown pairs.
-3. `router or ...` became `if router is None`: a passed router object that is falsy no longer triggers config load (edge change).
+3. DELIBERATE, peer-approved semantics fix: `router or Router.from_config(...)` became `if router is None`. A falsy injected router is now respected (old code discarded it and loaded config). Not a silent repair. Pinned by test_falsy_injected_router_is_used_not_replaced_by_config (a router whose __bool__ returns False; the old router-or-default code would replace it and the test's config boom would fail). Added test-first in H10f; 4eeab7bc had only a truthy-router test (test_passed_router_skips_config_entirely), which did not pin this.
 4. `shared ask` behavior for a caught config error now exits 1 with stdout JSON.
 
 ## Findings only (NOT fixed, no catch-all)
@@ -59,3 +62,6 @@ RUN: git/diff/sha tooling only. NOT RUN: all tests, imports, compilation. Test a
 
 ## Claim limit
 Authored only. Not tested, not working, not a general privacy claim. Covers only the listed sites and the shared_ask attempts detail.
+
+## H10f chronology (IST)
+15:28:3x falsy-router test added to tests/test_h10_shared_boundary.py FIRST, then this contract corrected. No source change. Nothing run. Authority: Main's relay of peer rulings, not independently authenticated by me. Mutant claim (router-or-default fails the new test) is by reading, unrun.
