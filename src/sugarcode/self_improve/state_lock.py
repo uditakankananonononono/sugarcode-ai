@@ -87,9 +87,11 @@ class StateLock:
             self._fd, self._depth = fd, 1
             return self
         except BaseException:
-            if fd is not None:
-                os.close(fd)
-            self._thread_lock.release()
+            try:
+                if fd is not None:
+                    os.close(fd)
+            finally:
+                self._thread_lock.release()
             raise
 
     def __exit__(self, *exc) -> None:
