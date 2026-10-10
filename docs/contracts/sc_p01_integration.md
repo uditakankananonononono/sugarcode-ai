@@ -42,3 +42,8 @@ it and parity test. Default _PARAMETERS remains module-visible mutable state, th
 revalidated every public entry; not tamper-proof. Low-level candidate/registry APIs
 remain trusted, no forced domain validation of handwritten candidates here.
 Independent verdict required, no landing claimed.
+
+Independent VERIFIED newly-generated template domain verdict573PASS reproduced.
+Compile validation accepts expensive regex (a+)+$, NO ReDoS/runtime budget claim.
+No item/allocation or concurrent mutation cap; no migration of active versions.
+No mutation testing. Historical PREP doc corrected before source landing.
