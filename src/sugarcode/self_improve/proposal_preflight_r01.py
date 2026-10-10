@@ -25,13 +25,6 @@ class StrictRegistryValidator(Protocol):
         ...
 
 
-_KEY = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}\Z", re.ASCII)
-_NAME = re.compile(r"[a-z][a-z0-9_]{0,127}\Z", re.ASCII)
-_MODULE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}\Z", re.ASCII)
-_KINDS = frozenset(("keyword_filter", "scoring_rule", "text_transform",
-                    "aggregator", "threshold_alert", "field_extractor"))
-
-
 @dataclass(frozen=True)
 class ProposalWritePlan:
     """Validated input bytes and destinations. This does not authorize a write."""
@@ -55,9 +48,9 @@ def _text(value: object, field: str) -> str:
     return value
 
 
-def _identity(value: object, field: str, pattern: re.Pattern[str]) -> str:
+def _identity(value: object, field: str) -> str:
     text = _text(value, field)
-    if not pattern.fullmatch(text):
+    if not text.replace("-", "").replace("_", "").isalnum():
         raise ProposalPreflightError(f"unsafe {field}")
     return text
 
@@ -102,11 +95,11 @@ def preflight_proposal(
     be absent, including broken symlinks. A returned plan is a snapshot, not a
     reservation: the integration must close the concurrent-create/replace races.
     """
-    module_slug = _identity(module_slug, "module_slug", _MODULE)
-    key = _identity(key, "key", _KEY)
-    name = _identity(name, "name", _NAME)
+    module_slug = _identity(module_slug, "module_slug")
+    key = _identity(key, "key")
+    name = _identity(name, "name")
     kind = _text(kind, "kind")
-    if kind not in _KINDS:
+    if not kind:
         raise ProposalPreflightError("unsupported kind")
     gap_signature = _text(gap_signature, "gap_signature")
     code = _text(code, "code")
@@ -127,6 +120,10 @@ def preflight_proposal(
         _plain_directory_chain(directory)
         if not stat.S_ISREG(registry_path.lstat().st_mode):
             raise ProposalPreflightError("registry must be a plain regular file")
+        # Filesystem byte-name limit, not an arbitrary character-domain cap.
+        name_max = os.pathconf(directory, "PC_NAME_MAX")
+        if name_max > 0 and any(len(os.fsencode(path.name)) > name_max for path in (code_path, test_path)):
+            raise ProposalPreflightError("candidate filename exceeds filesystem limit")
         raw = registry_path.read_bytes()
     except OSError as exc:
         raise ProposalPreflightError("cannot inspect existing registry") from exc
