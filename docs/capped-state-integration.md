@@ -44,3 +44,8 @@ one-over, strict duplicate JSON and oversize proposal preflight/no candidate IO.
 Registry read cap maps RegistryError with InputLimitExceeded cause; JSONL direct
 ValueError subclass. Existing _log can fail after other state mutation (J01 residue).
 No RSS/CPU, FIFO timeout, path authority, writer race or corruption repair claim.
+
+Reconciliation correction: R01 helper itself had an uncapped read_bytes even
+though registry digest/_load were capped. Helper's raw registry acquisition now
+uses capped bytes BEFORE strict decoder too. Combined preflight probe targets
+that exact helper byte budget, no files before refusal. No exception normalization.
