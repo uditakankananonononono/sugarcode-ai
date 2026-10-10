@@ -7,6 +7,7 @@ registry transaction/crash/revoke races; no host effect authorization claim.
 import hashlib,json,math,os,signal,subprocess,sys,tempfile
 from pathlib import Path
 from .isolation import IsolatedRunner,IsolationUnavailable
+from .isolated_result_codec import decode_child_result
 
 _LAUNCHER='''import resource,json,sys,importlib.util,contextlib
 resource.setrlimit(resource.RLIMIT_AS,(536870912,536870912))
@@ -45,6 +46,4 @@ def dispatch(registry,name,items,params=None,*,timeout_seconds=10):
                 child.wait();raise TimeoutError('isolated dispatch timeout')
             stdout.seek(0);raw=stdout.read(1_048_577)
             if child.returncode or len(raw)>1_048_576:raise RuntimeError('isolated feature failed or result exceeded cap')
-            result=json.loads(raw)
-            if not isinstance(result,dict) or set(result)!={'result'}:raise ValueError('invalid result protocol')
-            return result['result']
+            return decode_child_result(raw)
