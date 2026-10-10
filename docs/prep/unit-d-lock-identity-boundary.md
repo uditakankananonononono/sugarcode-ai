@@ -102,10 +102,19 @@ No reverse nested registry -> gate path was found in the inspected methods.
 Custom gate implementations must meet the protocol; a stable identity string
 alone cannot prove that they actually coordinate. Ledger locking is separate.
 
-Existing test_state_lock_integration.py contains kind='generic' proposal fixtures;
-the pinned preflight permits six kinds and rejects generic. Their apparent
-lock-focused intent does not make those fixtures executable evidence. No existing
-test was changed or executed; new tests focus on independent lock fixtures.
+Existing test_state_lock_integration.py contains kind='generic' proposal fixtures.
+Pinned proposal_preflight_r01.py lines 103-105 checks an exact string and rejects
+EMPTY kind only; it does not reject generic. The six-kind restriction belongs to
+FeaturePlan.__post_init__ in plans.py lines 24-26, not direct registry preflight.
+This pinned source evidence supersedes the earlier incorrect six-kind-preflight
+claim in this report and the preparation status message. Separate new lock
+fixtures remain useful for isolation, not a nonexistent generic-preflight refusal.
+No existing test was changed or executed during this preparation.
+
+Peer audit reports 20/20 new cases and 19 existing state_lock cases passed, plus a
+real save_proposal with generic kind accepted and persisted. These are attributed
+peer execution reports, not locally executed or independently rechecked results.
+This docs-only correction preserves all authored tests unchanged.
 
 ## DESIGN choices requiring later approval and audit
 
