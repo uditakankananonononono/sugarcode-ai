@@ -1,0 +1,56 @@
+{
+  "environment": {
+    "decimal_precision": 80,
+    "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+    "rounding": "ROUND_HALF_EVEN"
+  },
+  "qualifiers": [
+    "controlled existing sqrt dependency sequence, not physical RMSD",
+    "current required product source not yet locally available",
+    "tests not authored or executed; peer adjudication pending"
+  ],
+  "raw_nonnegative_rmsd_inputs": [
+    "0.03125",
+    "0.09375",
+    "0.0625",
+    "0.03125"
+  ],
+  "rounded4_rmsd_trace": [
+    "0.0312",
+    "0.0938",
+    "0.0625",
+    "0.0312"
+  ],
+  "rounded_trace_aggregates": {
+    "first": "0.0312",
+    "last": "0.0312",
+    "max": "0.0938",
+    "mean": "0.054675",
+    "min": "0.0312",
+    "sum": "0.2187"
+  },
+  "second_case": {
+    "raw_nonnegative_rmsd_inputs": [
+      "0.09375",
+      "0.03125",
+      "0.0625",
+      "0.09375"
+    ],
+    "rounded4_rmsd_trace": [
+      "0.0938",
+      "0.0312",
+      "0.0625",
+      "0.0938"
+    ],
+    "rounded_trace_aggregates": {
+      "first": "0.0938",
+      "last": "0.0938",
+      "max": "0.0938",
+      "mean": "0.070325",
+      "min": "0.0312",
+      "sum": "0.2813"
+    }
+  },
+  "source_base_required": "9a6b93805f31d3b9df77b7a031d58b726a5c4bc0",
+  "status": "H24 builder arithmetic freeze, not third-party or product output"
+}
