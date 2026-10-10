@@ -1,4 +1,4 @@
-"""AUTHORED, NOT RUN. Approval record schema/binding helper (SC-J05 prep)."""
+"""Peer-authored PREP, locally run after fixture corrections. Approval record schema/binding helper (SC-J05 prep)."""
 import copy
 import math
 

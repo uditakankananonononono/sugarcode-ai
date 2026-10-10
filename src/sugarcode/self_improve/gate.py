@@ -101,7 +101,6 @@ class ManualApprovalGate:
                 "requested_at": time.time(), "decided_at": None,
             }
             try:
-            try:
                 validate_record(data[approval_id], allow_unrecorded_decision=self._auto)
             except ApprovalSchemaError as exc:
                 raise InvalidApprovalState("invalid approval record schema") from exc

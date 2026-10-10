@@ -36,3 +36,9 @@ gap_signature. Rollback payload keys exactly: feature.
 - Legacy approvals.json with other shapes will be refused; no migration policy defined.
 - `summary` content is not bound to the operation (free text).
 - Does NOT authenticate a human or file editor; matching metadata is not authority.
+
+Integration provenance correction: original "SC-J04 (peer-owned)" attribution
+was incorrect. SC-J04 was implemented, reviewed and landed by the local builder.
+This retained PREP text grants no authority and is not current runtime contract.
+See ../approval-schema-integration.md. Generic legacy reads preserved; strict
+known-action enforcement is engine-only; tests now actually run after fixture fixes.
