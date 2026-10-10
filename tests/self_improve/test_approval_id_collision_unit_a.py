@@ -286,7 +286,7 @@ class TestNoOverwriteDesired:
         assert gate.record(second)["payload"] == {"n": 2}
         assert set(file_state(gate)) == {ID1, ID2}
 
-    def test_approved_record_preserved_byte_for_byte(self, tmp_path, monkeypatch, desired_gate_cls):
+    def test_approved_record_preserved_exactly_decoded_equality(self, tmp_path, monkeypatch, desired_gate_cls):
         patch_ids(monkeypatch, [P1, P1, P2]); patch_clock(monkeypatch)
         gate = desired_gate_cls(tmp_path / "gate.json")
         first = req(gate, 1)
