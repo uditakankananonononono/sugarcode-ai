@@ -67,7 +67,10 @@ def test_profile_status_reason_is_generic_and_fields_unchanged():
     assert bad["ready"] is False and bad["reason"] == GEN
     assert set(bad) == set(good)            # same keys in error and success rows (name/base_url/model stay as before)
     assert good["ready"] is True and good["reason"] == "configured"
-    assert SECRET_ENV not in json.dumps(bad) and "needs" not in bad["reason"]
+    # secrecy is about the REASON only; api_key_env is an existing success-row field and is kept with its declared value
+    assert SECRET_ENV not in bad["reason"] and SECRET_NAME not in bad["reason"] and "needs" not in bad["reason"]
+    assert bad["api_key_env"] == SECRET_ENV
+    assert bad["name"] == SECRET_NAME and bad["base_url"] == NEEDS_KEY["base_url"] and bad["model"] == "m"
 
 
 # ---- ask(): AskResult.skipped / error ----
