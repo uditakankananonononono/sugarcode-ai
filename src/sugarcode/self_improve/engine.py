@@ -142,9 +142,12 @@ class SelfImprovementEngine:
         self._log("gap_event_recorded", signature=signature, kind=kind)
         return event
 
-    def detect_gaps(self) -> list[CapabilityGap]:
-        gaps = [g for g in self.detector.detect(self.module_slug)
+    def _open_gaps(self) -> list[CapabilityGap]:
+        return [g for g in self.detector.detect(self.module_slug)
                 if not self.registry.covers_gap(g.signature)]
+
+    def detect_gaps(self) -> list[CapabilityGap]:
+        gaps = self._open_gaps()
         for gap in gaps:
             self._log("gap_detected", signature=gap.signature,
                       occurrences=gap.occurrences, severity=gap.severity)
@@ -317,11 +320,26 @@ class SelfImprovementEngine:
         return report
 
     def status(self) -> dict[str, Any]:
+        """Inspection without logging. Independent reads, not an atomic snapshot.
+
+        Cooperating log reads may create advisory sidecars; state bytes are not
+        rewritten. Invalid history still refuses rather than reporting healthy.
+        """
+        events = self.store.all(self.module_slug)
+        registry = self.registry._load()
+        ledger = self.ledger()
+        covered = {
+            v["gap_signature"] for feature in registry["features"].values()
+            for v in feature["versions"]
+        }
+        covered.update(p["gap_signature"] for p in registry["proposals"].values()
+                       if p["status"] in ("proposed", "activated"))
+        gaps = self.detector._detect_events(self.module_slug, events)
         return {
             "module": self.module_slug,
-            "gap_events": len(self.store.all(self.module_slug)),
-            "open_gaps": [g.signature for g in self.detect_gaps()],
-            "features": self.registry.features(),
-            "proposals": self.registry.proposals(),
-            "ledger_events": len(self.ledger()),
+            "gap_events": len(events),
+            "open_gaps": [g.signature for g in gaps if g.signature not in covered],
+            "features": registry["features"],
+            "proposals": registry["proposals"],
+            "ledger_events": len(ledger),
         }
