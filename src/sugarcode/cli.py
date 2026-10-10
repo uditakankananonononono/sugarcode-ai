@@ -96,6 +96,38 @@ def _emit(obj) -> int:
     return 0
 
 
+# H08 AUTHORED, NOT RUN. CLI-only handling of the expected ProviderError family from the model layer.
+# Disclosure rule (same as H04): echoable = field names, missing-field names, built-in constants, the item
+# index, the exception CLASS name, codec reasons. Never a profile/route/custom name, endpoint, env label or
+# body excerpt. A message is passed through (str) ONLY from these two classified sources:
+#   SAFE   _provider_preflight(): load_profiles() failures (the H04 loader boundary strings).
+#   SAFE   ToolCallShapeError (and subclasses): text is built only from constants, the index and
+#          type(x).__name__ (tool_call_shape.py 36-55).
+# Everything else (unknown route/profile, resolve errors, env labels, any ambiguous source) gets the fixed
+# generic text plus the class name, never the exception text.
+# Caveat: preflight and the command each read os.environ; if the config changes in between, the worst case
+# is the generic message instead of the loader message. The distinction is message-only, not provenance.
+_PROVIDER_GENERIC = "model provider error (details withheld)"
+
+
+def _provider_preflight() -> str | None:
+    """None if the profile config loads; else the SAFE H04 loader message. Only ProviderError is caught."""
+    from .llm.providers import ProviderError, load_profiles
+    try:
+        load_profiles()
+    except ProviderError as exc:
+        return str(exc)
+    return None
+
+
+def _provider_failure(exc) -> str:
+    """Text for a ProviderError reached AFTER a passing preflight (or from the shared container check)."""
+    from .llm.tool_call_shape import ToolCallShapeError
+    if isinstance(exc, ToolCallShapeError):
+        return f"{type(exc).__name__}: {exc}"
+    return f"{type(exc).__name__}: {_PROVIDER_GENERIC}"
+
+
 def _cmd_splice_assess(args) -> int:
     return _emit(live_splice_assessment(args.gene, args.notation,
                                         offline=args.offline,
@@ -183,13 +215,29 @@ def _cmd_pwm_score(args) -> int:
 
 
 def _cmd_models_list(args) -> int:
-    from .llm.providers import profile_status
-    return _emit(profile_status(probe=args.probe, allow_paid=args.allow_paid or None))
+    from .llm.providers import ProviderError, profile_status
+    bad = _provider_preflight()
+    if bad is not None:
+        _emit({"error": bad})
+        return 1
+    try:
+        return _emit(profile_status(probe=args.probe, allow_paid=args.allow_paid or None))
+    except ProviderError as exc:
+        _emit({"error": _provider_failure(exc)})
+        return 1
 
 
 def _cmd_models_check(args) -> int:
     from .llm.providers import ProviderError, parse_route, resolve
-    names = [args.profile] if args.profile else parse_route()
+    bad = _provider_preflight()
+    if bad is not None:  # config failure is top-level, not a fake per-profile row
+        _emit({"error": bad})
+        return 1
+    try:
+        names = [args.profile] if args.profile else parse_route()
+    except ProviderError as exc:  # unknown route names: UNSAFE source, generic text only
+        _emit({"error": _provider_failure(exc)})
+        return 1
     out = []
     for n in names:
         try:
@@ -219,8 +267,17 @@ def _cmd_tool(args) -> int:
 
 def _cmd_ask(args) -> int:
     from .llm.agent import ask
-    res = ask(args.question, profile=args.profile, route=args.route, model=args.model,
-              allow_paid=args.allow_paid or None)
+    from .llm.providers import ProviderError
+    bad = _provider_preflight()
+    if bad is not None:
+        _emit({"error": bad})
+        return 1
+    try:
+        res = ask(args.question, profile=args.profile, route=args.route, model=args.model,
+                  allow_paid=args.allow_paid or None)
+    except ProviderError as exc:  # e.g. unknown --route names escaping resolve_route: generic text only
+        _emit({"error": _provider_failure(exc)})
+        return 1
     _emit(res.to_dict())
     return 0 if res.answer else 1
 
@@ -228,7 +285,12 @@ def _cmd_ask(args) -> int:
 def _cmd_shared(args) -> int:
     from .llm import shared
     if args.sub == "ask":
-        res = shared.shared_ask(args.question, private=args.private, execute=not args.no_execute)
+        from .llm.providers import ProviderError
+        try:
+            res = shared.shared_ask(args.question, private=args.private, execute=not args.no_execute)
+        except ProviderError as exc:  # container ToolCallShapeError (SAFE text); any other subclass: generic
+            _emit({"error": _provider_failure(exc)})
+            return 1
         _emit(res)
         return 0 if res.get("ok") else 1
     try:
