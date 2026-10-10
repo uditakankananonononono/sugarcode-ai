@@ -41,8 +41,11 @@ test_strict_gap_json 1, test_mixin_wiring 1); none in BED paths; the new
 test passed within the run. OBSERVATION ONLY, not a verified cause:
 tracebacks show isolated/sandbox child processes exiting with "No module
 named pytest"; the ruled install placed pytest in the user site, which
-isolated children may not inherit. Accepted as-is under parent ruling (a);
-no venv/PYTHONPATH/install corrective was permitted or taken. Selected,
+isolated children may not inherit. Author CONTINUATION with this
+caveat disclosed was authorized by parent ruling (a); that ruling is
+NOT peer audit acceptance, and the wider result stands as 38 failed,
+not a pass. No venv/PYTHONPATH/install corrective was permitted or
+taken. Selected,
 not global suite; XFAILs are not implemented repairs.
 Restored-adjacent after mutants: 16P/.48s.
 Four independent new-only mutants on src/sugarcode/bio/bed.py, each applied
