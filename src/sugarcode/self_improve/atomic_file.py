@@ -1,4 +1,4 @@
-"""Single-file atomic replacement helper (SC-F01 prep, additive, not wired).
+"""Single-file atomic replacement helper, integrated after local verification.
 
 Contract
 --------
@@ -59,6 +59,7 @@ class _Ops:
     open = staticmethod(os.open)
     write = staticmethod(os.write)
     fsync = staticmethod(os.fsync)
+    fchmod = staticmethod(os.fchmod)
     close = staticmethod(os.close)
     replace = staticmethod(os.replace)
     unlink = staticmethod(os.unlink)
@@ -89,12 +90,15 @@ def atomic_write_bytes(path: Path | str, data: bytes, *, mode: int | None = None
         info = None
     if info is not None and not stat.S_ISREG(info.st_mode):
         raise AtomicWriteError(f"refusing non-regular target {target}")
+    preserve_mode = mode is None and info is not None
     if mode is None:
         mode = stat.S_IMODE(info.st_mode) if info is not None else 0o600
     temp = directory / f".{target.name}.{uuid.uuid4().hex}.tmp"
     fd = ops.open(str(temp), os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
     fd_open = True
     try:
+        if preserve_mode:
+            ops.fchmod(fd, mode)  # os.open alone would mask old bits through umask
         view = memoryview(data)
         while view:
             written = ops.write(fd, view)
