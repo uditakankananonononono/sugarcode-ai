@@ -262,3 +262,18 @@ def replay_retention_plan(*, manifest_json: bytes, active_json: bytes,
         return state
     except (KeyError, TypeError, ValueError, RecursionError, OverflowError) as exc:
         raise InvalidRetentionPlan("retrieval integrity check failed") from exc
+
+
+def prepare_current_policy_plan(state: dict[str, Any], *, archive_ids: tuple[str, ...],
+                                limits: RetentionLimits) -> RetentionPlan:
+    """Fail-closed readiness wrapper: current eligible set is empty.
+
+    No trusted cold-history classification grant exists. All records are unknown,
+    including terminal records. This preserves every active record or fails capacity.
+    Pure bytes only, no archive publication, active-state write, or relocation.
+    """
+    if type(archive_ids) is not tuple or archive_ids:
+        raise InvalidRetentionPlan("current policy has no eligible archive IDs")
+    _object(state)
+    return prepare_retention_plan(state, roles={key: "unknown" for key in state},
+                                  archive_ids=(), limits=limits)
