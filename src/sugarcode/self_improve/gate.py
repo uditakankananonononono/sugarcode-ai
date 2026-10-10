@@ -17,6 +17,7 @@ from uuid import uuid4
 
 from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .json_values import snapshot_json
+from .approval_schema import validate_record, ApprovalSchemaError
 
 PENDING, APPROVED, REJECTED = "pending", "approved", "rejected"
 
@@ -49,6 +50,7 @@ class ApprovalGate(Protocol):
     def request(self, *, module_id: int, module_slug: str, action_type: str,
                 summary: str, payload: dict[str, Any]) -> str: ...
     def decision(self, approval_id: str) -> str: ...
+    def record(self, approval_id: str) -> dict[str, Any]: ...
 
 
 class ManualApprovalGate:
@@ -99,11 +101,15 @@ class ManualApprovalGate:
                 "requested_at": time.time(), "decided_at": None,
             }
             try:
+                validate_record(data[approval_id], allow_unrecorded_decision=self._auto)
+            except ApprovalSchemaError as exc:
+                raise InvalidApprovalState("invalid approval record schema") from exc
+            try:
                 self._save(data)
             except AtomicDurabilityError as exc:
-                # Replacement landed: caller needs the generated identity to reconcile.
                 exc.approval_id = approval_id
                 raise
+
         return approval_id
 
     def decide(self, approval_id: str, decision: str, *, decided_by: str = "human") -> None:
@@ -113,14 +119,29 @@ class ManualApprovalGate:
             data = self._load()
             if approval_id not in data:
                 raise KeyError(f"unknown approval {approval_id!r}")
+            existing = data[approval_id]
+            if type(existing) is not dict or type(existing.get("status")) is not str or existing["status"] not in (PENDING, APPROVED, REJECTED):
+                raise InvalidApprovalState("invalid approval status record")
             data[approval_id]["status"] = decision
             data[approval_id]["decided_at"] = time.time()
             data[approval_id]["decided_by"] = decided_by
+            if "action_type" in data[approval_id]:
+                try:
+                    validate_record(data[approval_id], allow_unrecorded_decision=self._auto)
+                except ApprovalSchemaError as exc:
+                    raise InvalidApprovalState("invalid approval record schema") from exc
             self._save(data)
 
-    def decision(self, approval_id: str) -> str:
+    def record(self, approval_id: str) -> dict[str, Any]:
+        """Detached full record; metadata does not authenticate its author."""
         with self._lock:
             data = self._load()
         if approval_id not in data:
             raise KeyError(f"unknown approval {approval_id!r}")
-        return data[approval_id]["status"]
+        record = data[approval_id]
+        if type(record) is not dict or type(record.get("status")) is not str or record["status"] not in (PENDING, APPROVED, REJECTED):
+            raise InvalidApprovalState("invalid approval status record")
+        return snapshot_json(record)
+
+    def decision(self, approval_id: str) -> str:
+        return self.record(approval_id)["status"]
