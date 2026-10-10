@@ -91,4 +91,13 @@ def run_bounded_process(command, *, timeout_seconds, cwd=None, env=None,
     except BaseException:
         _kill_group(child);child.wait();raise
     finally:
-        child.stdout.close();child.stderr.close()
+        try:
+            child.stdout.close()
+        except BaseException:
+            try:
+                child.stderr.close()
+            except BaseException:
+                pass  # Preserve the first close error, not a cleanup replacement.
+            raise
+        else:
+            child.stderr.close()
