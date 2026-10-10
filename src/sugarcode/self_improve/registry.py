@@ -19,6 +19,7 @@ from typing import Any
 from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .proposal_preflight_r01 import preflight_proposal
 from .registry_validation import decode_registry_json, validate_registry_state, RegistryValidationError
+from .capped_readers import read_capped_bytes, InputLimitExceeded, REGISTRY_FILE_BYTES
 
 
 class RegistryError(RuntimeError):
@@ -40,8 +41,8 @@ class FeatureRegistry:
 
     def _load(self) -> dict[str, Any]:
         try:
-            return decode_registry_json(self._path.read_bytes(), expected_module=self.module_slug)
-        except RegistryValidationError as exc:
+            return decode_registry_json(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES), expected_module=self.module_slug)
+        except (RegistryValidationError, InputLimitExceeded) as exc:
             raise RegistryError("invalid registry state; repair required") from exc
 
     def _save(self, data: dict[str, Any]) -> None:
@@ -50,6 +51,8 @@ class FeatureRegistry:
             encoded = json.dumps(data, indent=2, sort_keys=True, allow_nan=False)
         except (ValueError, TypeError, RecursionError) as exc:
             raise RegistryError("invalid registry write; state unchanged") from exc
+        if len(encoded.encode("utf-8")) > REGISTRY_FILE_BYTES:
+            raise InputLimitExceeded("file", REGISTRY_FILE_BYTES)
         atomic_write_text(self._path, encoded)
 
     def _contained(self, path: Path) -> Path:
@@ -66,7 +69,7 @@ class FeatureRegistry:
                 key=key, name=name, kind=kind, code=code, test_code=test_code,
                 gap_signature=gap_signature, validate_registry=decode_registry_json)
             data = self._load()
-            if hashlib.sha256(self._path.read_bytes()).hexdigest() != plan.registry_sha256:
+            if hashlib.sha256(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES)).hexdigest() != plan.registry_sha256:
                 raise RegistryError("registry changed during proposal preflight")
             plan.code_path.parent.mkdir(exist_ok=True)
             created: list[Path] = []
