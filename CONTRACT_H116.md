@@ -1,0 +1,52 @@
+# H116: literal BED extra-start characterization
+
+PREP-NORUN. Authored test only, not runtime-characterized, tested or repaired.
+Exactly two additions: CONTRACT_H116.md and
+ tests/test_h116_bed_extra_start_characterization.py.
+Prerequisite: 05fc2a6040ad8a49b13077a613d1e468592ec8f9, public main rechecked
+immediately before writing. No anchor delta from reported 05fc2a60.
+
+One literal: parse_bed('chr1\t0\t9\tg\t0\t+\t0\t9\t0\t1\t9\t0,1').
+Expected exact builtin ValueError identity and full diagnostic:
+'line 1: blockCount 1 != 1 sizes / 2 starts'. One authored test/function/case.
+
+Full reads before writing: src/sugarcode/bio/bed.py, tests/test_bio_bed.py,
+tests/test_cli_bed.py, CONTRACT_H101.md and H101 characterization test.
+Current source lines 55-57 parse bc=1, sizes=[9], starts=[0,1]. Guard line 60
+checks bc == len(sizes) == len(starts); first equality passes, second fails.
+Lines 61-63 construct the expected diagnostic. This is source-derived reasoning,
+NOT an observed probe or independent BED oracle.
+
+Collision search: exact expected diagnostic, 0,1 and count/H116/extra-start
+terms over tests/*bed* and CONTRACT* at this base. No exact H116 pin found in
+those searched paths; no exhaustive absence claim. Ordinary test_bio_bed.py
+lines 31-33 already exercises this same guard with a regex on another literal.
+H101 pins bc2/sizes1/starts1, same guard and identity/text shape. H115 reservation
+pins bc1/sizes2/starts1, same guard, but is not published at this base. H116 is
+incremental extra-start literal coverage only, not generic validation novelty.
+
+Dependency action: single python -m pip install pytest attempt at 00:50:22 IST
+2026-10-11 failed exit 127, python: command not found. Parent ratified fallback
+PREP-NORUN. No retry, --user or other install. No tests, imports, direct calls,
+syntax checks, probes, mutations, restore executions or PASS counts. No product,
+existing-test or other file edits, pushes or merges. Peer execution and verdict
+remain outstanding; tests-first execution was blocked before authoring.
+
+Peer planned commands, NOT RUN by builder, in disposable independent worktree:
+
+    PYTHONPATH=src python -B -m pytest -q tests/test_h116_bed_extra_start_characterization.py
+    PYTHONPATH=src python -B -m pytest -q tests/test_h116_bed_extra_start_characterization.py tests/test_bio_bed.py tests/test_cli_bed.py
+    PYTHONPATH=src python -B -m pytest -q tests/test_h116_bed_extra_start_characterization.py tests/test_bio_bed.py tests/test_cli_bed.py tests/self_improve
+
+Wider is this scoped selection only, not global. Record actual counts and strict
+XFAIL handling; existing XFAILs do not become implemented repairs.
+Isolated one-at-time mutations only: count-guard return None; return full
+expected diagnostic string; raise RuntimeError; remove count guard. For the
+last, source inference says zip(starts,sizes) considers only fitting (0,9),
+so accepted record should violate this test. Expected failures are NOT observed
+mutant evidence. Peer must require exit 1 and failure cause, byte-exact original
+restoration with SHA256 after EACH mutant, then restored adjacent selection.
+No other mechanism authorized. Stop on missing dependency or mismatch.
+
+No successful parser, consumer/biology, broad schema/count-policy, clinical,
+repair, exhaustive mutant adequacy or full-suite claim. One literal only.
