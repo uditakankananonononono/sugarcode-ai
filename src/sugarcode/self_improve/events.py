@@ -8,15 +8,14 @@ from __future__ import annotations
 
 import json
 import math
-import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
-                            JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
+from .capped_readers import InputLimitExceeded, JSONL_FILE_BYTES, JSONL_LINE_BYTES
+from .jsonl_store import append_jsonl, read_jsonl
 from .json_values import InvalidTelemetryValue, snapshot_json
 
 def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -62,7 +61,6 @@ class GapEventStore:
     def __init__(self, root: Path) -> None:
         self._root = Path(root)
         self._root.mkdir(parents=True, exist_ok=True)
-        self._lock = threading.Lock()
 
     def _path(self, module_slug: str) -> Path:
         safe = "".join(c for c in module_slug if c.isalnum() or c in "-_")
@@ -81,21 +79,18 @@ class GapEventStore:
         encoded = (line + "\n").encode("utf-8")
         if len(encoded) > JSONL_LINE_BYTES:
             raise InputLimitExceeded("line", JSONL_LINE_BYTES)
-        with self._lock:
-            path = self._path(event.module_slug)
-            prior = read_capped_bytes(path, max_file_bytes=JSONL_FILE_BYTES) if path.exists() else b""
-            if len(prior) + len(encoded) > JSONL_FILE_BYTES:
-                raise InputLimitExceeded("file", JSONL_FILE_BYTES)
-            with path.open("ab") as fh:
-                fh.write(encoded)
+        append_jsonl(self._path(event.module_slug), encoded,
+                     max_file_bytes=JSONL_FILE_BYTES, max_line_bytes=JSONL_LINE_BYTES,
+                     decode=lambda lines: self._decode_events(event.module_slug, lines))
 
     def all(self, module_slug: str) -> list[GapEvent]:
-        path = self._path(module_slug)
-        if not path.exists():
-            return []
+        """Validated history; may create advisory lock sidecar, not pure file read."""
+        return read_jsonl(self._path(module_slug), max_file_bytes=JSONL_FILE_BYTES,
+                          max_line_bytes=JSONL_LINE_BYTES,
+                          decode=lambda lines: self._decode_events(module_slug, lines))
+
+    def _decode_events(self, module_slug, lines) -> list[GapEvent]:
         events: list[GapEvent] = []
-        with self._lock:
-            lines = read_capped_utf8_lines(path, max_file_bytes=JSONL_FILE_BYTES, max_line_bytes=JSONL_LINE_BYTES)
         for line_number, line in enumerate(lines, 1):
             line = line.strip()
             if not line:

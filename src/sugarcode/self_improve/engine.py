@@ -8,7 +8,6 @@ stage is recorded to an append-only ledger.
 from __future__ import annotations
 
 import json
-import threading
 import time
 from pathlib import Path
 from typing import Any
@@ -21,8 +20,8 @@ from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
 from .evidence import GapObservation, preview_evidence
-from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
-                            JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
+from .capped_readers import InputLimitExceeded, JSONL_FILE_BYTES, JSONL_LINE_BYTES
+from .jsonl_store import append_jsonl, read_jsonl
 from .json_values import snapshot_json
 from .gate import APPROVED, ApprovalGate, ManualApprovalGate
 from .plans import Candidate, FeaturePlan
@@ -73,7 +72,6 @@ class SelfImprovementEngine:
         self.registry = FeatureRegistry(module_slug, self.state_dir)
         self.gate: ApprovalGate = gate or ManualApprovalGate(self.state_dir / "approvals.json")
         self._ledger_path = self.state_dir / "ledger.jsonl"
-        self._ledger_lock = threading.Lock()
         self._candidates: dict[str, Candidate] = {}
 
     # -- ledger --------------------------------------------------------------
@@ -88,18 +86,15 @@ class SelfImprovementEngine:
         output = (encoded + "\n").encode("utf-8")
         if len(output) > JSONL_LINE_BYTES:
             raise InputLimitExceeded("line", JSONL_LINE_BYTES)
-        with self._ledger_lock:
-            prior = read_capped_bytes(self._ledger_path, max_file_bytes=JSONL_FILE_BYTES) if self._ledger_path.exists() else b""
-            if len(prior) + len(output) > JSONL_FILE_BYTES:
-                raise InputLimitExceeded("file", JSONL_FILE_BYTES)
-            with self._ledger_path.open("ab") as fh:
-                fh.write(output)
+        append_jsonl(self._ledger_path, output, max_file_bytes=JSONL_FILE_BYTES,
+                     max_line_bytes=JSONL_LINE_BYTES, decode=self._decode_ledger)
 
     def ledger(self) -> list[dict[str, Any]]:
-        if not self._ledger_path.exists():
-            return []
-        with self._ledger_lock:
-            lines = read_capped_utf8_lines(self._ledger_path, max_file_bytes=JSONL_FILE_BYTES, max_line_bytes=JSONL_LINE_BYTES)
+        """Validated history; may create advisory lock sidecar, not pure file read."""
+        return read_jsonl(self._ledger_path, max_file_bytes=JSONL_FILE_BYTES,
+                          max_line_bytes=JSONL_LINE_BYTES, decode=self._decode_ledger)
+
+    def _decode_ledger(self, lines) -> list[dict[str, Any]]:
         records: list[dict[str, Any]] = []
         for number, line in enumerate(lines, 1):
             if not line.strip():
