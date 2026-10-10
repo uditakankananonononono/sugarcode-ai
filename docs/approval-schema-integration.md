@@ -35,7 +35,7 @@ A01 version pin/replay binding NOT integrated yet: rollback is feature-bound but
 not bound to active-version-at-request or once-only consumed approval. Report
 these separately; do not advertise complete replay/revocation authorization.
 
-Builder selected411 PASS/no skips: prior main316 +82 helper +19 seam cases.
+Builder selected411 PASS/no skips: prior main310 +82 helper +19 seam cases.
 Includes actual generic legacy, auto, status-only custom source, wrong identity/
 payload, rollback activation-ID misuse and atomic orphan-ID regressions. Base
 seam canaries copied unchanged to2aefa5a detect absent API/binding. Independent
