@@ -41,3 +41,9 @@ payload, rollback activation-ID misuse and atomic orphan-ID regressions. Base
 seam canaries copied unchanged to2aefa5a detect absent API/binding. Independent
 verdict required. Initial merge attempt introduced an IndentationError before
 collection; fixed before passing run, no failed probe called green.
+
+Independent verdict VERIFIED engine binding, scoped base canary receipt not rerun.
+Verifier independently411PASS plus real authorization/subclass probes. Deliberate
+policy effects: status-only manual editor must also write decided_at/decided_by;
+ManualApprovalGate subclasses do NOT inherit unrecorded auto-decision bypass
+(exact type, not isinstance). Generic legacy read/decide compatibility preserved.
