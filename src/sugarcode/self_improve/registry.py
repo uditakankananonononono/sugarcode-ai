@@ -204,6 +204,14 @@ class FeatureRegistry:
         return next(v for v in feature["versions"] if v["version"] == feature["active_version"])
 
     def dispatch(self, name: str, items: list, params: dict | None = None) -> dict:
+        return self._dispatch_with_receipt(name, items, params)[0]
+
+    def _dispatch_with_receipt(self, name: str, items: list, params: dict | None = None):
+        """Internal result/version receipt only after counter save succeeds.
+
+        Counter-save failure after run is not classified here as committed or
+        safe to retry. Existing dispatch exceptions remain unchanged.
+        """
         entry = self._active_entry(name)
         path = Path(entry["file"])
         self._contained(path)
@@ -229,7 +237,7 @@ class FeatureRegistry:
                     v["dispatch_count"] = v.get("dispatch_count", 0) + 1
                     v["last_dispatched_at"] = time.time()
             self._save(data)
-        return result
+        return result, entry["version"]
 
     def reconcile_extensions(self, *, max_entries=10000) -> dict[str, Any]:
         """Evidence-now only. No artifact or registry is modified."""
