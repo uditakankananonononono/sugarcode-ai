@@ -1,11 +1,60 @@
 from __future__ import annotations
 import math
+from typing import Optional
+
 import numpy as np
 from scipy import ndimage
 
 
-def _segment(img: np.ndarray, threshold_pct: float = 60.0) -> tuple[np.ndarray, int]:
-    """Background-normalized threshold segmentation + watershed-free labeling."""
+_NUCLEI_MIN_AREA_PX = 10  # min object area of the cellpainter_4d.segment_nuclei target (legacy path keeps 5)
+
+
+def _to_8bit_range(img: np.ndarray) -> np.ndarray:
+    """Native 8-bit data (integral values within 0..255) passes UNCHANGED; anything else is min-max normalised to 0..255."""
+    a = np.asarray(img, float)
+    if a.size and a.min() >= 0 and a.max() <= 255 and np.array_equal(a, np.round(a)):
+        return a
+    lo, hi = float(a.min()), float(a.max())
+    if hi == lo:
+        return np.zeros_like(a)
+    return (a - lo) / (hi - lo) * 255.0
+
+
+def _segment_nuclei_labels(img8: np.ndarray) -> tuple[np.ndarray, int]:
+    """Otsu + seeded watershed label image: the same algorithm as cellpainter_4d.segment_nuclei (H14).
+
+    Returns (labels, n) with every watershed object, before the minimum-area filter. The Otsu helper is
+    reused from cellpainter_4d so the two cannot drift apart.
+    """
+    from ..cellpainter_4d.core import _otsu_threshold
+    sm = ndimage.gaussian_filter(img8, 1.0)
+    t = _otsu_threshold(sm)
+    fg = ndimage.binary_fill_holes(sm > t)
+    lab, n = ndimage.label(fg)
+    if n == 0:
+        return np.zeros(img8.shape, dtype=np.int32), 0
+    areas = np.asarray(ndimage.sum(fg, lab, range(1, n + 1)))
+    med = float(np.median(areas[areas >= _NUCLEI_MIN_AREA_PX])) if (areas >= _NUCLEI_MIN_AREA_PX).any() else float(np.median(areas))
+    r = max(2.0, 0.5 * np.sqrt(med / np.pi))
+    sm2 = ndimage.gaussian_filter(img8, r / 2)
+    peaks = (sm2 == ndimage.maximum_filter(sm2, size=int(2 * r) + 1)) & fg
+    markers, nm = ndimage.label(peaks)
+    markers = markers.astype(np.int32)
+    markers[~fg] = nm + 1  # background is its own basin
+    cost = np.where(fg, np.round(254 * (1 - sm2 / max(sm2[fg].max(), 1e-9))), 255).astype(np.uint8)
+    ws = ndimage.watershed_ift(cost, markers)
+    ws[(~fg) | (ws == nm + 1)] = 0
+    return ws, int(nm)
+
+
+def _segment(img: np.ndarray, threshold_pct: Optional[float] = None) -> tuple[np.ndarray, int]:
+    """Segmentation. threshold_pct None/omitted: Otsu + seeded watershed (H14). Any explicit float: the legacy
+    background-normalized fixed-threshold, watershed-free labeling, unchanged."""
+    if threshold_pct is None:
+        a = _to_8bit_range(img)
+        if a.size == 0 or a.max() == a.min():
+            return np.zeros(a.shape, dtype=np.int32), 0  # constant image: no objects (explicit, not left to Otsu)
+        return _segment_nuclei_labels(a)
     if isinstance(threshold_pct,bool) or not math.isfinite(threshold_pct) or not 0 <= threshold_pct <= 100:
         raise ValueError('threshold_pct must be finite in [0, 100]')
     bg = ndimage.gaussian_filter(img.astype(float), sigma=max(img.shape) / 8)
@@ -94,31 +143,37 @@ def _chain_perimeter(mask: np.ndarray) -> float:
     return total
 
 
-def count_cells(image: list[list[float]], threshold_pct: float = 60.0) -> dict:
-    """Count cells in a grayscale microscopy image (2D array)."""
+def count_cells(image: list[list[float]], threshold_pct: Optional[float] = None) -> dict:
+    """Count cells in a grayscale microscopy image (2D array).
+
+    threshold_pct omitted/None: Otsu + seeded watershed (the cellpainter_4d.segment_nuclei algorithm; objects under 10 px are debris).
+    Native 8-bit input is used as is; other input is min-max normalised to 0-255. An explicit threshold_pct (any float, including 60)
+    selects the legacy fixed-threshold segmentation (objects under 5 px are debris). Output keys are the same on both paths."""
     img = validate_image(image, allow_constant=True)
     labels, n = _segment(img, threshold_pct)
+    min_px = 5 if threshold_pct is not None else _NUCLEI_MIN_AREA_PX
     sizes = ndimage.sum(np.ones_like(labels), labels, range(1, n + 1))
     sizes = np.array(sizes) if n else np.array([])
-    # split filter: drop debris (<5 px) 
-    real = int((sizes >= 5).sum()) if n else 0
+    # split filter: drop debris (<min_px px)
+    real = int((sizes >= min_px).sum()) if n else 0
     return {
         "raw_objects": n,
         "cell_count": real,
         "debris_filtered": n - real,
-        "mean_cell_area_px": round(float(sizes[sizes >= 5].mean()), 1) if real else 0.0,
+        "mean_cell_area_px": round(float(sizes[sizes >= min_px].mean()), 1) if real else 0.0,
         "coverage_fraction": round(float((labels > 0).mean()), 4),
     }
 
 
-def analyze_image(image: list[list[float]], threshold_pct: float = 60.0) -> dict:
-    """Full analysis: count, morphology per cell, culture-health summary."""
+def analyze_image(image: list[list[float]], threshold_pct: Optional[float] = None) -> dict:
+    """Full analysis: count, morphology per cell, culture-health summary. threshold_pct follows count_cells (None: Otsu + seeded watershed; explicit float: legacy)."""
     img = validate_image(image, allow_constant=True)
     labels, n = _segment(img, threshold_pct)
+    min_px = 5 if threshold_pct is not None else _NUCLEI_MIN_AREA_PX
     cells = []
     for i in range(1, n + 1):
         ys, xs = np.nonzero(labels == i)
-        if len(ys) < 5:
+        if len(ys) < min_px:
             continue
         area = len(ys)
         h = ys.max() - ys.min() + 1
