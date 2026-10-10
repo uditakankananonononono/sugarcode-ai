@@ -179,6 +179,8 @@ class ChatClient:
                     f"then `ollama pull {self.model}`.") if self.kind == "local" else ""
             raise ProviderError(f"{self.profile} unreachable at {self.base_url}: "
                                 f"{getattr(e, 'reason', e)}.{hint}") from e
+        except ValueError as e:  # bad JSON / UnicodeDecodeError / int digit limit in the response body
+            raise ProviderError(f"{self.profile} returned an unreadable response: {str(e)[:200]}") from e
         choices = data.get("choices") or []
         if not choices:
             raise ProviderError(f"{self.profile} returned no choices: {str(data)[:300]}")

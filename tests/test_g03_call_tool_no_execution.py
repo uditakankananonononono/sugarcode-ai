@@ -1,6 +1,5 @@
-"""UNAPPLIED, AUTHORED, NOT RUN. Would live at tests/test_prep_g02_call_tool_no_execution.py and only passes
-AFTER prep_proposals/G02/UNAPPLIED-llm-wiring.diff.txt is applied. Monkeypatches the catalog and module import,
-so no real module runs."""
+"""AUTHORED, NOT RUN. G03: call_tool must not import or call the tool function when argument validation fails.
+Monkeypatches the catalog and module import, so no real module runs."""
 import types
 
 import pytest

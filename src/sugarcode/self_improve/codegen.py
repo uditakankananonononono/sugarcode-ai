@@ -15,6 +15,7 @@ from dataclasses import replace
 from typing import Any
 
 from .domain_source import GENERATED_VALIDATOR_SOURCE
+from .header_text import render_header_fields
 from .parameter_domains import validate_parameters
 from .plans import Candidate, FeaturePlan
 from .safety import validate_source
@@ -46,7 +47,8 @@ def _assemble(plan: FeaturePlan, body: str) -> str:
     body = body.replace('    params = params or {}',
                         '    params = validate_parameters(_KIND, _PARAMETERS, params)\n'
                         '    validate_runtime_items(_KIND, items, params)')
-    return (_HEADER.format(module_slug=plan.module_slug, gap_signature=plan.gap_signature,
+    module_text, gap_text = render_header_fields(plan.module_slug, plan.gap_signature)
+    return (_HEADER.format(module_slug=module_text, gap_signature=gap_text,
                            feature_meta=_meta(plan)) + GENERATED_VALIDATOR_SOURCE +
             f"\n_KIND = {plan.kind!r}\n_PARAMETERS = {plan.params!r}\n" + body)
 
