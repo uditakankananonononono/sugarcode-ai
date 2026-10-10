@@ -38,8 +38,8 @@ def main(path):
     out = {"source": "IEDB MHC-I binding benchmark 2013 (bdata.20130222.mhci.txt), measured IC50 nM",
            "target": "1 - ln(IC50 nM)/ln(50000), clipped 0..1", "method": f"ridge(lambda={LAM}) on one-hot 9-mer",
            # H11 provenance (AUTHORED, NOT RUN; only affects a FUTURE regeneration)
-           "fit_all_rows": True, "metrics_describe_model": "80pct-fit",
-           "split_description": "held out where md5(peptide) % 5 == 0 (about 20%)",
+           "refit_all_rows": True, "metrics_describe_model": "80pct-fit",
+           "split_description": "split algorithm md5%5 known from trainer code; the shipped instance is not reproducible from available artifacts",
            "n_train_total_semantics": "n_train_total counts ALL rows including the n_heldout held-out rows; "
                                       "metric_fit_size is the size of the 80% fit the metrics come from",
            "alleles": {}}
