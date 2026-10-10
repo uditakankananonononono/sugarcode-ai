@@ -38,3 +38,21 @@ encoder failure creating an empty file, not missing-import canaries.
 Broader self_improve + shared-layer + router-asset selection223 PASS, no skips
 (198 prior +25 new), not independent/full configured-suite/CI/science acceptance.
 Raw/JUnit and adapted baseline test are supplied for independent verification.
+
+## Independent verdict and caller mutation residue
+
+Independent verdict relayed2026-10-10: VERIFIED for _log()/ledger(), SCOPED on
+residue. Verifier reproduced25 new PASS, whole archived selection223 PASS with
+zero collection errors, and adapted base23 FAIL/2 PASS. Broader223 is independently
+reproduced, not merely builder receipts. Additional read/write probes confirmed
+typed/indexed failures. Commit/remote identity separately verified by builder.
+
+PRACTICAL: activate/rollback/dispatch mutate OTHER state BEFORE _log. A logging
+failure can therefore mean completed mutation, no ledger row, and exception to
+caller. Ordinary13 call sites were inspected by verifier, but custom registry
+outcomes/nonbuiltin exemplar-derived values not proven. No blind retry guarantee.
+Historical malformed/out-of-contract default=str-derived records fail whole reads
+until manual repair; ordinary legacy strings within valid object records remain
+accepted, not semantically reconstructed. No file cap, authenticity, atomic append,
+migration or cross-process locks; OSError/MemoryError/OverflowError unnormalized.
+Other paths remain unchanged by THIS unit, even if separately repaired later.
