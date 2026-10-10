@@ -17,7 +17,7 @@ docs/prep/unit-b-decision-envelope-compat-contract.md.
 | Decision value domain | Enforced: decide() accepts only "approved"/"rejected" (ValueError otherwise) | Unchanged |
 | approved<->rejected flip | Enforced as ALLOWED: decide() has no transition guard; any record with a valid status string can be re-decided. This is documented policy in docs/approval-consumption-locks.md ("a later REJECTED decision can revoke unused approved records; a later APPROVED decision can restore UNUSED request permission") and exercised by existing tests | Option A (default, compatible): flips remain allowed. Option B (opt-in strict): pending->approved/rejected terminal; decided records refuse re-decide |
 | Envelope rewrite on re-decide | decide() unconditionally overwrites status, decided_at, decided_by on the SAME envelope; previous decision values are lost | Option B appends the prior decision to a decision_history list before overwrite; Option A keeps lossy overwrite |
-| Decision-event history | Absent: the record schema (approval_schema.RECORD_REQUIRED/OPTIONAL) has no history field and validate_record REFUSES unexpected fields, so no history can be stored today | Option B adds decision_history to the allowed-key set; every entry counts against the J04 whole-state snapshot budget (10,000 expanded values) and the 4 MiB APPROVAL_FILE_BYTES cap |
+| Decision-event history | Absent on MANAGED FULL envelopes: the record schema (approval_schema.RECORD_REQUIRED/OPTIONAL) has no history field and validate_record REFUSES unexpected fields, so a schema-validated record cannot carry history. Legacy status-only records are NOT covered by this: decide() skips validate_record when "action_type" is absent, so a decision_history key on such a record survives direct save/decide unexamined | Option B adds decision_history to the allowed-key set; every entry counts against the J04 whole-state snapshot budget (10,000 expanded values) and the 4 MiB APPROVAL_FILE_BYTES cap |
 | Expected-envelope fingerprint at decide | Absent: ManualApprovalGate.decide signature is (approval_id, decision, *, decided_by); coordinated_record yields the LOCK identity (resolved path string), not a record fingerprint; engine checks only that identity is a nonempty string | Optional expect_fingerprint parameter: sha256 over the canonical JSON of snapshot_json(record); None preserves current behavior (required for legacy and auto-gate flows) |
 | requested_at <= decided_at ordering | Not enforced: validate_record checks only that both are finite int/float (or decided_at None); a stored record with requested_at greater than decided_at passes validation and decide() succeeds on it | Proposed check in validate_record (decided records only); legacy and auto-gate shapes exempt per their existing exceptions |
 | Negative timestamps | Accepted: _is_number admits negative int/float for requested_at/decided_at. NOTE: approval_consumption.validate_consumptions requires consumed_at >= 0, so the gate and consumption time domains already differ | Proposed: reject negative requested_at/decided_at in validate_record; aligns gate with consumption domain |
@@ -36,7 +36,11 @@ processes only. Reading the code:
    changes status/decided_at/decided_by; the reviewer's later decide() then
    overwrites that decision based on a stale view. Locks serialize the
    writes but do not tell the second decider the envelope changed since the
-   review. Only an expected-envelope fingerprint closes this.
+   review. An expected-envelope fingerprint is ONE way to close this;
+   alternatives exist (compare-and-swap on the full detached record, a
+   monotonic revision counter checked at decide, or holding the gate
+   lock continuously across review and decide). The contract proposes
+   the fingerprint; which mechanism, if any, ships is OPEN.
 2. Edited payload before decide: no cooperating API mutates payload after
    request(), but a NONCOOPERATING editor (or any process that ignores the
    sidecar lock) can rewrite approvals.json between review and decide.
@@ -104,8 +108,10 @@ processes only. Reading the code:
   snapshot_json (10,000 expanded values) and capped at APPROVAL_FILE_BYTES
   (4 MiB); test_appended_history_counts_against_j04_budget exercises the
   budget directly. Interaction with SC-H01
-  (docs/sc-h01-approval-retention-contract.md): history growth is exactly
-  the pressure that contract partitions; the two proposals must land
-  together or history will eventually block every save.
+  (docs/sc-h01-approval-retention-contract.md): history growth is the
+  kind of pressure that contract partitions, but whether history waits
+  for SC-H01, lands unbounded until the ceiling refuses saves, or is
+  bounded some other way is an OPEN owner/integrator choice (contract
+  section 6). No relief mechanism is asserted here.
 - Generic legacy and actual auto-gate exceptions preserved: sections 1 and
   the contract carry both as explicit exemptions; guard tests authored.

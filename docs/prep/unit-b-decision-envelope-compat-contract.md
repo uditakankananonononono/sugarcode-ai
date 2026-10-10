@@ -80,7 +80,18 @@ Option B (OPT-IN strict, e.g. ManualApprovalGate(strict_transitions=True)):
   replacement revocation path (e.g. a distinct recorded "revoked" status),
   which this contract does not define.
 
-## 4. Decision-event history (proposed, pairs with Option B)
+## 4. Decision-event history (proposed; a separate knob from strictness)
+
+History and strict transitions are INDEPENDENT knobs. Under strict
+Option B every re-decide is refused, so the "append superseded
+decision before overwrite" rule below never fires in that mode; what
+history, if any, strict mode records (nothing, or the single initial
+decision) is an OPEN semantic, listed in section 6. The append rule
+as written applies to modes where overwrites happen (Option A, or any
+mode permitting re-decide). The authored reference implementation
+demonstrates the pending, default-None (no fingerprint) path only;
+decided-record compatibility under Option B is NOT demonstrated by
+the authored tests.
 
 - New optional record key "decision_history": a list of entries
   {"status", "decided_at", "decided_by", "envelope_fingerprint"}, one per
@@ -92,13 +103,14 @@ Option B (OPT-IN strict, e.g. ManualApprovalGate(strict_transitions=True)):
   J04 snapshot_json 10,000-value whole-state budget and the serialized
   bytes against APPROVAL_FILE_BYTES (4 MiB). A state at the ceiling
   refuses the next decide that would append - fail-closed, state
-  unchanged, per the existing _save boundary. Long-term relief is the
-  SC-H01 retention partition (docs/sc-h01-approval-retention-contract.md);
-  this contract does not implement retention.
+  unchanged, per the existing _save boundary. SC-H01
+  (docs/sc-h01-approval-retention-contract.md) is one candidate for
+  relief; it is unverified for this purpose, this contract does not
+  implement retention, and whether history waits for SC-H01 is an
+  OPEN choice (section 6), not a pairing requirement.
 - Option A (flips without strict transitions) MAY also append history;
-  history and strictness are independent knobs, but history without
-  strictness still preserves the overwritten envelopes that strictness
-  would have refused.
+  history without strictness still preserves the overwritten envelopes
+  that strictness would have refused.
 
 ## 5. Timestamp semantics (proposed additions to validate_record)
 
@@ -118,7 +130,9 @@ Option B (OPT-IN strict, e.g. ManualApprovalGate(strict_transitions=True)):
 1. Option A vs Option B as the shipped default; Option B's deletion of
    flip-to-revoke needs a revocation replacement.
 2. Auto-gate records under Option B: is the first real decide a fresh
-   pending->decision, or refused like other re-decides?
+   pending->decision, or refused like other re-decides? And does
+   strict mode record any decision_history at all, given that its
+   re-decide refusals mean the append rule never fires?
 3. History retention: unbounded growth until the J04/4 MiB ceiling refuses
    saves, or block landing until SC-H01 retention ships?
 4. Fingerprint helper surface: method on the gate vs free function over
