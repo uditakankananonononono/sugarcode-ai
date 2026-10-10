@@ -33,3 +33,9 @@ must supply classifications, incorrect: no such trusted classification exists.
 Remaining PREP ownership/instructions are design history, not authority.
 Independent verdict before any source landing, which would still be readiness
 only. All code additive, live production paths untouched.
+
+Independent VERIFIED pure model + empty-policy wrapper363PASS reproduced, NOT
+archival/retention/ceiling relief. Low-level pending guard matches exact "pending"
+only; case/whitespace/missing status can model movement if caller asserts cold role.
+Wrapper blocks ALL selections today. Manifest roles self-asserted, hashes consistency
+not authorship. No storage/locking/recovery/capacity evidence, no mutation testing.
