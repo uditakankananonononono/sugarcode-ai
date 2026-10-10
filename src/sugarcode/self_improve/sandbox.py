@@ -6,13 +6,13 @@ with a scrubbed environment and a hard timeout. pytest is the runner.
 from __future__ import annotations
 
 import os
-import subprocess
 import sys
 import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .bounded_process import run_bounded_process
 from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .plans import Candidate
 
@@ -26,6 +26,8 @@ class SandboxResult:
     duration_seconds: float
     timed_out: bool = False
     workdir: str = ""
+    output_limit_exceeded: bool = False
+    output_limit_stream: str | None = None
 
 
 class SandboxRunner:
@@ -49,26 +51,25 @@ class SandboxRunner:
         (workdir / "test_feature.py").write_bytes(snapshot.tests.content)
         start = time.monotonic()
         try:
-            proc = subprocess.run(
+            proc = run_bounded_process(
                 [sys.executable, "-m", "pytest", "-q", "-x", "--no-header", "-p", "no:cacheprovider", str(workdir)],
-                capture_output=True, text=True, timeout=self.timeout_seconds,
-                env=self._scrubbed_env(), cwd=str(workdir),
-            )
+                timeout_seconds=self.timeout_seconds, env=self._scrubbed_env(), cwd=str(workdir))
             duration = time.monotonic() - start
+            stdout = proc.stdout.decode("utf-8", errors="replace")
+            stderr = proc.stderr.decode("utf-8", errors="replace")
+            if proc.timed_out:
+                stderr = f"timed out after {self.timeout_seconds}s"
+            elif proc.overflow_stream is not None:
+                reason = f"output byte limit exceeded on {proc.overflow_stream}"
+                stderr = reason + "\n" + stderr[-3800:]
             return SandboxResult(
-                passed=proc.returncode == 0, exit_code=proc.returncode,
-                stdout=proc.stdout[-4000:], stderr=proc.stderr[-4000:],
-                duration_seconds=round(duration, 3),
+                passed=proc.exit_code == 0 and not proc.timed_out and proc.overflow_stream is None,
+                exit_code=-1 if proc.timed_out else proc.exit_code,
+                stdout=stdout, stderr=stderr, duration_seconds=round(duration, 3),
+                timed_out=proc.timed_out,
                 workdir=str(workdir) if self.keep_workdirs else "",
-            )
-        except subprocess.TimeoutExpired as exc:
-            duration = time.monotonic() - start
-            return SandboxResult(
-                passed=False, exit_code=-1, stdout=(exc.stdout or "")[-4000:] if isinstance(exc.stdout, str) else "",
-                stderr=f"timed out after {self.timeout_seconds}s",
-                duration_seconds=round(duration, 3), timed_out=True,
-                workdir=str(workdir) if self.keep_workdirs else "",
-            )
+                output_limit_exceeded=proc.overflow_stream is not None,
+                output_limit_stream=proc.overflow_stream)
         finally:
             if not self.keep_workdirs:
                 import shutil

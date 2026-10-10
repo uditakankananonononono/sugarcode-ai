@@ -164,6 +164,8 @@ class SelfImprovementEngine:
         result = self.sandbox.run(candidate)
         self._log("feature_evaluated", key=candidate_key, passed=result.passed,
                   exit_code=result.exit_code, timed_out=result.timed_out,
+                  output_limit_exceeded=result.output_limit_exceeded,
+                  output_limit_stream=result.output_limit_stream,
                   duration=result.duration_seconds)
         if not result.passed:
             self._log("feature_rejected_by_tests", key=candidate_key,
