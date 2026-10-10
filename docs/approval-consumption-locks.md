@@ -68,13 +68,21 @@ Existing caps/encoding/atomic-source rules remain, no paid service or PRIDICT wo
 
 ## Executed evidence
 
-33 new parameterized cases PASS; selected 1,121 PASS = 1,088 prior + 33 new, no skips.
+Initial 33 new cases PASS; strengthened candidate adds 7 lock probes (40 new cases total).
 Includes 4 separate two-POSIX-process cases (gate updates, registry proposals,
-concurrent initialization, same-approval engine commit), barriers/events rather
-than probabilistic sleep, plus fresh Python process consumption/replay check.
+concurrent initialization, same-approval engine commit), start barriers are smoke checks, NOT forced overlap of all critical sections;
+plus fresh Python process consumption/replay check. Six added forced contention
+probes hold the parent sidecar through child timeout/result (test-only .2s), covering
+gate/registry init, gate request, registry proposal, engine gate and registry commit.
+Production 5s default separately asserted.
 Thread races include two engine activation/rollback, two gate/registry objects,
 and commit-winning vs revoke locking. Gate-ownership assertion in committing
 thread avoids falsely passing because revoker transiently owns lock.
+
+Correction of base evidence: the sole old-base PASS is
+test_consumption_atomic_registry_failure_reconciles[before], pre-replace refusal
+already preserved on base. Old Lock lacking _thread_lock explains the SEPARATE
+revoke test FAIL, never the PASS.
 
 Base integration canaries (new pure helper files copied for imports only, old
 engine/gate/registry untouched): selected 12 cases -> 11 FAIL, 1 PASS; plus base
@@ -92,3 +100,9 @@ not hidden unsupported claim. Pure helper/process-boundary tests may pass on bas
 with additive helper imports, no claim all base cases fail. Initial full adjacent
 2 FAIL / 1,086 PASS diagnostics/order regressions fixed preserving old assertions.
 Independent fresh auditor required before any landing; local candidate not public.
+
+Bounded audit recheck evidence: 40 new cases now PASS; selected 1,128 PASS =
+1,088 prior + 40 new, no skips. Added 6 forced process probes all FAIL against
+no-flock mutant, all PASS candidate, plus production 5s constant check PASS.
+The earlier 4 process start-barrier cases retain smoke labels, not overclaimed
+critical-section interleaving coverage. No production lock policy change.
