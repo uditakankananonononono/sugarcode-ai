@@ -9,7 +9,9 @@ from sugarcode.modules.neohunter.core import hla_binding, hla_binding_trained
 
 CAVEAT = ("stored held-out r/AUC describe the 80%-fit model, not the shipped all-row model; "
           "stored source values, not validated performance")
-SPLIT = "about 20% held out; exact split not reproducible from available artifacts"
+# peer-exact (H11f ruling): algorithm known from trainer code; shipped instance not reproducible
+SPLIT = ("split algorithm md5%5 known from trainer code; "
+         "the shipped instance is not reproducible from available artifacts")
 JSON_PATH = Path(nh.__file__).with_name("data_pssm_iedb2013.json")
 DATA = json.load(open(JSON_PATH))
 TRAINER = Path(__file__).resolve().parents[1] / "scripts" / "train_neohunter_pssm.py"
@@ -65,7 +67,21 @@ def test_docstring_warns_metrics_describe_80pct_fit():
 def test_trainer_source_emits_future_provenance_fields():
     # text check only: the trainer is NOT imported or run
     t = TRAINER.read_text()
-    for needle in ('"metric_fit_size"', '"fit_all_rows"', '"metrics_describe_model"', '"split_description"',
+    for needle in ('"metric_fit_size"', '"refit_all_rows"', '"metrics_describe_model"', '"split_description"',
                    '"n_train_total_semantics"'):
         assert needle in t, needle
     assert "int((~test).sum())" in t
+    # peer ruling: the trainer field is the PROCESS flag refit_all_rows; the shipped JSON keeps fit_all_rows (weight origin)
+    assert '"fit_all_rows"' not in t
+    assert SPLIT in t                                       # exact peer text as one literal in the trainer
+    assert "md5(s.encode())" in t and "% 5 == 0" in t       # the algorithm the text refers to, unchanged
+
+
+def test_json_keeps_fit_all_rows_not_refit_all_rows():
+    assert DATA["fit_all_rows"] is True and "refit_all_rows" not in DATA
+
+
+def test_contract_documents_both_distinct_meanings():
+    c = (Path(__file__).resolve().parents[1] / "CONTRACT_H11.md").read_text()
+    assert "fit_all_rows" in c and "refit_all_rows" in c
+    assert "weight origin" in c and "process" in c
