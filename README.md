@@ -742,3 +742,10 @@ pipe drain. Diagnostics now keep 4,000 BYTES per stream rather than 4,000 Unicod
 characters, a deliberate memory-bounded behavior change. It is not an absolute
 RSS/CPU quota or host-effect sandbox; escaped-session descendants are outside
 scope. IsolatedRunner disk-output and isolated dispatch files are unchanged.
+
+Historical builder-only `/proc` flood measurement in the review packet: 17,744 KiB
+baseline RSS, 18,120 KiB sampled peak (376 KiB delta, 10 samples), 1,048,577 observed
+stdout bytes, 4,000-byte retained diagnostic ring, child exit -9. These are one
+environment's measurements, not a total RSS guarantee or a general memory quota.
+The independent auditor's separate run measured 17,628 / 18,068 KiB (440 KiB delta,
+9 samples); it is a different run, not the builder packet's historical evidence.
