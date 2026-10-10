@@ -49,7 +49,7 @@ def test_float_overflow_literal():
     assert reason(b'{"result": {"x": -1e999}}') == "float_overflow"
 
 def test_int_overflow_digits():
-    assert reason(b'{"result": ' + b"9" * 65 + b'}') == "int_overflow"
+    assert reason(b'{"result": ' + b"9" * 65 + b'}', max_int_digits=64) == "int_overflow"
 
 def test_int_at_digit_limit_ok():
     assert decode_child_result(b'{"result": ' + b"9" * 64 + b'}') == int("9" * 64)

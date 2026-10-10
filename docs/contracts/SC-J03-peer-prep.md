@@ -22,3 +22,8 @@ Proposed wiring (NOT applied; integrator owns): replace lines 48-50 with
 and add the import. Lines 46-47 stay. Error mapping: ResultProtocolError(ValueError).
 
 Unverified: import/compile/test pass; pyproject test layout; that real isolation ran (this helper never implies containment PASS); the lone-surrogate and deep-nesting test expectations were reasoned, not executed.
+
+Integration override: this is retained original PREP provenance, not current
+contract. See ../isolated-result-protocol.md for actual wired behavior. Arbitrary
+64-digit default removed; default None uses active interpreter limit, wrapper
+root0 depth counting, exact limit validation added, tests actually run locally.
