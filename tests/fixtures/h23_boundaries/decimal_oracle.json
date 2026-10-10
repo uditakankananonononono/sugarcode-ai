@@ -1,0 +1,287 @@
+{
+  "cutoff_policy": "strict < is current product source characterization; ProDy convention reference pending peer evidence, unexecuted",
+  "distances": [
+    {
+      "binary64_realization": "integer coordinates exactly representable; no float evaluation run",
+      "coordinates_decimal": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "9",
+          "0",
+          "0"
+        ]
+      ],
+      "distance_exact_decimal_A": "9",
+      "label": "below",
+      "less_than_or_equal_10": true,
+      "strict_less_than_10": true
+    },
+    {
+      "binary64_realization": "integer coordinates exactly representable; no float evaluation run",
+      "coordinates_decimal": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "10",
+          "0",
+          "0"
+        ]
+      ],
+      "distance_exact_decimal_A": "10",
+      "label": "exact",
+      "less_than_or_equal_10": true,
+      "strict_less_than_10": false
+    },
+    {
+      "binary64_realization": "integer coordinates exactly representable; no float evaluation run",
+      "coordinates_decimal": [
+        [
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "11",
+          "0",
+          "0"
+        ]
+      ],
+      "distance_exact_decimal_A": "11",
+      "label": "above",
+      "less_than_or_equal_10": false,
+      "strict_less_than_10": false
+    }
+  ],
+  "environment": {
+    "decimal_precision": 80,
+    "python": "3.10.12 (main, Aug 31 2026, 10:18:17) [GCC 11.4.0]",
+    "rounding": "ROUND_HALF_EVEN"
+  },
+  "mechanics_gap": "Tie decimals are exactly representable binary64 dyadic inputs, but no proof they arise through actual transition_trace phase/mode/RMSD arithmetic; negative RMSD fixtures are arithmetic-only, not physical RMSD.",
+  "rounding": [
+    {
+      "expected_half_even_decimal": "0.062",
+      "precision": 3,
+      "raw_exact_decimal": "0.06249",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "below",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.062",
+      "precision": 3,
+      "raw_exact_decimal": "0.0625",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "tie",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.063",
+      "precision": 3,
+      "raw_exact_decimal": "0.06251",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "above",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.063",
+      "precision": 3,
+      "raw_exact_decimal": "-0.06251",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "below",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.062",
+      "precision": 3,
+      "raw_exact_decimal": "-0.0625",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "tie",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.062",
+      "precision": 3,
+      "raw_exact_decimal": "-0.06249",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "above",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.187",
+      "precision": 3,
+      "raw_exact_decimal": "0.18749",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "below",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.188",
+      "precision": 3,
+      "raw_exact_decimal": "0.1875",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "tie",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.188",
+      "precision": 3,
+      "raw_exact_decimal": "0.18751",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "above",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.188",
+      "precision": 3,
+      "raw_exact_decimal": "-0.18751",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "below",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.188",
+      "precision": 3,
+      "raw_exact_decimal": "-0.1875",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "tie",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.187",
+      "precision": 3,
+      "raw_exact_decimal": "-0.18749",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "above",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0312",
+      "precision": 4,
+      "raw_exact_decimal": "0.031249",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "below",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0312",
+      "precision": 4,
+      "raw_exact_decimal": "0.03125",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "tie",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0313",
+      "precision": 4,
+      "raw_exact_decimal": "0.031251",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "above",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0313",
+      "precision": 4,
+      "raw_exact_decimal": "-0.031251",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "below",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0312",
+      "precision": 4,
+      "raw_exact_decimal": "-0.03125",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "tie",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0312",
+      "precision": 4,
+      "raw_exact_decimal": "-0.031249",
+      "retained_digit_parity_at_tie": "even",
+      "side_in_numeric_order": "above",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0937",
+      "precision": 4,
+      "raw_exact_decimal": "0.093749",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "below",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0938",
+      "precision": 4,
+      "raw_exact_decimal": "0.09375",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "tie",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "0.0938",
+      "precision": 4,
+      "raw_exact_decimal": "0.093751",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "above",
+      "sign": 1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0938",
+      "precision": 4,
+      "raw_exact_decimal": "-0.093751",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "below",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0938",
+      "precision": 4,
+      "raw_exact_decimal": "-0.09375",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "tie",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    },
+    {
+      "expected_half_even_decimal": "-0.0937",
+      "precision": 4,
+      "raw_exact_decimal": "-0.093749",
+      "retained_digit_parity_at_tie": "odd",
+      "side_in_numeric_order": "above",
+      "sign": -1,
+      "tie_realization": "tie values are dyadic rationals; actual product path unexecuted"
+    }
+  ],
+  "status": "independent arithmetic freeze, not product or ProDy execution"
+}
