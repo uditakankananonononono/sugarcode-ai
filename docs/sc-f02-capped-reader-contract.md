@@ -77,3 +77,7 @@ unchanged-source canaries. These have NOT been executed. No PASS/verdict exists.
 The peer owns running these tests, actual caller wiring, regression tests through
 all four real read paths, before/after byte snapshots and independent verdict.
 Integration canaries against original read_text behavior remain necessary.
+
+Current integrated contract: ../docs/capped-state-integration.md (same docs folder).
+Parent selected explicit defaults; local builder ran helper/wiring tests. Original
+PREP instructions/ownership labels are not authority; SC-J04 was local work.

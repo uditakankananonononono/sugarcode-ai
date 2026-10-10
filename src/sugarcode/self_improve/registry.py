@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import Any
 
 
+from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
+                            JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
 from .atomic_file import atomic_write_text
 
 
@@ -37,10 +39,12 @@ class FeatureRegistry:
             self._save({"module": module_slug, "features": {}, "proposals": {}})
 
     def _load(self) -> dict[str, Any]:
-        return json.loads(self._path.read_text(encoding="utf-8"))
+        return json.loads(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES).decode("utf-8"))
 
     def _save(self, data: dict[str, Any]) -> None:
         encoded = json.dumps(data, indent=2, sort_keys=True)
+        if len(encoded.encode("utf-8")) > REGISTRY_FILE_BYTES:
+            raise InputLimitExceeded("file", REGISTRY_FILE_BYTES)
         atomic_write_text(self._path, encoded)
 
     def _contained(self, path: Path) -> Path:

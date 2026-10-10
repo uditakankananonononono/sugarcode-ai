@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from .capped_readers import (read_capped_bytes, read_capped_utf8_lines, InputLimitExceeded,
+                            JSONL_FILE_BYTES, JSONL_LINE_BYTES, APPROVAL_FILE_BYTES, REGISTRY_FILE_BYTES)
 from .json_values import InvalidTelemetryValue, snapshot_json
 
 def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -76,8 +78,16 @@ class GapEventStore:
             line = json.dumps(snapshot, sort_keys=True, allow_nan=False)
         except (ValueError, TypeError, RecursionError) as exc:
             raise InvalidTelemetryValue("telemetry JSON serialization failed") from exc
-        with self._lock, self._path(event.module_slug).open("a", encoding="utf-8") as fh:
-            fh.write(line + "\n")
+        encoded = (line + "\n").encode("utf-8")
+        if len(encoded) > JSONL_LINE_BYTES:
+            raise InputLimitExceeded("line", JSONL_LINE_BYTES)
+        with self._lock:
+            path = self._path(event.module_slug)
+            prior = read_capped_bytes(path, max_file_bytes=JSONL_FILE_BYTES) if path.exists() else b""
+            if len(prior) + len(encoded) > JSONL_FILE_BYTES:
+                raise InputLimitExceeded("file", JSONL_FILE_BYTES)
+            with path.open("ab") as fh:
+                fh.write(encoded)
 
     def all(self, module_slug: str) -> list[GapEvent]:
         path = self._path(module_slug)
@@ -85,7 +95,7 @@ class GapEventStore:
             return []
         events: list[GapEvent] = []
         with self._lock:
-            lines = path.read_text(encoding="utf-8").splitlines()
+            lines = read_capped_utf8_lines(path, max_file_bytes=JSONL_FILE_BYTES, max_line_bytes=JSONL_LINE_BYTES)
         for line_number, line in enumerate(lines, 1):
             line = line.strip()
             if not line:
