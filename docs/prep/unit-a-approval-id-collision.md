@@ -13,8 +13,11 @@ check. If the key already exists, the stored value is replaced whole, whatever i
 record is validated, then saved atomically. Nothing in `request()` validates OTHER entries, so
 a non-dict or corrupt existing entry is also replaced silently. The engine writes the returned
 ID into the registry proposal (`set_proposal_approval`), and consumption is keyed
-`sha256([gate_identity, approval_id])` in the registry (`approval_consumption.py`), so the
-registry and gate agree only on the ID string.
+`sha256([gate_identity, approval_id])` in the registry (`approval_consumption.py`), and
+the engine at commit binds the gate record's payload, module and action to the proposal (J05/A01).
+What is missing is per-request generation or fingerprint continuity: nothing ties an ID to ONE
+request instance, so a record replaced under the same ID with a matching payload is
+indistinguishable from the original.
 
 ## Collision-state matrix (existing entry at the drawn ID, then a second `request()`)
 
@@ -25,7 +28,7 @@ registry and gate agree only on the ID string.
 | rejected | replaced by pending (or approved on an auto gate) | rejection reopened; an auto gate can turn a rejected ID into approved with no human decision |
 | approved and consumed | replaced; registry consumption record untouched | gate history (original payload, decided_by, decided_at, requested_at) lost. Engine commit still refuses: same-payload overwrite gives "already consumed" from the registry; different-payload overwrite gives the J05 "binding mismatch". The new request can never be committed (dead request) |
 | auto-approved (approved, decided_at null) | replaced | as approved/pending above |
-| non-dict or malformed entry | replaced by valid record | masks stored corruption that `record()` would have refused |
+| non-dict or malformed entry | replaced by valid record | hides the stored entry. `record()` refuses a non-dict entry or one without a valid status, but it does NOT refuse every corruption: a legacy `{status: approved}` entry and some schema-malformed full envelopes remain readable, so the overwrite may replace something `record()` would have returned |
 | legacy minimal entry (e.g. only `status`) or non-`si-` key | only the exact same key can be hit; `si-` IDs never equal other formats | legacy IDs not at risk unless equal strings |
 
 Engine linkage: the binding in `engine.activate/rollback` (J05 envelope plus A01 pin) refuses
@@ -50,8 +53,8 @@ the J05 envelope says nothing about gate history. Consumption protects commit-on
    should be combined with option 1, not substituted for it.
 3. Monotonic IDs (e.g. max existing numeric suffix + 1). Deterministic and collision-free while
    the file is intact, but needs a stored counter or derives from existing keys. A counter key
-   in the gate file breaks the "every top-level key is a record" reader assumption and the
-   retention plan helper; deriving from existing keys can reuse a number after pruning or
+   in the gate file would conflict with the retention/record APIs, which treat top-level keys as approval records (raw
+   `_load` itself enforces only an object root, not record-shaped values), and with the retention plan helper; deriving from existing keys can reuse a number after pruning or
    restore, which re-arms the consumed-ID problem above. IDs become guessable (no authentication
    is claimed anywhere, so this is neutral but should be said). Larger format change.
 
