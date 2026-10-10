@@ -6,6 +6,7 @@ registry transaction/crash/revoke races; no host effect authorization claim.
 """
 import hashlib,json,math,os,signal,subprocess,sys,tempfile
 from pathlib import Path
+from .source_admission import read_source_snapshot, SOURCE_CODE_BYTES
 from .isolation import IsolatedRunner,IsolationUnavailable
 from .isolated_result_codec import decode_child_result
 
@@ -25,9 +26,8 @@ print(json.dumps({'result':result},allow_nan=False))
 def dispatch(registry,name,items,params=None,*,timeout_seconds=10):
     if not isinstance(items,list) or (params is not None and not isinstance(params,dict)):raise ValueError('JSON list/object required')
     if type(timeout_seconds) not in (int,float) or not math.isfinite(timeout_seconds) or timeout_seconds<=0:raise ValueError('positive timeout required')
-    entry=registry._active_entry(name);path=registry._contained(Path(entry['file']))
-    code=path.read_bytes()
-    if hashlib.sha256(code).hexdigest()!=entry['sha256']:raise ValueError('active feature checksum mismatch')
+    entry=registry._active_entry(name);path=Path(entry['file']);registry._contained(path)
+    code=read_source_snapshot(path,max_bytes=SOURCE_CODE_BYTES,expected_sha256=entry['sha256']).content
     encoded=json.dumps({'items':items,'params':params or {}},allow_nan=False).encode()
     if len(code)>1_048_576 or len(encoded)>1_048_576:raise ValueError('input/code cap exceeded')
     runner=IsolatedRunner(timeout_seconds=timeout_seconds)

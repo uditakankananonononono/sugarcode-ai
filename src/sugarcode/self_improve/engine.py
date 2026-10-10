@@ -16,6 +16,7 @@ from typing import Any
 from .approval_schema import (ActivationExpectation, RollbackExpectation,
                               ApprovalSchemaError, require_approved)
 from .approval_binding import validate_rollback_binding, ApprovalBindingError
+from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .codegen import synthesize_code
 from .detector import CapabilityGap, GapDetector
 from .events import GapEvent, GapEventStore
@@ -146,6 +147,7 @@ class SelfImprovementEngine:
         for exemplar in self._exemplars_for(plan.gap_signature):
             sample = sample + [exemplar]
         test_code = synthesize_tests(plan, sample)
+        admit_candidate_text(code, test_code, limits=PRODUCTION_SOURCE_LIMITS)
         candidate = Candidate(plan=plan, code=code, test_code=test_code)
         self._candidates[candidate.key] = candidate
         self._log("feature_synthesized", key=candidate.key, name=plan.name,
@@ -158,6 +160,7 @@ class SelfImprovementEngine:
 
     def evaluate(self, candidate_key: str) -> SandboxResult:
         candidate = self._candidates[candidate_key]
+        admit_candidate_text(candidate.code, candidate.test_code, limits=PRODUCTION_SOURCE_LIMITS)
         result = self.sandbox.run(candidate)
         self._log("feature_evaluated", key=candidate_key, passed=result.passed,
                   exit_code=result.exit_code, timed_out=result.timed_out,

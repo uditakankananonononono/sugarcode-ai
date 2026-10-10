@@ -673,3 +673,17 @@ Set `INSTINCT_HERMES_URL=http://127.0.0.1:11434/v1`, `INSTINCT_HERMES_MODEL=herm
 ## Jev API status (2026-09-26)
 
 Vercel currently lists `typesafe-ai/jev` without Free Tier eligibility; the gateway route is paid. The TypeSafe direct API is also paid. A browser playground, if available from an official provider, is not free API access. The previously referenced `thejevai.com` could not be verified as TypeSafe AI's official site; do not use it for API keys, billing, or model calls. Official direct API: https://api.typesafe.ai/v1/systemone; keys: https://console.typesafe.ai/keys (https://docs.typesafe.ai/api). Gateway: https://ai-gateway.vercel.sh/typesafe/v1/systemone (https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe). Both routes stay OFF until a key is explicitly configured. Set `AI_GATEWAY_API_KEY` (or `INSTINCT_AI_GATEWAY_API_KEY`) for the preferred gateway route, or `JEV_API_KEY` (or `INSTINCT_JEV_API_KEY`) for the direct alternate; if both are present the gateway wins. Do not add keys to git. Vercel eligibility: https://vercel.com/ai-gateway/models/providers/typesafe-ai and https://vercel.com/docs/ai-gateway/pricing.
+
+### Source admission and snapshot execution
+
+Self-improvement proposal, evaluation, activation and dispatch source now has a
+1MiB code /1MiB test UTF8 byte admission ceiling. Over-limit or final-symlink/
+nonregular source files refuse. Activation copies verified snapshot bytes;
+dispatch executes the verified snapshot instead of reopening source through the
+loader. It remains in-process execution, not host-effect isolation. Activation's
+hash behavior deliberately changes from newline-normalized text to raw UTF8 bytes,
+matching proposal checksums and preserving CRLF code. Existing LF code keeps its
+hash. Byte admission is not a CPU/RSS/timeout budget; external-writer/ancestor-path
+races and cross-file crash transactions remain outside this boundary. Existing
+source-admission helper was previously unwired; these real caller changes are the
+separate production integration, not retroactive closure of the earlier helper.
