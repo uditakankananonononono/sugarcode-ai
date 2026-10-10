@@ -1,0 +1,2467 @@
+{
+  "input_sha256": "44210d2cf942a13b4a319d490e478a7cfceaf35c8493c248e3ab59e29fa98309",
+  "virtual_cell": [
+    {
+      "bounds": {},
+      "FBA_objective_module": 0.873922,
+      "FBA_objective_reference": 0.8739215069684279,
+      "objective_abs_error": 4.93031572124103e-07,
+      "mass_balance_max_abs": 3.082000003473695e-05,
+      "pfba_method": "fba",
+      "pfba_stage": "failed: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pFBA_total_abs_error": NaN,
+      "pFBA_objective_abs_error": 4.93031572124103e-07,
+      "verdict": "FAIL"
+    },
+    {
+      "bounds": {
+        "EX_o2_e": [
+          0.0,
+          0.0
+        ]
+      },
+      "FBA_objective_module": 0.211663,
+      "FBA_objective_reference": 0.21166294973531258,
+      "objective_abs_error": 5.026468741231582e-08,
+      "mass_balance_max_abs": 4.03000000481768e-06,
+      "pfba_method": "fba",
+      "pfba_stage": "failed: The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pFBA_total_abs_error": NaN,
+      "pFBA_objective_abs_error": 5.026468741231582e-08,
+      "verdict": "FAIL"
+    },
+    {
+      "bounds": {
+        "EX_glc__D_e": [
+          0.0,
+          0.0
+        ]
+      },
+      "reference_status": "infeasible",
+      "module_status": "infeasible",
+      "verdict": "INFEASIBILITY CLASSIFICATION PASS"
+    }
+  ],
+  "chemgpt_engine": [
+    {
+      "fragments": [
+        "benzene"
+      ],
+      "smiles": "c1ccccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.013999999999995794,
+      "module_mass": 78.1,
+      "reference_mass": 78.11399999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.013399999999999856,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.001999999999981128,
+      "module_mass": 79.1,
+      "reference_mass": 79.10199999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.18159999999999987,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl"
+      ],
+      "smiles": "O",
+      "sanitizes": true,
+      "mass_abs_error": 0.015000000000000568,
+      "module_mass": 18.0,
+      "reference_mass": 18.015,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.1753,
+      "HBD_difference": 1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine"
+      ],
+      "smiles": "N",
+      "sanitizes": true,
+      "mass_abs_error": 0.030999999999998806,
+      "module_mass": 17.0,
+      "reference_mass": 17.031,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.762,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl"
+      ],
+      "smiles": "C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.025000000000005684,
+      "module_mass": 46.0,
+      "reference_mass": 46.025000000000006,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.0008000000000000229,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide"
+      ],
+      "smiles": "C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.04099999999999682,
+      "module_mass": 45.0,
+      "reference_mass": 45.041,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.09850000000000003,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl"
+      ],
+      "smiles": "C",
+      "sanitizes": true,
+      "mass_abs_error": 0.04299999999999926,
+      "module_mass": 16.0,
+      "reference_mass": 16.043,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.1361,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link"
+      ],
+      "smiles": "CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.030000000000001137,
+      "module_mass": 30.1,
+      "reference_mass": 30.07,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.0262,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "fluorine"
+      ],
+      "smiles": "F",
+      "sanitizes": true,
+      "mass_abs_error": 0.006000000000000227,
+      "module_mass": 20.0,
+      "reference_mass": 20.006,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.14749999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide"
+      ],
+      "smiles": "S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.003999999999976467,
+      "module_mass": 81.1,
+      "reference_mass": 81.09600000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.0285,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.021000000000000796,
+      "module_mass": 68.1,
+      "reference_mass": 68.079,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.3097,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.038000000000010914,
+      "module_mass": 86.1,
+      "reference_mass": 86.138,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.6208,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1c1ccccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.012000000000000455,
+      "module_mass": 154.2,
+      "reference_mass": 154.212,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.046399999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "pyridine"
+      ],
+      "smiles": "c1ccccc1c1ccncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.0,
+      "module_mass": 155.2,
+      "reference_mass": 155.2,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.1486000000000005,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "hydroxyl"
+      ],
+      "smiles": "c1ccccc1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.012999999999991019,
+      "module_mass": 94.1,
+      "reference_mass": 94.11299999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.6922000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "amine"
+      ],
+      "smiles": "c1ccccc1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.029000000000010573,
+      "module_mass": 93.1,
+      "reference_mass": 93.129,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.16879999999999984,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "carboxyl"
+      ],
+      "smiles": "c1ccccc1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.022999999999981924,
+      "module_mass": 122.1,
+      "reference_mass": 122.12299999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.01519999999999988,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "amide"
+      ],
+      "smiles": "c1ccccc1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03900000000000148,
+      "module_mass": 121.1,
+      "reference_mass": 121.139,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.11449999999999994,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "methyl"
+      ],
+      "smiles": "c1ccccc1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.04099999999999682,
+      "module_mass": 92.1,
+      "reference_mass": 92.14099999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.20498000000000016,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "ethyl_link"
+      ],
+      "smiles": "c1ccccc1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.03200000000001069,
+      "module_mass": 106.2,
+      "reference_mass": 106.16799999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.4509999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "fluorine"
+      ],
+      "smiles": "c1c(F)cccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.003999999999990678,
+      "module_mass": 96.1,
+      "reference_mass": 96.10399999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.17430000000000012,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "sulfonamide"
+      ],
+      "smiles": "c1ccccc1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.006000000000000227,
+      "module_mass": 157.2,
+      "reference_mass": 157.194,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8659999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "imidazole"
+      ],
+      "smiles": "c1ccccc1c1nc[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.022999999999996135,
+      "module_mass": 144.2,
+      "reference_mass": 144.177,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.2766999999999997,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "benzene",
+        "piperazine"
+      ],
+      "smiles": "c1ccccc1C1CNCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.036000000000001364,
+      "module_mass": 162.2,
+      "reference_mass": 162.236,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.5795000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "benzene"
+      ],
+      "smiles": "c1ccncc1c1ccccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.0,
+      "module_mass": 155.2,
+      "reference_mass": 155.2,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.1486000000000005,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1c1ccncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.012000000000028876,
+      "module_mass": 156.2,
+      "reference_mass": 156.18799999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.34359999999999924,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "hydroxyl"
+      ],
+      "smiles": "c1ccncc1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.0009999999999763531,
+      "module_mass": 95.1,
+      "reference_mass": 95.10099999999997,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.8871999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "amine"
+      ],
+      "smiles": "c1ccncc1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.016999999999995907,
+      "module_mass": 94.1,
+      "reference_mass": 94.11699999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.36379999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "carboxyl"
+      ],
+      "smiles": "c1ccncc1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.010999999999967258,
+      "module_mass": 123.1,
+      "reference_mass": 123.11099999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.17979999999999985,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "amide"
+      ],
+      "smiles": "c1ccncc1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.026999999999986812,
+      "module_mass": 122.1,
+      "reference_mass": 122.12699999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.08049999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "methyl"
+      ],
+      "smiles": "c1ccncc1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.02899999999998215,
+      "module_mass": 93.1,
+      "reference_mass": 93.12899999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.009979999999999878,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "ethyl_link"
+      ],
+      "smiles": "c1ccncc1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.04400000000002535,
+      "module_mass": 107.2,
+      "reference_mass": 107.15599999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.256,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "fluorine"
+      ],
+      "smiles": "c1c(F)cncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.008000000000009777,
+      "module_mass": 97.1,
+      "reference_mass": 97.09199999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.020700000000000163,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "sulfonamide"
+      ],
+      "smiles": "c1ccncc1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.018000000000029104,
+      "module_mass": 158.2,
+      "reference_mass": 158.18199999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.671,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "imidazole"
+      ],
+      "smiles": "c1ccncc1c1nc[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.03499999999999659,
+      "module_mass": 145.2,
+      "reference_mass": 145.165,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.4716999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "pyridine",
+        "piperazine"
+      ],
+      "smiles": "c1ccncc1C1CNCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.023999999999972488,
+      "module_mass": 163.2,
+      "reference_mass": 163.22399999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.3845000000000002,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.012999999999991019,
+      "module_mass": 94.1,
+      "reference_mass": 94.11299999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.6922000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.0009999999999763531,
+      "module_mass": 95.1,
+      "reference_mass": 95.10099999999997,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.8871999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "hydroxyl"
+      ],
+      "smiles": "OO",
+      "sanitizes": true,
+      "mass_abs_error": 0.014000000000002899,
+      "module_mass": 34.0,
+      "reference_mass": 34.014,
+      "heavy_atoms_exact": true,
+      "logP_difference": -2.0174,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "amine"
+      ],
+      "smiles": "ON",
+      "sanitizes": true,
+      "mass_abs_error": 0.030000000000001137,
+      "module_mass": 33.0,
+      "reference_mass": 33.03,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.9342999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "carboxyl"
+      ],
+      "smiles": "OC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.024000000000008015,
+      "module_mass": 62.0,
+      "reference_mass": 62.02400000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": -1.5224,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "amide"
+      ],
+      "smiles": "OC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03999999999999915,
+      "module_mass": 61.0,
+      "reference_mass": 61.04,
+      "heavy_atoms_exact": true,
+      "logP_difference": -1.4231,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "methyl"
+      ],
+      "smiles": "OC",
+      "sanitizes": true,
+      "mass_abs_error": 0.04200000000000159,
+      "module_mass": 32.0,
+      "reference_mass": 32.042,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.10850000000000004,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "ethyl_link"
+      ],
+      "smiles": "OCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.030999999999998806,
+      "module_mass": 46.1,
+      "reference_mass": 46.069,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.0014000000000000679,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "fluorine"
+      ],
+      "smiles": "OF",
+      "sanitizes": true,
+      "mass_abs_error": 0.005000000000002558,
+      "module_mass": 36.0,
+      "reference_mass": 36.005,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.5631999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "sulfonamide"
+      ],
+      "smiles": "OS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0049999999999954525,
+      "module_mass": 97.1,
+      "reference_mass": 97.095,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.2479,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.02200000000000557,
+      "module_mass": 84.1,
+      "reference_mass": 84.07799999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -1.0152999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "hydroxyl",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.03700000000000614,
+      "module_mass": 102.1,
+      "reference_mass": 102.137,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.48079999999999945,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.029000000000010573,
+      "module_mass": 93.1,
+      "reference_mass": 93.129,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.16879999999999984,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.016999999999995907,
+      "module_mass": 94.1,
+      "reference_mass": 94.11699999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.36379999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "hydroxyl"
+      ],
+      "smiles": "NO",
+      "sanitizes": true,
+      "mass_abs_error": 0.030000000000001137,
+      "module_mass": 33.0,
+      "reference_mass": 33.03,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.9342999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "amine"
+      ],
+      "smiles": "NN",
+      "sanitizes": true,
+      "mass_abs_error": 0.045999999999999375,
+      "module_mass": 32.0,
+      "reference_mass": 32.046,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.018799999999999928,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "carboxyl"
+      ],
+      "smiles": "NC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.04000000000000625,
+      "module_mass": 61.0,
+      "reference_mass": 61.040000000000006,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.5230999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "amide"
+      ],
+      "smiles": "NC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.044000000000004036,
+      "module_mass": 60.1,
+      "reference_mass": 60.056,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.42379999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "methyl"
+      ],
+      "smiles": "NC",
+      "sanitizes": true,
+      "mass_abs_error": 0.04200000000000159,
+      "module_mass": 31.1,
+      "reference_mass": 31.058,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.32510000000000006,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "ethyl_link"
+      ],
+      "smiles": "NCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.015000000000007674,
+      "module_mass": 45.1,
+      "reference_mass": 45.084999999999994,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.43499999999999994,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "fluorine"
+      ],
+      "smiles": "NF",
+      "sanitizes": true,
+      "mass_abs_error": 0.021000000000000796,
+      "module_mass": 35.0,
+      "reference_mass": 35.021,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.1296000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "sulfonamide"
+      ],
+      "smiles": "NS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.01100000000000989,
+      "module_mass": 96.1,
+      "reference_mass": 96.111,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.7513999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0059999999999860165,
+      "module_mass": 83.1,
+      "reference_mass": 83.09400000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.49189999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amine",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.04699999999998283,
+      "module_mass": 101.2,
+      "reference_mass": 101.15300000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.434699999999999,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.022999999999981924,
+      "module_mass": 122.1,
+      "reference_mass": 122.12299999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.01519999999999988,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.010999999999967258,
+      "module_mass": 123.1,
+      "reference_mass": 123.11099999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.17979999999999985,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "hydroxyl"
+      ],
+      "smiles": "C(=O)OO",
+      "sanitizes": true,
+      "mass_abs_error": 0.024000000000008015,
+      "module_mass": 62.0,
+      "reference_mass": 62.02400000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.9324000000000001,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "amine"
+      ],
+      "smiles": "C(=O)ON",
+      "sanitizes": true,
+      "mass_abs_error": 0.03999999999999915,
+      "module_mass": 61.0,
+      "reference_mass": 61.04,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.06690000000000007,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "carboxyl"
+      ],
+      "smiles": "C(=O)OC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.033999999999991815,
+      "module_mass": 90.0,
+      "reference_mass": 90.03399999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.43739999999999984,
+      "HBD_difference": 1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "amide"
+      ],
+      "smiles": "C(=O)OC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.05000000000001137,
+      "module_mass": 89.0,
+      "reference_mass": 89.05000000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.33810000000000007,
+      "HBD_difference": 1,
+      "HBA_difference": 1,
+      "verdict": "FAIL"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "methyl"
+      ],
+      "smiles": "C(=O)OC",
+      "sanitizes": true,
+      "mass_abs_error": 0.047999999999994714,
+      "module_mass": 60.1,
+      "reference_mass": 60.05200000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.4108,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "ethyl_link"
+      ],
+      "smiles": "C(=O)OCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.020999999999986585,
+      "module_mass": 74.1,
+      "reference_mass": 74.07900000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.5206999999999999,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "fluorine"
+      ],
+      "smiles": "C(=O)OF",
+      "sanitizes": true,
+      "mass_abs_error": 0.015000000000000568,
+      "module_mass": 64.0,
+      "reference_mass": 64.015,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.043899999999999995,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "sulfonamide"
+      ],
+      "smiles": "C(=O)OS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.005000000000009663,
+      "module_mass": 125.1,
+      "reference_mass": 125.105,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8371000000000002,
+      "HBD_difference": 1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.012000000000014666,
+      "module_mass": 112.1,
+      "reference_mass": 112.08799999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.3078999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "carboxyl",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.047000000000025466,
+      "module_mass": 130.1,
+      "reference_mass": 130.14700000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.06959999999999983,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03900000000000148,
+      "module_mass": 121.1,
+      "reference_mass": 121.139,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.11449999999999994,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.026999999999986812,
+      "module_mass": 122.1,
+      "reference_mass": 122.12699999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.08049999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "hydroxyl"
+      ],
+      "smiles": "C(=O)NO",
+      "sanitizes": true,
+      "mass_abs_error": 0.04000000000000625,
+      "module_mass": 61.0,
+      "reference_mass": 61.040000000000006,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.9215999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "amine"
+      ],
+      "smiles": "C(=O)NN",
+      "sanitizes": true,
+      "mass_abs_error": 0.044000000000004036,
+      "module_mass": 60.1,
+      "reference_mass": 60.056,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.00609999999999955,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "carboxyl"
+      ],
+      "smiles": "C(=O)NC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.04999999999998295,
+      "module_mass": 89.0,
+      "reference_mass": 89.04999999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.5104,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "amide"
+      ],
+      "smiles": "C(=O)NC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.033999999999991815,
+      "module_mass": 88.1,
+      "reference_mass": 88.066,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.4111,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "methyl"
+      ],
+      "smiles": "C(=O)NC",
+      "sanitizes": true,
+      "mass_abs_error": 0.03200000000000358,
+      "module_mass": 59.1,
+      "reference_mass": 59.068,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.33780000000000016,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "ethyl_link"
+      ],
+      "smiles": "C(=O)NCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.0049999999999954525,
+      "module_mass": 73.1,
+      "reference_mass": 73.095,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.44770000000000004,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "fluorine"
+      ],
+      "smiles": "C(=O)NF",
+      "sanitizes": true,
+      "mass_abs_error": 0.03100000000000591,
+      "module_mass": 63.0,
+      "reference_mass": 63.031000000000006,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.11689999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "sulfonamide"
+      ],
+      "smiles": "C(=O)NS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.021000000000000796,
+      "module_mass": 124.1,
+      "reference_mass": 124.121,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.7640999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0040000000000048885,
+      "module_mass": 111.1,
+      "reference_mass": 111.104,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.20859999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "amide",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03699999999997772,
+      "module_mass": 129.2,
+      "reference_mass": 129.163,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.02969999999999917,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.04099999999999682,
+      "module_mass": 92.1,
+      "reference_mass": 92.14099999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.20498000000000016,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.02899999999998215,
+      "module_mass": 93.1,
+      "reference_mass": 93.12899999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.009979999999999878,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "hydroxyl"
+      ],
+      "smiles": "CO",
+      "sanitizes": true,
+      "mass_abs_error": 0.04200000000000159,
+      "module_mass": 32.0,
+      "reference_mass": 32.042,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.10849999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "amine"
+      ],
+      "smiles": "CN",
+      "sanitizes": true,
+      "mass_abs_error": 0.04200000000000159,
+      "module_mass": 31.1,
+      "reference_mass": 31.058,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.32509999999999994,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "carboxyl"
+      ],
+      "smiles": "CC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.047999999999994714,
+      "module_mass": 60.1,
+      "reference_mass": 60.05200000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.10910000000000009,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "amide"
+      ],
+      "smiles": "CC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03200000000000358,
+      "module_mass": 59.1,
+      "reference_mass": 59.068,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.20839999999999997,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "methyl"
+      ],
+      "smiles": "CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.030000000000001137,
+      "module_mass": 30.1,
+      "reference_mass": 30.07,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.0262,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "ethyl_link"
+      ],
+      "smiles": "CCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.003000000000007219,
+      "module_mass": 44.1,
+      "reference_mass": 44.096999999999994,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.08370000000000011,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "fluorine"
+      ],
+      "smiles": "CF",
+      "sanitizes": true,
+      "mass_abs_error": 0.03300000000000125,
+      "module_mass": 34.0,
+      "reference_mass": 34.033,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.21430000000000005,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "sulfonamide"
+      ],
+      "smiles": "CS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.023000000000024556,
+      "module_mass": 95.1,
+      "reference_mass": 95.12300000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.0953,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.006000000000000227,
+      "module_mass": 82.1,
+      "reference_mass": 82.106,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.11811999999999989,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "methyl",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.03499999999999659,
+      "module_mass": 100.2,
+      "reference_mass": 100.165,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.7786,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.03200000000001069,
+      "module_mass": 106.2,
+      "reference_mass": 106.16799999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.4509999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.04400000000002535,
+      "module_mass": 107.2,
+      "reference_mass": 107.15599999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.256,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "hydroxyl"
+      ],
+      "smiles": "CCO",
+      "sanitizes": true,
+      "mass_abs_error": 0.030999999999998806,
+      "module_mass": 46.1,
+      "reference_mass": 46.069,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.0014000000000000123,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "amine"
+      ],
+      "smiles": "CCN",
+      "sanitizes": true,
+      "mass_abs_error": 0.015000000000007674,
+      "module_mass": 45.1,
+      "reference_mass": 45.084999999999994,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.43499999999999983,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "carboxyl"
+      ],
+      "smiles": "CCC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.021000000000000796,
+      "module_mass": 74.1,
+      "reference_mass": 74.079,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.21899999999999997,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "amide"
+      ],
+      "smiles": "CCC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0049999999999954525,
+      "module_mass": 73.1,
+      "reference_mass": 73.095,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.31829999999999997,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "methyl"
+      ],
+      "smiles": "CCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.003000000000007219,
+      "module_mass": 44.1,
+      "reference_mass": 44.096999999999994,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.08370000000000011,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "ethyl_link"
+      ],
+      "smiles": "CCCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.023999999999993804,
+      "module_mass": 58.1,
+      "reference_mass": 58.123999999999995,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.1936,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "fluorine"
+      ],
+      "smiles": "CCF",
+      "sanitizes": true,
+      "mass_abs_error": 0.03999999999999915,
+      "module_mass": 48.1,
+      "reference_mass": 48.06,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.32420000000000004,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "sulfonamide"
+      ],
+      "smiles": "CCS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.05000000000001137,
+      "module_mass": 109.1,
+      "reference_mass": 109.15,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.2051999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "FAIL"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.03300000000000125,
+      "module_mass": 96.1,
+      "reference_mass": 96.133,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.12790000000000012,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "ethyl_link",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.007999999999995566,
+      "module_mass": 114.2,
+      "reference_mass": 114.19200000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8885000000000001,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "benzene"
+      ],
+      "smiles": "c1c(F)cccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.003999999999990678,
+      "module_mass": 96.1,
+      "reference_mass": 96.10399999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.17430000000000012,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "pyridine"
+      ],
+      "smiles": "c1c(F)cncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.008000000000009777,
+      "module_mass": 97.1,
+      "reference_mass": 97.09199999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.020700000000000163,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "hydroxyl"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "amine"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "carboxyl"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "amide"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "methyl"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "ethyl_link"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "fluorine"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "sulfonamide"
+      ],
+      "refused": true,
+      "error": "fluorine cannot be the core of a larger molecule"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "imidazole"
+      ],
+      "smiles": "c1nc(F)[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.03100000000000591,
+      "module_mass": 86.1,
+      "reference_mass": 86.06899999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.14879999999999993,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "fluorine",
+        "piperazine"
+      ],
+      "smiles": "C1C(F)NCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.028000000000005798,
+      "module_mass": 104.1,
+      "reference_mass": 104.128,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.6252000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "benzene"
+      ],
+      "smiles": "c1ccccc1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.006000000000000227,
+      "module_mass": 157.2,
+      "reference_mass": 157.194,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8659999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "pyridine"
+      ],
+      "smiles": "c1ccncc1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.018000000000029104,
+      "module_mass": 158.2,
+      "reference_mass": 158.18199999999996,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.671,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "hydroxyl"
+      ],
+      "smiles": "S(=O)(=O)NO",
+      "sanitizes": true,
+      "mass_abs_error": 0.0049999999999954525,
+      "module_mass": 97.1,
+      "reference_mass": 97.095,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.008399999999999963,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "amine"
+      ],
+      "smiles": "S(=O)(=O)NN",
+      "sanitizes": true,
+      "mass_abs_error": 0.011000000000024102,
+      "module_mass": 96.1,
+      "reference_mass": 96.11100000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.9238999999999997,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "carboxyl"
+      ],
+      "smiles": "S(=O)(=O)NC(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.0049999999999954525,
+      "module_mass": 125.1,
+      "reference_mass": 125.10499999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.41959999999999975,
+      "HBD_difference": -1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "amide"
+      ],
+      "smiles": "S(=O)(=O)NC(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.021000000000015007,
+      "module_mass": 124.1,
+      "reference_mass": 124.12100000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.5188999999999997,
+      "HBD_difference": -1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "methyl"
+      ],
+      "smiles": "S(=O)(=O)NC",
+      "sanitizes": true,
+      "mass_abs_error": 0.023000000000010346,
+      "module_mass": 95.1,
+      "reference_mass": 95.123,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.2678,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "ethyl_link"
+      ],
+      "smiles": "S(=O)(=O)NCC",
+      "sanitizes": true,
+      "mass_abs_error": 0.05000000000001137,
+      "module_mass": 109.1,
+      "reference_mass": 109.15,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.3777000000000001,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "FAIL"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "fluorine"
+      ],
+      "smiles": "S(=O)(=O)NF",
+      "sanitizes": true,
+      "mass_abs_error": 0.013999999999981583,
+      "module_mass": 99.1,
+      "reference_mass": 99.08600000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8130999999999999,
+      "HBD_difference": -1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "sulfonamide"
+      ],
+      "smiles": "S(=O)(=O)NS(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.02400000000000091,
+      "module_mass": 160.2,
+      "reference_mass": 160.176,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.6941000000000002,
+      "HBD_difference": -1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.04099999999999682,
+      "module_mass": 147.2,
+      "reference_mass": 147.159,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.5429,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "sulfonamide",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.018000000000000682,
+      "module_mass": 165.2,
+      "reference_mass": 165.218,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.2048999999999979,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "benzene"
+      ],
+      "smiles": "c1nc[nH]c1c1ccccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.022999999999996135,
+      "module_mass": 144.2,
+      "reference_mass": 144.177,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.2766999999999997,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "pyridine"
+      ],
+      "smiles": "c1nc[nH]c1c1ccncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.03499999999999659,
+      "module_mass": 145.2,
+      "reference_mass": 145.165,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.4716999999999998,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "hydroxyl"
+      ],
+      "smiles": "c1nc[nH]c1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.02200000000000557,
+      "module_mass": 84.1,
+      "reference_mass": 84.07799999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -1.0152999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "amine"
+      ],
+      "smiles": "c1nc[nH]c1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0059999999999860165,
+      "module_mass": 83.1,
+      "reference_mass": 83.09400000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.49189999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "carboxyl"
+      ],
+      "smiles": "c1nc[nH]c1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.012000000000014666,
+      "module_mass": 112.1,
+      "reference_mass": 112.08799999999998,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.3078999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "amide"
+      ],
+      "smiles": "c1nc[nH]c1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.0040000000000048885,
+      "module_mass": 111.1,
+      "reference_mass": 111.104,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.20859999999999995,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "methyl"
+      ],
+      "smiles": "c1nc[nH]c1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.006000000000000227,
+      "module_mass": 82.1,
+      "reference_mass": 82.106,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.11811999999999989,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "ethyl_link"
+      ],
+      "smiles": "c1nc[nH]c1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.03300000000000125,
+      "module_mass": 96.1,
+      "reference_mass": 96.133,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.12790000000000012,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "fluorine"
+      ],
+      "smiles": "c1nc(F)[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.03100000000000591,
+      "module_mass": 86.1,
+      "reference_mass": 86.06899999999999,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.14879999999999993,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "sulfonamide"
+      ],
+      "smiles": "c1nc[nH]c1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.04099999999999682,
+      "module_mass": 147.2,
+      "reference_mass": 147.159,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.5429,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "imidazole"
+      ],
+      "smiles": "c1nc[nH]c1c1nc[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.04200000000000159,
+      "module_mass": 134.1,
+      "reference_mass": 134.142,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.5997999999999999,
+      "HBD_difference": 0,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "imidazole",
+        "piperazine"
+      ],
+      "smiles": "c1nc[nH]c1C1CNCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.0010000000000047748,
+      "module_mass": 152.2,
+      "reference_mass": 152.201,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.25639999999999996,
+      "HBD_difference": 0,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "benzene"
+      ],
+      "smiles": "C1CNCCN1c1ccccc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.036000000000029786,
+      "module_mass": 162.2,
+      "reference_mass": 162.23600000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.4038000000000004,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "pyridine"
+      ],
+      "smiles": "C1CNCCN1c1ccncc1",
+      "sanitizes": true,
+      "mass_abs_error": 0.02400000000000091,
+      "module_mass": 163.2,
+      "reference_mass": 163.224,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.20880000000000049,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "hydroxyl"
+      ],
+      "smiles": "C1CNCCN1O",
+      "sanitizes": true,
+      "mass_abs_error": 0.03700000000000614,
+      "module_mass": 102.1,
+      "reference_mass": 102.137,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.48079999999999945,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "amine"
+      ],
+      "smiles": "C1CNCCN1N",
+      "sanitizes": true,
+      "mass_abs_error": 0.04699999999998283,
+      "module_mass": 101.2,
+      "reference_mass": 101.15300000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.434699999999999,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "carboxyl"
+      ],
+      "smiles": "C1CNCCN1C(=O)O",
+      "sanitizes": true,
+      "mass_abs_error": 0.047000000000025466,
+      "module_mass": 130.1,
+      "reference_mass": 130.14700000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": -0.06959999999999983,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "amide"
+      ],
+      "smiles": "C1CNCCN1C(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.03699999999997772,
+      "module_mass": 129.2,
+      "reference_mass": 129.163,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.02969999999999917,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "methyl"
+      ],
+      "smiles": "C1CNCCN1C",
+      "sanitizes": true,
+      "mass_abs_error": 0.03499999999999659,
+      "module_mass": 100.2,
+      "reference_mass": 100.165,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.7786,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "ethyl_link"
+      ],
+      "smiles": "C1CNCCN1CC",
+      "sanitizes": true,
+      "mass_abs_error": 0.007999999999995566,
+      "module_mass": 114.2,
+      "reference_mass": 114.19200000000001,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.8885000000000001,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "fluorine"
+      ],
+      "smiles": "C1C(F)NCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.028000000000005798,
+      "module_mass": 104.1,
+      "reference_mass": 104.128,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.6252000000000001,
+      "HBD_difference": 0,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "sulfonamide"
+      ],
+      "smiles": "C1CNCCN1S(=O)(=O)N",
+      "sanitizes": true,
+      "mass_abs_error": 0.018000000000000682,
+      "module_mass": 165.2,
+      "reference_mass": 165.218,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.2048999999999979,
+      "HBD_difference": 1,
+      "HBA_difference": 2,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "imidazole"
+      ],
+      "smiles": "C1CNCCN1c1nc[nH]c1",
+      "sanitizes": true,
+      "mass_abs_error": 0.0010000000000331966,
+      "module_mass": 152.2,
+      "reference_mass": 152.20100000000002,
+      "heavy_atoms_exact": true,
+      "logP_difference": 0.08070000000000047,
+      "HBD_difference": 1,
+      "HBA_difference": 1,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    },
+    {
+      "fragments": [
+        "piperazine",
+        "piperazine"
+      ],
+      "smiles": "C1CNCCN1C1CNCCN1",
+      "sanitizes": true,
+      "mass_abs_error": 0.040000000000020464,
+      "module_mass": 170.3,
+      "reference_mass": 170.26,
+      "heavy_atoms_exact": true,
+      "logP_difference": 1.1894999999999971,
+      "HBD_difference": 1,
+      "HBA_difference": 0,
+      "verdict": "SUPPORTED CHEMISTRY PARITY PASS"
+    }
+  ]
+}
