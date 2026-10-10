@@ -1,0 +1,18 @@
+{
+  "artifact_sha256": {
+    "BBBC001_v1_counts.txt": "b24671230222f889b63ac287599bfa4a8b009e458a465bfd13cf82ef966b12af",
+    "images/AS_09125_050118150001_A03f00d0.tif": "f71cd6ae30ba4f162671a420055dd71eec6be8cd011475fae930930cccbcf578",
+    "images/AS_09125_050118150001_A03f01d0.tif": "f4201216eaf409affd97b54d8868da38d127f8f7d50dba3164902df6b9ad028f",
+    "images/AS_09125_050118150001_A03f02d0.tif": "486ab75b9dbdfd25a8bc532d0a86c37b6d541ffc0946237c4516e500aafdaf61",
+    "images/AS_09125_050118150001_A03f03d0.tif": "34541a532e5a89d1cefba57ef2764a73a6bb80d3905f785a0f1305b6e9156799",
+    "images/AS_09125_050118150001_A03f04d0.tif": "40f8a1e2520f1547bfbd6df52f393c7c087c0b514b2dc54df81df74a131192af",
+    "images/AS_09125_050118150001_A03f05d0.tif": "9d4ee2b2e2fb10d04be69d0469df712721fc866bc78874138e5ba0ff8e77b9fd"
+  },
+  "count_target_mean_fraction": 0.11,
+  "scope": "BBBC001v1 sixfields all included; countonly",
+  "sources": [
+    "https://bbbc.broadinstitute.org/BBBC001",
+    "https://data.broadinstitute.org/bbbc/BBBC001/BBBC001_v1_images_tif.zip",
+    "https://data.broadinstitute.org/bbbc/BBBC001/BBBC001_v1_counts.txt"
+  ]
+}
