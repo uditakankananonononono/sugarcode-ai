@@ -673,3 +673,13 @@ Set `INSTINCT_HERMES_URL=http://127.0.0.1:11434/v1`, `INSTINCT_HERMES_MODEL=herm
 ## Jev API status (2026-09-26)
 
 Vercel currently lists `typesafe-ai/jev` without Free Tier eligibility; the gateway route is paid. The TypeSafe direct API is also paid. A browser playground, if available from an official provider, is not free API access. The previously referenced `thejevai.com` could not be verified as TypeSafe AI's official site; do not use it for API keys, billing, or model calls. Official direct API: https://api.typesafe.ai/v1/systemone; keys: https://console.typesafe.ai/keys (https://docs.typesafe.ai/api). Gateway: https://ai-gateway.vercel.sh/typesafe/v1/systemone (https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe). Both routes stay OFF until a key is explicitly configured. Set `AI_GATEWAY_API_KEY` (or `INSTINCT_AI_GATEWAY_API_KEY`) for the preferred gateway route, or `JEV_API_KEY` (or `INSTINCT_JEV_API_KEY`) for the direct alternate; if both are present the gateway wins. Do not add keys to git. Vercel eligibility: https://vercel.com/ai-gateway/models/providers/typesafe-ai and https://vercel.com/docs/ai-gateway/pricing.
+
+### Self-improvement proposal commit boundary
+
+Proposal commits validate the complete prospective registry schema and its16MiB
+encoded byte cap before creating the candidates directory or code/test files.
+Corrupt-registry preflight errors now surface as `RegistryError` with the original
+`RegistryValidationError` cause (a deliberate exception-type change). Capacity or
+schema refusal leaves no new candidate files/directory; later IO failures can
+still leave an empty directory or hard-crash orphan files. This is in-process
+admission, not a cross-file transaction or external-writer race guarantee.

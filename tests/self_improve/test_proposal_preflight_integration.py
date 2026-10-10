@@ -1,5 +1,5 @@
 import pytest
-from sugarcode.self_improve.registry import FeatureRegistry
+from sugarcode.self_improve.registry import FeatureRegistry, RegistryError
 from sugarcode.self_improve.proposal_preflight_r01 import ProposalPreflightError
 from sugarcode.self_improve import atomic_file as af
 
@@ -13,7 +13,7 @@ def propose(registry,key='x',**over):
 def test_corrupt_registry_before_any_candidate_write(tmp_path):
     registry=FeatureRegistry('m',tmp_path)
     registry._path.write_text('{bad');before=registry._path.read_bytes()
-    with pytest.raises(ValueError):propose(registry)
+    with pytest.raises(RegistryError):propose(registry)
     assert registry._path.read_bytes()==before
     assert not (registry._dir/'candidates').exists()
 
