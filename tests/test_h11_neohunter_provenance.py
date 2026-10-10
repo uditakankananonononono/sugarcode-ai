@@ -84,4 +84,4 @@ def test_json_keeps_fit_all_rows_not_refit_all_rows():
 def test_contract_documents_both_distinct_meanings():
     c = (Path(__file__).resolve().parents[1] / "CONTRACT_H11.md").read_text()
     assert "fit_all_rows" in c and "refit_all_rows" in c
-    assert "weight origin" in c and "process" in c
+    assert "weight origin" in c and "PROCESS flag" in c
