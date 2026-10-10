@@ -90,9 +90,9 @@ else:
  pid=int(marker.read_text())
  status=Path(f'/proc/{pid}/status')
  import time
- deadline=time.monotonic()+2
- while status.exists() and 'State:\tZ' not in status.read_text() and time.monotonic()<deadline:time.sleep(.01)
- assert not status.exists() or 'State:\tZ' in status.read_text()
+ from process_terminal_poll_h27 import poll_terminal_status
+ observation=poll_terminal_status(status.read_text,monotonic=time.monotonic,sleep=time.sleep,timeout=2.0,expected_pid=pid,expected_name=Path(sys.executable).name)
+ assert observation["terminal"], observation
 
 
 def test_read_exception_kills_and_reaps_direct_child(monkeypatch,tmp_path):
