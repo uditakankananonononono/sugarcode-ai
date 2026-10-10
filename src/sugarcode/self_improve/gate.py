@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from uuid import uuid4
 
+from .atomic_file import AtomicDurabilityError, atomic_write_text
 from .json_values import snapshot_json
 
 PENDING, APPROVED, REJECTED = "pending", "approved", "rejected"
@@ -64,7 +65,7 @@ class ManualApprovalGate:
         self._auto = auto_approve
         self._lock = threading.Lock()
         if not self._path.exists():
-            self._path.write_text("{}", encoding="utf-8")
+            atomic_write_text(self._path, "{}")
 
     def _load(self) -> dict[str, Any]:
         try:
@@ -84,7 +85,7 @@ class ManualApprovalGate:
             encoded = json.dumps(snapshot, indent=2, sort_keys=True, allow_nan=False)
         except (ValueError, TypeError, RecursionError) as exc:
             raise InvalidApprovalState("invalid approval JSON write; state unchanged") from exc
-        self._path.write_text(encoded, encoding="utf-8")
+        atomic_write_text(self._path, encoded)
 
     def request(self, *, module_id: int, module_slug: str, action_type: str,
                 summary: str, payload: dict[str, Any]) -> str:
@@ -97,7 +98,12 @@ class ManualApprovalGate:
                 "status": APPROVED if self._auto else PENDING,
                 "requested_at": time.time(), "decided_at": None,
             }
-            self._save(data)
+            try:
+                self._save(data)
+            except AtomicDurabilityError as exc:
+                # Replacement landed: caller needs the generated identity to reconcile.
+                exc.approval_id = approval_id
+                raise
         return approval_id
 
     def decide(self, approval_id: str, decision: str, *, decided_by: str = "human") -> None:
