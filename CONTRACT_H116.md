@@ -50,3 +50,28 @@ No other mechanism authorized. Stop on missing dependency or mismatch.
 
 No successful parser, consumer/biology, broad schema/count-policy, clinical,
 repair, exhaustive mutant adequacy or full-suite claim. One literal only.
+
+## Later environment ruling and actual execution, separate new commit
+
+The PREP-NORUN statement above records the initial chronology, not final state.
+Parent's later explicit one-action ruling allowed python3 -m pip install --user
+pytest. That single action succeeded (pytest9.1.1, pluggy1.6.0,
+iniconfig2.3.1 user site). Required final pip show and pluggy import both exit0.
+No retry, uninstall or broad corrective install. python3 was used because the
+initial python command was absent; substitution reported before test execution.
+
+Actual separate selections:
+- New-only: exit0, 1 passed in0.10s.
+- New plus test_bio_bed.py and test_cli_bed.py: exit0,16 passed in0.72s.
+- Same plus tests/self_improve with -o xfail_strict=true: exit1,38 failed,
+  1818 passed,13 xfailed in25.73s. Scoped selection, NOT global or all-green.
+
+STOP on mismatch/dependency gap. Observed isolated runner stderr contains
+'/usr/bin/python3: No module named pytest'. Outer user-site python3 can run
+pytest but isolation does not use that environment. Empty engine proposal
+failures also occurred; not all causes individually diagnosed. No corrective
+install or rerun. Mutants and restored-adjacent remain UNRUN. Product bed.py
+was never edited; no byte-restoration execution or mutant adequacy claim.
+One literal's new/adjacent results do not establish generic BED repair. Exact
+command chronology and raw stdout/stderr are delivered outside this two-path
+commit. No syntax checks performed at any stage.
