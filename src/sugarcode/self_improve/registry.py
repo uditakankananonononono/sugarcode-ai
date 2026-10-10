@@ -16,6 +16,9 @@ from pathlib import Path
 from typing import Any
 
 
+from .atomic_file import atomic_write_text
+
+
 class RegistryError(RuntimeError):
     pass
 
@@ -37,7 +40,8 @@ class FeatureRegistry:
         return json.loads(self._path.read_text(encoding="utf-8"))
 
     def _save(self, data: dict[str, Any]) -> None:
-        self._path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+        encoded = json.dumps(data, indent=2, sort_keys=True)
+        atomic_write_text(self._path, encoded)
 
     def _contained(self, path: Path) -> Path:
         resolved = path.resolve()
