@@ -45,7 +45,8 @@ class FeatureRegistry:
         except (RegistryValidationError, InputLimitExceeded) as exc:
             raise RegistryError("invalid registry state; repair required") from exc
 
-    def _save(self, data: dict[str, Any]) -> None:
+    def _encode_state(self, data: dict[str, Any]) -> str:
+        """Validate prospective state without opening or changing any file."""
         try:
             validate_registry_state(data, expected_module=self.module_slug)
             encoded = json.dumps(data, indent=2, sort_keys=True, allow_nan=False)
@@ -53,7 +54,10 @@ class FeatureRegistry:
             raise RegistryError("invalid registry write; state unchanged") from exc
         if len(encoded.encode("utf-8")) > REGISTRY_FILE_BYTES:
             raise InputLimitExceeded("file", REGISTRY_FILE_BYTES)
-        atomic_write_text(self._path, encoded)
+        return encoded
+
+    def _save(self, data: dict[str, Any]) -> None:
+        atomic_write_text(self._path, self._encode_state(data))
 
     def _contained(self, path: Path) -> Path:
         resolved = path.resolve()
@@ -65,12 +69,23 @@ class FeatureRegistry:
     def save_proposal(self, key: str, *, name: str, kind: str, code: str,
                       test_code: str, gap_signature: str) -> dict[str, Any]:
         with self._lock:
-            plan = preflight_proposal(self._dir, module_slug=self.module_slug,
-                key=key, name=name, kind=kind, code=code, test_code=test_code,
-                gap_signature=gap_signature, validate_registry=decode_registry_json)
+            try:
+                plan = preflight_proposal(self._dir, module_slug=self.module_slug,
+                    key=key, name=name, kind=kind, code=code, test_code=test_code,
+                    gap_signature=gap_signature, validate_registry=decode_registry_json)
+            except RegistryValidationError as exc:
+                raise RegistryError("invalid registry state; repair required") from exc
             data = self._load()
             if hashlib.sha256(read_capped_bytes(self._path, max_file_bytes=REGISTRY_FILE_BYTES)).hexdigest() != plan.registry_sha256:
                 raise RegistryError("registry changed during proposal preflight")
+            record = {
+                "name": name, "kind": kind, "gap_signature": gap_signature,
+                "code_sha256": plan.code_sha256, "test_sha256": plan.test_sha256,
+                "code_file": str(plan.code_path), "test_file": str(plan.test_path),
+                "approval_id": None, "status": "proposed", "created_at": time.time(),
+            }
+            data["proposals"][key] = record
+            self._encode_state(data)  # prospective refusal precedes mkdir/file writes
             plan.code_path.parent.mkdir(exist_ok=True)
             created: list[Path] = []
             committed = False
@@ -79,13 +94,6 @@ class FeatureRegistry:
                     with path.open("xb") as stream:
                         created.append(path)
                         stream.write(content)
-                record = {
-                    "name": name, "kind": kind, "gap_signature": gap_signature,
-                    "code_sha256": plan.code_sha256, "test_sha256": plan.test_sha256,
-                    "code_file": str(plan.code_path), "test_file": str(plan.test_path),
-                    "approval_id": None, "status": "proposed", "created_at": time.time(),
-                }
-                data["proposals"][key] = record
                 try:
                     self._save(data)
                 except AtomicDurabilityError:
