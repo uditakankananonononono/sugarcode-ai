@@ -1,0 +1,57 @@
+"""UNAPPLIED, AUTHORED, NOT RUN. Would live at tests/test_prep_g02_call_tool_no_execution.py and only passes
+AFTER prep_proposals/G02/UNAPPLIED-llm-wiring.diff.txt is applied. Monkeypatches the catalog and module import,
+so no real module runs."""
+import types
+
+import pytest
+
+import sugarcode.llm.tools as T
+
+
+def _deep(n):
+    d = {}
+    for _ in range(n - 1):
+        d = {"a": d}
+    return d
+
+
+@pytest.fixture
+def executed(monkeypatch):
+    log = []
+    tool = T.Tool(name="m__f", module="m", function="f", description="d",
+                  parameters={"type": "object", "properties": {"a": {"type": "object"}}, "required": ["a"]})
+    monkeypatch.setattr(T, "catalog", lambda: {"m__f": tool})
+
+    def fake_import(name):
+        log.append(("import", name))
+        return types.SimpleNamespace(f=lambda **kw: log.append(("called", kw)) or {"ok": True})
+    monkeypatch.setattr(T.importlib, "import_module", fake_import)
+    return log
+
+
+@pytest.mark.parametrize("args", [
+    {"a": _deep(70)},                       # direct dict over the depth ceiling
+    {"a": {}, 1: "x"},                      # non-str key
+    '{"a": {}, "a": {}}',                   # duplicate key
+    '{"a": NaN}', '{"a": 1e999}',
+    "x" * 70_000,                           # over DEFAULT_MAX_CHARS
+    '["a"]', ["a"], None,                   # not an object
+])
+def test_no_import_or_call_when_validation_fails(executed, args):
+    out = T.call_tool("m__f", args)
+    assert "error" in out
+    assert executed == []
+
+
+def test_valid_text_and_dict_execute_once_each(executed):
+    assert T.call_tool("m__f", '{"a": {"b": 1}}') == {"result": {"ok": True}}
+    assert T.call_tool("m__f", {"a": {"b": 1}}) == {"result": {"ok": True}}
+    assert [e[0] for e in executed] == ["import", "called", "import", "called"]
+
+
+def test_import_failure_is_an_error_dict_not_a_raise(monkeypatch, executed):
+    def boom(name):
+        raise ImportError("no such module")
+    monkeypatch.setattr(T.importlib, "import_module", boom)
+    out = T.call_tool("m__f", {"a": {}})
+    assert list(out) == ["error"] and out["error"].startswith("ImportError")
