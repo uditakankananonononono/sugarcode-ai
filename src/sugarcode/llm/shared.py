@@ -24,6 +24,7 @@ from instinct_models import JevEval, ProductConfig, Router, Task, load_config
 from instinct_models.training.dataset import ExampleRow, build_needle_jsonl
 
 from .router import route as route_modules
+from .tool_call_shape import ToolCallShapeError, tool_call_container, tool_call_fields
 from .tools import call_tool, tools_for_modules
 
 PRODUCT = "sugarcode"
@@ -67,6 +68,17 @@ def shared_tools(question: str, k: int = 3, limit: int = 12) -> tuple[list[dict]
     return [t.openai_schema()["function"] for t in tools], mods
 
 
+def _run_shared_call(call, index: int, offered: set) -> dict:
+    """One tool result per call: a malformed call becomes a typed error result; valid siblings still run."""
+    try:
+        f = tool_call_fields(call, flat=True, index=index)
+    except ToolCallShapeError as e:
+        return {"error": f"malformed tool call: {e}"}
+    if f.name not in offered:
+        return {"error": f"model called {f.name!r}, which was not offered"}
+    return call_tool(f.name, f.arguments or {})
+
+
 def shared_ask(question: str, *, private: bool = False, execute: bool = True, router: Router | None = None,
                env: dict | None = None, k: int = 3) -> dict:
     tools, mods = shared_tools(question, k=k)
@@ -83,9 +95,7 @@ def shared_ask(question: str, *, private: bool = False, execute: bool = True, ro
     out.update(provider=r.provider, model=r.model, text=r.text, tool_calls=r.tool_calls)
     if execute and r.tool_calls:
         offered = {t["name"] for t in tools}
-        out["tool_results"] = [call_tool(c["name"], c.get("arguments") or {}) if c.get("name") in offered
-                               else {"error": f"model called {c.get('name')!r}, which was not offered"}
-                               for c in r.tool_calls]
+        out["tool_results"] = [_run_shared_call(c, i, offered) for i, c in enumerate(tool_call_container(r.tool_calls))]
     return out
 
 

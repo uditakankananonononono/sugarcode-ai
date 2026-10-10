@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 from .providers import ChatClient, ProviderError, resolve, resolve_route
 from .router import route as route_modules
+from .tool_call_shape import ToolCallShapeError, tool_call_batch
 from .tools import call_tool, tools_for_modules
 
 SYSTEM = (
@@ -50,16 +51,19 @@ def _run(client: ChatClient, question: str, tools, max_steps: int) -> tuple[str,
     trace: list[dict] = []
     for _ in range(max_steps):
         msg = client.chat(messages, tools=schemas)
-        calls = msg.get("tool_calls") or []
+        raw_calls = msg.get("tool_calls")
+        try:  # validate the container and every call BEFORE running any tool
+            calls = tool_call_batch(raw_calls)
+        except ToolCallShapeError as e:
+            raise ToolCallShapeError(f"{client.profile}: {e}") from e
         if not calls:
             return (msg.get("content") or "").strip(), trace
-        messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
+        messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": raw_calls})
         for c in calls:
-            fn = c.get("function", {})
-            result = call_tool(fn.get("name", ""), fn.get("arguments") or "{}")
-            trace.append({"tool": fn.get("name"), "arguments": fn.get("arguments"),
+            result = call_tool(c.name, c.arguments or "{}")
+            trace.append({"tool": c.name, "arguments": c.arguments,
                           "ok": "error" not in result})
-            messages.append({"role": "tool", "tool_call_id": c.get("id", ""),
+            messages.append({"role": "tool", "tool_call_id": c.id,
                              "content": json.dumps(result)[:12000]})
     messages.append({"role": "user", "content": "Answer now from the tool results so far."})
     return (client.chat(messages).get("content") or "").strip(), trace
