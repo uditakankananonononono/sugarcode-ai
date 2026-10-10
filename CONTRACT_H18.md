@@ -1,0 +1,20 @@
+# CONTRACT_H18: str_scope exact-repeat characterization against the frozen TRF comparison (AUTHORED, NOT RUN; test and contract only)
+Base f1931559be238a132612ae764575892458b8b223. str_scope/core.py blob 3bc9ed40465e7e1f7cb6e33a4fcd36db1f397cd7 is UNCHANGED (no product edit, no output edited or rescored). Authority: peer rulings relayed by Main, not independently authenticated by me.
+Chronology (IST, 10 Oct 2026): fixtures copied and test written 16:45:27-16:45:38; this contract 16:45:41. No source edit exists. Test before contract (self-reported).
+## Evidence (peer-supplied, vendored byte-identical, not regenerated)
+- tests/fixtures/h18_str_trf_input.fasta sha256 40ffa4192ece95dae49199365a477ba81537ba004ebea83c1d0c95dee4f80286; tests/fixtures/h18_str_trf_freeze_v2.md sha256 9e4fc95cf86c569e2395c13f7c9dec08b92466025ba5d76e2c2bee567b94b285; tests/fixtures/h18_str_trf_results.json sha256 1bbe1037155d262af605c4ac0d30d1fb68e2dda7440216996b73cf1ead5d3197. Per the peer: archive SHA 7b60ab42b56b7d1fe453d6127ceaaa0c771c84991541a4bf7041d528fedd1ea0 (not available to me); TRF 4.09.1, command input.fasta 2 1000 1000 80 10 8 6 -d -h -r -ngs, filter 100% matches / 0 indels / primitive period 1-6 / at least 4 complete units; spans 0-based half-open compared with module span_start/span_end.
+- Cases (actual rows in the results): 9 total = 1 HBB (NM_000518.5, 628 nt) + 8 analytical including the all-N record (homopolymer A x12, CAG x10, partial CAG x10+CA, ATTC x6, compound GGGGTT x4, GAA x8 with TTGAA prefix, reverse CTG x12, all-N). 8 of 9 exact; HBB diverges. Results JSON does not label "reference" vs "actual"; per the peer reference = TRF, actual = module (HBB: TRF 0, module 6).
+## Assertions (tests/test_h18_str_trf_characterization.py)
+- TIER 1: for the 8 analytical cases, find_strs(seq,1,6,4) spans (span_start, span_end, unit_len, canonical_unit) equal the frozen TRF spans; all-N gives [].
+- TIER 2 (HBB): the module returns exactly the six frozen spans and each is verified exact by brute-force string checks (period u in 1-6, at least 4 complete units, 100% s[j]==s[j+u], canonical unit equals the smallest rotation, maximal on both sides). TRF reported none, so each of the six is a TRF-OMISSION (coverage), not a false positive; the converse (TRF spans the module misses) is empty. Test also pins the frozen strict-exactness FAIL (HBB exact false, verdict FAIL).
+## The six HBB spans, verbatim (0-based half-open, unit length 1, module side)
+96-100 G (GGGG, 4 units); 188-192 G (GGGG, 4); 420-424 C (CCCC, 4); 560-565 G (GGGGG, 5); 604-610 A (AAAAAA, 6); 616-620 T (TTTT, 4).
+Pre-authoring string arithmetic on the FASTA text (no module import, no TRF): all six slices are single-letter runs with unit = canonical unit reported, complete units 4/4/4/5/6/4, period 1, 100% exact, maximal on both sides. The 7 non-N analytical slices also checked periodic with the reported canonical unit and whole-unit counts 12/10/10/6/4/9/12 (author arithmetic, not a TRF result).
+## Protocol omission clause
+TRF is heuristic and can omit low-score, small repeats; omissions by one side are reported as disagreement/coverage and confer no biological failure. TRF's silence on the six HBB homopolymers is not evidence that find_strs reports false positives, and the module's reports are not evidence of biological repeats beyond exact periodicity.
+## Historical strict FAIL (retained, not erased)
+The frozen run recorded exact false and verdict FAIL for strict equality of the two span lists on HBB. That record stays; this unit characterizes the cause (TRF omission of six exact 4-6 unit homopolymers) and does not reclassify the original receipt.
+## Not established
+No expansion or pathogenicity accuracy is claimed (biological_validation in the frozen results: "NOT ESTABLISHED: exact repeats only; real HBB + 8 analytical cases, not observed expansions"). No product fix and no new biological PASS.
+## RUN vs NOT RUN
+NOT RUN: all tests, pytest, imports of sugarcode, TRF, py_compile. RUN: git, sha256sum, file copies, bounded plain-string arithmetic on the frozen FASTA/JSON text.
