@@ -27,7 +27,9 @@ No capacity relief, cleanup, archive eligibility or installed forecast API exist
   Tests contain the serializer comparison; no calculation was executed here.
 - Read/write asymmetry: `_load` checks raw JSON, not snapshot value/depth limits;
   `_save` checks both. A compact syntactically valid dictionary can load yet block
-  every prospective write through J04. Canonical indent/escaping can also exhaust
+  all append-only requests and status-only decisions retaining the oversized subtree.
+  This is not universal write impossibility: UUID replacement of the offending
+  record can produce an admitted smaller state (`gate.py:103-117`). Canonical indent/escaping can also exhaust
   write bytes while raw read bytes fit (`gate.py:77-99`). Negative canonical
   byte headroom means baseline is already unsavable, not extra allowance.
 
@@ -98,3 +100,39 @@ were performed. Source-based analysis can be wrong; independent auditor executio
 mutation validation and landing remain outstanding. Runtime errors such as lock,
 filesystem or serializer implementation limits must not be reclassified as capacity
 success. Other Python versions/implementations may need reproduction review.
+
+## Repair-round qualifications and mutation reproduction
+
+Source refusals now return baseline unavailable_reason and prospective refusal
+with stage=source/provenance gate.py:77-88. Raw over-cap, duplicate/nonfinite,
+nonobject, invalid UTF-8 and malformed JSON cases are authored against real _load.
+Real _save comparisons are added for both exact repeat boundaries, including
+unchanged bytes on rejection. Fixed-shape encoded assertions use 225*n+2,
+derived from the declared pretty-printed envelope layout, not measured by builder.
+The peer reported initial independent execution success; revised tests remain NOT RUN.
+
+Reference traversal prevalidates dictionary key types before child descent and
+checks count before depth. Product visits dictionary entries in order, checks
+count/depth together, and can encounter an earlier child-domain failure before a
+later invalid key (`json_values.py:21-45`). Thus mixed-invalid-domain reference
+reason is diagnostic, not guaranteed identical first-error priority. Auditor must
+use single-fault probes for reason equality and actual gate cause for mixed inputs.
+Baseline unsavability never proves all mutations refuse; collision repair is tested.
+
+Actual function-source mutant reruns are reproducible by the auditor only:
+
+```
+for m in count_keys deduplicate_alias utf8 drop_indent drop_sort; do
+  if GATE_FORECAST_MUTANT="$m" PYTHONPATH=src python3 -m pytest -q \
+    tests/self_improve/test_gate_capacity_forecast_prep.py -k wrong_reference_mutants; then
+    echo "surviving mutant: $m"; exit 1
+  fi
+done
+```
+
+Each selected mutation rewrites the reference function source inside its test,
+executes only that synthetic mutated function, and must fail unchanged fixed
+count/byte oracle assertions. Unselected standard suite should pass. Auditor must
+confirm failure is the oracle assertion, not collection/import/setup failure.
+No mutant or test execution occurred here. Bundle exports HEAD; commit identity,
+not transport of a named branch, is verified. Local branch is only local metadata.
