@@ -17,6 +17,16 @@ from uuid import uuid4
 
 from .json_values import InvalidTelemetryValue, snapshot_json
 
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """Reject repeated decoded keys, including escaped equivalents."""
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise InvalidTelemetryValue("duplicate telemetry object key")
+        result[key] = value
+    return result
+
+
 GAP_KINDS = ("capability_miss", "unhandled_intent", "repeated_error", "feature_request")
 
 
@@ -61,7 +71,11 @@ class GapEventStore:
     def append(self, event: GapEvent) -> None:
         raw = {name: getattr(event, name) for name in (
             "module_slug", "signature", "kind", "detail", "exemplar", "event_id", "at")}
-        line = json.dumps(snapshot_json(raw), sort_keys=True, allow_nan=False)
+        snapshot = snapshot_json(raw)
+        try:
+            line = json.dumps(snapshot, sort_keys=True, allow_nan=False)
+        except (ValueError, TypeError, RecursionError) as exc:
+            raise InvalidTelemetryValue("telemetry JSON serialization failed") from exc
         with self._lock, self._path(event.module_slug).open("a", encoding="utf-8") as fh:
             fh.write(line + "\n")
 
@@ -77,7 +91,7 @@ class GapEventStore:
             if not line:
                 continue
             try:
-                raw = snapshot_json(json.loads(line))
+                raw = snapshot_json(json.loads(line, object_pairs_hook=_unique_object))
                 if type(raw) is not dict or raw.get("module_slug") != module_slug:
                     raise InvalidTelemetryValue("invalid event module")
                 event = GapEvent(
