@@ -175,6 +175,13 @@ def load_profiles(env: dict | None = None) -> dict[str, ModelProfile]:
     return profiles
 
 
+class _WhoamiMalformed:
+    """Internal signal from _hf_token_valid: a 200 whoami body of the wrong shape (type names only, no body)."""
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+
+
 @dataclass
 class ChatClient:
     """OpenAI-compatible chat client (stdlib only)."""
@@ -233,7 +240,12 @@ class ChatClient:
         return message
 
     def health(self) -> dict:
-        """Zero-token probe: GET {base_url}/models (plus an HF token check on the HF router). Never raises."""
+        """Zero-token probe: GET {base_url}/models (plus an HF token check on the HF router).
+
+        Returns an error result {profile, ok: False, error} instead of raising for: an HTTP, URL, OS, timeout or
+        value error on /models; a /models body of the wrong shape; and a malformed whoami body on the HF router.
+        No claim is made about any other exception. chat() differs: it raises ProviderError.
+        """
         req = urllib.request.Request(self.base_url.rstrip("/") + "/models", headers=self._headers())
         try:
             with urllib.request.urlopen(req, timeout=min(self.timeout, 15)) as r:
@@ -256,19 +268,28 @@ class ChatClient:
         out = {"profile": self.profile, "ok": True, "model": self.model,
                "model_listed": self.model in ids, "models_available": len(ids)}
         if "huggingface.co" in self.base_url:
-            out["token_valid"] = self._hf_token_valid()  # the router's model list is public
-            out["ok"] = out["token_valid"] is True
+            token = self._hf_token_valid()  # the router's model list is public
+            if isinstance(token, _WhoamiMalformed):
+                return {"profile": self.profile, "ok": False, "error": f"malformed whoami response: {token.reason}"}
+            out["token_valid"] = token
+            out["ok"] = token is True
         return out
 
-    def _hf_token_valid(self) -> bool | str:
+    def _hf_token_valid(self) -> "bool | str | _WhoamiMalformed":
         req = urllib.request.Request("https://huggingface.co/api/whoami-v2", headers=self._headers())
         try:
             with urllib.request.urlopen(req, timeout=15) as r:
-                return bool(json.loads(r.read().decode()).get("name"))
+                data = json.loads(r.read().decode())
         except urllib.error.HTTPError as e:
             return False if e.code in (401, 403) else f"HTTP {e.code}"
         except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
             return f"unreachable: {getattr(e, 'reason', e)}"
+        if not isinstance(data, dict):
+            return _WhoamiMalformed(f"body is {type(data).__name__}, expected an object")
+        name = data.get("name")
+        if isinstance(name, str) and name != "":  # whitespace-only counts as non-empty; no strip
+            return True
+        return _WhoamiMalformed("name is missing or not a non-empty string")
 
 
 @dataclass
