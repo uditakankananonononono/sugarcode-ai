@@ -1,0 +1,217 @@
+{
+  "input_freeze": {
+    "binary_sha256": "536092453453e5ca90327434cc7a0be88e9f40eed17cd15c43d3fb61246af765",
+    "protocol_sha256": "9e4fc95cf86c569e2395c13f7c9dec08b92466025ba5d76e2c2bee567b94b285",
+    "input_sha256": "40ffa4192ece95dae49199365a477ba81537ba004ebea83c1d0c95dee4f80286",
+    "source_url": "https://github.com/Benson-Genomics-Lab/TRF/releases/download/v4.09.1/trf409.linux64",
+    "accession_url": "https://www.ncbi.nlm.nih.gov/nuccore/NM_000518.5"
+  },
+  "command": [
+    "/tmp/sc-batch-a/trf409.linux64",
+    "/tmp/sc-batch-a/trf-input.fasta",
+    "2",
+    "1000",
+    "1000",
+    "80",
+    "10",
+    "8",
+    "6",
+    "-d",
+    "-h",
+    "-r",
+    "-ngs"
+  ],
+  "cases": [
+    {
+      "case": "HBB",
+      "reference": [],
+      "actual": [
+        {
+          "span_start": 96,
+          "span_end": 100,
+          "unit_len": 1,
+          "canonical_unit": "G"
+        },
+        {
+          "span_start": 188,
+          "span_end": 192,
+          "unit_len": 1,
+          "canonical_unit": "G"
+        },
+        {
+          "span_start": 420,
+          "span_end": 424,
+          "unit_len": 1,
+          "canonical_unit": "C"
+        },
+        {
+          "span_start": 560,
+          "span_end": 565,
+          "unit_len": 1,
+          "canonical_unit": "G"
+        },
+        {
+          "span_start": 604,
+          "span_end": 610,
+          "unit_len": 1,
+          "canonical_unit": "A"
+        },
+        {
+          "span_start": 616,
+          "span_end": 620,
+          "unit_len": 1,
+          "canonical_unit": "T"
+        }
+      ],
+      "exact": false
+    },
+    {
+      "case": "homopolymer",
+      "reference": [
+        {
+          "span_start": 1,
+          "span_end": 13,
+          "unit_len": 1,
+          "canonical_unit": "A"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 1,
+          "span_end": 13,
+          "unit_len": 1,
+          "canonical_unit": "A"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "CAG",
+      "reference": [
+        {
+          "span_start": 2,
+          "span_end": 33,
+          "unit_len": 3,
+          "canonical_unit": "AGC"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 2,
+          "span_end": 33,
+          "unit_len": 3,
+          "canonical_unit": "AGC"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "partial",
+      "reference": [
+        {
+          "span_start": 0,
+          "span_end": 32,
+          "unit_len": 3,
+          "canonical_unit": "AGC"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 0,
+          "span_end": 32,
+          "unit_len": 3,
+          "canonical_unit": "AGC"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "ATTC",
+      "reference": [
+        {
+          "span_start": 1,
+          "span_end": 25,
+          "unit_len": 4,
+          "canonical_unit": "ATTC"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 1,
+          "span_end": 25,
+          "unit_len": 4,
+          "canonical_unit": "ATTC"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "compound",
+      "reference": [
+        {
+          "span_start": 3,
+          "span_end": 27,
+          "unit_len": 6,
+          "canonical_unit": "GGGGTT"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 3,
+          "span_end": 27,
+          "unit_len": 6,
+          "canonical_unit": "GGGGTT"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "GAA",
+      "reference": [
+        {
+          "span_start": 2,
+          "span_end": 29,
+          "unit_len": 3,
+          "canonical_unit": "AAG"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 2,
+          "span_end": 29,
+          "unit_len": 3,
+          "canonical_unit": "AAG"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "reverse",
+      "reference": [
+        {
+          "span_start": 3,
+          "span_end": 40,
+          "unit_len": 3,
+          "canonical_unit": "CTG"
+        }
+      ],
+      "actual": [
+        {
+          "span_start": 3,
+          "span_end": 40,
+          "unit_len": 3,
+          "canonical_unit": "CTG"
+        }
+      ],
+      "exact": true
+    },
+    {
+      "case": "unknown",
+      "reference": [],
+      "actual": [],
+      "exact": true
+    }
+  ],
+  "verdict": "FAIL",
+  "biological_validation": "NOT ESTABLISHED: exact repeats only; realHBB+8analyticalcases, not observed expansions"
+}
