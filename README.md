@@ -703,3 +703,32 @@ hash. Byte admission is not a CPU/RSS/timeout budget; external-writer/ancestor-p
 races and cross-file crash transactions remain outside this boundary. Existing
 source-admission helper was previously unwired; these real caller changes are the
 separate production integration, not retroactive closure of the earlier helper.
+
+### Cooperating approval consumption and revocation
+
+Engine `activate` and `rollback` require a coordinated approval gate. The file
+manual gate now holds a shared canonical-path reentrant lock and stable POSIX
+advisory sidecar lock through fresh approval checks and registry commit. Full-
+record-only custom gates now refuse at BOTH engine entry points unless they
+implement `coordinated_record(id)` yielding a stable identity and full record
+while holding their decision lock. Generic gate workflows and trusted direct
+registry methods remain available; custom Python implementations are trusted.
+
+Consumption is recorded in the same atomic registry JSON replacement as the
+activation/rollback effect. Reuse refuses even if a version is manually restored;
+legacy IDs start unused. A revoke winning the gate lock first blocks commit; a
+revoke after commit cannot undo it. Auto approval does not bypass consumption.
+Locks cooperate across objects/processes, acquire with a 5-second timeout, and
+fail closed on unsupported POSIX locking or unsafe sidecars. They do NOT stop
+direct file editors, noncooperating writers, ancestor swaps or hardlink aliases.
+Deleting/restoring consumption metadata can reopen replay. At-most-once registry
+commit is not exactly-once host execution or human authentication. Consumption
+history counts against the existing 16 MiB limit; no ceiling relief or retention.
+Postreplace durability/logging errors may follow committed state; no blind retry.
+The reserved `engine_consumed_approvals` extension must now have the strict map
+shape; malformed present records refuse, absent legacy map remains supported.
+
+Process start-barrier tests are real-process smoke checks, not proof of every race
+window. Additional forced-lock tests hold a parent sidecar until the child reports
+a test-only 0.2-second timeout; production default is separately checked at 5s.
+Filesystem open/fstat/IO itself remains outside that acquisition deadline.
