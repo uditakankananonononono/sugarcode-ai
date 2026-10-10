@@ -75,3 +75,17 @@ was never edited; no byte-restoration execution or mutant adequacy claim.
 One literal's new/adjacent results do not establish generic BED repair. Exact
 command chronology and raw stdout/stderr are delivered outside this two-path
 commit. No syntax checks performed at any stage.
+
+## Explicit continuation after STOP disclosure
+
+Parent directed continuation after wider disclosure. In isolated temporary
+archive workspace only, four one-at-time guard mutations each exited1:
+returnNone 1 failed/0.11s; return full diagnostic 1 failed/0.12s;
+RuntimeError 1 failed/0.13s; remove count guard 1 failed/0.11s. First, second
+and fourth failed DID NOT RAISE ValueError; third exposed RuntimeError with the
+expected diagnostic. No collection/import failure counted as mutant evidence.
+Byte-exact original bed.py restored after EACH, SHA256
+8f8a6cce995c76b9b16cf5d4df5ff661b96c4f0a1e6f9522627327bd8482e420.
+Restored-adjacent exit0,16 passed/0.40s. Original branch product file unchanged.
+Driver source, commands, exact timestamp log and raw output delivered. No
+exhaustive mutant claim. Wider remains FAILED, no inherited/full-suite green.
