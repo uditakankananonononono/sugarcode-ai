@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any
 
 
+from .immutable_source import publish_source, SourcePublicationError, checkpoint
+from .extension_reconciliation import inspect_extensions
 from .state_lock import shared_state_lock
 from .approval_consumption import add_consumption
 from .source_admission import read_source_snapshot, SOURCE_CODE_BYTES
@@ -147,7 +149,8 @@ class FeatureRegistry:
                 add_consumption(data, gate_identity=engine_gate_identity, approval_id=approval_id,
                                 action="self_improvement_activation", feature=name,
                                 version=version, consumed_at=time.time())
-            dest = self._contained(self._ext_dir / f"{name}_v{version}.py")
+            dest = self._ext_dir / f"{name}_v{version}.py"
+            self._contained(dest.parent)
             entry = {
                 "version": version, "file": str(dest), "sha256": digest,
                 "kind": proposal["kind"], "gap_signature": proposal["gap_signature"],
@@ -158,8 +161,16 @@ class FeatureRegistry:
             feature["active_version"] = version
             data["proposals"][proposal_key]["status"] = "activated"
             self._encode_state(data)  # full prospective consumption+effect before file write
-            dest.write_bytes(snapshot.content)
-            self._save(data)
+            publish_source(dest,snapshot.content,candidate_key=proposal_key)
+            checkpoint("before_registry_commit")
+            try:
+                read_source_snapshot(dest,max_bytes=SOURCE_CODE_BYTES,expected_sha256=digest)
+                self._save(data)
+            except Exception as exc:
+                raise SourcePublicationError("published extension registry commit failed; reconcile",
+                    published=True,destination=dest,candidate_key=proposal_key,
+                    registry_committed=True if isinstance(exc,AtomicDurabilityError) else None) from exc
+            checkpoint("registry_committed")
         return entry
 
     def rollback(self, name: str, *, approval_id: str, expected_active_version: int | None = None, engine_gate_identity: str | None = None) -> dict[str, Any]:
@@ -219,6 +230,15 @@ class FeatureRegistry:
                     v["last_dispatched_at"] = time.time()
             self._save(data)
         return result
+
+    def reconcile_extensions(self, *, max_entries=10000) -> dict[str, Any]:
+        """Evidence-now only. No artifact or registry is modified."""
+        with self._lock:
+            raw=read_capped_bytes(self._path,max_file_bytes=REGISTRY_FILE_BYTES)
+            state=decode_registry_json(raw,expected_module=self.module_slug)
+            return inspect_extensions(self._ext_dir,state,
+                                      registry_sha256=hashlib.sha256(raw).hexdigest(),
+                                      max_entries=max_entries)
 
     # -- inspection ----------------------------------------------------------
     def features(self) -> dict[str, Any]:
