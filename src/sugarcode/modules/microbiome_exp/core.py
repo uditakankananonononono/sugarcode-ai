@@ -32,7 +32,7 @@ def analyze_16s(counts: dict[str, int], metadata: dict | None = None) -> dict:
     rel = {g: c / total for g, c in counts.items()}
     shannon = -sum(p * math.log(p) for p in rel.values() if p > 0)
     simpson = 1 - sum(p ** 2 for p in rel.values())
-    richness = len(counts)
+    richness = sum(1 for c in counts.values() if c > 0)  # taxa with positive support, not len(counts) (H15)
     dominant = sorted(rel, key=rel.get, reverse=True)[:5]
     functions = {}
     for g, p in rel.items():
