@@ -9,7 +9,7 @@ Source: https://github.com/uditakankananonononono/sugarcode-ai
 SC-J04 gate.py snapshots the complete prospective state through snapshot_json,
 which counts expanded values including the root and containers, rejects depth
 above 64, and caps values at 10,000. Growing history can block both new requests
-and decisions. Its write_text is not atomic. This proposal does not change that
+and decisions. Historical PREP base description; current F01 gate uses atomic_write_text, not cross-file transactions. This proposal does not change that
 code, the approval reader, the JSON write boundary or any production path.
 
 Added standalone approval_retention_plan.py performs a pure, bounded partition
@@ -30,7 +30,7 @@ and unknown IDs remain active. No subset, absent ID or repeated ID is accepted.
 A nonobject record cannot be selected. Nonselected JSON values are preserved,
 not blessed as semantically valid approval records.
 
-SC-J05 must define and validate records and supply trustworthy classifications.
+SC-J05 validates records only and does not supply trusted cold-history classification.
 Approved records can be authority-bearing long after decision. Rejected records
 can also be needed for audit or subsequent decision logic. Caller classification
 is not proof of authorization. A malicious/wrong cold_history label other than the
@@ -107,7 +107,7 @@ also are not a storage receipt or supported retrieval route.
 - Archive storage identity, access/authenticity controls, independent retrieval,
   backup, corruption repair, durability and cost. No new service proposed.
 - Atomic commit and cross-process locking, generation comparison, recovery and
-  old-generation retention. Existing gate write_text does not provide them.
+  old-generation retention. Current F01 single-file atomic writer does not provide cross-file locking/commit/recovery.
 - Eventual removal from active state and backup purge authority. No live deletion
   or retention-policy action is authorized by this helper's existence.
 
@@ -131,3 +131,6 @@ stale-generation, cross-process, crash-after-commit and rollback/restart canarie
 and independently verify full gate wiring and decision replay. No tests,
 pytest, services, PostgreSQL or Alembic were run by this prep unit. No main write,
 push, existing-path edit, migration, secret/env read or live archive occurred.
+
+Current policy wrapper/integration readiness: retention-readiness-integration.md.
+No live adapter; eligible set empty absent explicit role grant.
