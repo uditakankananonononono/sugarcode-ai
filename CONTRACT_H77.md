@@ -48,3 +48,22 @@ Source restored byte-exact after each mutant; final source SHA256:
 cb898c1d85eb8ba9e04fab108a7a731c0d94e9bb8ef952b555d0a9ef24eee21a.
 XML receipts and full mutant log accompany the read-only audit package.
 Publication requires separate parent instruction after independent verdict.
+
+## H77 repair, separate child commit
+
+The original candidate 1d839f3276f1accba975292e4cce9a213ced9c85 is
+preserved unchanged. Its subclass-acceptance limitation above remains
+historical. Parent requested explicit type identity after auditor feedback.
+The repaired test adds type(exc.value) is ValueError, so it now checks
+exact exception class as well as exact diagnostic, for '' only.
+No other scope is added. Original runtime receipts remain separate.
+
+Repair new1 passed/.14s, adjacent19 passed/.37s,
+wider selected1859 passed/13 xfailed/46.25s,
+restored new1 passed/.15s, same selections/interpreter/PYTHONPATH as above.
+Four original mutants rerun independently: removed guard1 failed/.15s,
+RuntimeError1 failed/.15s, diagnostic1 failed/.18s, emptyNone1 failed/.14s.
+Additional ValueError-subclass mutant1 failed/.15s at explicit type identity.
+Uppercase-removal and guard-placement survivors each1 passed/.14s remain.
+Source restored byte-exact after each attempt; SHA256 unchanged as above.
+Repair XML receipts and full log are a separate read-only package.
