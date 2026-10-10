@@ -181,10 +181,22 @@ class ChatClient:
                                 f"{getattr(e, 'reason', e)}.{hint}") from e
         except ValueError as e:  # bad JSON / UnicodeDecodeError / int digit limit in the response body
             raise ProviderError(f"{self.profile} returned an unreadable response: {str(e)[:200]}") from e
+        if not isinstance(data, dict):
+            raise ProviderError(f"{self.profile} returned a {type(data).__name__} body, expected an object")
         choices = data.get("choices") or []
         if not choices:
             raise ProviderError(f"{self.profile} returned no choices: {str(data)[:300]}")
-        return choices[0].get("message") or {}
+        if not isinstance(choices, list):
+            raise ProviderError(f"{self.profile} returned choices of type {type(choices).__name__}, expected a list")
+        first = choices[0]
+        if not isinstance(first, dict):
+            raise ProviderError(f"{self.profile} returned a first choice of type {type(first).__name__}, expected an object")
+        message = first.get("message")
+        if message is None:
+            return {}
+        if not isinstance(message, dict):
+            raise ProviderError(f"{self.profile} returned a message of type {type(message).__name__}, expected an object")
+        return message
 
     def health(self) -> dict:
         """Zero-token probe: GET {base_url}/models (plus an HF token check on the HF router). Never raises."""
