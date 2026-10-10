@@ -5,6 +5,7 @@ import re
 from typing import Protocol
 
 from .detector import CapabilityGap
+from .parameter_domains import validate_parameters
 from .plans import FeaturePlan
 
 _STOPWORDS = frozenset({
@@ -104,4 +105,5 @@ class FeaturePlanner:
         FeaturePlan.__post_init__(refined)
         if (refined.module_slug, refined.gap_signature, refined.name, refined.kind) != expected_identity:
             raise ValueError("refiner cannot change plan identity or kind")
+        validate_parameters(refined.kind, refined.params)
         return refined

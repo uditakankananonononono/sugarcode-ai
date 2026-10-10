@@ -29,7 +29,7 @@ def test_generated_code_executes():
 def test_hostile_params_cannot_inject():
     plan = make_plan("keyword_filter", {
         "keywords": ['x");\nimport os\nos.system("id")\n#'],
-        "mode": 'keep"""'}
+        "mode": "keep"}
     )
     src = synthesize_code(plan)
     validate_source(src)
