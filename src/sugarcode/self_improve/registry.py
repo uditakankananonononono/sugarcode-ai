@@ -17,6 +17,7 @@ from typing import Any
 
 
 from .atomic_file import atomic_write_text
+from .registry_validation import decode_registry_json, validate_registry_state, RegistryValidationError
 
 
 class RegistryError(RuntimeError):
@@ -37,10 +38,17 @@ class FeatureRegistry:
             self._save({"module": module_slug, "features": {}, "proposals": {}})
 
     def _load(self) -> dict[str, Any]:
-        return json.loads(self._path.read_text(encoding="utf-8"))
+        try:
+            return decode_registry_json(self._path.read_bytes(), expected_module=self.module_slug)
+        except RegistryValidationError as exc:
+            raise RegistryError("invalid registry state; repair required") from exc
 
     def _save(self, data: dict[str, Any]) -> None:
-        encoded = json.dumps(data, indent=2, sort_keys=True)
+        try:
+            validate_registry_state(data, expected_module=self.module_slug)
+            encoded = json.dumps(data, indent=2, sort_keys=True, allow_nan=False)
+        except (ValueError, TypeError, RecursionError) as exc:
+            raise RegistryError("invalid registry write; state unchanged") from exc
         atomic_write_text(self._path, encoded)
 
     def _contained(self, path: Path) -> Path:
