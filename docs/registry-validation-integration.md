@@ -33,3 +33,9 @@ skips (main310+98+8). F01 failure tests changed only invalid registry save fixtu
 rather than prematurely blocked by new schema. Initial3 failures recorded, then
 fixed fixture. Base wiring comparison reported separately; no helper-existence
 completion/clinical/model/science claim. Independent verdict required.
+
+Independent VERIFIED schema verdict,416PASS reproduced. Known boundary: stored
+version/code/test paths only nonempty strings; existing containment at activation,
+no end-to-end traversal proof. Whole-state bad row refuses. IO/MemoryError/
+OverflowError outside typed RegistryError. J02 alone prevalidation orphan gap is
+closed only by R01 stack, therefore landed together. F02 byte caps separate unit.

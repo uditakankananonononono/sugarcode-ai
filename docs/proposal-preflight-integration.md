@@ -38,3 +38,11 @@ filesystem NAME_MAX. Selected480 PASS/no skips (J02 stack416+54+10), not an
 independent/full configured-suite verdict. Initial stale-signature edit62 TypeError
 failures and filesystem long-name478 PASS/1 FAIL were non-green builder probes.
 No tests are presented as peer-run. Independent verdict and J02 dependency required.
+
+Independent VERIFIED scoped verdict480PASS reproduced plus actual overwrite,
+corrupt registry/no-files, orphan preservation, traversal/NAME_MAX and symlink
+probes. Prominent exception boundary: corrupt registry from preflight raises
+RegistryValidationError, NOT RegistryError; callers catching RegistryError alone
+miss it. No normalization in this unit. Local lock only, ancestor/external writer
+TOCTOU, empty directory residue, silent cleanup failure, hard-crash orphans,
+best-effort generation hash and no cross-file crash transaction remain open.
