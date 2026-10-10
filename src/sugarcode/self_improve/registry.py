@@ -139,13 +139,15 @@ class FeatureRegistry:
             self._save(data)
         return entry
 
-    def rollback(self, name: str, *, approval_id: str) -> dict[str, Any]:
+    def rollback(self, name: str, *, approval_id: str, expected_active_version: int | None = None) -> dict[str, Any]:
         with self._lock:
             data = self._load()
             feature = data["features"].get(name)
             if feature is None or feature["active_version"] is None:
                 raise KeyError(f"no active feature {name!r}")
             current = feature["active_version"]
+            if expected_active_version is not None and (type(expected_active_version) is not int or current != expected_active_version):
+                raise PermissionError("rollback approval version does not match active version")
             earlier = [v["version"] for v in feature["versions"] if v["version"] < current]
             feature["active_version"] = max(earlier) if earlier else None
             for v in feature["versions"]:
