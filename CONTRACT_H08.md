@@ -30,9 +30,9 @@ Never: profile or route names, custom names, endpoints, env labels, body excerpt
 | `models list` after preflight | `profile_status` catches per-profile resolve errors itself; only a load_profiles failure can escape (config changed after preflight) | UNSAFE-by-ambiguity | `ProviderError: model provider error (details withheld)` |
 | `models check` parse_route | providers.py 361 (lists custom names), loader (re-read) | UNSAFE | generic + class |
 | `ask` (resolve_route/parse_route/resolve) | 331, 337, 339, 343, 361, 217-239 style endpoint/body text, env labels | UNSAFE | generic + class |
-| `shared ask` container | `ToolCallShapeError` (tool_call_shape.py 36: constant + type name), subclasses | SAFE | `ClassName: str(e)` |
+| `shared ask` container | `ToolCallShapeError` incl. exact base and subclasses (H08a: NOT passed through; agent._run re-raises the exact base class with a `client.profile` prefix, so class membership proves nothing about text) | UNSAFE | generic + class |
 | `shared ask` any other ProviderError | unknown | UNSAFE | generic + class |
-Ambiguous source = unsafe. `str(e)` never defaults.
+Ambiguous source = unsafe. `str(e)` never defaults. `str(e)` is used at ONE site only: the preflight loader boundary.
 
 ## Caveat: preflight vs command
 Preflight and the command each read `os.environ`. If config changes between them, the result is at worst the generic message
@@ -43,6 +43,7 @@ instead of the loader message. The distinction is message-only; it is NOT a prov
 1. Loader failure in `models check` (with or without a profile) is now top-level `{"error"}` instead of a per-profile row.
 2. Loader failure in `ask` (incl. `--profile`) is now top-level `{"error"}` exit 1 instead of an `AskResult` dict.
 3. `ask --route <unknown>`, `models check` unknown route, `models list` load failure, and `shared ask` container shape errors no longer traceback.
+4. (H08a) `shared ask` container shape errors print `ToolCallShapeError: model provider error (details withheld)`; the type-name detail from tool_call_shape.py is deliberately given up.
 
 ## Static enumeration of the module-import surface (no execution)
 Method: source inventory at ab154245. Read pyproject `[project.scripts]` (only `sugarcode.cli:main` and
@@ -66,3 +67,14 @@ Conclusion: `route`, `tool`, `ailibrary` do not reach load_profiles by any stati
 ## Claim limit
 Claimed: the wrapped escape sites above emit the classified text and exit 1. Not claimed: any general CLI privacy guarantee,
 runtime behavior, or that anything passes (nothing was run).
+
+## H08a amendment (on top of 6fc5178f561b40b5afbe9f5db1e56adee076f5a1) - AUTHORED, NOT RUN
+Peer amended policy (relayed by Main): every wrapped ToolCallShapeError, exact base included, gets fixed generic + class name,
+zero `str(e)`. No type-allowlist shortcut. Reason found by read: agent.py 55-58 re-raises `ToolCallShapeError(f"{client.profile}: {e}")`
+(exact base class, custom profile name possible). In current code that error is caught inside `ask()` (agent.py 88-91) and lands in
+`AskResult.skipped` (pre-existing echo, UNCHANGED, still in the ledger above), not at the CLI catch; the CLI classifier no longer relies on that.
+No production subclass of ToolCallShapeError exists in src (grep); the subclass case is test-local only.
+Two H08 tests that asserted the type pass-through were rewritten (container message, subclass `Sub`); two prefix tests were added.
+The privacy claim stays withheld: only the wrapped escape sites are claimed, and nothing was run.
+Actual chronology for H08a: tests/test_h08_cli_provider_errors.py edited FIRST, then cli.py, then this section. Nothing run.
+(H08's own chronology, recorded above, was code-first.)
