@@ -196,3 +196,10 @@ def test_empty_banner_is_valueerror():
 def test_whitespace_banner_is_valueerror():
     with pytest.raises(ValueError, match="banner"):
         render_glow_report("T", _sections(), banner="   \t ")
+
+
+def test_non_str_banner_is_valueerror():
+    # pins the isinstance guard: dropping it yields an incidental
+    # AttributeError from int.strip(), not a ValueError
+    with pytest.raises(ValueError, match="banner"):
+        render_glow_report("T", _sections(), banner=5)
