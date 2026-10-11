@@ -28,6 +28,7 @@ from .plans import Candidate, FeaturePlan
 from .planner import FeaturePlanner
 from .registry import FeatureRegistry
 from .sandbox import SandboxResult, SandboxRunner
+from .runtime_preflight import SandboxEnvironmentUnavailable
 from .testsynth import synthesize_tests
 
 _KIND_SAMPLES: dict[str, list] = {
@@ -180,7 +181,12 @@ class SelfImprovementEngine:
     def evaluate(self, candidate_key: str) -> SandboxResult:
         candidate = self._candidates[candidate_key]
         admit_candidate_text(candidate.code, candidate.test_code, limits=PRODUCTION_SOURCE_LIMITS)
-        result = self.sandbox.run(candidate)
+        try:
+            result = self.sandbox.run(candidate)
+        except SandboxEnvironmentUnavailable:
+            self._log("sandbox_environment_unavailable", key=candidate_key,
+                      reason="child_pytest_preflight_failed")
+            raise
         self._log("feature_evaluated", key=candidate_key, passed=result.passed,
                   exit_code=result.exit_code, timed_out=result.timed_out,
                   output_limit_exceeded=result.output_limit_exceeded,

@@ -16,6 +16,7 @@ import time
 from .bounded_process import run_bounded_process
 from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .sandbox import SandboxResult
+from .runtime_preflight import require_pytest, SandboxEnvironmentUnavailable
 
 class IsolationUnavailable(RuntimeError):
     pass
@@ -55,8 +56,6 @@ class IsolatedRunner:
         start=time.monotonic()
         with tempfile.TemporaryDirectory(prefix='sugarcode-isolated-') as tmp:
             work=Path(tmp)
-            (work/'feature.py').write_bytes(snapshot.code.content)
-            (work/'test_feature.py').write_bytes(snapshot.tests.content)
             cmd=self._command(work)
             # Verify namespace/mount setup before running any candidate code.
             try:
@@ -66,6 +65,9 @@ class IsolatedRunner:
                 raise IsolationUnavailable('containment probe failed') from exc
             if probe.returncode:
                 raise IsolationUnavailable('containment probe refused: '+probe.stderr.decode(errors='replace')[-1000:])
+            require_pytest(cmd+[sys.executable, '-I'])
+            (work/'feature.py').write_bytes(snapshot.code.content)
+            (work/'test_feature.py').write_bytes(snapshot.tests.content)
             # Limit ordinary resource use in the child before pytest. Hard
             # limits cannot be raised by the candidate after capabilities drop.
             launcher="import resource,os,sys; resource.setrlimit(resource.RLIMIT_AS,(536870912,536870912)); resource.setrlimit(resource.RLIMIT_CPU,(10,10)); resource.setrlimit(resource.RLIMIT_FSIZE,(1048576,1048576)); resource.setrlimit(resource.RLIMIT_NOFILE,(64,64)); os.execv(sys.executable,[sys.executable,'-m','pytest','-q','-x','--no-header','-p','no:cacheprovider','/work'])"

@@ -1,0 +1,18 @@
+{
+  "selected": {
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "self_improve": {
+    "passed": 1851,
+    "failed": 0,
+    "xfailed": 13
+  },
+  "hashes": {
+    "sc-preflight-selected.xml": "fad68c8b73f95694b00219c9a17e8d3a6308dc2b31be4e807c6cc49ee0da0c1f",
+    "sc-preflight-selected.log": "02f55bf90d446fed0235e787c1a2f832cf4c6d616dfdc6d4820a20839aa8221d",
+    "sc-preflight-broad.xml": "78f6098ed6ba83287c93c24fa049a38633d8e1a636c077b26c8f63760191a7fd",
+    "sc-preflight-broad.log": "e1f96cd689019c8c59342011e9c4576f7f96330cc3a07b8b78a7aaeb2da89924"
+  }
+}
