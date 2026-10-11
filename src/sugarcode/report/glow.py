@@ -63,9 +63,12 @@ _CSS = (
     "padding:.55rem .85rem;font-size:.88rem;border-radius:0 8px 8px 0}"
     ".provenance li{margin:.15rem 0}"
     "footer.meta{max-width:960px;margin:0 auto 2rem;color:var(--muted);font-size:.85rem}"
+    ".banner{max-width:960px;margin:1rem auto 0;padding:.5rem 1rem;text-align:center;"
+    "font-weight:700;letter-spacing:.08em;color:#7a5b00;background:#ffe9a8;"
+    "border:2px dashed #d4a017;border-radius:8px}"
     "@media (prefers-color-scheme:dark){:root{--bg:#101512;--card:#182019;"
     "--ink:#e6ece8;--muted:#93a89c;--line:#2c3a31;--note-bg:#3a3416;"
-    "--prov-bg:#1d2b23;--zebra:#1e2822}"
+    "--prov-bg:#1d2b23;--zebra:#1e2822;--accent:#52b788;--accent2:#95d5b2}"
     ".band{background:linear-gradient(120deg,#081c15,#1b4332 55%,#2d6a4f)}}"
     "@media print{body{background:#ffffff}.band,.card{box-shadow:none;border:1px solid #999;"
     "border-radius:0}.band{color:#000;background:none}.band .meta{color:#333}}"
@@ -130,13 +133,17 @@ def _block_html(b: dict) -> str:
 
 def render_glow_report(title: str, sections: list[dict], *,
                        generated_utc: str | None = None,
-                       footer: str | None = None) -> str:
+                       footer: str | None = None,
+                       banner: str | None = None) -> str:
     """Render a complete standalone styled HTML document. Escapes all data."""
     if not isinstance(title, str) or not title.strip():
         raise ValueError("title must be non-empty")
     _check_sections(sections)
     generated = generated_utc or _utc_now()
-    body = ["<header class='band'>",
+    body = []
+    if banner is not None:
+        body.append(f"<div class='banner'>{_esc(banner)}</div>")
+    body += ["<header class='band'>",
             f"<h1>{_esc(title)}</h1>",
             f"<p class='meta'>Generated {html.escape(generated)} by sugarcode-ai glow renderer</p>",
             "</header>", "<main>"]

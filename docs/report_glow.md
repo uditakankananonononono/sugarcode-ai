@@ -1,6 +1,6 @@
 # Glow report renderer (v2 visual pass)
 
-`sugarcode.report.glow.render_glow_report(title, sections, *, generated_utc=None, footer=None)`
+`sugarcode.report.glow.render_glow_report(title, sections, *, generated_utc=None, footer=None, banner=None)`
 renders the same typed-block sections as `report.engine` into a styled,
 standalone HTML document. `report.engine` and its Markdown renderer are
 untouched; this module is additive. HTML only.
@@ -16,6 +16,29 @@ Named features:
 - **F4 dark mode + print** - CSS variables, a `prefers-color-scheme: dark`
   palette, and print rules that flatten the design.
 - **F5 responsive tables** - horizontal-scroll wrapper and zebra rows.
+
+`banner=` adds a visible escaped notice strip above the header band (the
+demo carries the literal text `SYNTHETIC DEMO DATA`). The demo makes no
+clinical-accuracy claim: its provenance block states the data is a local
+fixture, not clinical data.
+
+## Measured axes (C8)
+
+`x1,000,000` has no unit, so real before/after measures are reported
+instead, computed by `sugarcode.glow_axes` (stdlib-only, AST counts +
+perf_counter latency) and stored in `docs/axes_report.json`:
+
+- test files: base 542 -> tip 544 (+2: test_report_glow, test_glow_axes)
+- test functions (AST): base 3448 -> tip 3477 (+29)
+- source modules: base 221 -> tip 223 (+2: report/glow, glow_axes)
+- render latency, 50 renders of one mixed fixture: engine median
+  0.010 ms, glow median 0.011 ms (glow does strictly more work and stays
+  within noise of the engine)
+- features: +5 named (F1-F5 above); correctness gate: 38 glow/axes tests
+  green, plus the pre-existing report engine tests untouched
+
+Dark-palette heading contrast verified on pixels after brightening
+`--accent`/`--accent2` inside the dark media block.
 
 The block contract and validation behavior match `report.engine` exactly:
 same six block types, same ValueError/TypeError cases, all data text

@@ -1,0 +1,42 @@
+{
+  "base": "5605394a0b8ee635d3bc303c158288d22119d819",
+  "base_axes": {
+    "modules": 221,
+    "tests": {
+      "files": 542,
+      "functions": 3448
+    }
+  },
+  "feature_delta": {
+    "names": [
+      "F1 header band",
+      "F2 section cards",
+      "F3 status pills",
+      "F4 dark+print CSS",
+      "F5 responsive tables"
+    ],
+    "new_named_features": 5,
+    "note": "x1,000,000 has no unit; real before/after measures are reported instead"
+  },
+  "latency_engine_base_ms": {
+    "max_ms": 0.07989000005181879,
+    "median_ms": 0.010193999969487777,
+    "min_ms": 0.00963300044531934,
+    "repeat": 50
+  },
+  "latency_glow_tip_ms": {
+    "max_ms": 0.03231000027881237,
+    "median_ms": 0.010673999440768966,
+    "min_ms": 0.010022000424214639,
+    "repeat": 50
+  },
+  "measured_at_ist": "2026-10-11T15:16+05:30",
+  "tip": "review/report-glow child",
+  "tip_axes": {
+    "modules": 223,
+    "tests": {
+      "files": 544,
+      "functions": 3477
+    }
+  }
+}

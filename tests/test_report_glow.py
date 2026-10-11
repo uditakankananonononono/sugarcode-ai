@@ -177,3 +177,25 @@ def test_kv_tables_also_wrapped():
     out = render_glow_report("T", [{"heading": "S", "blocks": [
         {"type": "kv", "items": {"a": 1}}]}])
     assert out.count("<div class='table-wrap'><table>") == 1
+
+
+def test_dark_mode_headings_keep_contrast():
+    out = render_glow_report("T", _sections())
+    dark = out.split("@media (prefers-color-scheme:dark)", 1)[1]
+    # headings use var(--accent); the dark palette must brighten it
+    assert "--accent:#52b788" in dark
+
+
+def test_banner_renders_visibly_when_given():
+    out = render_glow_report("T", _sections(), banner="SYNTHETIC DEMO DATA")
+    assert "<div class='banner'>SYNTHETIC DEMO DATA</div>" in out
+    assert ".banner{" in out
+
+
+def test_banner_is_escaped():
+    out = render_glow_report("T", _sections(), banner="<b>fake</b>")
+    assert "<b>fake</b>" not in out and "&lt;b&gt;fake&lt;/b&gt;" in out
+
+
+def test_no_banner_by_default():
+    assert "class='banner'" not in render_glow_report("T", _sections())
