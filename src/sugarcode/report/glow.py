@@ -80,12 +80,16 @@ def _utc_now() -> str:
 
 
 def _check_sections(sections: list[dict]) -> None:
-    if not isinstance(sections, list) or not sections:
+    if not isinstance(sections, list):
+        raise TypeError("sections must be a list")
+    if not sections:
         raise ValueError("sections must be a non-empty list")
     for i, s in enumerate(sections):
         if not isinstance(s, dict):
             raise TypeError(f"section {i} is not a dict")
-        if not isinstance(s.get("heading"), str) or not s["heading"].strip():
+        if not isinstance(s.get("heading"), str):
+            raise TypeError(f"section {i} heading must be a str")
+        if not s["heading"].strip():
             raise ValueError(f"section {i} needs a non-empty heading")
         blocks = s.get("blocks")
         if not isinstance(blocks, list):
@@ -136,9 +140,13 @@ def render_glow_report(title: str, sections: list[dict], *,
                        footer: str | None = None,
                        banner: str | None = None) -> str:
     """Render a complete standalone styled HTML document. Escapes all data."""
-    if not isinstance(title, str) or not title.strip():
+    if not isinstance(title, str):
+        raise TypeError("title must be a str")
+    if not title.strip():
         raise ValueError("title must be non-empty")
     _check_sections(sections)
+    if generated_utc is not None and not isinstance(generated_utc, str):
+        raise TypeError("generated_utc must be a str")
     generated = generated_utc or _utc_now()
     body = []
     if banner is not None:

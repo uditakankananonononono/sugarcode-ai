@@ -46,11 +46,19 @@ def test_axes_report_shape_and_json(tmp_path):
     json.dumps(r, sort_keys=True)  # must be JSON-serializable
 
 
+# Floors over the live repo, recomputed every run - deliberately NOT exact
+# counts, so the suite does not pin fixed repo output. Synthetic fixtures
+# above keep exact counts because their inputs are fixed by the test.
+FLOOR_TEST_FILES = 400
+FLOOR_TEST_FUNCTIONS = 1000
+FLOOR_MODULES = 100
+
+
 def test_repo_axes_sanity():
     r = axes_report(REPO)
-    assert r["tests"]["files"] > 400  # repo ships hundreds of test files
-    assert r["tests"]["functions"] > 1000
-    assert r["modules"] > 100
+    assert r["tests"]["files"] > FLOOR_TEST_FILES
+    assert r["tests"]["functions"] > FLOOR_TEST_FUNCTIONS
+    assert r["modules"] > FLOOR_MODULES
 
 
 def _sections():

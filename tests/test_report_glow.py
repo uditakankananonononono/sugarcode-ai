@@ -182,8 +182,11 @@ def test_kv_tables_also_wrapped():
 def test_dark_mode_headings_keep_contrast():
     out = render_glow_report("T", _sections())
     dark = out.split("@media (prefers-color-scheme:dark)", 1)[1]
-    # headings use var(--accent); the dark palette must brighten it
+    # headings use var(--accent) with a var(--accent2) underline; the dark
+    # palette must brighten both, and the band must stay dark
     assert "--accent:#52b788" in dark
+    assert "--accent2:#95d5b2" in dark
+    assert ".band{background:linear-gradient(120deg,#081c15" in dark
 
 
 def test_banner_renders_visibly_when_given():
