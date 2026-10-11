@@ -15,6 +15,7 @@ from pathlib import Path
 from .bounded_process import run_bounded_process
 from .source_admission import admit_candidate_text, PRODUCTION_SOURCE_LIMITS
 from .plans import Candidate
+from .runtime_preflight import require_pytest, SandboxEnvironmentUnavailable
 
 
 @dataclass(frozen=True)
@@ -47,13 +48,21 @@ class SandboxRunner:
     def run(self, candidate: Candidate) -> SandboxResult:
         snapshot = admit_candidate_text(candidate.code, candidate.test_code, limits=PRODUCTION_SOURCE_LIMITS)
         workdir = Path(tempfile.mkdtemp(prefix="sugarcode-si-sandbox-"))
-        (workdir / "feature.py").write_bytes(snapshot.code.content)
-        (workdir / "test_feature.py").write_bytes(snapshot.tests.content)
         start = time.monotonic()
         try:
+            env = self._scrubbed_env()
+            try:
+                require_pytest([sys.executable], env=env, cwd=str(workdir))
+            except SandboxEnvironmentUnavailable:
+                # No candidate workspace exists to preserve on preflight refusal.
+                import shutil
+                shutil.rmtree(workdir, ignore_errors=True)
+                raise
+            (workdir / "feature.py").write_bytes(snapshot.code.content)
+            (workdir / "test_feature.py").write_bytes(snapshot.tests.content)
             proc = run_bounded_process(
                 [sys.executable, "-m", "pytest", "-q", "-x", "--no-header", "-p", "no:cacheprovider", str(workdir)],
-                timeout_seconds=self.timeout_seconds, env=self._scrubbed_env(), cwd=str(workdir))
+                timeout_seconds=self.timeout_seconds, env=env, cwd=str(workdir))
             duration = time.monotonic() - start
             stdout = proc.stdout.decode("utf-8", errors="replace")
             stderr = proc.stderr.decode("utf-8", errors="replace")
