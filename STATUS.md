@@ -5,7 +5,9 @@ real external data, what runs on real published algorithms, what is a
 spec-level heuristic, and what is Missing. If a claim here conflicts with a
 module's behavior, the module is right and this doc is stale - say so.
 
-Test suite: full run on 2026-10-07 at the builder truth-pass commit (Python 3.10 venv, numpy/scipy/pandas/cryptography, no network keys): **2,270 passed, 16 skipped, 0 failed**. The earlier figures in this file (2,279 passed; 1,831 passed) were wrong or stale. Network-dependent tests are among the skips; CI outcome should be checked separately.
+Test suite: verified on **2026-10-11** at `a9b532dedb7ab825a7c21ffb220b4bb324f42bde`, Python 3.10.12 venv / pytest 9.1.1: **5,551 passed, 14 skipped, 13 xfailed, 0 failed**, across five disjoint processes covering the configured testpaths (not a single monolithic run). Collection: **5,572 runnable cases**; the 14 skip receipts include six module-level collection skips and eight runtime skips, so they are not all collected cases. See [the dated diagnosis and run receipt](docs/validation/2026-10-11-suite-diagnosis/README.md), [counts and receipt hashes](docs/validation/2026-10-11-suite-diagnosis/receipt.json), and [all 58 inventory-failure verdicts](docs/validation/2026-10-11-suite-diagnosis/per-failure.csv).
+
+The previous header's **2,270 passed / 16 skipped** was an **October 7 historical figure**, not the current suite. At its exact commit `d20e807ecd0b193d48f906a4f9692d5e550a0372`, the October 11 venv rerun gives **2,278 passed / 14 skipped**; that historical discrepancy remains **unresolved**. Test growth and environment/selection differences must stay separate: tests/ collection increased from 2,286 at that October 7 commit to 5,566 now under this venv, while the inventory selected tests/ only and omitted six configured PG cases. The inventory's 58 failures reproduce under missing RNA and child-pytest conditions and pass unchanged in the venv. Optional dependency skips differ; this is not a byte-identical inventory-environment run. CI outcome should be checked separately.
 
 
 ## 2026-10-10 landed repair units H11-H19 (documentary ledger, no code)
