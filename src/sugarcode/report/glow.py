@@ -12,6 +12,11 @@ document. Named features:
 
 All data text is HTML-escaped; no raw markup from data is ever embedded.
 HTML only; the engine's Markdown renderer is unchanged and untouched.
+
+Validation parity with report.engine: non-str title, non-list sections
+and non-str heading raise ValueError, as the engine does. One deliberate
+addition: generated_utc is a glow-only parameter and a non-str value
+raises TypeError; a blank banner raises ValueError.
 """
 from __future__ import annotations
 
@@ -80,16 +85,12 @@ def _utc_now() -> str:
 
 
 def _check_sections(sections: list[dict]) -> None:
-    if not isinstance(sections, list):
-        raise TypeError("sections must be a list")
-    if not sections:
+    if not isinstance(sections, list) or not sections:
         raise ValueError("sections must be a non-empty list")
     for i, s in enumerate(sections):
         if not isinstance(s, dict):
             raise TypeError(f"section {i} is not a dict")
-        if not isinstance(s.get("heading"), str):
-            raise TypeError(f"section {i} heading must be a str")
-        if not s["heading"].strip():
+        if not isinstance(s.get("heading"), str) or not s["heading"].strip():
             raise ValueError(f"section {i} needs a non-empty heading")
         blocks = s.get("blocks")
         if not isinstance(blocks, list):
@@ -140,9 +141,7 @@ def render_glow_report(title: str, sections: list[dict], *,
                        footer: str | None = None,
                        banner: str | None = None) -> str:
     """Render a complete standalone styled HTML document. Escapes all data."""
-    if not isinstance(title, str):
-        raise TypeError("title must be a str")
-    if not title.strip():
+    if not isinstance(title, str) or not title.strip():
         raise ValueError("title must be non-empty")
     _check_sections(sections)
     if generated_utc is not None and not isinstance(generated_utc, str):
@@ -150,6 +149,8 @@ def render_glow_report(title: str, sections: list[dict], *,
     generated = generated_utc or _utc_now()
     body = []
     if banner is not None:
+        if not isinstance(banner, str) or not banner.strip():
+            raise ValueError("banner must be a non-empty string when given")
         body.append(f"<div class='banner'>{_esc(banner)}</div>")
     body += ["<header class='band'>",
             f"<h1>{_esc(title)}</h1>",

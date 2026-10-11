@@ -119,8 +119,9 @@ def test_status_vocabulary_case_insensitive(raw, cls):
 
 # --- 8. exact exception types ------------------------------------------------
 
-def test_non_str_title_is_typeerror():
-    with pytest.raises(TypeError):
+def test_non_str_title_is_valueerror():
+    # parity with report.engine: wrong-type title is a ValueError there
+    with pytest.raises(ValueError):
         render_glow_report(5, _sections())
 
 
@@ -129,13 +130,15 @@ def test_blank_title_is_valueerror():
         render_glow_report("   ", _sections())
 
 
-def test_non_list_sections_is_typeerror():
-    with pytest.raises(TypeError, match="sections must be a list"):
+def test_non_list_sections_is_valueerror():
+    # parity with report.engine: non-list sections is a ValueError there
+    with pytest.raises(ValueError, match="sections must be a non-empty list"):
         render_glow_report("T", "not a list")
 
 
-def test_non_str_heading_is_typeerror():
-    with pytest.raises(TypeError):
+def test_non_str_heading_is_valueerror():
+    # parity with report.engine: wrong-type heading is a ValueError there
+    with pytest.raises(ValueError):
         render_glow_report("T", [{"heading": 7, "blocks": []}])
 
 
@@ -156,3 +159,40 @@ def test_double_quotes_are_escaped():
 def test_demo_doc_carries_synthetic_banner():
     doc = Path(__file__).resolve().parent.parent / "docs" / "demo_glow.html"
     assert "SYNTHETIC DEMO DATA" in doc.read_text(encoding="utf-8")
+
+
+# --- S1. every STATUS_VOCAB key maps to its pill class -----------------------
+# The expected mapping is a FIXED literal table here, never derived from
+# STATUS_VOCAB itself - a table built from the module would adapt to a
+# mutated vocabulary and let removals or remaps survive.
+
+EXPECTED_STATUS_VOCAB = {
+    "pathogenic": "pill-bad", "fail": "pill-bad", "error": "pill-bad", "high": "pill-bad",
+    "likely pathogenic": "pill-warn", "vus": "pill-warn", "warn": "pill-warn",
+    "moderate": "pill-warn",
+    "benign": "pill-good", "pass": "pill-good", "ok": "pill-good", "low": "pill-good",
+    "likely benign": "pill-neutral",
+}
+
+
+def test_status_vocab_matches_fixed_table():
+    assert STATUS_VOCAB == EXPECTED_STATUS_VOCAB
+
+
+@pytest.mark.parametrize("word,cls", sorted(EXPECTED_STATUS_VOCAB.items()))
+def test_every_status_vocab_key_maps_to_its_pill(word, cls):
+    out = render_glow_report("T", [{"heading": "S", "blocks": [
+        {"type": "kv", "items": {"k": word}}]}])
+    assert f"<span class='pill {cls}'>{word}</span>" in out
+
+
+# --- S2. blank banner refuses -------------------------------------------------
+
+def test_empty_banner_is_valueerror():
+    with pytest.raises(ValueError, match="banner"):
+        render_glow_report("T", _sections(), banner="")
+
+
+def test_whitespace_banner_is_valueerror():
+    with pytest.raises(ValueError, match="banner"):
+        render_glow_report("T", _sections(), banner="   \t ")
