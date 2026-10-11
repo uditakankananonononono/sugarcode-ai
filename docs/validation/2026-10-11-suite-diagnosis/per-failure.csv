@@ -1,0 +1,105 @@
+nodeid,verdict,cause,controlled_rerun,unchanged_venv_rerun,failure_message
+tests/self_improve/test_approval_schema_integration.py::test_activation_wrong_record_identity_refuses[module_id-2],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_wrong_record_identity_refuses[module_slug-other],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_wrong_record_identity_refuses[action_type-generic],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_payload_mismatch_refuses[name-other],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_payload_mismatch_refuses[kind-other],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_payload_mismatch_refuses[code_sha256-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_payload_mismatch_refuses[candidate_key-other],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_payload_mismatch_refuses[gap_signature-other],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_autoapprove_valid_only_explicit_gate_auto,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_unrecorded_approval_not_accepted_by_manual_gate,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_activation_id_cannot_authorize_rollback,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_approval_schema_integration.py::test_status_only_custom_gate_fails_closed_before_activation,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_engine.py::test_full_cycle_proposes_but_does_not_activate,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,assert False is True
+tests/self_improve/test_engine.py::test_activation_after_human_approval,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_engine.py::test_wrong_approval_id_refused,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_engine.py::test_gap_not_rebuilt_once_covered,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert [CapabilityGa...everity=0.15)] == []
+  
+  Left contains one more item: CapabilityGap(module_slug='opportunity-discovery', signature='filter only biology grants', occurrences=3, kinds=('capa...etail='user keeps asking to filter grants', first_seen=1791700315.6638546, last_seen=1791700315.6647308, severity=0.15)
+  Use -v to get more diff"
+tests/self_improve/test_engine.py::test_rollback_flow,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_exact_and_oneover_raw_pipe[1048576-1],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert False == (1048576 == 1048576)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.053, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_exact_and_oneover_raw_pipe[1048576-2],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert False == (1048576 == 1048576)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.052, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_exact_and_oneover_raw_pipe[1048577-1],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert False == (1048577 > 1048576)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.046, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).output_limit_exceeded"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_exact_and_oneover_raw_pipe[1048577-2],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert False == (1048577 > 1048576)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.045, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).output_limit_exceeded"
+tests/self_improve/test_isolated_output_parity.py::test_real_timeout_kill_keeps_negative_actual_exit,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert (False)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.05, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).timed_out"
+tests/self_improve/test_isolated_output_parity.py::test_regular_file_rlimit_kept,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.044, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[keyword_filter],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.061, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[scoring_rule],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.044, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[text_transform],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.046, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[aggregator],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.047, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[threshold_alert],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.049, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolated_output_parity.py::test_real_isolated_six_ordinary_templates[field_extractor],environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.048, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolation.py::test_real_containment,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.05, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_isolation.py::test_timeout_and_failure,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert (not False and False)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.054, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed
+ +  and   False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.054, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).timed_out"
+tests/self_improve/test_mixin_wiring.py::test_mixin_end_to_end,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,IndexError: list index out of range
+tests/self_improve/test_sandbox.py::test_sandbox_passes_good_candidate,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.022, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_sandbox.py::test_sandbox_all_kinds,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: scoring_rule: /usr/bin/python3: No module named pytest
+  
+assert False
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.024, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed"
+tests/self_improve/test_sandbox_output_caps.py::test_real_pytest_flood_refuses_cleanup_and_reason,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert (not False and False)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.023, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).passed
+ +  and   False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.023, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).output_limit_exceeded"
+tests/self_improve/test_sandbox_output_caps.py::test_output_result_propagates_engine_ledger,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert (False)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seconds=0.023, timed_out=False, workdir='', output_limit_exceeded=False, output_limit_stream=None).output_limit_exceeded"
+tests/self_improve/test_sandbox_output_caps.py::test_keep_workspace_and_timeout_contract,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"AssertionError: assert (not False and False)
+ +  where False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seco..., timed_out=False, workdir='/tmp/sugarcode-si-sandbox-wr0tmsl1', output_limit_exceeded=False, output_limit_stream=None).passed
+ +  and   False = SandboxResult(passed=False, exit_code=1, stdout='', stderr='/usr/bin/python3: No module named pytest\n', duration_seco..., timed_out=False, workdir='/tmp/sugarcode-si-sandbox-wr0tmsl1', output_limit_exceeded=False, output_limit_stream=None).timed_out"
+tests/self_improve/test_strict_gap_json.py::test_engine_rejects_bad_input_then_valid_cycle_still_works,environment,Child interpreter cannot import pytest under scrubbed/isolated environment,FAIL,PASS,"assert 0 == 1
+ +  where 0 = len([])"
+tests/test_prime_design_spec.py::test_structure_penalizes_complementarity,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_flap_resolution_bounded,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_repair_competition_normalized,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_outcomes_normalized,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_architecture_grid_ranked,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_diagnostics_honest_default_and_background,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_diagnostics_change_with_architecture,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_design_spec.py::test_compiler_complete_and_honest,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_fold_canaries.py::test_pegrna_secondary_structure_uses_real_thermodynamic_fold,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_fold_canaries.py::test_self_complementarity_cannot_pair_a_base_to_itself,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_prime_probability_domain.py::test_zero_activities_explicit_surrogate_not_biological_assertion,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_decoder_spec.py::test_structure,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_decoder_spec.py::test_functional,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_decoder_spec.py::test_design_honest,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_decoder_spec.py::test_diagnostics,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_truth_canaries.py::test_structure_is_actual_pairing_not_palindrome_or_fake_energy,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_truth_canaries.py::test_empty_structure_does_not_divide_by_zero,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_truth_canaries.py::test_functional_impact_does_not_fabricate_effects_from_motif_counts,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_truth_canaries.py::test_no_gc_derived_encapsulation_prediction,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
+tests/test_rna_truth_canaries.py::test_structure_reports_cross_window_pairs_in_full_sequence_mode,environment,ViennaRNA/RNA dependency unavailable,FAIL,PASS,sugarcode.modules.rna_nussinov.energy.EnergyModelMissing: ViennaRNA not installed: pip install ViennaRNA
