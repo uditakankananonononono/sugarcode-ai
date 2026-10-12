@@ -7,7 +7,8 @@ branches, ring closures (single digit and %nn, with bond order on either end),
 dot-disconnected components.
 
 Parsed but ignored (reported in ``Molecule.ignored``): tetrahedral / extended
-chirality (@, @@, @TH1...), cis/trans bond direction (/ and \\), atom classes.
+chirality (@, @@, @TH1...) and cis/trans bond direction (/ and \\). Atom classes
+are parsed and silently discarded; they are not reported in Molecule.ignored.
 
 Not supported (raise ``SmilesError``): the '*' wildcard, reaction SMILES ('>'),
 SMARTS syntax. Kekule rings ARE re-aromatised after hydrogen assignment by a
@@ -18,9 +19,11 @@ that are only aromatic as a 3+ ring whole, and B/Se/Te/As donors in Kekule
 form, are not perceived. Implicit hydrogens
 on aromatic organic-subset atoms use the OpenSMILES rule (lowest normal valence
 minus bond count minus one, floor 0), so pyrrole-type nitrogens must be written
-[nH] as the standard requires. Bracket [H] atoms bonded to exactly one heavy atom
-(no isotope, charge or class) are folded into that atom's hydrogen count;
-isotopic hydrogens ([2H], [3H]) stay explicit atoms.
+[nH] as the standard requires. Bracket [H] atoms bonded by a single bond to exactly one heavy atom
+(no isotope or charge) are folded into that atom's hydrogen count; classes
+are discarded before folding, so class-labelled H folds too. Folding does
+not reduce implicit H assignment and can overcount hydrogen, as in [H]O
+(formula H3O instead of H2O). Isotopic hydrogens ([2H], [3H]) stay explicit atoms.
 """
 from __future__ import annotations
 

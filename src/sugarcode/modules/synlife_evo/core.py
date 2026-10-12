@@ -19,8 +19,9 @@ def evolve(pathway_genes: list[str] | None = None, generations: int = 2000,
 
     Each individual carries expression levels per pathway gene. Fitness =
     growth (1 - burden) + yield advantage. Mutations tune expression up/down
-    or knock genes out (loss-of-function). Tracks dominant genotype and the
-    classic failure mode: silencing of the burdensome pathway.
+    or knock genes out (loss-of-function). Returns population-mean expression
+    under the legacy dominant_genotype key, not a modal genotype, and tracks
+    sampled majority-knockout silencing of the burdensome pathway.
     """
     genes = pathway_genes or ["enzymeA", "enzymeB", "transporter"]
     if not genes or any(not isinstance(g, str) or not g.strip() for g in genes): raise ValueError("pathway_genes must be a non-empty list of non-blank gene names")
@@ -140,8 +141,8 @@ def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, popu
     """Simulate genotype classes under mutation, selection, drift and environment.
 
     Returns scientist-facing allele trajectories, dominant genotype, failure
-    onset, uncertainty, QC flags and stabilization recommendations. Units and
-    parameter provenance are explicit. This is a mechanistic research model,
+    onset, uncertainty, QC flags and stabilization recommendations. Mutation-rate units and the seed are explicit. Parameter-source provenance
+    is not returned, and the experiment metadata omits burden and yield_selection. This is a mechanistic research model,
     not a trained or clinically validated predictor.
     """
     _validate_experiment(genes,generations,population,mutation_rate,sample_every)
@@ -213,7 +214,8 @@ def simulate_competition(genes, *, generations=2000, population=5000, burden=.08
     regulated, knockout). Pathway flux is limited by the weakest gene, burden
     scales with total expression, and product coupling (yield_selection x the
     environment's product_selection) rewards flux. The competitor carries no
-    pathway: fixed fitness, no burden, no mutation. Mechanistic model, not trained.
+    pathway: baseline fitness adjusted by environment stress, no expression burden,
+    no mutation. Mechanistic model, not trained.
     """
     _validate_experiment(genes, generations, population, mutation_rate, sample_every)
     if len(genes) > 6:

@@ -167,7 +167,11 @@ def simulate_protocol(protocol: list[dict], *, seed: int=42) -> dict:
 
 
 def enhancement_features(result: dict) -> dict:
-    """Compute exactly 51 result-derived experiment diagnostics."""
+    """Compute 51 virtual-protocol diagnostic fields.
+
+    Missing action types use synthetic zero arrays; their summary statistics
+    can include a placeholder event (for example one within-2pct pipette with
+    no pipette steps). Do not interpret these fallback counts as observations."""
     import numpy as np
     log=result["execution_log"]; samples=result["samples"]; pip=[x for x in log if x["action"]=="pipette"]; inc=[x for x in log if x["action"]=="incubate"]; meas=[x for x in log if x["action"]=="measure"]
     errors=np.asarray([x["result"]["relative_error"] for x in pip] or [0.]); volumes=np.asarray([x["result"]["actual_uL"] for x in pip] or [0.]); readings=np.asarray([x["result"]["reading"] for x in meas] or [0.]); gains=np.asarray([x["result"]["signal_gain"] for x in inc] or [0.]); temps=np.asarray([x["result"]["temp_C"] for x in inc] or [0.]); mins=np.asarray([x["result"]["minutes"] for x in inc] or [0.])

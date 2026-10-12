@@ -2,7 +2,10 @@
 
 Masses use the vendored periodic table (RDKit atomic_data.cpp, pinned; see
 PROVENANCE.md). Descriptor definitions re-implement the RDKit 2024.09.6
-definitions (pinned sources in PROVENANCE.md) so they can be oracle-tested:
+definitions as local graph rules (pinned sources in PROVENANCE.md) for
+oracle comparison, not complete RDKit equivalence. Known differences include
+explicit isotope-H donor/acceptor counts, ordinary H folding, and minimum
+cycle-basis size versus RDKit symmetrized ring count (cubane: 5 versus 6):
 
   * mol_wt           average molecular weight (isotope mass for labelled atoms)
   * exact_mol_wt     monoisotopic mass (most common isotope), minus charge x electron mass
@@ -90,7 +93,11 @@ def _in_triple(mol, i):
 
 # ----------------------------------------------------------------- H-bonding
 def hbd(mol: Molecule) -> int:
-    """RDKit NumHDonors: [N&!H0&v3, N&!H0&+1&v4, O&H1&+0, S&H1&+0, n&H1&+0]."""
+    """Local graph approximation to RDKit NumHDonors:
+    [N&!H0&v3, N&!H0&+1&v4, O&H1&+0, S&H1&+0, n&H1&+0].
+
+    Explicit isotope-H neighbors are not included in total_h, so deuterated
+    ammonia [2H]N([2H])[2H] returns 0 here versus RDKit 2024.09.6 returning 1."""
     n = 0
     for i, a in enumerate(mol.atoms):
         v = _valence(mol, i)

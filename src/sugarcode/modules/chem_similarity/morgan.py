@@ -1,4 +1,8 @@
-"""Morgan / ECFP-style circular fingerprints, bit-compatible with RDKit.
+"""Morgan / ECFP-style circular fingerprints with bounded RDKit compatibility.
+
+Ordinary tested molecules match RDKit 2024.09.6, but parser hydrogen-folding
+defects cause mismatches for inputs such as [H]O and [H:7]O. Universal bit
+compatibility is not claimed.
 
 Re-implements RDKit's MorganGenerator (Release_2024_09_6,
 Code/GraphMol/Fingerprints/MorganGenerator.cpp + FingerprintUtil.cpp
@@ -73,7 +77,10 @@ def atom_invariants(mol: Molecule, include_ring_membership: bool = True) -> list
 
 
 def morgan_environments(mol: Molecule, radius: int = 2, use_bond_types: bool = True):
-    """List of (code, atom_index, layer) exactly as RDKit's generator emits them."""
+    """List of (code, atom_index, layer) from the local parsed graph.
+
+    Normal tested graphs match RDKit's generator; parser hydrogen-folding
+    defects make [H]O a counterexample to exact RDKit equivalence."""
     n = len(mol.atoms)
     nbrs = [[] for _ in range(n)]
     for k, bd in enumerate(mol.bonds):
