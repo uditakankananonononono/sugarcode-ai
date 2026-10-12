@@ -1,0 +1,96 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_part_budget_refuses_excess_before_result _________________
+
+    def test_part_budget_refuses_excess_before_result():
+        for call in (compile_project, run_wizard):
+>           with pytest.raises(ValueError, match='part budget'):
+E           Failed: DID NOT RAISE ValueError
+
+tests/test_synbio_stack_repairs.py:9: Failed
+_________________ test_gc_windows_slide_and_reject_invalid_dna _________________
+
+    def test_gc_windows_slide_and_reject_invalid_dna():
+        dna = 'A' * 30 + 'G' * 30
+>       result = codon_metrics(dna, window_nt=30, stride_nt=3)
+E       TypeError: codon_metrics() got an unexpected keyword argument 'window_nt'
+
+tests/test_synbio_stack_repairs.py:16: TypeError
+______________________ test_sbml_core_document_semantics _______________________
+
+    def test_sbml_core_document_semantics():
+        text = sbml_export(['step a', 'step b'], {'step a': 1.5})
+        ns = {'s': 'http://www.sbml.org/sbml/level3/version2/core'}
+        root = ET.fromstring(text)
+>       assert root.tag == '{' + ns['s'] + '}sbml'
+E       AssertionError: assert 'sbml' == '{http://www....on2/core}sbml'
+E
+E         - {http://www.sbml.org/sbml/level3/version2/core}sbml
+E         + sbml
+
+tests/test_synbio_stack_repairs.py:29: AssertionError
+_________________________ test_sbml_parser_consistency _________________________
+
+    def test_sbml_parser_consistency():
+        import libsbml
+        doc = libsbml.readSBMLFromString(sbml_export(['step a', 'step b']))
+>       assert doc.getNumErrors() == 0, doc.getErrorLog().toString()
+E       AssertionError: line 2: (20101 [Error]) The <sbml> container element must declare the XML Namespace for SBML, and this declaration must be consistent with the values of the 'level' and 'version' attributes on the <sbml> element.
+E         Reference: L3V2 Section 4.1
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'boundaryCondition' is missing from the <species> with the id 'S0'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'hasOnlySubstanceUnits' is missing from the <species> with the id 'S0'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'constant' is missing from the <species> with the id 'S0'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'boundaryCondition' is missing from the <species> with the id 'S1'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'hasOnlySubstanceUnits' is missing from the <species> with the id 'S1'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'constant' is missing from the <species> with the id 'S1'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'boundaryCondition' is missing from the <species> with the id 'S2'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'hasOnlySubstanceUnits' is missing from the <species> with the id 'S2'.
+E
+E         line 2: (20623 [Error]) A Species object must have the required attributes 'id', 'compartment', 'hasOnlySubstanceUnits', 'boundaryCondition' and 'constant', and may have the optional attributes 'metaid', 'sboTerm', 'name', 'initialAmount', 'initialConcentration', 'substanceUnits' and 'conversionFactor'. No other attributes from the SBML Level 3 Core namespace are permitted on a Species object.
+E         Reference: L3V2 Section 4.6
+E          The required attribute 'constant' is missing from the <species> with the id 'S2'.
+E
+E         line 2: (21110 [Error]) A <reaction> object must have the required attributes 'id' and 'reversible', and may have the optional attributes 'metaid', 'sboTerm', 'name' and 'compartment'. For SBML Level 3 Version 1 documents only, 'fast' is additionally required.  No other attributes from the SBML Level 3 Core namespace are permitted on a Reaction object.
+E         Reference: L3V2 Section 4.11
+E          Attribute 'estimatedFlux' is not part of the definition of an SBML Level 3 Version 2 <reaction> element.
+E
+E         line 2: (21110 [Error]) A <reaction> object must have the required attributes 'id' and 'reversible', and may have the optional attributes 'metaid', 'sboTerm', 'name' and 'compartment'. For SBML Level 3 Version 1 documents only, 'fast' is additionally required.  No other attributes from the SBML Level 3 Core namespace are permitted on a Reaction object.
+E         Reference: L3V2 Section 4.11
+E          Attribute 'estimatedFlux' is not part of the definition of an SBML Level 3 Version 2 <reaction> element.
+E
+E
+E       assert 12 == 0
+E        +  where 12 = getNumErrors()
+E        +    where getNumErrors = <SBMLDocument>.getNumErrors
+
+tests/test_synbio_stack_repairs.py:44: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_synbio_stack_repairs.py::test_part_budget_refuses_excess_before_result
+FAILED tests/test_synbio_stack_repairs.py::test_gc_windows_slide_and_reject_invalid_dna
+FAILED tests/test_synbio_stack_repairs.py::test_sbml_core_document_semantics
+FAILED tests/test_synbio_stack_repairs.py::test_sbml_parser_consistency - Ass...
+4 failed in 0.63s

@@ -243,3 +243,1128 @@ Original claim (historical): "rigor and reproducibility"
 Current wording: Project compiler aggregates deterministic/seeded helpers without verified model correctness, recorded environment manifest or laboratory replication. Statistical feedback is manual.
 
 Source: `src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project); src/sugarcode/modules/synbio_wizard/core.py:190 (feedback_posterior)`.
+
+
+## Stack-local scope corrections
+
+These 140 row-specific dispositions supersede earlier wording only for their listed IDs. No independent reproducer has signed these rows. Counts: COMPLETE 0, PARTIAL 140, UNSUPPORTED 0. Three BUILD rows contain local red/green tests; 137 CORRECT rows narrow wording without capability completion. Original banner and historical text remain unchanged.
+
+### S5-012.A01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-012.A01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-012.A01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Four embedded host profiles are ranked using a fixed weighted formula; scores do not establish biological host suitability.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:36`.
+
+### S5-012.A01.C04
+
+Disposition: BUILD. Final label: PARTIAL.
+
+Architecture part budget is enforced before producing the catalog result; no lab procedure or construct sequence is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-012.A02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-012.A03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A noisy catalog difficulty prior and host score yield a heuristic go/redesign label, not a lab readiness verdict.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:248`.
+
+### S5-012.A03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-017.A01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-017.A01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-017.A02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Four embedded host profiles are ranked using a fixed weighted formula; scores do not establish biological host suitability.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:36`.
+
+### S5-017.A03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A noisy catalog difficulty prior and host score yield a heuristic go/redesign label, not a lab readiness verdict.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:248`.
+
+### S5-017.A03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Part count chooses Golden Gate or Gibson as an architecture label; no executable assembly procedure or sequence design is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-041.01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-041.01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-041.01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.01.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Four embedded host profiles are ranked using a fixed weighted formula; scores do not establish biological host suitability.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:36`.
+
+### S5-041.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied unit-interval scores are combined by fixed weights; ranking is a numerical preference formula.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:161`.
+
+### S5-041.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A noisy catalog difficulty prior and host score yield a heuristic go/redesign label, not a lab readiness verdict.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:248`.
+
+### S5-041.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Part count chooses Golden Gate or Gibson as an architecture label; no executable assembly procedure or sequence design is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-041.03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-041.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-041.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-041.04.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-041.04.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-041.04.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-041.04.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-041.04.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-041.05.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-041.05.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-041.05.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.05.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-041.05.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-041.05.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-041.05.C07
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.06.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-041.06.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+CAI is explicitly a GC-distance/codon-diversity proxy, not host codon-frequency CAI.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:44`.
+
+### S5-041.06.C03
+
+Disposition: BUILD. Final label: PARTIAL.
+
+GC fractions are computed over explicit sliding nucleotide windows; ambiguous input bases are rejected. These are sequence counts, not an expression model.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:44`.
+
+### S5-041.06.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A local adjacent GC/AU-pair energy proxy is computed; it is not nearest-neighbor RNA folding or a fitted translation-initiation model.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:58`.
+
+### S5-041.06.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A supplied Hill occupancy model returns relative transcription rates; parameters are caller choices, not fitted host kinetics.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:63`.
+
+### S5-041.06.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied concentrations and dissociation constants determine competitive occupancy; affinity is not inferred from sequence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:68`.
+
+### S5-041.06.C07
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Copy number, promoter strength and protein length enter a fixed ATP-demand ratio capped at one; this is a resource proxy.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:94`.
+
+### S5-041.07.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A local adjacent GC/AU-pair energy proxy is computed; it is not nearest-neighbor RNA folding or a fitted translation-initiation model.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:58`.
+
+### S5-041.07.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Michaelis-Menten rate and kcat-to-capacity unit conversion are computed; there is no kcat/Km optimization.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:76`.
+
+### S5-041.07.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.07.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.07.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-041.07.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-042.01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-042.01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Input is matched to one of five embedded product names by normalization/substring rules; arbitrary goals and natural-language reasoning are not supported.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:28`.
+
+### S5-042.01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-042.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Boolean truth operations return a text implementation label, not a biochemical circuit simulation.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:116`.
+
+### S5-042.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A host-family backbone label and ordered promoter/gene/terminator records are returned; no sequence-level plasmid assembly is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:178`.
+
+### S5-042.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Part count chooses Golden Gate or Gibson as an architecture label; no executable assembly procedure or sequence design is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-042.02.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A seeded four-channel birth/death SSA runs with a stated event cap; no multi-gene circuit is simulated.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:106`.
+
+### S5-042.02.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-042.03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Forward-strand 20-base windows with NGG/NAG matching are enumerated and sorted by GC/diversity proxies; no guide optimization against experimental outcomes occurs.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:124`.
+
+### S5-042.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Forward-strand 20-base windows with NGG/NAG matching are enumerated and sorted by GC/diversity proxies; no guide optimization against experimental outcomes occurs.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:124`.
+
+### S5-042.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The score uses guide GC distance and seed nucleotide diversity; this module does not search a genome or score mismatch tolerance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:124`.
+
+### S5-042.04.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-042.04.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-042.04.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-042.04.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-042.04.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-043.01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-043.01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A codon-change heuristic feeds multiplicative flux/growth retention formulas; no cellular phenotype or stress-response simulation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:142`.
+
+### S5-043.01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-043.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A codon-change heuristic feeds multiplicative flux/growth retention formulas; no cellular phenotype or stress-response simulation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:142`.
+
+### S5-043.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A short codon lookup and supplied conservation/active-site flags drive heuristic scores; no protein coordinates, SIFT or PolyPhen implementation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:134`.
+
+### S5-043.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A serial-pathway linear program constrains abstract uptake, ATP and redox; it is not a genome-scale stoichiometric reconstruction or coupled omics optimizer.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:80`.
+
+### S5-043.02.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A codon-change heuristic feeds multiplicative flux/growth retention formulas; no cellular phenotype or stress-response simulation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:142`.
+
+### S5-043.02.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A codon-change heuristic feeds multiplicative flux/growth retention formulas; no cellular phenotype or stress-response simulation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:142`.
+
+### S5-043.02.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A codon-change heuristic feeds multiplicative flux/growth retention formulas; no cellular phenotype or stress-response simulation is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:142`.
+
+### S5-043.03.C01
+
+Disposition: BUILD. Final label: PARTIAL.
+
+Serial stoichiometry exports as SBML L3V2 core with compartment, species, reaction references and namespaced flux annotation. Parser checks pass for fixtures; no kinetic-engine integration is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:182`.
+
+### S5-043.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-043.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-043.03.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-043.03.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-043.03.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-043.03.C07
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-043.04.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-043.04.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-043.04.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-043.04.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-043.04.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-043.04.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A closed-form mutation/burden/selection decay formula runs; this module does not simulate a population fitness landscape or resistance emergence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:146`.
+
+### S5-044.01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.01.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-044.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-044.03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.03.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The graph is an embedded catalog chain and feedback accepts caller-supplied success counts; the module read does not establish the named source integration, omics parser or laboratory evidence.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:212`.
+
+### S5-044.03.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-044.04.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-044.04.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-044.04.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Part count chooses Golden Gate or Gibson as an architecture label; no executable assembly procedure or sequence design is produced.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-044.04.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-044.04.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-045.01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.02.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied unit-interval scores are combined by fixed weights; ranking is a numerical preference formula.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:161`.
+
+### S5-045.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied unit-interval scores are combined by fixed weights; ranking is a numerical preference formula.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:161`.
+
+### S5-045.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied unit-interval scores are combined by fixed weights; ranking is a numerical preference formula.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:161`.
+
+### S5-045.04.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.04.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-045.04.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-045.04.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-045.04.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-045.04.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-045.05.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A contact/hydrogen-bond/charge/flexibility formula returns an energy proxy; no solvent sampling, molecular pose search or conformational ensemble is computed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:151`.
+
+### S5-045.05.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A contact/hydrogen-bond/charge/flexibility formula returns an energy proxy; no solvent sampling, molecular pose search or conformational ensemble is computed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:151`.
+
+### S5-045.05.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A contact/hydrogen-bond/charge/flexibility formula returns an energy proxy; no solvent sampling, molecular pose search or conformational ensemble is computed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:151`.
+
+### S5-045.05.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A contact/hydrogen-bond/charge/flexibility formula returns an energy proxy; no solvent sampling, molecular pose search or conformational ensemble is computed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:151`.
+
+### S5-045.05.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Seeded Gaussian draws and caller-set width/sample-count terms produce central draw intervals; they do not establish coverage against observations or uncertainty reduction.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:156`.
+
+### S5-046.01.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-046.01.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-046.01.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-046.02.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Supplied uncertainty and decision sensitivity rank fixed suggestion strings; no hypothesis search, pathway-knockout simulator or experimental feedback loop is executed.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:169`.
+
+### S5-046.02.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-046.02.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-046.03.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-046.03.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-046.03.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-046.03.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied successes/totals update Beta counts by design name; no assay parser or training loop is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-046.03.C05
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-046.03.C06
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-046.03.C07
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module supplies part-count assembly labels and architecture only; it does not carry out laboratory work or provide operational laboratory procedures.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:174`.
+
+### S5-DISC-synbio_wizard
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+This module uses fixed formulas and count-level Beta posterior updates; no trained learning model, autonomous code growth or experimental-prediction evidence is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:222`.
+
+### S5-CODEDOC-017.C01
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.
+
+### S5-CODEDOC-017.C02
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+A single mRNA/protein two-variable ODE runs; no multi-gene regulatory network is established.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:99`.
+
+### S5-CODEDOC-017.C03
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Caller-supplied conditions enter a Q10/Gaussian-pH/nutrient multiplier; the response is not fitted to observations.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:228`.
+
+### S5-CODEDOC-017.C04
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+Energy keys in the module use kcal/mol; the source row kJ/mol wording is superseded. Other units are function-specific labels, not an all-input unit guarantee.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:58`.
+
+### S5-CODEDOC-019
+
+Disposition: CORRECT. Final label: PARTIAL.
+
+The callable combines embedded catalog labels, serial flux constraints and numerical proxies. Its outputs are computational examples, not evidence of broader biological performance.
+
+Code read: `src/sugarcode/modules/synbio_wizard/core.py:239`.

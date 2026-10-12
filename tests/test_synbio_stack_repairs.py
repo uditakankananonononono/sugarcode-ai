@@ -45,3 +45,16 @@ def test_sbml_parser_consistency():
     doc.checkConsistency()
     severe = [doc.getError(i).getMessage() for i in range(doc.getNumErrors()) if doc.getError(i).getSeverity() >= libsbml.LIBSBML_SEV_ERROR]
     assert not severe
+
+
+def test_disposition_rows_complete_and_no_self_reproduction():
+    import csv
+    from pathlib import Path
+    rows = list(csv.DictReader((Path(__file__).parents[1] / 'audits/synbio_stack/dispositions.csv').open()))
+    assert len(rows) == 140 and len({x['id'] for x in rows}) == 140
+    assert sum(x['build_or_correct'] == 'BUILD' for x in rows) == 3
+    assert all(x['final_label'] == 'PARTIAL' for x in rows)
+    assert all(not x['independent_reproducer'] and not x['repro_commit'] for x in rows)
+    for x in rows:
+        if x['build_or_correct'] == 'BUILD':
+            assert x['commit'] and x['code_file_line'] and x['failing_without_it_test'] and x['failing_run_evidence']
