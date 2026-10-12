@@ -5,7 +5,7 @@ from sugarcode.modules.qsar_bench.chemistry import parse_smiles
 
 
 @pytest.mark.parametrize("smi", ["FC(F)(F)(F)F", "C(C)(C)(C)(C)C", "CC(C)(C)(C)(C)C", "N(C)(C)(C)(C)C",
-                                 "C(=O)(=O)(=O)=O", "OO(C)C", "[CH5]", "c1ccc(C)(C)(C)cc1"])
+                                 "C(=O)(=O)(=O)=O", "OO(C)C", "[CH5]", "[CH5+]", "[O+](C)(C)(C)C", "c1ccc(C)(C)(C)cc1"])
 def test_valence_impossible_atoms_are_rejected(smi):
     with pytest.raises(ValueError, match="valence error"):
         parse_smiles(smi)
@@ -32,7 +32,7 @@ def test_stereo_is_flagged_not_silently_dropped():
 
 
 @pytest.mark.parametrize("smi", ["C=", "=C", "C==", "C==C", "C=-C", "C#=", "C-", "C--", "-C", "C(=)C", "C(=O=)C",
-                                 "C..", ".C", "C.", "C(.)C", "C(.C)", "C()", "C(()C)", "CC()C", "C11", "C1C1", "C=1C1",
+                                 "C..", ".C", "C.", "C(.)C", "C(.C)", "C()", "C((C))", "C(()C)", "CC()C", "C11", "C1C1", "C=1C1",
                                  "C//C", "F/C=/C/F", "C(=)", "C(C)=", "C1CC1=", "[Na+].=[Cl-]"])
 def test_malformed_strings_are_rejected(smi):
     # old code accepted every one of these (valid_fraction 1.0 for "C=" and "C()")

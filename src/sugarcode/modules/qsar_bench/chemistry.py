@@ -63,12 +63,14 @@ def _atom(token: str) -> Atom:
 
 
 def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
-    """Parse common SMILES into a molecular graph; reject malformed input.
+    """Parse a supported subset of SMILES into a molecular graph.
 
+    This is not a general SMILES validator. The checks below cover documented
+    syntax and valence cases, not every rule implemented by chemistry toolkits.
     Rejects dangling or doubled bond symbols ("C=", "C==C", "=C"), empty branches
     ("C()"), misplaced "." and ring closures onto the same atom or an already
-    bonded atom ("C11", "C1C1"). Rejects valence-impossible atoms (for example
-    pentavalent carbon). Does not check that aromatic
+    bonded atom ("C11", "C1C1"). Checks selected valence limits (including neutral pentavalent carbon and
+    over-coordinated charged C/N/O). Does not check that aromatic
     rings can be kekulized ("c1cccc1" parses). Tetrahedral
     chirality (@, @@) and cis/trans marks (/, \\) are not represented in the graph:
     they are listed in ``Molecule.ignored``, or raise ValueError when
@@ -87,6 +89,7 @@ def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
             pending=bondmap[tok]; bond_pending=True; after_open=False; continue
         if tok == "(":
             if current is None: raise ValueError("branch without atom")
+            if after_open: raise ValueError("nested branch before branch atom")
             if bond_pending: raise ValueError("bond symbol before branch")
             stack.append(current); after_open=True; continue
         if tok == ")":
@@ -134,12 +137,17 @@ def _check_valence(atoms,bonds):
         if a.aromatic:
             if deg[i]>3: raise ValueError(f"valence error: aromatic {a.element} atom {i} has {deg[i]} neighbours")
             continue
-        if a.charge!=0 or a.element not in MAX_VALENCE: continue
+        if a.element not in MAX_VALENCE: continue
         total=int(round(used[i]))+a.explicit_h
-        if a.element=="N" and total>3 and not any(o>=2 for k,(x,y,o) in enumerate(bonds) if i in (x,y)):
+        maximum=MAX_VALENCE[a.element]
+        if a.element=="C": maximum=4
+        elif a.element=="N" and a.charge>0: maximum=4
+        elif a.element=="O" and a.charge>0: maximum=3
+        elif a.element=="O" and a.charge<0: maximum=1
+        if a.element=="N" and a.charge==0 and total>3 and not any(o>=2 for x,y,o in bonds if i in (x,y)):
             raise ValueError(f"valence error: N atom {i} has valence {total} with no multiple bond")
-        if total>MAX_VALENCE[a.element]:
-            raise ValueError(f"valence error: {a.element} atom {i} has valence {total} (max {MAX_VALENCE[a.element]})")
+        if total>maximum:
+            raise ValueError(f"valence error: {a.element} atom {i} has valence {total} (max {maximum})")
 
 
 def _adj(m: Molecule):
