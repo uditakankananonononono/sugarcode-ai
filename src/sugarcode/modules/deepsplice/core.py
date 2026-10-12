@@ -243,7 +243,7 @@ def site_class(window: str, site_type: str = "donor") -> str:
     (U12), else "other".
     The learned PWMs apply to GT donors (and GC via the documented swap)
     and AG acceptors ONLY. Scoring an AT-AC or other-class site with them
-    is not applicable - the extended SCN1A golden (drop 26) caught real
+    is not applicable - the extended SCN1A golden (drop 26) caught
     pathogenic +1 variants at two AT-AC introns scoring delta=0 ("minimal
     effect"), a dangerously wrong answer, before this check existed.
     """
