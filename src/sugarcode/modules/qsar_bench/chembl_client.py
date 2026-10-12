@@ -31,8 +31,9 @@ class ChEMBLQSARClient:
 
         Duplicates are aggregated by median pChEMBL per canonical SMILES and
         years are retained for temporal validation. Records lacking pChEMBL,
-        canonical SMILES, an exact '=' relation, or a requested type are
-        counted and excluded rather than imputed.
+        canonical SMILES, an exact '=' relation, or a requested standard type
+        are counted and excluded rather than imputed. The type is checked on
+        each returned row as well as in the server query.
         """
         if not target_chembl_id.startswith("CHEMBL"): raise ValueError("target ID must start CHEMBL")
         page=self._get("activity.json",{"target_chembl_id":target_chembl_id,"standard_type__in":",".join(standard_types),
@@ -42,7 +43,7 @@ class ChEMBLQSARClient:
         for start in range(0,len(ids),100):
             data=self._get("molecule.json",{"molecule_chembl_id__in":",".join(ids[start:start+100]),"limit":100})
             for m in data.get("molecules",[]): structures[m.get("molecule_chembl_id")]=(m.get("molecule_structures") or {}).get("canonical_smiles")
-        grouped={}; excluded={"non_exact_relation":0,"missing_pchembl":0,"missing_structure":0,"invalid_value":0}
+        grouped={}; excluded={"non_exact_relation":0,"missing_pchembl":0,"missing_structure":0,"invalid_value":0,"non_requested_type":0}
         for a in acts:
             if str(a.get("standard_relation") or "").strip()!="=": excluded["non_exact_relation"]+=1; continue
             if a.get("pchembl_value") is None: excluded["missing_pchembl"]+=1; continue
@@ -50,6 +51,7 @@ class ChEMBLQSARClient:
             if not smi: excluded["missing_structure"]+=1; continue
             try: val=float(a["pchembl_value"])
             except (TypeError,ValueError): excluded["invalid_value"]+=1; continue
+            if a.get("standard_type") not in standard_types: excluded["non_requested_type"]+=1; continue
             grouped.setdefault(smi,[]).append((val,a.get("document_year"),a.get("molecule_chembl_id")))
         rows=[]
         for smi,items in grouped.items():
