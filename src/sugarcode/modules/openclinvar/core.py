@@ -135,7 +135,7 @@ def _consequence_from_hgvs(variant: str) -> str | None:
             return None if k <= 20 else "intronic"  # splice region: undetermined, not benign
         if body.startswith("-") or body.startswith("*"):
             return "utr"
-        m = re.match(r"^(\d+)(?:_(\d+))?(del|dup|ins|delins)([ACGT]*)", body)
+        m = re.match(r"^(\d+)(?:_(\d+))?(delins|del|dup|ins)([ACGT]*)", body)
         if m:
             start, end, kind, bases = int(m.group(1)), m.group(2), m.group(3), m.group(4)
             if kind in ("del", "dup"):
