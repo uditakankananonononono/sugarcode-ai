@@ -37,7 +37,7 @@ _VERIFIED: set[str] = set()  # populated below from _MODULES
 _MODULES: list[tuple[str, str, str, str]] = [
     # slug, name, subnetwork, summary
     ("neuro_hub", "Neuro-Hub (Dashboard)", "core-intelligence",
-     "Central command center: global flux (the share of registered modules that import), unified search across the module stack, platform-wide health."),
+     "Local dashboard: fraction of registered modules importable in this process, keyword search over indexed registry/spec text, process-memory projects; no service uptime or compute telemetry."),
     ("bio_copilot", "Bio-Copilot", "core-intelligence",
      "Keyword-routed research assistant (no language model): live PubMed retrieval, UniProt gene context; mutation-to-phenotype pipeline; FASTA/PDB outputs; CRISPR design; JSON research-artifact serialization."),
     ("synbio_wizard", "SynBio Wizard", "core-intelligence",
@@ -184,7 +184,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("biosimvr", "BioSimVR", "fabrication-evolution",
      "Simulated 3D virtual-laboratory runner: two scripted sessions with fixed outputs (reporter signal 0.72 set in code for the transfection session) plus separate seeded docking, guide-enumeration and protocol simulations; not a lab experiment."),
     ("synlife_evo", "SynLife Evo", "fabrication-evolution",
-     "Long-term evolutionary simulation of synthetic organisms over thousands of generations."),
+     "Seeded population-genetics simulation over configurable generations under supplied fitness and mutation assumptions; no organism or industrial outcome certification."),
     ("omega_stats", "Omega Stats", "platform",
      "Platform performance dashboard: prediction accuracy, efficiency rates, throughput across sub-networks."),
     ("enterprise_bio", "Enterprise Bio", "platform",

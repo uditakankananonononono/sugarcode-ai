@@ -6,7 +6,7 @@
 
 # SynLife Evo
 
-SynLife Evo: A long-term evolutionary simulator for synthetic organisms, predicting how engineered pathways adapt over thousands of generations in competitive environments. It identifies dominant genotypes and predicted adaptations. SynLife Evo helps researchers design stable and resilient synthetic biological systems, ensuring that engineered functions are maintained during industrial processes.
+SynLife Evo is a seeded mechanistic population-genetics simulator over configurable generations. Competition uses supplied burden, product-selection, stress and competitor assumptions. Returned genotype summaries and adaptation strings describe this simulation only. They do not establish future biological adaptation, stability, engineered-function retention or industrial performance.
 
 Microbiome Rx
 Microbiome Rx is formulated as a multi-scale dynamical systems simulator for gut microbial ecosystems, where each microbial species is represented as a genome-scale metabolic network embedded within a coupled ecological field. The system integrates Flux Balance Analysis (FBA), dynamic FBA (dFBA), and enzyme-constrained metabolic models (ecFBA) into a unified community constraint optimization problem. Each species iii is defined by a stoichiometric matrix SiS_iSi​, flux vector viv_ivi​, and uptake constraints Ui(t)U_i(t)Ui​(t), while community metabolism is solved under the global constraint ∑iSivi=0\sum_i S_i v_i = 0∑i​Si​vi​=0 with time-dependent nutrient boundary conditions derived from dietary intake functions.

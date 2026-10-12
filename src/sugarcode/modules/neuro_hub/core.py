@@ -6,7 +6,7 @@ _PROJECTS: list[dict] = []  # in-memory project state store
 
 
 def dashboard() -> dict:
-    """Unified platform view: module-import flux (fraction of modules importable), sub-network status, project states."""
+    """Local view: module-import fraction, per-network import counts and process-memory projects. No hardware compute, remote service uptime or biological fidelity inference."""
     flux = compute_flux()
     return {
         "platform": "SugarCode AI / Omega OS v7.0",
@@ -37,7 +37,7 @@ def recent_projects(limit: int = 10) -> list[dict]:
 
 
 def register_project(name: str, module: str, state: str = "created") -> dict:
-    """Register a project against a real registry module slug."""
+    """Register a project against a local registry module slug."""
     from omega.registry import REGISTRY
     if not isinstance(name, str) or not name.strip():
         raise ValueError("project name must be a non-empty string")

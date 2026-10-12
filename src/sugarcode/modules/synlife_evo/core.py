@@ -141,8 +141,8 @@ def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, popu
     """Simulate genotype classes under mutation, selection, drift and environment.
 
     Returns scientist-facing allele trajectories, dominant genotype, failure
-    onset, uncertainty, QC flags and stabilization recommendations. Mutation-rate units and the seed are explicit. Parameter-source provenance
-    is not returned, and the experiment metadata omits burden and yield_selection. This is a mechanistic research model,
+    onset, uncertainty, QC flags and stabilization recommendations. Mutation-rate units and the seed are explicit. Function-argument origin, burden, yield selection and sampling interval
+    are recorded in experiment metadata. External parameter provenance is not checked. This is a mechanistic research model,
     not a trained or clinically validated predictor.
     """
     _validate_experiment(genes,generations,population,mutation_rate,sample_every)
@@ -175,7 +175,7 @@ def simulate_evolution_experiment(genes:list[str], *, generations:int=2000, popu
     if final[2]+final[1]>.2: recommendations += ["couple product formation to an essential metabolite","reduce promoter/RBS strength to lower burden","test chromosomal integration at a neutral locus"]
     if final[4]>.2: recommendations.append("screen copy-number amplification and plasmid instability")
     recommendations += ["run at least 3 biological replicate evolution lines","sequence founder and endpoint populations","measure product titer and growth every sampling interval"]
-    return {"experiment":{"genes":genes,"generations":generations,"population":population,"mutation_rate_per_gene_generation":mutation_rate,"seed":seed,"environment_schedule":schedule},
+    return {"experiment":{"genes":genes,"generations":generations,"population":population,"mutation_rate_per_gene_generation":mutation_rate,"seed":seed,"environment_schedule":schedule,"burden_per_gene":burden,"yield_selection":yield_selection,"sample_every_generations":sample_every,"parameter_origin":"function arguments; external provenance not checked"},
       "trajectory":history,"dominant_genotype":names[dom],"final_genotype_frequencies":dict(zip(names,final.tolist())),"failure_onset_generation":onset,
       "predicted_adaptations":[names[i] for i in np.argsort(-final) if final[i]>.01],"diagnostics":diagnostics,"enhancement_feature_count":len(diagnostics),
       "quality_control":qc,"recommended_next_steps":recommendations,"model_status":"mechanistic population-genetics simulation; not trained or clinically validated"}

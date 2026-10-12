@@ -12,10 +12,10 @@ nearest_neighbors("CC(=O)Oc1ccccc1C(=O)O", library_smiles, k=5)
 
 ## What it computes
 - `morgan_counts(smiles, radius)`: unfolded count fingerprint, 32-bit codes,
-  identical to RDKit `GetMorganFingerprint(m, radius)` (ECFP invariants,
+  compared with frozen RDKit 2024.09.6 fixtures, not universally identical to `GetMorganFingerprint(m, radius)` (ECFP invariants,
   bond types on, chirality off, redundant environments dropped).
 - `morgan_bits(smiles, radius, n_bits)`: folded on-bits (code % n_bits),
-  identical to `GetMorganFingerprintAsBitVect`. ECFP4 = radius 2.
+  compared with frozen `GetMorganFingerprintAsBitVect` fixtures. ECFP4 = radius 2.
 - `morgan_bit_info`: bit -> [(atom, radius)].
 - `tanimoto` (= `jaccard`) and `dice` on bit sets or count dicts (RDKit
   definitions; two empty fingerprints give 0.0).
@@ -36,3 +36,5 @@ nearest_neighbors("CC(=O)Oc1ccccc1C(=O)O", library_smiles, k=5)
 - Identical codes to RDKit depend on identical aromaticity; see
   chem_descriptors README for the aromaticity cases not perceived.
 - Search is a linear scan (fine for thousands, not millions).
+
+Known parser boundary: explicit hydrogen inputs such as `[H]O` and `[H:7]O` can differ from the frozen comparator conventions. Fixture agreement is not universal parity. No fresh external oracle was executed by this correction pass.
