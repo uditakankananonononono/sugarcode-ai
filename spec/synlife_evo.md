@@ -42,3 +42,12 @@ Extrusion dynamics are simulated using Navier–Stokes equations coupled with pa
 Crosslinking kinetics are modeled using reaction–diffusion equations where gelation is driven by ionic diffusion, photoinitiated radical polymerization, or enzymatic crosslinking reactions. The system solves coupled PDEs describing polymer network formation and spatial stiffness evolution over time, enabling prediction of scaffold heterogeneity and structural anisotropy.
 Mechanical stability is evaluated using finite element analysis on evolving tissue geometries, incorporating nonlinear elasticity, poroelastic fluid flow, and time-dependent viscoelastic relaxation. Boundary conditions simulate physiological loading such as vascular pressure, compressive musculoskeletal forces, and shear flow in perfused bioreactors.
 Finally, BioPrint Pro performs global optimization over printing parameters using gradient-based and evolutionary algorithms. The objective function maximizes structural fidelity, cell viability, and long-term tissue maturation stability. Outputs include optimized print trajectories, material compositions, mechanical resilience maps, and predicted maturation pathways for engineered tissues.
+
+## Whole-claim corrections (2026-10-12)
+
+These corrections apply to the original wording above. They describe the
+implementation at commit 99cb2d329690cf946ae491cb3ca027ee66b7f656 and do not
+claim that the aspirational capability has been implemented.
+
+- S5-105.02.C02, original claim: "predicted adaptations".
+  Corrected scope (PARTIAL): Adaptations are templated from model counts and misstate the denominator; no confirmed future adaptations.

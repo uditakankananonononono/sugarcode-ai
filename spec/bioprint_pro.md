@@ -44,3 +44,32 @@ Mechanical stability is evaluated using finite element analysis on evolving tiss
 Finally, BioPrint Pro performs global optimization over printing parameters using gradient-based and evolutionary algorithms. The objective function maximizes structural fidelity, cell viability, and long-term tissue maturation stability. Outputs include optimized print trajectories, material compositions, mechanical resilience maps, and predicted maturation pathways for engineered tissues.
 
 BioCanvas 7.0: A genetic architecture sandbox for building complex biological systems from modular components, integrating data from over 20 platforms. It visualizes logic interconnects and simulates functional outcomes in a high-fidelity environment. BioCanvas 7.0 offers a freestyle design space for bio-engineering, enabling researchers to explore new genetic architectures.
+
+## Whole-claim corrections (2026-10-12)
+
+These corrections apply to the original wording above. They describe the
+implementation at commit 99cb2d329690cf946ae491cb3ca027ee66b7f656 and do not
+claim that the aspirational capability has been implemented.
+
+- S5-096.01.C02, original claim: "cellular biomechanics".
+  Corrected scope (OVERSTATED): Cellular biomechanics is replaced by a survival heuristic without empirical fitting.
+- S5-096.02.C04, original claim: "stress relaxation".
+  Corrected scope (OVERSTATED): Extrusion stress relaxation is not reproduced; mechanical relaxation elsewhere does not satisfy this clause.
+- S5-097.02.C01, original claim: "mechanical stress exposure".
+  Corrected scope (OVERSTATED): Rate x exposure is a survival proxy, not the claimed stress-magnitude model.
+- S5-097.02.C02, original claim: "shear stress magnitude".
+  Corrected scope (OVERSTATED): Rate x exposure is a survival proxy, not the claimed stress-magnitude model.
+- S5-098.01.C03, original claim: "photoinitiated radical polymerization".
+  Corrected scope (OVERSTATED): No photon, radical or enzyme species/kinetics; these are fixed-rate label surrogates.
+- S5-098.01.C04, original claim: "enzymatic crosslinking reactions".
+  Corrected scope (OVERSTATED): No photon, radical or enzyme species/kinetics; these are fixed-rate label surrogates.
+- S5-099.02.C01, original claim: "vascular pressure".
+  Corrected scope (OVERSTATED): Generic load, prescribed pressure and unscaled index gradient cannot establish specified physiological boundary conditions.
+- S5-099.02.C02, original claim: "compressive musculoskeletal forces".
+  Corrected scope (OVERSTATED): Generic load, prescribed pressure and unscaled index gradient cannot establish specified physiological boundary conditions.
+- S5-099.02.C03, original claim: "shear flow in perfused bioreactors".
+  Corrected scope (OVERSTATED): Generic load, prescribed pressure and unscaled index gradient cannot establish specified physiological boundary conditions.
+- S5-100.02.C03, original claim: "long-term tissue maturation stability".
+  Corrected scope (OVERSTATED): Maturation stability is reported, not optimized; no long-term validation.
+- S5-100.03.C02, original claim: "material compositions".
+  Corrected scope (UNSUPPORTED): Optimized material composition is absent/unrunnable.
