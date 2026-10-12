@@ -1,0 +1,183 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+__________________ test_short_identity_has_zero_cosine_change __________________
+
+    def test_short_identity_has_zero_cosine_change():
+>       assert g.delta_embedding('AAA','AAA')['cosine_change']==0
+E       assert 1.0 == 0
+
+tests/test_genomegpt_stack_b5.py:8: AssertionError
+_______ test_per_bin_tracks_condition_expression_without_track_mutation ________
+
+    def test_per_bin_tracks_condition_expression_without_track_mutation():
+        tracks={'atac':[0.1,0.9],'h3k27ac':[0.2,0.8],'methylation':[0.9,0.1]}
+>       result=g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_genomegpt_stack_b5.py:14:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+seq = 'ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC'
+tracks = {'atac': [0.1, 0.9], 'h3k27ac': [0.2, 0.8], 'methylation': [0.9, 0.1]}
+cell_type = 'generic', bin_size = 100
+
+    def epigenetic_fusion(seq,tracks=None,cell_type="generic",bin_size=100):
+        s=clean_dna(seq); state=CELL_STATES.get(cell_type,CELL_STATES['generic']); tracks=tracks or {}
+        bins=[]
+        for i in range(0,len(s),bin_size):
+>           w=s[i:i+bin_size]; atac=float(tracks.get('atac',state['atac'])); hist=float(tracks.get('h3k27ac',state['h3k27ac'])); meth=float(tracks.get('methylation',state['methylation'])); gc=gc_content(w); activity=.35*gc+.3*atac+.25*hist+.1*(1-meth); bins.append({"start":i,"end":i+len(w),"gc":gc,"atac":atac,"h3k27ac":hist,"methylation":meth,"regulatory_activity":activity})
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: float() argument must be a string or a real number, not 'list'
+
+src/sugarcode/modules/genomegpt/core.py:119: TypeError
+__________ test_track_shape_value_and_unknown_key_rejection[tracks0] ___________
+
+tracks = {'atac': [0.1]}
+
+    @pytest.mark.parametrize('tracks',[{'atac':[0.1]},{'atac':[0.1,float('nan')]},{'atac':True},{'atac':[0.1,1.1]},{'unknown':.5}])
+    def test_track_shape_value_and_unknown_key_rejection(tracks):
+>       with pytest.raises(ValueError):g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_genomegpt_stack_b5.py:24:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+seq = 'ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC'
+tracks = {'atac': [0.1]}, cell_type = 'generic', bin_size = 100
+
+    def epigenetic_fusion(seq,tracks=None,cell_type="generic",bin_size=100):
+        s=clean_dna(seq); state=CELL_STATES.get(cell_type,CELL_STATES['generic']); tracks=tracks or {}
+        bins=[]
+        for i in range(0,len(s),bin_size):
+>           w=s[i:i+bin_size]; atac=float(tracks.get('atac',state['atac'])); hist=float(tracks.get('h3k27ac',state['h3k27ac'])); meth=float(tracks.get('methylation',state['methylation'])); gc=gc_content(w); activity=.35*gc+.3*atac+.25*hist+.1*(1-meth); bins.append({"start":i,"end":i+len(w),"gc":gc,"atac":atac,"h3k27ac":hist,"methylation":meth,"regulatory_activity":activity})
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: float() argument must be a string or a real number, not 'list'
+
+src/sugarcode/modules/genomegpt/core.py:119: TypeError
+__________ test_track_shape_value_and_unknown_key_rejection[tracks1] ___________
+
+tracks = {'atac': [0.1, nan]}
+
+    @pytest.mark.parametrize('tracks',[{'atac':[0.1]},{'atac':[0.1,float('nan')]},{'atac':True},{'atac':[0.1,1.1]},{'unknown':.5}])
+    def test_track_shape_value_and_unknown_key_rejection(tracks):
+>       with pytest.raises(ValueError):g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_genomegpt_stack_b5.py:24:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+seq = 'ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC'
+tracks = {'atac': [0.1, nan]}, cell_type = 'generic', bin_size = 100
+
+    def epigenetic_fusion(seq,tracks=None,cell_type="generic",bin_size=100):
+        s=clean_dna(seq); state=CELL_STATES.get(cell_type,CELL_STATES['generic']); tracks=tracks or {}
+        bins=[]
+        for i in range(0,len(s),bin_size):
+>           w=s[i:i+bin_size]; atac=float(tracks.get('atac',state['atac'])); hist=float(tracks.get('h3k27ac',state['h3k27ac'])); meth=float(tracks.get('methylation',state['methylation'])); gc=gc_content(w); activity=.35*gc+.3*atac+.25*hist+.1*(1-meth); bins.append({"start":i,"end":i+len(w),"gc":gc,"atac":atac,"h3k27ac":hist,"methylation":meth,"regulatory_activity":activity})
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: float() argument must be a string or a real number, not 'list'
+
+src/sugarcode/modules/genomegpt/core.py:119: TypeError
+__________ test_track_shape_value_and_unknown_key_rejection[tracks2] ___________
+
+tracks = {'atac': True}
+
+    @pytest.mark.parametrize('tracks',[{'atac':[0.1]},{'atac':[0.1,float('nan')]},{'atac':True},{'atac':[0.1,1.1]},{'unknown':.5}])
+    def test_track_shape_value_and_unknown_key_rejection(tracks):
+>       with pytest.raises(ValueError):g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_genomegpt_stack_b5.py:24: Failed
+__________ test_track_shape_value_and_unknown_key_rejection[tracks3] ___________
+
+tracks = {'atac': [0.1, 1.1]}
+
+    @pytest.mark.parametrize('tracks',[{'atac':[0.1]},{'atac':[0.1,float('nan')]},{'atac':True},{'atac':[0.1,1.1]},{'unknown':.5}])
+    def test_track_shape_value_and_unknown_key_rejection(tracks):
+>       with pytest.raises(ValueError):g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_genomegpt_stack_b5.py:24:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+seq = 'ATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGCATGC'
+tracks = {'atac': [0.1, 1.1]}, cell_type = 'generic', bin_size = 100
+
+    def epigenetic_fusion(seq,tracks=None,cell_type="generic",bin_size=100):
+        s=clean_dna(seq); state=CELL_STATES.get(cell_type,CELL_STATES['generic']); tracks=tracks or {}
+        bins=[]
+        for i in range(0,len(s),bin_size):
+>           w=s[i:i+bin_size]; atac=float(tracks.get('atac',state['atac'])); hist=float(tracks.get('h3k27ac',state['h3k27ac'])); meth=float(tracks.get('methylation',state['methylation'])); gc=gc_content(w); activity=.35*gc+.3*atac+.25*hist+.1*(1-meth); bins.append({"start":i,"end":i+len(w),"gc":gc,"atac":atac,"h3k27ac":hist,"methylation":meth,"regulatory_activity":activity})
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: float() argument must be a string or a real number, not 'list'
+
+src/sugarcode/modules/genomegpt/core.py:119: TypeError
+__________ test_track_shape_value_and_unknown_key_rejection[tracks4] ___________
+
+tracks = {'unknown': 0.5}
+
+    @pytest.mark.parametrize('tracks',[{'atac':[0.1]},{'atac':[0.1,float('nan')]},{'atac':True},{'atac':[0.1,1.1]},{'unknown':.5}])
+    def test_track_shape_value_and_unknown_key_rejection(tracks):
+>       with pytest.raises(ValueError):g.epigenetic_fusion('ATGC'*50,tracks,bin_size=100)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_genomegpt_stack_b5.py:24: Failed
+__________ test_cell_contrast_consumes_cell_specific_supplied_tracks ___________
+
+    def test_cell_contrast_consumes_cell_specific_supplied_tracks():
+>       r=g.cell_state_contrast('ATGC'*50,cell_types=('a','b'),tracks_by_cell={'a':{'atac':0},'b':{'atac':1}},bin_size=100)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cell_state_contrast() got an unexpected keyword argument 'tracks_by_cell'
+
+tests/test_genomegpt_stack_b5.py:28: TypeError
+_____ test_edit_result_includes_reference_edited_loops_contacts_insulation _____
+
+    def test_edit_result_includes_reference_edited_loops_contacts_insulation():
+        motif='CCGCGAGGCGGCAG';rc=motif[::-1].translate(str.maketrans('ACGT','TGCA'))
+        seq='AT'*1750+motif+'AT'*1000+rc+'AT'*1500
+>       r=g.simulate_edit(seq,3500,3501,'A',contact_bin_size=1000)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: simulate_edit() got an unexpected keyword argument 'contact_bin_size'
+
+tests/test_genomegpt_stack_b5.py:35: TypeError
+_________ test_indel_contact_coordinates_not_subtracted_as_if_aligned __________
+
+    def test_indel_contact_coordinates_not_subtracted_as_if_aligned():
+>       r=g.simulate_edit('ATGC'*100,10,12,'',contact_bin_size=100)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: simulate_edit() got an unexpected keyword argument 'contact_bin_size'
+
+tests/test_genomegpt_stack_b5.py:45: TypeError
+_ test_profile_constraints_accept_satisfying_edits_and_reject_impossible_ones __
+
+    def test_profile_constraints_accept_satisfying_edits_and_reject_impossible_ones():
+        seq='ATGC'*5
+>       r=g.propose_expression_profile_edits(seq,{'hepatocyte':0},tolerances={'hepatocyte':1},preserve_cells={'neuron':1},max_candidates=3)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'sugarcode.modules.genomegpt.core' has no attribute 'propose_expression_profile_edits'
+
+tests/test_genomegpt_stack_b5.py:52: AttributeError
+_______________ test_profile_search_budget_and_nonfinite_target ________________
+
+    def test_profile_search_budget_and_nonfinite_target():
+>       with pytest.raises(ValueError):g.propose_expression_profile_edits('ATGC'*251,{'generic':0})
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'sugarcode.modules.genomegpt.core' has no attribute 'propose_expression_profile_edits'
+
+tests/test_genomegpt_stack_b5.py:59: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_genomegpt_stack_b5.py::test_short_identity_has_zero_cosine_change
+FAILED tests/test_genomegpt_stack_b5.py::test_per_bin_tracks_condition_expression_without_track_mutation
+FAILED tests/test_genomegpt_stack_b5.py::test_track_shape_value_and_unknown_key_rejection[tracks0]
+FAILED tests/test_genomegpt_stack_b5.py::test_track_shape_value_and_unknown_key_rejection[tracks1]
+FAILED tests/test_genomegpt_stack_b5.py::test_track_shape_value_and_unknown_key_rejection[tracks2]
+FAILED tests/test_genomegpt_stack_b5.py::test_track_shape_value_and_unknown_key_rejection[tracks3]
+FAILED tests/test_genomegpt_stack_b5.py::test_track_shape_value_and_unknown_key_rejection[tracks4]
+FAILED tests/test_genomegpt_stack_b5.py::test_cell_contrast_consumes_cell_specific_supplied_tracks
+FAILED tests/test_genomegpt_stack_b5.py::test_edit_result_includes_reference_edited_loops_contacts_insulation
+FAILED tests/test_genomegpt_stack_b5.py::test_indel_contact_coordinates_not_subtracted_as_if_aligned
+FAILED tests/test_genomegpt_stack_b5.py::test_profile_constraints_accept_satisfying_edits_and_reject_impossible_ones
+FAILED tests/test_genomegpt_stack_b5.py::test_profile_search_budget_and_nonfinite_target
+12 failed in 0.27s
