@@ -35,7 +35,11 @@ def _cpg_islands(s: str, window: int = 200) -> list[dict]:
 
 
 def decode(seq: str, coding_spans: list[tuple[int, int]] | None = None) -> dict:
-    """Decode the regulatory landscape of a (mostly non-coding) locus."""
+    """Decode the regulatory landscape of a (mostly non-coding) locus.
+
+    ORF coordinates are forward-strand: minus-strand ORFs are mapped back to forward-strand
+    coordinates before the coding mask is applied.
+    """
     if not isinstance(seq, str):
         raise ValueError('sequence must be text')
     s = ''.join(seq.split()).upper()
@@ -81,7 +85,14 @@ def decode(seq: str, coding_spans: list[tuple[int, int]] | None = None) -> dict:
             clusters.append({"start": e["position"], "end": e["end"], "hits": [e]})
     enh_clusters = [c for c in clusters if len(c["hits"]) >= 3]
 
-    nc_orfs = [o for o in (orfs(s, min_aa=20) if s else []) if noncoding(o["start"],o["end"])]
+    def _forward(o):
+        # orfs() reports minus-strand ORFs in reverse-complement coordinates;
+        # map them back to the forward strand before applying the coding mask.
+        if o["strand"] == "-":
+            return {**o, "start": len(s) - o["end"], "end": len(s) - o["start"]}
+        return o
+
+    nc_orfs = [o for o in (_forward(x) for x in (orfs(s, min_aa=20) if s else [])) if noncoding(o["start"],o["end"])]
     lnc_candidates = [{"start": o["start"], "end": o["end"], "strand": o["strand"]}
                       for o in nc_orfs if o["aa_length"] < 100]
 
