@@ -50,5 +50,5 @@ def register_project(name: str, module: str, state: str = "created") -> dict:
 
 
 def initiate_search(query: str, limit: int = 10) -> dict:
-    """High-fidelity biological search across the module stack."""
+    """Keyword (BM25-style) search across the module registry and spec corpus."""
     return biological_search(query, limit)
