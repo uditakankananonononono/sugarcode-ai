@@ -132,12 +132,12 @@ def hba(mol: Molecule) -> int:
     [$([O,S;H1;v2]-[!$(*=[O,N,P,S])]), $([O,S;H0;v2]), $([O,S;-]),
      $([N;v3;!$(N-*=!@[O,N,P,S])]), $([nH0,o,s;+0])]
 
-    The [nH0,o,s;+0] term counts N-substituted aromatic n atoms, as in
-    caffeine (6 under RDKit 2024.09.6). On seed 20261012 and the 2,500-molecule
-    corpus (SHA-256 1f2256b7cfbe8d41fa3b2be9f2726e9a392ae076f82da1359630dc7737fb66c7),
+    The [nH0,o,s;+0] term counts N-substituted aromatic n atoms; caffeine is 6
+    under RDKit 2024.09.6. On seed 20261012 and the 2,500-molecule corpus
+    (SHA-256 1f2256b7cfbe8d41fa3b2be9f2726e9a392ae076f82da1359630dc7737fb66c7),
     the result matches RDKit 2024.09.6 for all molecules. Current RDKit 2026.9.1
-    differs on N-substituted aromatic heterocycles: it matches 2,030/2,500 and
-    does not count the relevant aromatic n in caffeine (3)."""
+    matches 2,030/2,500; its divergences are on N-substituted aromatic
+    heterocycles."""
     n = 0
     heteros = {"O", "N", "P", "S"}
     for i, a in enumerate(mol.atoms):
