@@ -363,7 +363,7 @@ def cryptic_scan(ref_seq: str, alt_seq: str, site_threshold: float = 0.75,
     """Detect cryptic splice-site activation from a sequence change.
 
     Scans ref and alt context (same length; point substitution or same-length
-    indel region) with the real donor and acceptor PWMs. Reports:
+    indel region) with the learned donor and acceptor PWMs. Reports:
     - new sites: positions where alt crosses `site_threshold` and ref did not
     - strengthened sites: same-position gains of >= `strengthen_delta`
     This is the mechanism behind many deep-intronic pathogenic variants that
@@ -510,7 +510,7 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
                     esc["alternative_outcomes"] = alt
                 out["exon_context"] = esc
         return out
-    # deeper intronic: cryptic scan on real context (strand-aware)
+    # deeper intronic: cryptic scan on the record's intronic context (strand-aware)
     gpos = _gpos_of(jm, n, sign, k)
     if gpos is None:
         return {"gene": gene, "notation": notation, "status": "outside scope",
@@ -634,8 +634,8 @@ def _rc2(s: str) -> str:
 def _exon_skip_context(jm: dict, site_type: str, n: int) -> dict | None:
     """If the destroyed site causes skipping of its exon, is that exon
     in-frame? Donor loss at c.N+k skips the exon ENDING at cDNA N; acceptor
-    loss at c.N-k skips the exon STARTING at cDNA N. Exon lengths are real
-    (RefSeqGene CDS spans). Skipping is the common outcome, not the only one
+    loss at c.N-k skips the exon STARTING at cDNA N. Exon lengths come from
+    the RefSeqGene CDS spans in the record. Skipping is the common outcome, not the only one
     (intron retention / cryptic use also occur) - labeled as conditional.
     """
     exons = jm.get("exons") or []

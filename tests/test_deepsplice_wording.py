@@ -10,3 +10,9 @@ def test_docstrings_drop_real():
     d = core.live_splice_assessment.__doc__
     assert "REAL" not in d and "real intronic" not in d
     assert "real intron length" not in core._outcome_context.__doc__ if core._outcome_context.__doc__ else True
+
+
+def test_more_docstrings_drop_real():
+    import inspect
+    src = inspect.getsource(core)
+    assert "Exon lengths are real" not in src and "scan on real context" not in src and "with the real donor" not in src
