@@ -288,67 +288,67 @@
   "name": "Tissue Eng",
   "slug": "tissue_eng",
   "start": 400,
-  "chars": 382
+  "chars": 3948
  },
  {
   "name": "Infinite Diagnosis",
   "slug": "infinite_diagnosis",
   "start": 401,
-  "chars": 390
+  "chars": 3434
  },
  {
   "name": "CAR-T Designer",
   "slug": "car_t_designer",
   "start": 402,
-  "chars": 388
+  "chars": 3347
  },
  {
   "name": "Living Tx",
   "slug": "living_tx",
   "start": 403,
-  "chars": 371
+  "chars": 2936
  },
  {
   "name": "NeoHunter",
   "slug": "neohunter",
   "start": 404,
-  "chars": 14403
+  "chars": 2493
  },
  {
   "name": "Gene-Tx Opt",
   "slug": "gene_tx_opt",
   "start": 441,
-  "chars": 354
+  "chars": 4219
  },
  {
   "name": "Vector Opt",
   "slug": "vector_opt",
   "start": 442,
-  "chars": 382
+  "chars": 3677
  },
  {
   "name": "Organoid Screen",
   "slug": "organoid_screen",
   "start": 443,
-  "chars": 387
+  "chars": 3096
  },
  {
   "name": "NeuroPlan AI",
   "slug": "neuroplan_ai",
   "start": 444,
-  "chars": 346
+  "chars": 2682
  },
  {
   "name": "NeoDti Engine",
   "slug": "neodti_engine",
   "start": 445,
-  "chars": 362
+  "chars": 2584
  },
  {
   "name": "Liquid Biopsy",
   "slug": "liquid_biopsy",
   "start": 446,
-  "chars": 16786
+  "chars": 2659
  },
  {
   "name": "RareNet AI",

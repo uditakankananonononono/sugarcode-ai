@@ -190,27 +190,27 @@ Status per module: **verified** = implemented with passing named tests;
 
 | Drop | Verified | Thin | Specified (pending) | Tests |
 |---|---|---|---|---|
-| 1 | 16 | 0 | 61 | 51 passing |
-| 2 | 27 | 0 | 50 | 71 passing |
-| 3 | **77 (all)** | 0 | 0 | 160 passing |
-| 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | 169 passing |
-| 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | 175 passing |
-| 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | 186 passing |
-| 7 | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | 193 passing |
-| 8 | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | 196 passing |
-| 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | 201 passing |
-| 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | 206 passing |
+| 1 | 16 | 0 | 61 | not re-run; see STATUS.md |
+| 2 | 27 | 0 | 50 | not re-run; see STATUS.md |
+| 3 | **77 (all)** | 0 | 0 | not re-run; see STATUS.md |
+| 4 | **77 (all)** + 4 live DB connectors | 0 | 0 | not re-run; see STATUS.md |
+| 5 | + RCSB PDB & AlphaFold DB structure connector | 0 | 0 | not re-run; see STATUS.md |
+| 6 | + real-geometry docking & published CFD off-target model | 0 | 0 | not re-run; see STATUS.md |
+| 7 | + published Doench 2014 on-target in design pipeline, e2e connector workflow | 0 | 0 | not re-run; see STATUS.md |
+| 8 | + MutDock live UniProt grounding; phageforge inherits CFD | 0 | 0 | not re-run; see STATUS.md |
+| 9 | + RareNet live ClinVar enrichment; structure resistance scan; streaming FASTA scan | 0 | 0 | not re-run; see STATUS.md |
+| 10 | + ChEMBL live bioactivity in NeoDTI; PubMed trends; Copilot live grounding | 0 | 0 | not re-run; see STATUS.md |
 | ... | drops 11-61: live connectors, published models, splice goldens, packaging | 0 | 0 | growing |
-| audit-fix | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | 1355 passing |
-| report_studio + 21 bio toolkits (pb3) | **89 registered (77 spec + 12 beyond-spec)**; report_studio lab report/export engine plus sugarcode.bio toolkits (VCF, FASTQ, GFF, BED, SAM, Newick, Stockholm, pileup, PDB, protein props, primers, motifs, restriction, alignment, k-mers, phylo, ORFs, RNA-seq, genome stats, DE) | 0 | 0 | 1642 passing |
-| crisprscan promotion (pb6) | **89 registered (77 spec + 12 beyond-spec)**; orphaned crisprscan_score (Moreno-Mateos 2015, byte-exact vendored coefficients) promoted + Rule Set 2 port in crispr_opt | 0 | 0 | 1371 passing, 1 skipped |
-| acmg_bayesian (pb6) | **90 registered (77 spec + 13 beyond-spec)**; Tavtigian 2018 Bayesian ACMG/AMP classifier (exact 350^(1/2^k) odds, BA1 stand-alone override, all Table 2/3 rows as fixtures) + optional ClinVar/PubMed context; replaces the unpromoted clinical_evidence_fusion orphan | 0 | 0 | 1404 passing, 1 skipped |
-| rna_nussinov (pb6) | **91 registered (77 spec + 14 beyond-spec)**; Nussinov-Jacobson 1980 max base-pair RNA folding (traceback, min loop, dot-bracket, exact optimal-structure count, stats), hand fixtures + brute-force verifier | 0 | 0 | 1426 passing, 1 skipped |
-| profile_hmm (pb6) | **92 registered (77 spec + 15 beyond-spec)**; Durbin Ch. 5 profile HMM from alignments (M/I/D states, pseudocounts), Viterbi path, Forward score, log-odds; hand fixtures + brute-force path enumerator | 0 | 0 | 1437 passing, 1 skipped |
-| profile_hmm Baum-Welch (pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | 1450 passing, 1 skipped |
-| chem_descriptors (pb6) | **93 registered (77 spec + 16 beyond-spec)**; pure-Python SMILES parser + MW/exact MW, formula, HBD/HBA, rotatable bonds, rings, Ertl TPSA, Fsp3, Lipinski Ro5 + Veber; every descriptor equals RDKit 2024.09.6 on a 66-drug ladder (aromatic and Kekule SMILES) and a 60-SMILES stress set bar 3 documented cases | 0 | 0 | 1458 passing, 1 skipped |
-| chem_similarity (pb6) | **94 registered (77 spec + 17 beyond-spec)**; Morgan/ECFP count + folded-bit fingerprints with codes identical to RDKit, Tanimoto/Jaccard/Dice, nearest-neighbour search; RDKit oracle on PubChem CIDs 1-400 (radius 1-3 exact, bulk similarities to 1e-12); aromaticity perception extended (exocyclic C=C, pyrrolide N-, fused-pair envelope) | 0 | 0 | 1466 passing, 1 skipped |
-| pb3 + pb6 integration (current) | **95 registered (77 spec + 18 beyond-spec)**; pb3 and pb6 merged to main; pb6 rows above were counted on its own branch before report_studio | 0 | 0 | 1709 passing, 7 skipped |
+| audit-fix | **88 registered (77 spec + 11 beyond-spec)**; stale duplicate tree removed; CI added | 0 | 0 | not re-run; see STATUS.md |
+| report_studio + 21 bio toolkits (pb3) | **89 registered (77 spec + 12 beyond-spec)**; report_studio lab report/export engine plus sugarcode.bio toolkits (VCF, FASTQ, GFF, BED, SAM, Newick, Stockholm, pileup, PDB, protein props, primers, motifs, restriction, alignment, k-mers, phylo, ORFs, RNA-seq, genome stats, DE) | 0 | 0 | not re-run; see STATUS.md |
+| crisprscan promotion (pb6) | **89 registered (77 spec + 12 beyond-spec)**; orphaned crisprscan_score (Moreno-Mateos 2015, byte-exact vendored coefficients) promoted + Rule Set 2 port in crispr_opt | 0 | 0 | not re-run; see STATUS.md |
+| acmg_bayesian (pb6) | **90 registered (77 spec + 13 beyond-spec)**; Tavtigian 2018 Bayesian ACMG/AMP classifier (exact 350^(1/2^k) odds, BA1 stand-alone override, all Table 2/3 rows as fixtures) + optional ClinVar/PubMed context; replaces the unpromoted clinical_evidence_fusion orphan | 0 | 0 | not re-run; see STATUS.md |
+| rna_nussinov (pb6) | **91 registered (77 spec + 14 beyond-spec)**; Nussinov-Jacobson 1980 max base-pair RNA folding (traceback, min loop, dot-bracket, exact optimal-structure count, stats), hand fixtures + brute-force verifier | 0 | 0 | not re-run; see STATUS.md |
+| profile_hmm (pb6) | **92 registered (77 spec + 15 beyond-spec)**; Durbin Ch. 5 profile HMM from alignments (M/I/D states, pseudocounts), Viterbi path, Forward score, log-odds; hand fixtures + brute-force path enumerator | 0 | 0 | not re-run; see STATUS.md |
+| profile_hmm Baum-Welch (pb6) | 92 registered (unchanged); forward-backward EM training on unaligned sequences (ML or Dirichlet MAP), LL-delta convergence, held-out log-likelihood; hand E/M steps + brute-force exact posterior counts | 0 | 0 | not re-run; see STATUS.md |
+| chem_descriptors (pb6) | **93 registered (77 spec + 16 beyond-spec)**; pure-Python SMILES parser + MW/exact MW, formula, HBD/HBA, rotatable bonds, rings, Ertl TPSA, Fsp3, Lipinski Ro5 + Veber; every descriptor equals RDKit 2024.09.6 on a 66-drug ladder (aromatic and Kekule SMILES) and a 60-SMILES stress set bar 3 documented cases | 0 | 0 | not re-run; see STATUS.md |
+| chem_similarity (pb6) | **94 registered (77 spec + 17 beyond-spec)**; Morgan/ECFP count + folded-bit fingerprints with codes identical to RDKit, Tanimoto/Jaccard/Dice, nearest-neighbour search; RDKit oracle on PubChem CIDs 1-400 (radius 1-3 exact, bulk similarities to 1e-12); aromaticity perception extended (exocyclic C=C, pyrrolide N-, fused-pair envelope) | 0 | 0 | not re-run; see STATUS.md |
+| pb3 + pb6 integration (current) | **95 registered (77 spec + 18 beyond-spec)**; pb3 and pb6 merged to main; pb6 rows above were counted on its own branch before report_studio | 0 | 0 | not re-run; see STATUS.md |
 
 ### Verified in this drop (real implementations, named tests)
 
@@ -218,10 +218,10 @@ Status per module: **verified** = implemented with passing named tests;
 |---|---|
 | neuro_hub | dashboard aggregation over live health + unified search + project store |
 | gene_explorer | central-dogma sequence report (transcribed mRNA, longest-ORF or frame translation, MW, hydrophobicity, both-strand ORF scan) plus text-only animation keyframes and hand-set state/variant/pathway surrogates; the protein may come from a reverse-strand ORF while the mRNA shown is the supplied plus strand, and minus-strand ORF coordinates are local to the reverse complement |
-| crispr_opt | PAM enumeration both strands, GC 20-80% filter (a GC 25% guide is accepted; a 40-60% GC window applies only inside the heuristic fallback scoring), position-weighted on-target score, hairpin check, browser-track payload; the main design pass reports off-target risk as a sum of published CFD scores, while the standalone legacy seed-weighted off-target scan uses fixed uncalibrated weights (exact match 0, seed mismatch 0.35, distal mismatch 0.13) |
+| crispr_opt | PAM enumeration both strands, GC 20-80% filter (a GC 25% guide is accepted; a 40-60% GC window applies only inside the heuristic fallback scoring), position-weighted on-target score, hairpin check, browser-track payload; the main design pass reports off-target risk as a sum of published CFD scores when a background sequence is supplied (otherwise 0/None), while the standalone legacy seed-weighted off-target scan uses fixed uncalibrated weights (exact match 0, 0.35 per seed/PAM-proximal single mismatch, 0.13 per distal single mismatch) |
 | codon_opt | CAI optimization vs E. coli K12 / H. sapiens tables, greedy synonymous GC-window repair and motif avoidance, CHI-style tRNA-strain index, single-site TASEP ribosome-flow KMC simulation, uncalibrated folding/load/attention proxies, SBML serialization; one hand-built FBA-style constraint row, no FBA solve |
 | prime_design | Exact pegRNA sequence construction (PBS 10-16 nt, RTT 10-20 nt) and actual PE3 spacer/nick candidates for the designs it accepts; not all valid PBS/RTT sets are accepted (a valid PBS16/RTT12 candidate is rejected and the compiler assumes primary nick 0); outcome/repair functions remain hand-set surrogates, not validated predictions |
-| deepsplice | splice PWMs learned from 1,170 real RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls + a polypyrimidine-tract term for AG acceptors (learned from the harvest, additive with unscaled matrix contribution) scored against a curated 28-gene ClinVar fixture + U12 family goldens, 2,720 unique pathogenic + 86 benign cases after full (gene, notation) dedupe (all 2,430 canonical sites scored as loss in this in-sample fixture rescoring: 2,414 U2 GT/GC-AG and 16 AT-AC across five sodium-channel genes), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A, canonical and explicit-transcript maps), exon-skip in-frame/frameshift context + alternative outcomes (intron retention with real intron lengths, cryptic-site-use candidates), cryptic-site activation scan checked on one published case (CFTR 3849+10kbC>T pseudoexon); isoform calls and Psi are hand-set surrogates; fixture-level results only, not held-out clinical accuracy (counts not re-taken by the audit) |
+| deepsplice | splice PWMs learned from 1,170 RefSeqGene GT-AG junctions (29 title-verified genes) + U12 minor-spliceosome matrices from 500 human gold introns (intronIC index; AT-AC and GT-AG U12 donors routed, U12 acceptor routing declined - too weak); variant delta + isoform calls + a polypyrimidine-tract term for AG acceptors (learned from the harvest, additive with unscaled matrix contribution) scored against a curated 28-gene ClinVar fixture + U12 family goldens, 2,720 unique pathogenic + 86 benign cases after full (gene, notation) dedupe (all 2,430 canonical sites scored as loss in this in-sample fixture rescoring: 2,414 U2 GT/GC-AG and 16 AT-AC across five sodium-channel genes), transcript-isoform junction maps via cDNA-record alignment (SCN1A NM_001165963 native), 5'-UTR intron routing (negative c. numbers, GJB2 c.-23+1G>A, canonical and explicit-transcript maps), exon-skip in-frame/frameshift context + alternative outcomes (intron retention with intron lengths from the record, cryptic-site-use candidates), cryptic-site activation scan checked on one published case (CFTR 3849+10kbC>T pseudoexon); isoform calls and Psi are hand-set surrogates; fixture-level results only, not held-out clinical accuracy (counts not re-taken by the audit) |
 | str_scope | Exact tandem-repeat search and anchored substitution-interrupted tract reconstruction; HTT/FMR1 motif-checked bands. Generic count comparisons are not pathogenicity calls; diagnostic/repair/intervention models remain uncalibrated surrogates. |
 | rna_decoder | DRACH candidate ranking (uncalibrated heuristic), real ViennaRNA thermodynamic ensembles, matched-control nanopore residuals and supplied-rate kinetics. Functional-effect and encapsulation models Missing. |
 | promoter_lib | sigma70 promoter scoring (-35/-10/spacer/UP element), strength-targeted design, library generation, motif heatmap |
@@ -231,40 +231,40 @@ Status per module: **verified** = implemented with passing named tests;
 | living_computer | boolean expression -> circuit compiler with fidelity scoring, parts registry, stochastic noise analysis (CV) |
 | omega_stats | metric recording, per-metric aggregates, sub-network rollup |
 | ecosystem | SDK snippet generation, plugin manifest contract, machine-readable API reference |
-| dna_to_code | 6 biology->Python concept translations with executable analogies |
+| dna_to_code | 6 biology->Python concept translations (analogy text plus illustrative Python source strings; five of the six strings call helper names that core.py does not define), with separate executable transcription, translation and point-mutation helpers |
 | gene_analysis | Sequence/live annotation integration plus hand-set variant and pathway surrogates; not a causally validated digital twin |
 | crispr_cargo | hard-coded vehicle/tissue ranking (LNP/AAV/VLP/PNP) per payload+tissue, illustrative one-compartment PK plus a plasma/target/cleared ODE model, fixed delivery blueprints with composition specs; uncalibrated delivery and immune proxies |
 | crispr_muse | policy-gradient gRNA generator with GC/off-target rewards and simulated NGS feedback loop |
 | epi_edit | CRISPRa/i promoter-window guide enumeration, sequence GC/motif accessibility and histone-mark proxies (no measured ATAC/ChIP input), hand-set fold-change formula and illustrative effector/network dynamics |
 | openclinvar | Local heuristic/curated classification plus appended live ClinVar/gnomAD/splice evidence; transparent Bayesian arithmetic and illustrative graphs/trajectories, not clinical AI |
 | genomegpt | k-mer z-score anomalies, TF/CTCF motif scan, convergent-CTCF chromatin loop prediction, motif-disruption variant reading |
-| alpha_fold_ui | Chou-Fasman secondary prediction, pLDDT/PAE analogs, idealized C-alpha backbone, real PDB output, pocket candidates |
+| alpha_fold_ui | Chou-Fasman secondary prediction, pLDDT/PAE analogs, idealized C-alpha backbone written as PDB-format text, pocket candidates; separate fetch-and-analysis path for deposited PDB and AlphaFold DB entries |
 | docking_studio | SMILES feature parsing (atoms, LogP, RO5), complementarity energy terms (vdW/H-bond/electrostatic/desolvation), Kd estimate, virtual screening |
 | evofold_4d | anisotropic network model normal modes (3Nx3N Hessian), hinge detection, open/closed transition traces with RMSD, PTM stiffening perturbation |
 | mutdock | class-change ddG + docking rescore per mutation, resistance hotspots, cross-drug resistance forecast |
-| protein_painter | intent->fold-template design, propensity-guided sampling with active-site placement, fold verification + stability ranking |
+| protein_painter | keyword-selected fixed fold pattern (four templates), seeded propensity-guided sequence sampling with active-site residues placed on coil positions, Chou-Fasman pattern agreement reported as fold_verified (not a 3D check), composition-based stability estimate and design-score ranking |
 | metabodesigner | pathway gap-filling by BFS over reaction network, yield-first ranking, FBA-verified production flux |
 | synthetic_life | essentiality priors by functional category, minimal-genome knockout sets with FBA growth check |
-| bio_material | material gene-part catalogs (silk/curli/MCP), pathway-to-material design, property prediction |
-| cell_free_opt | CFPS response-surface optimization over lysate/energy/additive space, yield-at-4h prediction |
-| stability_ai | Arrhenius shelf-life, deamidation/oxidation site risk, thermal stability forecast per protein |
-| syn_stab_ai | formulation search (buffer/excipient/stabilizer grid) maximizing predicted shelf-life |
+| bio_material | curated four-material table (PHA, spider_silk, bacterial_cellulose, PLA_bio) with fixed modulus/tensile/biocompatibility values, first-order degradation with hand-set rates, an application modulus check, static structure and fabrication notes, a reaction-graph production-pathway lookup for PHA and PLA_bio, and standalone equation helpers (polymerization, network mechanics, swelling, rheology); not a learned property predictor; not an exhaustive function list |
+| cell_free_opt | grid search over a hand-set Gaussian response-surface prior for CFPS yield (relative g/L, no fitted data), fixed-price reagent cost arithmetic reported for the best grid point (no cost ceiling is applied), a decaying-rate kinetic trace, and batch-normalization and replicate-QC helpers; not an exhaustive function list |
+| stability_ai | plasmid-loss and mutational-drift forecast over generations from hand-set rates, DNA sequence-window risk map, environment-adjusted decay and aggregation proxies, seeded Wright-Fisher drift runs and intervention ranking; no Arrhenius shelf-life, deamidation-site or per-protein thermal model |
+| syn_stab_ai | circuit burden and functional-loss estimate built on stability_ai.stability_forecast, fixed-text stabilization suggestions with hard-coded gain ranges, GC/repeat/palindrome sequence-risk proxy and a seeded drift simulation; no formulation search and no shelf-life model |
 | bio_switch | ligand-binding domain + effector fusion design, dose-response Hill curves, switching thresholds |
 | biofactory_1_a | biofoundry workflow compiler: Golden Gate/assembly step plans, timing, reagent manifests |
-| robotic_flow | liquid-class-calibrated pipetting plans, deck layout, error-checked transfer sequences |
+| robotic_flow | liquid-class pipetting step lists with uncalibrated default speeds, air gaps and evaporation terms, greedy dependency scheduling of tasks onto instruments, checkpoint-drift alerts over supplied times, tip-change and sample-lineage bookkeeping; no robot or camera connection bundled |
 | phageforge | phage genome feature map + CRISPR guide retargeting for phage engineering |
 | cell_twin | cell-state ODE twin (growth/cycle/stress), perturbation response, state-space trajectories |
 | fate_predictor | curated reprogramming factor maps, route scoring, efficiency/risk estimates |
 | cellfatenet | Checked hand-set GRN ODE/noise simulation and dense-relaxation control search with sparse returned-objective verification; simultaneous controls only. Not trained cell-fate prediction, causal identification or biological validation. |
 | organoid_ai | organoid differentiation recipes, growth-factor schedules, maturation scoring |
-| bioimage_ai | Classical microscopy segmentation and measured morphology with finite/label/empty-frame guards; shape/coverage are NOT culture health, viability or passage readiness. No trained phenotype classifier or real-image benchmark verified. |
+| bioimage_ai | Classical microscopy segmentation and per-object morphology statistics with finite/label/empty-frame guards; shape/coverage are NOT culture health, viability or passage readiness. No trained phenotype classifier or real-image benchmark verified. |
 | cellpainter | Cell Painting channel simulation, morphological profile extraction, perturbation fingerprints |
 | cellpainter_4d | time-lapse event model (division/death/motility), 4D trajectory rendering data |
-| syndroid | patient-cell digital twin: multi-compartment ODE with disease parameters, treatment response |
+| syndroid | minimal-cell toy simulator: mass/ATP/glucose ODE over six hand-set gene-module rates, MILP minimum-genome selection over a 16-gene hand-set catalog, and a coupled 8-state ODE with Gillespie expression sampling; no patient data, disease parameters or treatment model |
 | tissue_eng | scaffold porosity/mechanics + cell-seeding model, vascularization limit, tissue growth forecast |
 | infinite_diagnosis | cross-domain differential: symptom->systems mapping across module knowledge domains |
 | car_t_designer | CAR architecture per antigen (scFv/hinge/costim), toxicity priors (CRS/ICANS), safety switches |
-| living_tx | engineered-microbe therapeutics: chassis pick, payload circuits, kill-switch containment |
+| living_tx | engineered-microbe therapeutics: chassis pick, payload circuits, kill-switch containment as template text plus a computed containment-risk score |
 | neohunter | mutation-spanning peptide enumeration, HLA anchor-motif binding score, immunogenicity rank, vaccine payload |
 | gene_tx_opt | tissue->vector/promoter matching, transgene capacity enforcement (refuses AAV cargo over 4.7 kb), NAb risk |
 | vector_opt | seeded capsid-region variant list (each entry names a region and a mutation count only; no mutation identities), hand-set heuristic NAb-escape and transduction scores |
@@ -277,19 +277,19 @@ Status per module: **verified** = implemented with passing named tests;
 | pdx_insight | PDX fidelity index (mutation retention, expression concordance, stroma, drift), verdict + CRISPR repair |
 | microbiome_exp | 16S alpha diversity (Shannon/Simpson), functional potential, dysbiosis-disease flags |
 | microbiome_rx | gLV community ODE with cross-feeding + antibiotic susceptibility kernels, intervention ranking |
-| micro_tx | strain-prebiotic pairing per indication, community simulation, engraftment markers |
+| micro_tx | pair_therapeutic: strain-prebiotic lookup per indication, fixed-profile community simulation (does not depend on the pairing), engraftment markers as text; other module functions are not described by this row |
 | microaiverse | cultivation solver: lifestyle classes, auxotrophy supplements, coculture partners, success estimate |
 | riboswitch | aptamer + switching-stem design (on/off), stem energetics, dynamic-range prediction |
 | phage_tx | phage-pathogen matching, receptor-based resistance routes, escape-suppressing cocktails |
-| phage_designer | tail-fiber retargeting (receptor binders, adsorption), chimeric lysin potency incl. gram- strategy |
+| phage_designer | tail-fiber receptor-binder table with a heuristic adsorption formula (0.55 + 12/affinity, capped at 0.99), chimeric lysin potency heuristic; the gram- strategy is a text note |
 | chemgpt_engine | fragment assembly, Crippen-style LogP / logS / RO5 / CYP-hERG priors, Pareto front, retrosynthesis steps |
 | bioprint_pro | Cross-model rheology, SI-corrected Poiseuille printability window, first-order crosslinking, fidelity |
 | bioplayground | Wright-Fisher sandbox: selection/drift/mutation/bottlenecks, construct retention verdicts |
-| biosimvr | headless 3D lab scene graph + scripted sessions (CRISPR transfection, docking) with observations/conclusions |
+| biosimvr | headless 3D lab scene graph (LabScene) + two scripted sessions with fixed outputs (the CRISPR transfection session sets the reporter signal to 0.72 in code and its conclusion text is fixed; the docking session scores one fixed pocket and ligand with docking_studio.dock), plus separate seeded docking, guide-enumeration and protocol simulations |
 | synlife_evo | multi-generation pathway evolution: expression mutation, burden-vs-yield selection, silencing prediction |
 | bio_copilot | mutation->domain->ddG->pathway->phenotype DAG with inconsistency flags, FASTA/PDB writers, query routing |
-| synbio_wizard | goal->pathway->chassis->assembly pipeline, Monte-Carlo yield CI, feasibility verdict + experiments |
-| neuro_pipeline | numpy MLP training with STDP modulation, virtual lesion study, activation trace, RSA manifold analysis |
+| synbio_wizard | goal->pathway->chassis->assembly pipeline, Monte-Carlo yield interval (200 noisy draws of a heuristic base yield, reported from the 6th and 196th sorted draws, roughly a central 95% interval), feasibility verdict + experiments |
+| neuro_pipeline | numpy MLP training with a co-activation (STDP-inspired, not spike-timing) update term, virtual lesion study, activation trace, RSA manifold analysis |
 | biogpt_lit | evidence-weighted temporal knowledge graph, contradiction detection, multi-hop BFS, hypothesis generation |
 | enterprise_bio | tier entitlement engine: module gating, compute quotas, vault/robot access, audit trail |
 | nexus_support | inquiry triage/routing to owning sub-network (registry-derived), SLA by tier, KB matching |
@@ -642,7 +642,7 @@ screening proxy, not a free energy (named in every result).
 
 ```bash
 pip install -e .[dev]
-python -m pytest -q                 # 1642 tests, also run by GitHub Actions CI on every push
+python -m pytest -q                 # run counts and commit: see STATUS.md; CI (.github/workflows/ci.yml) runs pytest on pushes to main and wip-unaudited/* and on pull requests
 python - <<'PY'
 from omega.search import biological_search
 print(biological_search("CRISPR guide design")["results"][0]["name"])
@@ -688,7 +688,7 @@ Proposal metadata (`created_at`) is now captured before candidate files are
 written rather than after them, so it records proposal preparation time. The
 independent auditor saw 23 environment-dependent failures identical on base and
 candidate, with no new failures; those did not reproduce in the builder's
-1,065-passing selected run. Counts describe those environments, not universal
+1,065-passing selected run. (historical selected run; commit not recorded; not re-run) Counts describe those environments, not universal
 compatibility.
 ### Source admission and snapshot execution
 
