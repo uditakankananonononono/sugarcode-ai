@@ -49,7 +49,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("chemgpt_engine", "Fragment Molecule Designer (chemgpt_engine)", "fabrication-evolution",
      "NOT ChemGPT or a neural generator (slug kept for compatibility). Fragment-library SMILES assembly with additive LogP/descriptor estimates and Pareto ranking; no trained model."),
     ("genomegpt", "Genome k-mer & Motif Analyzer (genomegpt)", "core-intelligence",
-     "NOT a GPT or neural model (slug kept for compatibility). k-mer statistics, PWM motif energies, heuristic loop/contact functions and ClinVar variant lookup."),
+     "NOT a GPT or neural model (slug kept for compatibility). k-mer statistics, PWM motif energies, heuristic loop/contact functions and variant reading through the openclinvar module (heuristic; coordinate is context-relative, no transcript grounding)."),
     ("gene_analysis", "Gene Analysis", "genome-editing",
      "Sequence/live annotation integration plus hand-set variant and pathway surrogates; not a causally validated digital twin."),
     ("gene_explorer", "Gene Explorer", "genome-editing",
@@ -89,7 +89,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("bio_material", "Bio-Material", "synthetic-biology",
      "Synthetic biomaterial design: polymer-production pathways, degradation modeling, structure-function prediction."),
     ("synbio_studio", "Syn-Bio Studio", "synthetic-biology",
-     "Visual genetic logic-circuit builder with ODE-based dynamics: oscillators, switches, sensors."),
+     "Python API for genetic logic circuits: Hill-kinetics gate composition, ODE simulation, steady-state truth-table checks, and preset repressilator, toggle switch and AND gate; no visual interface."),
     ("metabodesigner", "MetaboDesigner", "synthetic-biology",
      "Novel metabolic pathway design: enzyme/reaction identification, FBA bottleneck analysis, precursor cost."),
     ("promoter_lib", "Promoter Lib", "synthetic-biology",
@@ -187,7 +187,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("enterprise_bio", "Enterprise Bio", "platform",
      "Computational tier breakdown: academic to industrial access levels, private data vaults."),
     ("ecosystem", "Ecosystem", "platform",
-     "Documentation and SDK hub: programmatic access snippets, plugin architecture, standards."),
+     "Documentation and SDK hub: SDK and client snippets (client snippets target a placeholder API host and /v1/modules/<module>/<operation> paths with no matching route in this repository), plugin manifests with dependency ordering, standards checklists."),
     ("nexus_support", "Nexus Support", "platform",
      "Communication node: inquiries, custom AI build requests, technical support routing."),
     # Beyond-spec modules: real published-model/computational implementations
@@ -221,7 +221,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("pgx_guidelines", "PGx Guidelines", "therapeutics",
      "CPIC-aligned pharmacogenomic decision support with provenance-preserved guideline translation."),
     ("evidence_mining", "Evidence Mining", "core-intelligence",
-     "Live, cached evidence mining from PubMed and ClinicalTrials.gov feeding downstream modules."),
+     "Live, cached evidence mining from PubMed and ClinicalTrials.gov."),
     ("neuro_hub_dashboard", "Neuro-Hub Dashboard (spec slug)", "core-intelligence",
      "Spec-named dashboard surface: module online-count health, a series of online/total module ratios from supplied samples (named global_flux), token-count search over supplied module records, project state and diagnostics over the Neuro-Hub core."),
     ("qsar_bench", "QSAR Bench", "fabrication-evolution",
@@ -229,7 +229,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("molecule_eval", "Molecule Eval", "fabrication-evolution",
      "Auditable evaluation of generated molecular libraries: validity (SMILES parser acceptance), novelty and Pareto fronts. Novelty and distribution comparison score a library against a caller-supplied reference set; a ChEMBL fetch client is included but is not used by the evaluation path."),
     ("report_studio", "Report Studio", "platform",
-     "Lab-grade export engine: HTML/Markdown reports with provenance, CSV/TSV exporters, executable Jupyter notebooks and sha256-checksummed evidence bundles."),
+     "Lab-grade export engine: HTML/Markdown reports with provenance, CSV/TSV exporters, a generated Jupyter notebook (one deepsplice assessment call, structure-checked, not executed here) and sha256-checksummed evidence bundles."),
 ]
 
 _VERIFIED = {slug for slug, _, _, _ in _MODULES}
