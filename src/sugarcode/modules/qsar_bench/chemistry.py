@@ -21,6 +21,11 @@ MASS = {"H":1.008,"B":10.81,"C":12.011,"N":14.007,"O":15.999,"F":18.998403,
         "Ba":137.327,"As":74.921595,"Hg":200.592,"Mn":54.938043,"Ti":47.867,"Sb":121.76}
 VALENCE = {"B":3,"C":4,"N":3,"O":2,"F":1,"P":3,"S":2,"Cl":1,"Br":1,"I":1,
            "Si":4,"Se":2}
+# Highest valence accepted per element when checking a parsed graph. Hypervalent
+# P, S, Se, halogens and N (nitro written N(=O)=O) are allowed up to the usual
+# maximum; anything above is rejected instead of being accepted as written.
+MAX_VALENCE = {"H":1,"B":3,"C":4,"N":5,"O":2,"F":1,"P":5,"S":6,"Cl":7,"Br":7,"I":7,
+               "Si":4,"Se":6}
 TOKEN = re.compile(r"Cl|Br|Si|Se|\[[^\]]+\]|[BCNOPSFIbcnops]|\(|\)|=|#|-|:|/|\\|\.|%\d{2}|\d")
 
 @dataclass(frozen=True)
@@ -36,6 +41,8 @@ class Molecule:
     atoms: list[Atom]
     bonds: list[tuple[int,int,float]]
     components: int
+    # Syntax that is parsed but not represented in the graph (stereo). Never silent.
+    ignored: tuple[str,...] = ()
 
 
 def _atom(token: str) -> Atom:
@@ -52,8 +59,13 @@ def _atom(token: str) -> Atom:
     return Atom(element, aromatic, charge, explicit_h, token.startswith("["))
 
 
-def parse_smiles(smiles: str) -> Molecule:
-    """Parse common SMILES into a molecular graph; reject malformed input."""
+def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
+    """Parse common SMILES into a molecular graph; reject malformed input.
+
+    Rejects valence-impossible atoms (for example pentavalent carbon). Tetrahedral
+    chirality (@, @@) and cis/trans marks (/, \\) are not represented in the graph:
+    they are listed in ``Molecule.ignored``, or raise ValueError when
+    ``strict_stereo=True``."""
     if not isinstance(smiles, str) or not smiles.strip(): raise ValueError("SMILES is empty")
     toks = TOKEN.findall(smiles)
     if "".join(toks) != smiles: raise ValueError("unsupported or malformed SMILES syntax")
@@ -85,7 +97,28 @@ def parse_smiles(smiles: str) -> Molecule:
         current=idx; pending=None
     if stack or rings: raise ValueError("unclosed branch or ring")
     if not atoms: raise ValueError("SMILES contains no atoms")
-    return Molecule(atoms,bonds,components)
+    _check_valence(atoms,bonds)
+    ignored=[]
+    if any(t.startswith("[") and "@" in t for t in toks): ignored.append("tetrahedral chirality (@, @@)")
+    if "/" in toks or "\\" in toks: ignored.append("cis/trans bond direction (/, \\)")
+    if ignored and strict_stereo: raise ValueError("stereochemistry not supported: "+"; ".join(ignored))
+    return Molecule(atoms,bonds,components,tuple(ignored))
+
+
+def _check_valence(atoms,bonds):
+    used=[0.0]*len(atoms); deg=[0]*len(atoms)
+    for i,j,o in bonds:
+        used[i]+=o; used[j]+=o; deg[i]+=1; deg[j]+=1
+    for i,a in enumerate(atoms):
+        if a.aromatic:
+            if deg[i]>3: raise ValueError(f"valence error: aromatic {a.element} atom {i} has {deg[i]} neighbours")
+            continue
+        if a.charge!=0 or a.element not in MAX_VALENCE: continue
+        total=int(round(used[i]))+a.explicit_h
+        if a.element=="N" and total>3 and not any(o>=2 for k,(x,y,o) in enumerate(bonds) if i in (x,y)):
+            raise ValueError(f"valence error: N atom {i} has valence {total} with no multiple bond")
+        if total>MAX_VALENCE[a.element]:
+            raise ValueError(f"valence error: {a.element} atom {i} has valence {total} (max {MAX_VALENCE[a.element]})")
 
 
 def _adj(m: Molecule):
