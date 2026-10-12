@@ -400,7 +400,7 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
                     r["evidence"].append({
                         "rule": "SPLICE_PWM", "weight": 0.0,
                         "detail": (f"weak {sa['site_type']}-site perturbation (delta {d:+.2f}) - "
-                                   "validated non-discriminating on the golden set; adds no evidence")})
+                                   "treated as non-discriminating (fixed zero weight); adds no evidence")})
             elif st == "cryptic_scan":
                 if sa.get("strong_findings"):
                     r["evidence"].append({
