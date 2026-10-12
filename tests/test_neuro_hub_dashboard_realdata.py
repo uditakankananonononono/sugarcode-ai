@@ -28,8 +28,16 @@ def test_flux_trend_is_order_independent():
 
 def test_unified_search_whole_tokens_on_registry():
     docs = [{"module": k, "text": v.summary} for k, v in REGISTRY.items()]
-    # substring counting matched "a" in all 95 records
-    assert len(unified_search("a", docs, 95)["results"]) < 10
+    # Property, not a count: the registry has grown, so a fixed cap of 10 no longer holds.
+    # Whole-token matching returns exactly the records with a standalone "a"; substring
+    # matching would return every record containing the letter "a" anywhere.
+    import re
+    hay = lambda d: " ".join(str(v) for v in d.values()).lower()
+    res = unified_search("a", docs, len(docs))["results"]
+    assert res and all("a" in re.findall(r"[a-z0-9]+", hay(r)) for r in res)
+    whole = [d for d in docs if "a" in re.findall(r"[a-z0-9]+", hay(d))]
+    substring = [d for d in docs if "a" in hay(d)]
+    assert len(res) == len(whole) < len(substring)
     top = unified_search("CRISPR guide RNA design off-target", docs, 1)["results"][0]
     assert top["module"].startswith("crispr")
     with pytest.raises(ValueError):
