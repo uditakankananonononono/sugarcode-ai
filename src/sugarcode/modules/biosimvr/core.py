@@ -3,7 +3,9 @@ import math
 
 
 class LabScene:
-    """A 3D lab: benches, instruments, positions - the 'VR' world model."""
+    """A headless 3D coordinate world model of a lab: benches, instruments,
+    positions. There is no rendering and no VR interface; objects are
+    name/kind/position/state records moved by scripted commands."""
 
     def __init__(self):
         self.objects: dict[str, dict] = {}
@@ -56,7 +58,10 @@ def default_lab() -> LabScene:
 
 
 def run_session(task: str = "crispr_transfection") -> dict:
-    """Scripted experiment in the virtual lab; returns observations + conclusions."""
+    """Scripted run in the scene model; returns scripted observation strings and
+    a fixed conclusion. The transfection session sets the reporter signal in
+    code (0.72) and both sessions end in pre-written conclusion text; no
+    biological outcome is inferred."""
     lab = default_lab()
     observations = []
     if task == "crispr_transfection":
@@ -137,7 +142,9 @@ def crispr_design_experiment(target_dna: str, *, pam: str="NGG", guide_length: i
 
 
 def simulate_protocol(protocol: list[dict], *, seed: int=42) -> dict:
-    """Execute a validated protocol with stochastic pipetting and incubation kinetics."""
+    """Execute a caller-supplied protocol with stochastic pipetting and
+    incubation kinetics. The protocol is data, not a reviewed method: steps
+    are simulated with seeded volume noise and a fixed signal-gain curve."""
     import numpy as np
     if not isinstance(protocol,list) or not protocol: raise ValueError("protocol must be a non-empty list of step mappings")
     rng=np.random.default_rng(seed); samples={}; log=[]; elapsed=0.; cost=0.
