@@ -73,3 +73,39 @@ claim that the aspirational capability has been implemented.
   Corrected scope (OVERSTATED): Maturation stability is reported, not optimized; no long-term validation.
 - S5-100.03.C02, original claim: "material compositions".
   Corrected scope (UNSUPPORTED): Optimized material composition is absent/unrunnable.
+- S5-022.A04, original claim: "structural-integrity prediction".
+  Corrected scope (OVERSTATED): calibrate returns an algebraic shape-fidelity proxy from conversion at 10 s; no structural-integrity model is computed.
+- S5-070.02.C01, original claim: "3D molecular visualizations of bio-ink components".
+  Corrected scope (UNSUPPORTED): The module computes scalars only; no molecular structure or 3D rendering exists anywhere in it.
+- S5-070.02.C02, original claim: "predicts structural integrity".
+  Corrected scope (OVERSTATED): predicted_shape_fidelity is an algebraic proxy from crosslink conversion at 10 s, not a structural-integrity prediction.
+- S5-070.03.C01, original claim: "high-resolution tissues".
+  Corrected scope (UNSUPPORTED): The module simulates no tissue; outputs are calibration and proxy scalars over three hand-set inks.
+- S5-070.03.C02, original claim: "regenerative medicine".
+  Corrected scope (UNSUPPORTED): No clinical, biological or patient-facing capability exists; the module is desk arithmetic over printing parameters.
+- S5-070.03.C03, original claim: "drug testing".
+  Corrected scope (UNSUPPORTED): No assay, compound or pharmacological model exists in the module.
+- S5-096.01.C04, original claim: "unified predictive bioprinting framework".
+  Corrected scope (OVERSTATED): simulate_bioprint composes independent proxy computations; it is not a unified framework and predicts nothing beyond those proxies.
+- S5-096.02.C01, original claim: "Oldroyd-B".
+  Corrected scope (OVERSTATED): oldroyd_b_extrusion applies a Giesekus-style steady 1D shear relation plus a Cross flow rate; an Oldroyd-B fluid cannot shear-thin, so no Oldroyd-B constitutive dynamics are solved. The function name is historical.
+- S5-097.01.C01, original claim: "Navier-Stokes equations".
+  Corrected scope (UNSUPPORTED): No Navier-Stokes solver exists; flow uses the steady laminar Hagen-Poiseuille closed form and a 1D steady shear relation.
+- S5-097.01.C02, original claim: "particle-based cell tracking algorithms".
+  Corrected scope (OVERSTATED): cell_radial_position samples static radial positions from a seeded RNG; no particles are tracked over time.
+- S5-097.02.C03, original claim: "stress-induced apoptosis".
+  Corrected scope (UNSUPPORTED): No apoptosis model exists; apoptotic_fraction thresholds a survival proxy at 0.5, which is not apoptosis biology.
+- S5-098.02.C01, original claim: "coupled PDEs".
+  Corrected scope (OVERSTATED): crosslink_reaction_diffusion integrates one 1D reaction-diffusion equation for the crosslinker with an algebraic gel-fraction update coupled to it; no multi-equation PDE system is solved.
+- S5-098.02.C05, original claim: "structural anisotropy".
+  Corrected scope (OVERSTATED): structural_anisotropy is the (max-min)/mean spread of a 1D stiffness profile, not an anisotropy tensor or structural measure.
+- S5-099.01.C01, original claim: "finite element analysis".
+  Corrected scope (UNSUPPORTED): No mesh, element assembly or FE solve exists; scaffold_mechanics evaluates algebraic formulas per position.
+- S5-099.01.C02, original claim: "nonlinear elasticity".
+  Corrected scope (UNSUPPORTED): strain is load/E times a porosity factor, a linear algebraic relation; no nonlinear constitutive law is computed.
+- S5-099.01.C03, original claim: "poroelastic fluid flow".
+  Corrected scope (UNSUPPORTED): pressure is a prescribed exponential decay profile; no poroelastic flow equations are solved.
+- S5-100.01.C02, original claim: "gradient-based".
+  Corrected scope (UNSUPPORTED): optimize_print uses scipy differential_evolution only; no gradient-based optimizer exists.
+- S5-100.03.C01, original claim: "optimized print trajectories".
+  Corrected scope (UNSUPPORTED): No trajectory, path or motion output exists; optimization returns three scalar parameters.

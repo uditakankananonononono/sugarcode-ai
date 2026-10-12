@@ -17,7 +17,7 @@ def _viscosity(ink: dict, shear: float) -> float:
 
 
 def calibrate(ink_name: str, nozzle_mm: float = 0.4, target_speed_mm_s: float = 8.0) -> dict:
-    """Printability window + crosslinking schedule + structural prediction."""
+    """Printability window + first-order crosslinking schedule + an algebraic shape-fidelity proxy (not a structural prediction)."""
     if ink_name not in INKS:
         raise KeyError(f"unknown ink; have {sorted(INKS)}")
     ink = INKS[ink_name]
@@ -108,7 +108,7 @@ def oldroyd_b_extrusion(pressure_kpa,nozzle_mm,length_mm=10,ink="alginate_2pct",
 
 
 def crosslink_reaction_diffusion(kind="ionic",seconds=60,size_mm=2,points=41):
-    """1D finite-difference diffusion-reaction gelation and stiffness PDE."""
+    """1D finite-difference diffusion-reaction gelation; stiffness is an algebraic map from gel fraction, not a solved stiffness PDE."""
     x=np.linspace(0,size_mm,points); dx=x[1]-x[0]; D={"ionic":.008,"photo":.02,"enzymatic":.004}[kind]; k={"ionic":.8,"photo":1.5,"enzymatic":.08}[kind]
     dt=min(.05,.4*dx*dx/D); c=np.zeros(points); gel=np.zeros(points); history=[]; t=0
     while t<seconds:
@@ -122,13 +122,13 @@ def crosslink_reaction_diffusion(kind="ionic",seconds=60,size_mm=2,points=41):
 
 
 def scaffold_mechanics(crosslink,load_kpa=10,seconds=3600,porosity=.35):
-    """Nonlinear poro-viscoelastic finite-element chain under physiological load."""
+    """Algebraic per-position chain with prescribed pore-pressure decay and exponential relaxation under a generic load (linear load/strain relation, no finite-element assembly)."""
     E=np.asarray(crosslink["stiffness_kPa"])*(1-porosity)**2; n=len(E); strain=load_kpa/np.maximum(E,1e-6); tau=300*(1+E/E.mean()); relaxed=strain*(.35+.65*np.exp(-seconds/tau))
     pressure=load_kpa*np.exp(-np.linspace(0,3,n)/(1+porosity)); shear=np.gradient(pressure)
     buckling=E*np.pi**2/(12*max(n,1)**2)
     return {"element_modulus_kPa":E.tolist(),"instantaneous_strain":strain.tolist(),"relaxed_strain":relaxed.tolist(),
             "pore_pressure_kPa":pressure.tolist(),"interelement_shear":shear.tolist(),"buckling_load_kPa":buckling.tolist(),
-            "max_strain":float(relaxed.max()),"safety_factor":float(np.min(buckling)/(load_kpa+1e-12)),"model":"nonlinear poro-viscoelastic FE chain"}
+            "max_strain":float(relaxed.max()),"safety_factor":float(np.min(buckling)/(load_kpa+1e-12)),"model":"algebraic poro-viscoelastic proxy chain, no finite-element assembly"}
 
 
 def maturation_pathway(viability,stiffness,days=28):
