@@ -256,7 +256,7 @@ def train_on_sequences(sequences=None, labels=None, k: int = 3,
 
     A stratified `holdout` fraction (default 0.2) is kept out of training and
     scored separately: training accuracy alone hid severe overfitting (default
-    one-hot run: train 0.965 vs 0.64 on fresh sequences). Set holdout=0 to
+    one-hot run: train 0.975 vs 0.562 on fresh sequences). Set holdout=0 to
     train on everything (no generalisation estimate is then reported)."""
     if encoding not in ("onehot", "kmer"):
         raise ValueError("encoding must be 'onehot' or 'kmer'")
