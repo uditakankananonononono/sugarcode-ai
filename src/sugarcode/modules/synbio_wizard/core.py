@@ -41,13 +41,19 @@ def score_chassis(product,weights=None):
   ranked.append({"chassis":name,"score":round(score,4),"components":{"product_fit":p[spec["product_type"]],"atp_budget":p["atp_budget"],"ease":p["ease"],"difficulty":spec["difficulty"]}})
  return sorted(ranked,key=lambda x:(-x["score"],x["chassis"]))
 
-def codon_metrics(dna,chassis="E_coli"):
- s=''.join(x for x in dna.upper() if x in 'ACGT')
+def codon_metrics(dna,chassis="E_coli",window_nt=30,stride_nt=3):
+ if not isinstance(dna,str) or not dna or any(x not in 'ACGT' for x in dna.upper()): raise ValueError("DNA must contain only ACGT")
+ if not isinstance(window_nt,int) or isinstance(window_nt,bool) or window_nt<1 or not isinstance(stride_nt,int) or isinstance(stride_nt,bool) or stride_nt<1: raise ValueError("window and stride must be positive integers")
+ s=dna.upper()
  if len(s)<3 or len(s)%3: raise ValueError("coding DNA must be non-empty and divisible by 3")
  gc=(s.count('G')+s.count('C'))/len(s); codons=[s[i:i+3] for i in range(0,len(s),3)]; target=CHASSIS[chassis]["gc_target"]
  cai=max(.05,1-abs(gc-target)*1.7)*(len(set(codons))/min(61,len(codons)))**.15
- windows=[(w.count('G')+w.count('C'))/len(w) for i in range(0,len(s),30) if (w:=s[i:i+30])]
- return {"length_nt":len(s),"gc_fraction":gc,"gc_window_min":min(windows),"gc_window_max":max(windows),"cai_proxy":cai,"codon_diversity":len(set(codons))/len(codons),"internal_stop_count":sum(c in ('TAA','TAG','TGA') for c in codons[:-1])}
+ starts=list(range(0,max(0,len(s)-window_nt)+1,stride_nt))
+ last=max(0,len(s)-window_nt)
+ if last not in starts: starts.append(last)
+ gc_windows=[{'start_nt':i,'end_nt':min(len(s),i+window_nt),'gc_fraction':(s[i:i+window_nt].count('G')+s[i:i+window_nt].count('C'))/len(s[i:i+window_nt])} for i in starts]
+ windows=[x['gc_fraction'] for x in gc_windows]
+ return {"length_nt":len(s),"gc_fraction":gc,"gc_window_min":min(windows),"gc_window_max":max(windows),"gc_windows":gc_windows,"window_nt":window_nt,"stride_nt":stride_nt,"cai_proxy":cai,"codon_diversity":len(set(codons))/len(codons),"internal_stop_count":sum(c in ('TAA','TAG','TGA') for c in codons[:-1])}
 
 def rbs_thermodynamics(sequence,temperature_c=37):
  s=sequence.upper().replace('T','U'); pairs=sum(s[i:i+2] in ('GC','CG') for i in range(len(s)-1)); au=sum(s[i:i+2] in ('AU','UA') for i in range(len(s)-1)); dg=-2.4*pairs-1.1*au+3.4
@@ -174,12 +180,34 @@ def plasmid_architecture(genes,chassis='E_coli'):
  return {"backbone":"low-copy bacterial" if chassis in ('E_coli','B_subtilis') else "yeast shuttle" if chassis=='S_cerevisiae' else "mammalian episomal","modules":[{"position":i+1,"promoter":"inducible","gene":g,"terminator":"host-compatible"} for i,g in enumerate(genes)],"assembly":assembly_recommendation(len(genes)*3)}
 
 def sbml_export(pathway,fluxes=None):
- root=Element('sbml',{'level':'3','version':'2'}); model=SubElement(root,'model',{'id':'synbio_wizard_model'}); species=SubElement(model,'listOfSpecies')
- for i,name in enumerate(['precursor']+list(pathway)): SubElement(species,'species',{'id':f'S{i}','name':name,'compartment':'cell'})
- reactions=SubElement(model,'listOfReactions')
+ """SBML core serial stoichiometry, not a biochemical or kinetic model."""
+ from xml.etree.ElementTree import register_namespace
+ if not pathway or any(not isinstance(name,str) or not name for name in pathway): raise ValueError("pathway names required")
+ ns='http://www.sbml.org/sbml/level3/version2/core'
+ register_namespace('',ns)
+ tag=lambda name:'{'+ns+'}'+name
+ root=Element(tag('sbml'),{'level':'3','version':'2'})
+ model=SubElement(root,tag('model'),{'id':'synbio_wizard_model'})
+ compartments=SubElement(model,tag('listOfCompartments'))
+ SubElement(compartments,tag('compartment'),{'id':'cell','constant':'true','spatialDimensions':'3','size':'1'})
+ species=SubElement(model,tag('listOfSpecies'))
+ for i,name in enumerate(['precursor']+list(pathway)):
+  SubElement(species,tag('species'),{'id':f'S{i}','name':name,'compartment':'cell','initialAmount':'0','hasOnlySubstanceUnits':'true','boundaryCondition':'false','constant':'false'})
+ reactions=SubElement(model,tag('listOfReactions'))
  for i,name in enumerate(pathway):
-  r=SubElement(reactions,'reaction',{'id':f'R{i+1}','name':name,'reversible':'false'}); r.set('estimatedFlux',str((fluxes or {}).get(name,0)))
+  r=SubElement(reactions,tag('reaction'),{'id':f'R{i+1}','name':name,'reversible':'false'})
+  reactants=SubElement(r,tag('listOfReactants'))
+  SubElement(reactants,tag('speciesReference'),{'species':f'S{i}','stoichiometry':'1','constant':'true'})
+  products=SubElement(r,tag('listOfProducts'))
+  SubElement(products,tag('speciesReference'),{'species':f'S{i+1}','stoichiometry':'1','constant':'true'})
+  # Non-core output data belongs in a namespaced annotation, not a reaction attribute.
+  if name in (fluxes or {}):
+   value=float(fluxes[name])
+   if not math.isfinite(value): raise ValueError("flux annotation must be finite")
+   annotation=SubElement(r,tag('annotation'))
+   SubElement(annotation,'{urn:catalog-flux}estimate',{'value':str(value),'units':'mmol_gdw_h','basis':'serial_lp_proxy'})
  return tostring(root,encoding='unicode')
+
 
 def knowledge_graph(product):
  spec=PRODUCTS[product]; nodes=[{"id":product,"type":"product"}]+[{"id":step,"type":"pathway_step"} for step in spec['pathway']]
@@ -209,7 +237,11 @@ def wizard_diagnostics(product,chassis=None):
  return d
 
 def compile_project(goal,seed=42,parts_max=8):
- parsed=parse_goal(goal); product=parsed['product']; spec=PRODUCTS[product]; ranking=score_chassis(product); selected=ranking[0]; pathway=flux_balance(spec['pathway']); assembly=assembly_recommendation(len(spec['pathway'])+2); uncertainty=uncertainty_distribution(max(.05,pathway['product_flux_mmol_gdw_h']/10),.15+.2*spec['difficulty'],20,seed)
+ parsed=parse_goal(goal); product=parsed['product'];
+ if not isinstance(parts_max,int) or isinstance(parts_max,bool) or parts_max<1: raise ValueError('part budget must be a positive integer')
+ required_parts=len(PRODUCTS[product]['pathway'])+2
+ if required_parts>parts_max: raise ValueError(f'part budget {parts_max} below required architecture count {required_parts}')
+ spec=PRODUCTS[product]; ranking=score_chassis(product); selected=ranking[0]; pathway=flux_balance(spec['pathway']); assembly=assembly_recommendation(len(spec['pathway'])+2); uncertainty=uncertainty_distribution(max(.05,pathway['product_flux_mmol_gdw_h']/10),.15+.2*spec['difficulty'],20,seed)
  unknown=[{"name":"pathway flux","domain":"flux","uncertainty":uncertainty['epistemic_fraction'],"decision_sensitivity":spec['difficulty']},{"name":"construct persistence","domain":"stability","uncertainty":.1+spec['difficulty']*.3,"decision_sensitivity":.8},{"name":"host burden","domain":"burden","uncertainty":spec['difficulty']*.25,"decision_sensitivity":.7}]
  return {"goal":parsed,"pathway":pathway,"chassis_ranking":ranking,"selected_chassis":selected,"assembly":assembly,"plasmid":plasmid_architecture(spec['pathway'],selected['chassis']),"yield_distribution":uncertainty,"evolution":evolutionary_stability(burden=.1*spec['difficulty']),"knowledge_graph":knowledge_graph(product),"sbml":sbml_export(spec['pathway'],pathway['fluxes_mmol_gdw_h']),"diagnostics":wizard_diagnostics(product,selected['chassis']),"uncertainties":unknown,"suggested_experiments":suggest_experiments(unknown),"model_status":"Transparent mechanistic/heuristic models; no trained model and not clinically validated."}
 
