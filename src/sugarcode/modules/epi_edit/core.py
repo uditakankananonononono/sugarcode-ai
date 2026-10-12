@@ -179,6 +179,7 @@ def multiplex_design(guides,max_guides=4,min_spacing=50):
 
 def epiedit_diagnostics(seq,effector='KRAB',occupancy=.7,transcribed_span=None):
     s=clean_dna(seq)
+    if len(s)<200: raise ValueError(f"epiedit_diagnostics needs at least 200 nt (one chromatin window); got {len(s)}")
     # When no annotation is supplied, use the central half as an explicit gene-body proxy.
     # This keeps every declared mark reachable while callers can pass a real span.
     span=transcribed_span or (len(s)//4, max(len(s)//4 + 1, 3*len(s)//4))

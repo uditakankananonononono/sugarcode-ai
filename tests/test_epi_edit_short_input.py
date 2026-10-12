@@ -16,3 +16,17 @@ def test_four_nt_guide_window_inside_longer_sequence_does_not_raise():
     seq = "ACGT" * 150
     r = design_epigenome_edit(seq, (54, 55), "CRISPRa")
     assert r["guide_window"] == [0, 4] and r["guides"] == []
+
+
+from sugarcode.modules.epi_edit.core import epiedit_diagnostics
+
+
+@pytest.mark.parametrize("n", [4, 50, 199])
+def test_diagnostics_short_input_names_the_minimum(n):
+    with pytest.raises(ValueError, match="at least 200 nt"):
+        epiedit_diagnostics(("ACGT" * 60)[:n])
+
+
+def test_diagnostics_at_one_window_still_returns():
+    d = epiedit_diagnostics("ACGT" * 50)
+    assert d["tile_count"] == 1.0 and d["length"] == 200.0
