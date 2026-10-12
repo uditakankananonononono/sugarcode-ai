@@ -48,8 +48,11 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "NOT BioGPT or any language model (slug kept for compatibility). Regex entity-relation-entity extraction into a knowledge graph with contradiction detection."),
     ("chemgpt_engine", "Fragment Molecule Designer (chemgpt_engine)", "fabrication-evolution",
      "NOT ChemGPT or a neural generator (slug kept for compatibility). Fragment-library SMILES assembly with additive LogP/descriptor estimates and Pareto ranking; no trained model."),
+    # S5-021.A05 correction: original "ClinVar variant lookup" is unsupported
+    # in this module path. interpret_sequence_variant calls a local heuristic
+    # with context-relative coordinates, not a live ClinVar lookup.
     ("genomegpt", "Genome k-mer & Motif Analyzer (genomegpt)", "core-intelligence",
-     "NOT a GPT or neural model (slug kept for compatibility). k-mer statistics, PWM motif energies, heuristic loop/contact functions and variant reading through the openclinvar module (heuristic; coordinate is context-relative, no transcript grounding)."),
+     "NOT a GPT or neural model (slug kept for compatibility). k-mer statistics, IUPAC motif-match energy proxies (not PWM energies), heuristic loop/contact functions and variant reading through the openclinvar module (heuristic; coordinate is context-relative, no transcript grounding)."),
     ("gene_analysis", "Gene Analysis", "genome-editing",
      "Sequence/live annotation integration plus hand-set variant and pathway surrogates; not a causally validated digital twin."),
     ("gene_explorer", "Gene Explorer", "genome-editing",
@@ -220,6 +223,9 @@ _MODULES: list[tuple[str, str, str, str]] = [
      "Tavtigian 2018 Bayesian ACMG/AMP variant classification (exact 350^(1/2^k) odds, BA1 stand-alone override) with optional live ClinVar/PubMed context."),
     ("pgx_guidelines", "PGx Guidelines", "therapeutics",
      "CPIC-aligned pharmacogenomic decision support with provenance-preserved guideline translation."),
+    # S5-029.A02 correction: original "feeding downstream modules." is
+    # unsupported as shipped wiring. EvidenceMiner returns a standalone table;
+    # no downstream module call of this client was located at this commit.
     ("evidence_mining", "Evidence Mining", "core-intelligence",
      "Live, cached evidence mining from PubMed and ClinicalTrials.gov."),
     ("neuro_hub_dashboard", "Neuro-Hub Dashboard (spec slug)", "core-intelligence",
