@@ -22,7 +22,7 @@ def _yield_model(mg, k, pep, tpl, peg) -> float:
 
 
 def optimize_cfps(grid_step: int = 2) -> dict:
-    """Grid search over reagent space for max yield under cost ceiling."""
+    """Grid search over reagent space for max yield. No cost ceiling is applied."""
     best = None
     # grids always include each reagent's documented optimum; otherwise some
     # steps (e.g. grid_step=2 for template: 2,6,10,14,...) never evaluate it
