@@ -11,6 +11,9 @@ HISTONE_MARKS = {
 }
 
 
+CHROMATIN_WINDOW_NT = 200  # tile width of chromatin_landscape; one tile is the minimum track
+
+
 def chromatin_landscape(seq: str, promoter_span: tuple[int, int] | None = None) -> dict:
     """Sequence-informed chromatin landscape: accessibility proxy + mark map.
 
@@ -18,7 +21,7 @@ def chromatin_landscape(seq: str, promoter_span: tuple[int, int] | None = None) 
     GC/CpG-dense promoter windows get H3K4me3; repeats get H3K9me3.
     """
     s = clean_dna(seq)
-    window = 200
+    window = CHROMATIN_WINDOW_NT
     track = []
     for i in range(0, len(s) - window + 1, window // 2):
         w = s[i:i + window]
@@ -179,7 +182,7 @@ def multiplex_design(guides,max_guides=4,min_spacing=50):
 
 def epiedit_diagnostics(seq,effector='KRAB',occupancy=.7,transcribed_span=None):
     s=clean_dna(seq)
-    if len(s)<200: raise ValueError(f"epiedit_diagnostics needs at least 200 nt (one chromatin window); got {len(s)}")
+    if len(s)<CHROMATIN_WINDOW_NT: raise ValueError(f"epiedit_diagnostics needs at least {CHROMATIN_WINDOW_NT} nt (one chromatin window); got {len(s)}")
     # When no annotation is supplied, use the central half as an explicit gene-body proxy.
     # This keeps every declared mark reachable while callers can pass a real span.
     span=transcribed_span or (len(s)//4, max(len(s)//4 + 1, 3*len(s)//4))
