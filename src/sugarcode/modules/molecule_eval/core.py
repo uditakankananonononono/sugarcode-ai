@@ -11,7 +11,7 @@ def _tan(a,b):
 def _canonical_graph_key(smiles):
     """Order-invariant graph digest for deduplication, not canonical SMILES."""
     import hashlib
-    m=parse_smiles(smiles); labels=[f"{a.element}:{int(a.aromatic)}:{a.charge}" for a in m.atoms]
+    m=smiles if hasattr(smiles,"atoms") else parse_smiles(smiles); labels=[f"{a.element}:{int(a.aromatic)}:{a.charge}" for a in m.atoms]
     for _ in range(4):
         new=[]
         for i in range(len(m.atoms)):
@@ -23,6 +23,21 @@ def _canonical_graph_key(smiles):
         labels=new
     edges=sorted(f"{o}:{min(labels[a],labels[b])}:{max(labels[a],labels[b])}" for a,b,o in m.bonds)
     return hashlib.sha256((";".join(sorted(labels))+"|"+";".join(edges)).encode()).hexdigest()
+
+
+def _iter_pairs(n,max_pairs,rng):
+    """Yield (i, j), i < j, in row-major order: all pairs if there are at most
+    ``max_pairs``, else a seeded sample of ``max_pairs``. The full pair list is
+    never built, so memory is O(n + max_pairs)."""
+    total=n*(n-1)//2
+    if total<=max_pairs:
+        for i in range(n):
+            for j in range(i+1,n): yield i,j
+        return
+    take=np.sort(rng.choice(total,max_pairs,replace=False))  # same draw as the old list-based code
+    starts=np.array([i*(2*n-i-1)//2 for i in range(n)],dtype=np.int64)  # first linear index of row i
+    rows=np.searchsorted(starts,take,side="right")-1
+    for k,i in zip(take.tolist(),rows.tolist()): yield i,i+1+(k-int(starts[i]))
 
 
 def _ci(values, statistic, seed, samples=400):
@@ -41,17 +56,15 @@ def evaluate_library(smiles,*,reference_smiles=None,n_bits=256,seed=29,max_pairs
     novelty or patent freedom-to-operate.
     """
     if not smiles: raise ValueError("library is empty")
-    valid=[]; invalid=[]; keys=[]
+    valid=[]; invalid=[]; keys=[]; stereo_ignored=0
     for i,s in enumerate(smiles):
-        try: keys.append(_canonical_graph_key(s)); valid.append((i,s))
+        try:
+            mol=parse_smiles(s); keys.append(_canonical_graph_key(mol)); valid.append((i,s)); stereo_ignored+=bool(mol.ignored)
         except (ValueError,TypeError) as e: invalid.append({"index":i,"smiles":s,"reason":str(e)})
     unique={}
     for (i,s),k in zip(valid,keys): unique.setdefault(k,(i,s))
     us=[x[1] for x in unique.values()]; fps=[morgan_fingerprint(s,n_bits=n_bits) for s in us]
-    rng=np.random.default_rng(seed); pairs=[(i,j) for i in range(len(fps)) for j in range(i+1,len(fps))]
-    if len(pairs)>max_pairs:
-        take=rng.choice(len(pairs),max_pairs,replace=False); pairs=[pairs[i] for i in sorted(take)]
-    distances=[1-_tan(fps[i],fps[j]) for i,j in pairs]
+    rng=np.random.default_rng(seed); distances=[1-_tan(fps[i],fps[j]) for i,j in _iter_pairs(len(fps),max_pairs,rng)]
     novelty=[]
     if reference_smiles:
         refs=[]
@@ -66,11 +79,11 @@ def evaluate_library(smiles,*,reference_smiles=None,n_bits=256,seed=29,max_pairs
         vals=[p[name] for p in props]
         summaries[name]={"mean":float(np.mean(vals)),"median":float(np.median(vals)),"std":float(np.std(vals)),"min":float(np.min(vals)),"max":float(np.max(vals))} if vals else None
     return {"input_count":len(smiles),"valid_count":len(valid),"invalid_count":len(invalid),"valid_fraction":len(valid)/len(smiles),
-      "unique_graph_count":len(us),"unique_fraction_among_valid":len(us)/len(valid) if valid else 0.,"invalid_records":invalid,
+      "stereo_ignored_count":stereo_ignored,"unique_graph_count":len(us),"unique_fraction_among_valid":len(us)/len(valid) if valid else 0.,"invalid_records":invalid,
       "internal_diversity":_ci(distances,np.mean,seed),"fingerprint_novelty_to_reference":_ci(novelty,np.mean,seed+1) if reference_smiles else None,
       "property_summary":summaries,"records":[{"smiles":s,"graph_key":k,"descriptors":d} for (k,(i,s)),d in zip(unique.items(),props)],
       "methods":{"fingerprint":"Morgan-style radius 2 hashed circular fingerprint","n_bits":n_bits,"pair_count":len(distances),"max_pairs":max_pairs,"bootstrap_samples":400,"seed":seed},
-      "limitations":["Graph keys are molecular-graph digests, not canonical SMILES or tautomer normalization.","Fingerprint novelty is not patent novelty or freedom-to-operate.","Synthetic accessibility and experimental validation: Missing."]}
+      "limitations":["Graph keys are molecular-graph digests, not canonical SMILES or tautomer normalization.","Stereochemistry (@, /, \\) is ignored in graph keys, diversity and novelty; stereo_ignored_count counts the valid inputs that carried it.","Fingerprint novelty is not patent novelty or freedom-to-operate.","Synthetic accessibility and experimental validation: Missing."]}
 
 
 def _js_divergence(a,b,bins=20):
