@@ -16,3 +16,97 @@ CRISPR design is implemented as a genome-scale optimization problem, where candi
 Bio-Copilot’s simulation layer executes multi-scale, time-resolved biological models. Gene regulatory networks are represented in SBML and solved using stiff ODE solvers for deterministic dynamics, while stochastic simulations (Gillespie SSA) capture transcriptional noise and low-copy-number effects. Metabolic networks are modeled using COBRA-based FBA, allowing prediction of flux distributions under gene knockouts or overexpression scenarios, constrained by mass balance and thermodynamic feasibility. Protein–ligand interactions are approximated through docking pipelines that evaluate binding poses and estimate free energy changes (ΔG) using scoring functions that account for van der Waals interactions, electrostatics, and desolvation penalties. Importantly, the system propagates uncertainty through these models—sampling parameter distributions to generate confidence intervals over predicted outcomes rather than single-point estimates.
 On the output side, Bio-Copilot generates fully executable, reproducible computational artifacts. Each query can be compiled into a Jupyter notebook containing data retrieval steps (API calls to genomic/proteomic databases), preprocessing pipelines, model execution code (e.g., FBA solvers, CRISPR scoring functions), and visualization routines (network graphs, 3D structural renderings). Sequence outputs are provided in FASTA format with precise coordinate mapping, while structural summaries are generated in PDB-like schemas annotating residue-level perturbations and functional domains. Additionally, all results are serialized into strict JSON schemas capturing inputs, intermediate computations, model parameters, and outputs, enabling downstream integration with other tools or pipelines.
 Critically, Bio-Copilot operates as a closed-loop, reinforcement-driven discovery system. Experimental results—such as NGS-derived edit efficiencies, RNA-seq expression changes, or proteomics data—are ingested and used to update model parameters via Bayesian or reinforcement learning frameworks. The system maintains posterior distributions over key biological parameters (e.g., editing efficiency, pathway flux coefficients), refining predictions as more data becomes available. It actively identifies regions of high epistemic uncertainty and proposes targeted experiments—such as saturation mutagenesis, CRISPR tiling screens, or pathway perturbations—to maximally reduce uncertainty. Over time, this creates a continuously improving system that not only answers biological questions but optimizes the process of discovering answers, effectively functioning as an autonomous layer for hypothesis generation, validation, and refinement in modern biological research.
+
+
+## Record-specific implementation corrections at 99cb2d32
+These corrections apply to the named claims below. Original aspirational wording above is retained for traceability. This is a wording repair, not a claim that the missing functionality was implemented.
+
+### S5-039.01.C02
+
+Original claim: "reproducible computational artifacts".
+
+Correction (PARTIAL): Serializer repeats supplied result and question; replay lists only generic installation and named-function instructions, not recorded function arguments or executable code.
+
+### S5-039.02.C02
+
+Original claim: "data retrieval steps".
+
+Correction (UNSUPPORTED): Fixture-backed retrieval returns records, but compilation includes no API calls or retrieval steps; notebook generation is absent.
+
+### S5-039.02.C05
+
+Original claim: "CRISPR scoring functions".
+
+Correction (PARTIAL): Standalone guide scoring runs, but compiler emits no executable CRISPR scoring code and no notebook.
+
+### S5-039.03.C03
+
+Original claim: "PDB-like schemas".
+
+Correction (PARTIAL): CA-only ideal helix is parseable fixed-column PDB text; no residue perturbation or domain annotations are added.
+
+### S5-039.04.C02
+
+Original claim: "inputs".
+
+Correction (PARTIAL): Only question and caller-supplied result are captured; actual function inputs gene/ref/pos/alt are not structured inputs in the compiled artifact.
+
+### S5-039.04.C04
+
+Original claim: "model parameters".
+
+Correction (UNSUPPORTED): Artifact has no model-parameter capture. The supplied mutation result contains outputs and labels, not coefficients or full replay parameters.
+
+### S5-039.04.C06
+
+Original claim: "downstream integration".
+
+Correction (PARTIAL): JSON roundtrip works, but no downstream consumer or integration contract is exercised or implemented in this compiler.
+
+### S5-040.01.C01
+
+Original claim: "closed-loop".
+
+Correction (PARTIAL): Feedback returns Beta-binomial counts; the subsequent mutation prediction is identical. No state store or wired closed loop.
+
+### S5-040.02.C01
+
+Original claim: "NGS-derived edit efficiencies".
+
+Correction (PARTIAL): Success/trial counts update posterior mean to .7; no NGS ingestion, read analysis, or updating editing-score pipeline.
+
+### S5-040.02.C04
+
+Original claim: "Bayesian or reinforcement learning frameworks".
+
+Correction (PARTIAL): Standalone Beta-binomial update works; no reinforcement model or updates to model parameters in prediction functions.
+
+### S5-040.03.C01
+
+Original claim: "posterior distributions".
+
+Correction (PARTIAL): Caller can pass previous mean and strength to another scalar update; system does not maintain posterior distributions or parameter-specific state.
+
+### S5-040.03.C02
+
+Original claim: "editing efficiency".
+
+Correction (PARTIAL): Generic success counts can represent a manually supplied rate; no maintained editing-efficiency parameter, recorded edit ingestion, or score update.
+
+### S5-040.03.C04
+
+Original claim: "refining predictions".
+
+Correction (PARTIAL): Repeated scalar posterior update changes .7 to .766667, but mutation/guide predictions do not consume the returned posterior.
+
+### S5-040.05.C04
+
+Original claim: "hypothesis generation".
+
+Correction (UNSUPPORTED): Mutation output contains a fixed experiment list, not hypothesis generation; no hypothesis function in the exported source or artifact compiler.
+
+### S5-040.05.C06
+
+Original claim: "refinement".
+
+Correction (PARTIAL): Manual scalar Bayesian update is not autonomous refinement; unchanged prediction reproduced before and after feedback.
