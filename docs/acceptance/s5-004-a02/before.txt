@@ -1,0 +1,44 @@
+FFFFF.                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_returned_sources_call_without_ambient_helpers[transcription-transcribe-args0-GUA] _
+tests/test_dna_to_code_executable_analogies.py:21: in test_returned_sources_call_without_ambient_helpers
+    assert ns[function](*args)==expected
+           ^^^^^^^^^^^^^^^^^^^
+<string>:5: in transcribe
+    ???
+E   NameError: name 'open_readonly' is not defined
+_ test_returned_sources_call_without_ambient_helpers[translation-translate-args1-expected1] _
+tests/test_dna_to_code_executable_analogies.py:21: in test_returned_sources_call_without_ambient_helpers
+    assert ns[function](*args)==expected
+           ^^^^^^^^^^^^^^^^^^^
+<string>:3: in translate
+    ???
+E   NameError: name 'chunks' is not defined
+_ test_returned_sources_call_without_ambient_helpers[pcr-pcr-args2-expected2] __
+tests/test_dna_to_code_executable_analogies.py:21: in test_returned_sources_call_without_ambient_helpers
+    assert ns[function](*args)==expected
+           ^^^^^^^^^^^^^^^^^^^
+<string>:6: in pcr
+    ???
+E   NameError: name 'flanked_by' is not defined
+_ test_returned_sources_call_without_ambient_helpers[crispr-crispr_edit-args3-ATGATGATGATGATGATGCATAGG] _
+tests/test_dna_to_code_executable_analogies.py:21: in test_returned_sources_call_without_ambient_helpers
+    assert ns[function](*args)==expected
+           ^^^^^^^^^^^^^^^^^^^
+<string>:2: in crispr_edit
+    ???
+E   NameError: name 'search_with_pam' is not defined
+_ test_returned_sources_call_without_ambient_helpers[mutation-point_mutation-args4-expected4] _
+tests/test_dna_to_code_executable_analogies.py:21: in test_returned_sources_call_without_ambient_helpers
+    assert ns[function](*args)==expected
+           ^^^^^^^^^^^^^^^^^^^
+<string>:2: in point_mutation
+    ???
+E   NameError: name 'compile_protein' is not defined
+=========================== short test summary info ============================
+FAILED tests/test_dna_to_code_executable_analogies.py::test_returned_sources_call_without_ambient_helpers[transcription-transcribe-args0-GUA]
+FAILED tests/test_dna_to_code_executable_analogies.py::test_returned_sources_call_without_ambient_helpers[translation-translate-args1-expected1]
+FAILED tests/test_dna_to_code_executable_analogies.py::test_returned_sources_call_without_ambient_helpers[pcr-pcr-args2-expected2]
+FAILED tests/test_dna_to_code_executable_analogies.py::test_returned_sources_call_without_ambient_helpers[crispr-crispr_edit-args3-ATGATGATGATGATGATGCATAGG]
+FAILED tests/test_dna_to_code_executable_analogies.py::test_returned_sources_call_without_ambient_helpers[mutation-point_mutation-args4-expected4]
+5 failed, 1 passed in 0.10s

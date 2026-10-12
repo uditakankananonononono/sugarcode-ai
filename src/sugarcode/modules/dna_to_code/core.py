@@ -85,12 +85,110 @@ CONCEPTS: dict[str, dict] = {
 }
 
 
+
+# Returned snippets are self-contained string algorithms. Helpers operate only
+# on supplied strings; none opens a file, calls a service or models a lab result.
+_SNIPPET_SCOPE = "Executable educational string analogy only; no biological prediction or experiment."
+_SNIPPET_COMMON = r"""
+def _sequence(value, alphabet, limit=10000):
+    if not isinstance(value, str) or not value or len(value) > limit:
+        raise ValueError("a nonempty bounded sequence string is required")
+    value = value.upper()
+    if set(value) - set(alphabet):
+        raise ValueError("unsupported sequence characters")
+    return value
+"""
+
+_SNIPPET_HELPERS = {
+    "transcription": r"""
+from io import StringIO
+
+def open_readonly(sequence):
+    # In-memory sequence buffer, not a filesystem operation.
+    return StringIO(_sequence(sequence, "ACGT"))
+""",
+    "translation": r"""
+def chunks(sequence, width):
+    sequence = _sequence(sequence, "ACGU")
+    if type(width) is not int or width != 3 or len(sequence) % width:
+        raise ValueError("complete three-base RNA codons are required")
+    return [sequence[i:i+width] for i in range(0, len(sequence), width)]
+""",
+    "pcr": r"""
+def flanked_by(sequence, primers):
+    sequence = _sequence(sequence, "ACGT", 1000)
+    if not isinstance(primers, tuple) or len(primers) != 2:
+        raise ValueError("two literal boundary strings are required")
+    left, right = (_sequence(p, "ACGT", 1000) for p in primers)
+    return sequence.startswith(left) and sequence.endswith(right)
+
+def copy(sequence):
+    return str(sequence)
+""",
+    "crispr": r"""
+from types import SimpleNamespace
+
+class OffTargetRisk(ValueError):
+    # Compatibility name for an ambiguous string address, not a risk model.
+    pass
+
+def search_with_pam(sequence, guide):
+    sequence = _sequence(sequence, "ACGT")
+    guide = _sequence(guide, "ACGT", 20)
+    if len(guide) != 20:
+        raise ValueError("a 20-character string address is required")
+    hits = [i for i in range(len(sequence) - 22)
+            if sequence[i:i+20] == guide and sequence[i+21:i+23] == "GG"]
+    if len(hits) > 1:
+        raise OffTargetRisk("ambiguous exact string address")
+    return SimpleNamespace(cut_site=hits[0]+17) if hits else None
+""",
+    "mutation": r"""
+def compile_protein(sequence):
+    sequence = _sequence(sequence, "ACGT")
+    if len(sequence) % 3:
+        raise ValueError("complete coding-frame codons are required")
+    protein = []
+    for i in range(0, len(sequence), 3):
+        aa = CODON_TABLE[sequence[i:i+3].replace("T", "U")]
+        if aa == "STOP":
+            break
+        protein.append(aa)
+    return "".join(protein)
+""",
+}
+
+
+def _executable_source(key):
+    from ...bio.sequence import STANDARD_CODE
+    helper = _SNIPPET_HELPERS.get(key, "")
+    table = ""
+    if key in {"translation", "mutation"}:
+        mapping = {k.replace("T", "U"): ("STOP" if v == "*" else v)
+                   for k, v in STANDARD_CODE.items()}
+        table = "CODON_TABLE = " + repr(mapping) + "\n"
+    code = CONCEPTS[key]["code"]
+    if key == "pcr":
+        code = code.replace("cycles: int = 30", "cycles: int = 4")
+        code = code.replace("    pool = [template]", "    if type(cycles) is not int or not 0 <= cycles <= 10:\n        raise ValueError('cycles must be integer 0..10')\n    template = _sequence(template, 'ACGT', 1000)\n    flanked_by(template, primers)  # validate even when cycles=0\n    pool = [template]")
+    elif key == "crispr":
+        code = code.replace("    match = search_with_pam", "    genome = _sequence(genome, 'ACGT')\n    payload = _sequence(payload, 'ACGT', 1000)\n    match = search_with_pam")
+    elif key == "mutation":
+        code = code.replace("    before = compile_protein(gene)", "    gene = _sequence(gene, 'ACGT')\n    if type(pos) is not int or not 0 <= pos < len(gene):\n        raise ValueError('position outside sequence')\n    base = _sequence(base, 'ACGT', 1)\n    before = compile_protein(gene)")
+    return "# " + _SNIPPET_SCOPE + "\n" + _SNIPPET_COMMON + table + helper + "\n" + code
+
+
+# Keep the public CONCEPTS source blocks consistent with translate_concept.
+for _concept_key in CONCEPTS:
+    CONCEPTS[_concept_key]["code"] = _executable_source(_concept_key)
+    CONCEPTS[_concept_key]["scope"] = _SNIPPET_SCOPE
+
 def translate_concept(concept: str) -> dict:
     key = concept.lower().replace(" ", "_").replace("-", "_")
     if key not in CONCEPTS:
         raise KeyError(f"unknown concept {concept!r}; have {sorted(CONCEPTS)}")
     c = CONCEPTS[key]
-    return {"concept": key, "analogy": c["analogy"], "python": c["code"],
+    return {"concept": key, "analogy": c["analogy"], "python": c["code"], "scope": c["scope"],
             "explanation": c["detail"]}
 
 def execute_transcription(dna):
