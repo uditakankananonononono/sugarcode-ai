@@ -239,7 +239,7 @@ Status per module: **verified** = implemented with passing named tests;
 | crispr_muse | policy-gradient gRNA generator with GC/off-target rewards and simulated NGS feedback loop |
 | epi_edit | CRISPRa/i promoter-window guide enumeration, sequence GC/motif accessibility and histone-mark proxies (no measured ATAC/ChIP input), hand-set fold-change formula and illustrative effector/network dynamics |
 | openclinvar | Local heuristic/curated classification plus appended live ClinVar/gnomAD/splice evidence; transparent Bayesian arithmetic and illustrative graphs/trajectories, not clinical AI |
-| genomegpt | k-mer z-score anomalies, TF/CTCF motif scan, convergent-CTCF chromatin loop prediction, motif-disruption variant reading |
+| genomegpt | k-mer composition-deviation and IUPAC motif scans; convergent-CTCF pair/contact proxies; context-relative motif differences; supplied per-bin cell tracks; same-length edit contact/insulation comparisons; bounded per-cell scalar expression-target search. No clinical or learned genomic-model claim. |
 | alpha_fold_ui | Chou-Fasman secondary prediction, pLDDT/PAE analogs, idealized C-alpha backbone written as PDB-format text, pocket candidates; separate fetch-and-analysis path for deposited PDB and AlphaFold DB entries |
 | docking_studio | SMILES feature parsing (atoms, LogP, RO5), complementarity energy terms (vdW/H-bond/electrostatic/desolvation), Kd estimate, virtual screening |
 | evofold_4d | anisotropic network model normal modes (3Nx3N Hessian), hinge detection, open/closed transition traces with RMSD, PTM stiffening perturbation |
