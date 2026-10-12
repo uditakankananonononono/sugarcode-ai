@@ -39,3 +39,12 @@ PYTHONPATH=src pytest -q tests/test_dna_to_code_executable_analogies.py \
 
 See after.txt for exact targeted results. No full-repository test run, external
 provider test or biological accuracy claim. No push performed.
+
+## Test-count correction
+
+`before.txt` records the initial six-case probe, not the final expanded
+tests-first patch. `final-tests-first.txt` records the clean tests-only
+worktree reproduction. `selected-after.txt` records the new and legacy
+DNA-to-Code cases. `after.txt` also includes 11 registry regression cases.
+
+Final tests-only reproduction: 23 failed, 1 passed. Selected after-fix run: 32 passed; registry-inclusive run: 43 passed.
