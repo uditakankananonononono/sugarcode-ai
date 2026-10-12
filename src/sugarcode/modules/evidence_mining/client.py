@@ -97,6 +97,8 @@ class CachedHTTPClient:
             return None
         try:
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            if not isinstance(meta, dict):
+                return None
             body = body_path.read_bytes()
             if meta.get("url") != url or meta.get("body_sha256") != sha256(body).hexdigest():
                 return None
