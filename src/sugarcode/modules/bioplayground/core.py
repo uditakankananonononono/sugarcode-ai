@@ -21,6 +21,7 @@ def run_sandbox(pop_size: int = 200, generations: int = 300, n_alleles: int = 3,
     freq = [1.0] + [0.0] * (n - 1)
     trajectory = [list(freq)]
     fixed_at = None
+    fixed_kind = None
     events = []
     gens_done = 0
     for gen in range(1, generations + 1):
@@ -49,14 +50,19 @@ def run_sandbox(pop_size: int = 200, generations: int = 300, n_alleles: int = 3,
         freq = [c / size for c in counts]
         if gen % 10 == 0:
             trajectory.append([round(f, 4) for f in freq])
+        bottleneck_pending = bottleneck_at is not None and gen < bottleneck_at
         if freq[0] == 0.0 and fixed_at is None:
             fixed_at = gen
+            fixed_kind = "lost"
             events.append({"gen": gen, "event": "construct_lost"})
-            break
+            if not bottleneck_pending:
+                break
         if freq[0] >= 0.999 and fixed_at is None:
             fixed_at = gen
+            fixed_kind = "fixed"
             events.append({"gen": gen, "event": "construct_fixed"})
-            break
+            if not bottleneck_pending:
+                break
     return {
         # BUG 56 fix: generations_run is the actual number of simulated
         # generations (len(trajectory)*10 over-reported by up to 10: 310 for a
@@ -70,16 +76,37 @@ def run_sandbox(pop_size: int = 200, generations: int = 300, n_alleles: int = 3,
         "fixation_gen": fixed_at,
         "events": events,
         "trajectory_every_10gen": trajectory,
-        "interpretation": _interpret(freq[0], fixed_at, fit),
+        "interpretation": _interpret(freq[0], fixed_at, fixed_kind, fit, gens_done),
     }
 
 
-def _interpret(f0, fixed_at, fit):
+def _interpret(f0, fixed_at, fixed_kind, fit, gens_done):
+    max_other = max(fit[1:]) if len(fit) > 1 else 0.0
     if f0 > 0.5:
-        return ("engineered allele stable - selection coefficient "
-                f"{fit[0]:.3f} holds it against drift")
-    return (f"engineered allele lost by gen {fixed_at} - fitness cost of the construct "
-            "exceeds what drift can tolerate; consider burden reduction or selection marker")
+        if fit[0] > max_other:
+            return (f"engineered allele present at final frequency {f0:.4f} "
+                    f"after {gens_done} generations with supplied relative "
+                    f"fitness {fit[0]:.3f} vs best alternative {max_other:.3f} "
+                    "- one sampled endpoint, not a stability verdict")
+        return (f"engineered allele present at final frequency {f0:.4f} after "
+                f"{gens_done} generations under neutral-or-comparable construct "
+                "fitness - retained in this run (drift/mutation balance)")
+    if f0 == 0.0 and fixed_at is not None and fixed_kind != "lost":
+        return (f"engineered allele not present at final gen (final frequency "
+                f"0.0 after {gens_done} generations; the recorded endpoint event "
+                f"was fixation at gen {fixed_at}, after which the run continued) "
+                "- no loss generation recorded")
+    if f0 == 0.0 and fixed_at is not None:
+        if fit[0] >= max_other:
+            return (f"engineered allele not present at final gen (sampled loss at "
+                    f"gen {fixed_at}) under neutral-or-better construct fitness - "
+                    "consistent with drift, not a demonstrated fitness cost")
+        return (f"engineered allele not present at final gen (sampled loss at "
+                f"gen {fixed_at}); construct fitness {fit[0]:.3f} vs best "
+                f"alternative {max_other:.3f}")
+    return (f"engineered allele present at frequency {f0:.4f} after {gens_done} "
+            "generations - not fixed, not absent; a single run gives no "
+            "retention verdict")
 
 import math
 

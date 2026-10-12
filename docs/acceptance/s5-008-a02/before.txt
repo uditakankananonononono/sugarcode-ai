@@ -1,0 +1,77 @@
+FF.FFF                                                                   [100%]
+=================================== FAILURES ===================================
+_________________ test_bottleneck_fires_after_construct_fixed __________________
+
+    def test_bottleneck_fires_after_construct_fixed():
+        r = run_sandbox(pop_size=200, generations=300, bottleneck_at=150, seed=42)
+        assert r["fixation_gen"] == 1  # construct fixes immediately, run must not stop there
+>       assert any(e["event"] == "bottleneck" and e["gen"] == 150 for e in r["events"])
+E       assert False
+E        +  where False = any(<generator object test_bottleneck_fires_after_construct_fixed.<locals>.<genexpr> at 0x7f26a4ceec70>)
+
+tests/test_bioplayground_bottleneck_retention.py:11: AssertionError
+__________________ test_bottleneck_fires_after_construct_lost __________________
+
+    def test_bottleneck_fires_after_construct_lost():
+        r = run_sandbox(pop_size=100, generations=200, n_alleles=2, fitness=[0.9, 1.0],
+                        mutation_rate=0.005, seed=0, bottleneck_at=150)
+        assert r["fixation_gen"] == 92  # construct lost at gen 92, run must not stop there
+>       assert any(e["event"] == "bottleneck" and e["gen"] == 150 for e in r["events"])
+E       assert False
+E        +  where False = any(<generator object test_bottleneck_fires_after_construct_lost.<locals>.<genexpr> at 0x7f26a4cef370>)
+
+tests/test_bioplayground_bottleneck_retention.py:19: AssertionError
+__________ test_mid_frequency_run_reports_no_loss_and_no_fitness_cost __________
+
+    def test_mid_frequency_run_reports_no_loss_and_no_fitness_cost():
+        # neutral fitness, construct ends at 0.37: not lost, and neutral fitness
+        # cannot support a "fitness cost" verdict
+        r = run_sandbox(pop_size=100, generations=200, n_alleles=2, fitness=[1.0, 1.0],
+                        mutation_rate=0.005, seed=42)
+        assert 0.0 < r["final_construct_freq"] <= 0.5
+>       assert "lost" not in r["interpretation"].lower()
+E       AssertionError: assert 'lost' not in 'engineered ...ction marker'
+E
+E         'lost' is contained here:
+E           engineered allele lost by gen none - fitness cost of the construct exceeds what drift can tolerate; consider burden reduction or selection marker
+E         ?                   ++++
+
+tests/test_bioplayground_bottleneck_retention.py:35: AssertionError
+_____________ test_advantaged_branch_states_endpoint_not_stability _____________
+
+    def test_advantaged_branch_states_endpoint_not_stability():
+        # construct fitness advantage + final frequency > 0.5 must still be
+        # reported as one sampled endpoint with supplied relative fitness,
+        # not as a stability or selection-coefficient claim
+        r = run_sandbox(pop_size=300, generations=200, fitness=[1.02, 0.98, 0.98], seed=5)
+        assert r["final_construct_freq"] > 0.5
+        interp = r["interpretation"].lower()
+>       assert "stable" not in interp
+E       AssertionError: assert 'stable' not in 'engineered ...gainst drift'
+E
+E         'stable' is contained here:
+E           engineered allele stable - selection coefficient 1.020 holds it against drift
+E         ?                   ++++++
+
+tests/test_bioplayground_bottleneck_retention.py:46: AssertionError
+______________ test_loss_wording_only_when_recorded_event_is_loss ______________
+
+    def test_loss_wording_only_when_recorded_event_is_loss():
+        # seed 14: construct fixes at gen 1, bottleneck at 150, final frequency 0.0 -
+        # the recorded endpoint event is a fixation, so the interpretation must not
+        # report gen 1 as a loss generation
+        r = run_sandbox(pop_size=100, generations=200, n_alleles=2, fitness=[0.9, 1.0],
+                        mutation_rate=0.005, seed=14, bottleneck_at=150)
+        assert any(e["event"] == "construct_fixed" and e["gen"] == 1 for e in r["events"])
+>       assert any(e["event"] == "bottleneck" and e["gen"] == 150 for e in r["events"])
+E       assert False
+E        +  where False = any(<generator object test_loss_wording_only_when_recorded_event_is_loss.<locals>.<genexpr> at 0x7f26a4cef220>)
+
+tests/test_bioplayground_bottleneck_retention.py:60: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_bioplayground_bottleneck_retention.py::test_bottleneck_fires_after_construct_fixed
+FAILED tests/test_bioplayground_bottleneck_retention.py::test_bottleneck_fires_after_construct_lost
+FAILED tests/test_bioplayground_bottleneck_retention.py::test_mid_frequency_run_reports_no_loss_and_no_fitness_cost
+FAILED tests/test_bioplayground_bottleneck_retention.py::test_advantaged_branch_states_endpoint_not_stability
+FAILED tests/test_bioplayground_bottleneck_retention.py::test_loss_wording_only_when_recorded_event_is_loss
+5 failed, 1 passed in 0.23s
