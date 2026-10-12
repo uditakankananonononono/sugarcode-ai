@@ -62,7 +62,10 @@ def _atom(token: str) -> Atom:
 def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
     """Parse common SMILES into a molecular graph; reject malformed input.
 
-    Rejects valence-impossible atoms (for example pentavalent carbon). Tetrahedral
+    Rejects dangling or doubled bond symbols ("C=", "C==C", "=C"), empty branches
+    ("C()"), misplaced "." and ring closures onto the same atom or an already
+    bonded atom ("C11", "C1C1"). Rejects valence-impossible atoms (for example
+    pentavalent carbon). Tetrahedral
     chirality (@, @@) and cis/trans marks (/, \\) are not represented in the graph:
     they are listed in ``Molecule.ignored``, or raise ValueError when
     ``strict_stereo=True``."""
@@ -70,31 +73,45 @@ def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
     toks = TOKEN.findall(smiles)
     if "".join(toks) != smiles: raise ValueError("unsupported or malformed SMILES syntax")
     atoms=[]; bonds=[]; stack=[]; rings={}; current=None; pending=None; components=1
+    bond_pending=False  # a bond symbol was read and no atom or ring digit has used it yet
+    after_open=False    # the previous token was "("
     bondmap={"-":1.0,"=":2.0,"#":3.0,":":1.5,"/":None,"\\":None}  # / and \\ only mark direction: order follows the implicit rule (aromatic between aromatic atoms, as RDKit reads c1/s...)
     for tok in toks:
-        if tok in bondmap: pending=bondmap[tok]; continue
+        if tok in bondmap:
+            if bond_pending: raise ValueError("consecutive bond symbols")
+            if current is None: raise ValueError("bond symbol with no preceding atom")
+            pending=bondmap[tok]; bond_pending=True; after_open=False; continue
         if tok == "(":
             if current is None: raise ValueError("branch without atom")
-            stack.append(current); continue
+            if bond_pending: raise ValueError("bond symbol before branch")
+            stack.append(current); after_open=True; continue
         if tok == ")":
             if not stack: raise ValueError("unmatched branch close")
+            if after_open or current is None: raise ValueError("empty branch")
+            if bond_pending: raise ValueError("branch ends with a bond symbol")
             current=stack.pop(); continue
-        if tok == ".": current=None; pending=None; components += 1; continue
+        if tok == ".":
+            if bond_pending or current is None or after_open: raise ValueError("misplaced '.'")
+            current=None; pending=None; components += 1; continue
         if tok[0].isdigit() or tok.startswith("%"):
             if current is None: raise ValueError("ring without atom")
             key=tok[1:] if tok.startswith("%") else tok
             if key in rings:
                 other, oldbond=rings.pop(key); order=pending or oldbond
+                if other==current: raise ValueError("ring closure bonds an atom to itself")
+                if any({x,y}=={other,current} for x,y,_ in bonds): raise ValueError("ring closure repeats an existing bond")
                 if order is None: order=1.5 if atoms[current].aromatic and atoms[other].aromatic else 1.0
                 bonds.append((other,current,order))
             else: rings[key]=(current,pending)
-            pending=None; continue
+            pending=None; bond_pending=False; after_open=False; continue
         atom=_atom(tok); idx=len(atoms); atoms.append(atom)
         if current is not None:
             order=pending
             if order is None: order=1.5 if atom.aromatic and atoms[current].aromatic else 1.0
             bonds.append((current,idx,order))
-        current=idx; pending=None
+        current=idx; pending=None; bond_pending=False; after_open=False
+    if bond_pending: raise ValueError("trailing bond symbol")
+    if toks[-1]==".": raise ValueError("trailing '.'")
     if stack or rings: raise ValueError("unclosed branch or ring")
     if not atoms: raise ValueError("SMILES contains no atoms")
     _check_valence(atoms,bonds)

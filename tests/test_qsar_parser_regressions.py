@@ -29,3 +29,19 @@ def test_stereo_is_flagged_not_silently_dropped():
         with pytest.raises(ValueError, match="stereochemistry not supported"):
             parse_smiles(smi, strict_stereo=True)
     assert parse_smiles("CCO", strict_stereo=True).atoms
+
+
+@pytest.mark.parametrize("smi", ["C=", "=C", "C==", "C==C", "C=-C", "C#=", "C-", "C--", "-C", "C(=)C", "C(=O=)C",
+                                 "C..", ".C", "C.", "C(.)C", "C(.C)", "C()", "C(()C)", "CC()C", "C11", "C1C1", "C=1C1",
+                                 "C//C", "F/C=/C/F", "C(=)", "C(C)=", "C1CC1=", "[Na+].=[Cl-]"])
+def test_malformed_strings_are_rejected(smi):
+    # old code accepted every one of these (valid_fraction 1.0 for "C=" and "C()")
+    with pytest.raises(ValueError):
+        parse_smiles(smi)
+
+
+@pytest.mark.parametrize("smi", ["C=C", "C(=O)O", "C(C)(C)C", "C1CC1", "C=1CCCCC=1", "C%10CCCC%10", "[C-]#[O+]", "C1.C1",
+                                 "[Na+].[Cl-]", "F/C=C/F", "F/C=C\\F", "C#CC#N", "CC(=O)[O-]", "c1ccccc1-c1ccccc1",
+                                 "C:C", "C(C(C)C)C", "O=C1CCC(=O)N1", "C1CC2CCC1C2"])
+def test_well_formed_strings_still_parse(smi):
+    assert parse_smiles(smi).atoms
