@@ -43,7 +43,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("synbio_wizard", "SynBio Wizard", "core-intelligence",
      "Guided synthetic-biology compiler: goal definition to pathway design, chassis selection, feasibility and assembly recommendations."),
     ("neuro_pipeline", "Neuro-Pipeline", "core-intelligence",
-     "Small numpy MLP with manual-gradient training, L2 weight-anchor continual-update (no Fisher term), virtual lesion studies, activation traces and RSA analysis."),
+     "Small numpy MLP with manual-gradient training, pair-based STDP rule, L2 and Fisher-diagonal weight-anchor continual updates, lesion studies, activation traces (single-pass and per-step), RSA, paired Procrustes alignment and a two-level linear predictive-coding model. Toy-scale, synthetic data."),
     ("biogpt_lit", "Literature Relation Extractor (biogpt_lit)", "core-intelligence",
      "NOT BioGPT or any language model (slug kept for compatibility). Regex entity-relation-entity extraction into a knowledge graph with contradiction detection."),
     ("chemgpt_engine", "Fragment Molecule Designer (chemgpt_engine)", "fabrication-evolution",

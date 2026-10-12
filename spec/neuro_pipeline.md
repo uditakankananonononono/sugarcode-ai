@@ -213,3 +213,13 @@ Original claim (historical): "autonomous biological discovery"
 Current wording: No autonomous experiment selection, lab execution, biological discovery validation or publication-feedback runtime is implemented.
 
 Source: `src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report); src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)`.
+
+### Stack-B4 updates (additions to the neuro_pipeline code, source `src/sugarcode/modules/neuro_pipeline/core.py`)
+
+These paragraphs describe code added after the pin-scoped sections above. They name the added functions and their limits. The banner at the top of this file is unchanged.
+
+- S5-013.A02, S5-047.03.C03: `stdp_timing_update` applies a pair-based timing rule to binary spike trains: pre-before-post pairs raise a weight, post-before-pre pairs lower it, with exponential decay in the delay. It is not connected to MLP training; the MLP `stdp_mod` term is still a co-activation term.
+- S5-018.A02, S5-047.03.C05: `fisher_diagonal` computes the exact diagonal Fisher information of the Bernoulli output head, and `continual_update_fisher` anchors all four parameter blocks with it. On a two-task toy test it keeps more of the first task than no anchor or the isotropic anchor at the same strength, and it also learns the second task less well. Forgetting is reduced on that toy test, not removed.
+- S5-050.03.C01, S5-050.03.C04, S5-CODEDOC-023.C01, S5-CODEDOC-023.C03: `temporal_activation_trace` returns hidden and output activations for each step of an input sequence plus the first step at which each hidden unit passes a threshold. Each step is an independent forward pass; there is no state carried between steps and no spike timing.
+- S5-048.03.C02: `procrustes_alignment` and `align_paired_modalities` rotate one embedding onto another using paired rows. They need rows that correspond; unpaired data is rejected. Error is scored on the rows used for fitting.
+- S5-047.02.C03: `predictive_coding_hierarchy` trains a two-level linear generative model by prediction-error updates. It is a point-estimate model on synthetic data; it has no priors or posterior distributions (see S5-047.02.C04, which stays unsupported).
