@@ -42,7 +42,7 @@ def train(n_in: int = 6, n_hidden: int = 12, epochs: int = 300, lr: float = 0.5,
           stdp_mod: float = 0.0, seed: int = 42) -> dict:
     """Train on a synthetic toy task (Gaussian features -> class).
 
-    Kept for backward compatibility and quick smoke tests. For biological
+    Toy-task entry point retained for compatibility and smoke tests (Gaussian features, no biological content). For biological
     sequence classification (DNA motifs), use train_on_sequences()."""
     rng = np.random.default_rng(seed)
     n = 400
@@ -105,7 +105,7 @@ def activation_trace(model: MLP, x: np.ndarray) -> dict:
         "hidden_mean_abs": round(float(np.mean(np.abs(h))), 3),
         "hidden_active_fraction": round(float(np.mean(np.abs(h) > 0.5)), 3),
         "output": [round(float(v), 3) for v in np.atleast_1d(y).ravel()],
-        "note": "per-layer activation magnitudes - spike-train analogue of inference",
+        "note": "per-layer activation magnitudes from one forward pass; for per-step activations over an input sequence see temporal_activation_trace",
     }
 
 
@@ -115,7 +115,7 @@ def rsa(model: MLP, n_in: int | None = None, n_stimuli: int = 40, seed: int = 7,
     dissimilarity matrices (are model embeddings organized like the data?).
 
     n_in defaults to the model's input width (a fixed 6 crashed on every
-    sequence-trained model); pass X to use real stimuli (e.g. encoded DNA)."""
+    sequence-trained model); pass X to supply your own stimuli (e.g. encoded DNA)."""
     if X is None:
         rng = np.random.default_rng(seed)
         X = rng.normal(0, 1, (n_stimuli, model.W1.shape[0] if n_in is None else n_in))
@@ -206,8 +206,8 @@ def synthetic_promoter_dataset(n: int = 400, seq_len: int = 50,
 
     Positives get `motif` (default TATA-box consensus) inserted at a random
     position; negatives are random sequence with the motif censored. This is
-    synthetic-but-biological data (real DNA alphabet, real motif grammar),
-    not Gaussian blobs. Returns {sequences, labels, motif, seq_len}."""
+    synthetic data: the A/C/G/T alphabet, random background and one planted
+    fixed motif. It carries no genomic data and no motif grammar. Returns {sequences, labels, motif, seq_len}."""
     rng = np.random.default_rng(seed)
     seqs, labels = [], []
     m = str(motif).upper()
@@ -251,7 +251,7 @@ def train_on_sequences(sequences=None, labels=None, k: int = 3,
     """Train the MLP to classify DNA sequences by motif content.
 
     Defaults to synthetic_promoter_dataset() (TATA-box vs random). Pass your
-    own sequences + labels (0/1) for real biological data. encoding is
+    own sequences + labels (0/1) to use your own sequence data. encoding is
     'onehot' (default, position-specific) or 'kmer' (4**k frequency features).
 
     A stratified `holdout` fraction (default 0.2) is kept out of training and
@@ -376,7 +376,169 @@ def feedback_reward_update(prior_alpha,prior_beta,outcomes):
     o=np.asarray(outcomes,float); a=prior_alpha+o.sum(); b=prior_beta+len(o)-o.sum(); return {'alpha':float(a),'beta':float(b),'reward_mean':float(a/(a+b)),'uncertainty':float(np.sqrt(a*b/((a+b)**2*(a+b+1))))}
 
 def pipeline_report(seed=42):
-    run=train(epochs=80,seed=seed); model=run['model']; lesion=lesion_study(model); connectivity=functional_connectivity(model); x=np.eye(6); causal=causal_intervention(model,x,0); return {'training':{k:v for k,v in run.items() if k!='model'},'connectivity':connectivity,'lesion':lesion,'causal':causal,'rsa':rsa(model),'feedback':feedback_reward_update(1,1,[1,0,1]),'model_status':'A real small NumPy MLP and explicit algorithms; no biological foundation model or autonomous lab agent is bundled.'}
+    run=train(epochs=80,seed=seed); model=run['model']; lesion=lesion_study(model); connectivity=functional_connectivity(model); x=np.eye(6); causal=causal_intervention(model,x,0); return {'training':{k:v for k,v in run.items() if k!='model'},'connectivity':connectivity,'lesion':lesion,'causal':causal,'rsa':rsa(model),'feedback':feedback_reward_update(1,1,[1,0,1]),'model_status':'A small NumPy MLP and explicit algorithms; no biological foundation model or autonomous lab agent is bundled.'}
 
 def neuro_diagnostics(seed=42):
     r=pipeline_report(seed); t=r['training']; l=r['lesion']; c=r['connectivity']; ca=r['causal']; return {'final_loss':t['final_loss'],'train_accuracy':t['train_accuracy'],'stdp_modulation':t['stdp_modulation'],'connectivity_edges':float(len(c['edges'])),'connectivity_density':c['density'],'lesion_baseline_accuracy':l['baseline_accuracy'],'critical_unit_count':float(len(l['critical_units'])),'max_lesion_drop':max((x['accuracy_drop'] for x in l['lesions']),default=0),'rsa_correlation':r['rsa']['rsa_correlation'],'causal_effect_abs':float(np.mean(np.abs(ca['average_causal_effect']))),'reward_mean':r['feedback']['reward_mean'],'reward_uncertainty':r['feedback']['uncertainty']}
+
+# --- Timing-dependent plasticity, Fisher-weighted anchoring, temporal traces,
+# --- paired alignment and a two-level predictive-coding hierarchy. -----------
+
+def stdp_timing_update(weights, pre_spikes, post_spikes, a_plus=0.01, a_minus=0.012, tau=5.0):
+    """Pair-based spike-timing-dependent plasticity on binary spike trains.
+
+    pre_spikes: (T, n_pre), post_spikes: (T, n_post), e.g. spiking_dynamics()['spikes'].
+    For each pre/post spike pair the weight change is a_plus * exp(-dt / tau) when the
+    pre spike comes first (dt > 0) and -a_minus * exp(dt / tau) when the post spike
+    comes first (dt < 0). Simultaneous spikes (dt == 0) add nothing. Returns the new
+    weights (n_pre, n_post) and the per-synapse delta. It is not connected to MLP
+    training: the MLP's stdp_mod term remains a co-activation term."""
+    pre = np.asarray(pre_spikes, float); post = np.asarray(post_spikes, float)
+    W = np.asarray(weights, float)
+    if pre.ndim != 2 or post.ndim != 2 or pre.shape[0] != post.shape[0]:
+        raise ValueError("pre_spikes and post_spikes must be (T, n) with equal T")
+    if W.shape != (pre.shape[1], post.shape[1]):
+        raise ValueError("weights must be (n_pre, n_post)")
+    if tau <= 0:
+        raise ValueError("tau must be positive")
+    T = pre.shape[0]
+    delta = np.zeros_like(W)
+    for i in range(pre.shape[1]):
+        t_pre = np.flatnonzero(pre[:, i])
+        for j in range(post.shape[1]):
+            t_post = np.flatnonzero(post[:, j])
+            for tp in t_pre:
+                for tq in t_post:
+                    dt = float(tq - tp)
+                    if dt > 0:
+                        delta[i, j] += a_plus * np.exp(-dt / tau)
+                    elif dt < 0:
+                        delta[i, j] -= a_minus * np.exp(dt / tau)
+    return {"weights": W + delta, "delta": delta, "steps": T,
+            "rule": "pair-based STDP (all pairs, exponential windows)"}
+
+
+def _logit_grads(model, X):
+    """Per-sample gradient of the output logit with respect to (W1, b1, W2, b2)."""
+    h = np.tanh(X @ model.W1 + model.b1)
+    d1 = model.W2[:, 0][None, :] * (1 - h ** 2)            # (n, hidden)
+    gW1 = X[:, :, None] * d1[:, None, :]                   # (n, in, hidden)
+    gb1 = d1
+    gW2 = h[:, :, None]                                    # (n, hidden, 1)
+    gb2 = np.ones((len(X), 1))
+    p = 1 / (1 + np.exp(-(h @ model.W2 + model.b2)))
+    return p, gW1, gb1, gW2, gb2
+
+
+def fisher_diagonal(model, X):
+    """Exact diagonal Fisher information of the Bernoulli output head:
+    F_i = mean over inputs of p(1-p) * (d logit / d theta_i)^2, for W1, b1, W2, b2."""
+    X = np.asarray(X, float)
+    p, gW1, gb1, gW2, gb2 = _logit_grads(model, X)
+    w = (p * (1 - p))[:, 0]
+    f = lambda g: np.tensordot(w, g ** 2, axes=(0, 0)) / len(X)
+    return {"W1": f(gW1), "b1": f(gb1), "W2": f(gW2), "b2": f(gb2)}
+
+
+def continual_update_fisher(model, X, y, fisher, previous=None, lr=0.1, epochs=20, ewc_lambda=1.0):
+    """Training with a Fisher-weighted quadratic anchor on all four parameter blocks:
+    after each loss step, theta <- theta - min(lr * ewc_lambda * F, 1) * (theta - theta_old).
+    fisher comes from fisher_diagonal() on the earlier task. Reduces drift on
+    high-Fisher parameters; it does not guarantee old-task retention."""
+    names = ("W1", "b1", "W2", "b2")
+    old = {k: getattr(model, k).copy() for k in names} if previous is None else previous
+    X = np.asarray(X, float); y = np.asarray(y, float); losses = []
+    for _ in range(epochs):
+        losses.append(model.backward(X, y, lr))
+        for k in names:
+            cur = getattr(model, k)
+            cur -= np.minimum(lr * ewc_lambda * fisher[k], 1.0) * (cur - old[k])
+    drift = float(sum(np.linalg.norm(getattr(model, k) - old[k]) for k in names))
+    return {"model": model, "loss_curve": losses, "parameter_drift": drift, "ewc_lambda": ewc_lambda,
+            "penalty": "Fisher-diagonal weighted anchor on W1, b1, W2, b2"}
+
+
+def temporal_activation_trace(model, x_sequence, threshold=0.5):
+    """Hidden/output activations for each time step of an input sequence (T, n_in).
+
+    Returns per-step hidden activations and outputs, and for each hidden unit the first
+    step at which |activation| >= threshold (None if never) plus the units ordered by that
+    onset step. The MLP has no state between steps, so each step is an independent
+    forward pass over a time-indexed input; this is an onset ordering of activations,
+    not spike timing."""
+    X = np.asarray(x_sequence, float)
+    if X.ndim != 2 or X.shape[1] != model.W1.shape[0]:
+        raise ValueError("x_sequence must be (T, n_in)")
+    h = np.tanh(X @ model.W1 + model.b1)
+    y = model.forward(X)
+    onset = []
+    for u in range(h.shape[1]):
+        hit = np.flatnonzero(np.abs(h[:, u]) >= threshold)
+        onset.append(int(hit[0]) if len(hit) else None)
+    order = sorted((u for u in range(len(onset)) if onset[u] is not None), key=lambda u: (onset[u], u))
+    return {"steps": int(X.shape[0]), "hidden": h.tolist(), "output": y.tolist(),
+            "onset_step": onset, "onset_order": order, "threshold": threshold}
+
+
+def procrustes_alignment(A, B):
+    """Orthogonal Procrustes alignment of two paired embeddings (same rows, same width).
+
+    Finds the orthogonal R minimising ||A R - B||_F after column-centering both, and
+    reports the error before and after rotation. Rows must correspond (paired samples);
+    unpaired data gives no meaningful result. Fitted and scored on the same rows."""
+    A = np.asarray(A, float); B = np.asarray(B, float)
+    if A.shape != B.shape or A.ndim != 2:
+        raise ValueError("A and B must be 2-D arrays of equal shape (paired rows)")
+    Ac = A - A.mean(0); Bc = B - B.mean(0)
+    u, _, vt = np.linalg.svd(Ac.T @ Bc)
+    R = u @ vt
+    before = float(np.linalg.norm(Ac - Bc) / max(np.linalg.norm(Bc), 1e-12))
+    after = float(np.linalg.norm(Ac @ R - Bc) / max(np.linalg.norm(Bc), 1e-12))
+    return {"rotation": R, "error_before": before, "error_after": after}
+
+
+def align_paired_modalities(modalities, latent_dim=4):
+    """PCA each modality to latent_dim, then Procrustes-align every later modality to the
+    first on their paired rows. Requires equal row counts (row i is the same sample)."""
+    if len(modalities) < 2:
+        raise ValueError("at least two modalities required")
+    zs = {}
+    for name, X in modalities.items():
+        X = np.asarray(X, float); c = X - X.mean(0)
+        _, _, vt = np.linalg.svd(c, full_matrices=False)
+        zs[name] = c @ vt[:min(latent_dim, vt.shape[0])].T
+    if len({len(z) for z in zs.values()}) != 1:
+        raise ValueError("paired alignment needs equal row counts")
+    k = min(z.shape[1] for z in zs.values())
+    names = list(zs); ref = names[0]; out = {}
+    for n in names[1:]:
+        r = procrustes_alignment(zs[n][:, :k], zs[ref][:, :k])
+        out[f"{n}->{ref}"] = {"error_before": r["error_before"], "error_after": r["error_after"]}
+    return {"alignments": out, "latent_dim": k, "pairing": "row i of every modality is the same sample"}
+
+
+def predictive_coding_hierarchy(X, latent_dims=(4, 2), steps=30, infer_lr=0.1, learn_lr=0.01, epochs=60, seed=0):
+    """Two-level linear predictive-coding network trained by prediction-error updates.
+
+    Level 1 predicts the data from z1 (x_hat = z1 W1); level 2 predicts z1 from z2
+    (z1_hat = z2 W2). For each sample the latents relax by gradient steps on the summed
+    squared prediction errors; the generative weights then take a Hebbian-style step
+    (error times latent). Returns the mean squared reconstruction error per epoch. It is
+    a deterministic point-estimate model: there are no priors or posterior distributions."""
+    X = np.asarray(X, float); X = X - X.mean(0)
+    n, d = X.shape; d1, d2 = latent_dims
+    rng = np.random.default_rng(seed)
+    W1 = rng.normal(0, 0.3, (d1, d)); W2 = rng.normal(0, 0.3, (d2, d1))
+    history = []
+    for _ in range(epochs):
+        z1 = np.zeros((n, d1)); z2 = np.zeros((n, d2))
+        for _ in range(steps):
+            e0 = X - z1 @ W1
+            e1 = z1 - z2 @ W2
+            z1 += infer_lr * (e0 @ W1.T - e1)
+            z2 += infer_lr * (e1 @ W2.T)
+        e0 = X - z1 @ W1; e1 = z1 - z2 @ W2
+        W1 += learn_lr * z1.T @ e0 / n
+        W2 += learn_lr * z2.T @ e1 / n
+        history.append(float(np.mean(e0 ** 2)))
+    return {"W1": W1, "W2": W2, "reconstruction_mse": history, "latent_dims": (d1, d2)}
