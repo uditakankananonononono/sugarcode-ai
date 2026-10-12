@@ -1,7 +1,8 @@
 """Molecular graph descriptors and Morgan-style hashed fingerprints.
 
 This is not a replacement for a sanitising chemistry toolkit. The parser is
-deterministic, rejects unknown atom tokens, unbalanced or empty branches, unclosed
+deterministic, rejects unknown atom tokens, bracket atoms with unrecognised
+trailing content, unbalanced or empty branches, unclosed
 rings, dangling bond symbols and atoms above their maximum valence, and lists
 stereo marks it does not model in ``Molecule.ignored``. It does not check
 aromatic-ring kekulizability ("c1cccc1" parses). Kekule and aromatic spellings
@@ -54,11 +55,21 @@ def _atom(token: str) -> Atom:
     if not m or m.group(1).capitalize() not in MASS:
         raise ValueError(f"unsupported atom token: {token}")
     sym = m.group(1); aromatic = sym.islower(); element = sym.capitalize()
-    hm = re.search(r"H(\d*)", raw[m.end():])
-    explicit_h = (int(hm.group(1)) if hm and hm.group(1) else 1) if hm else 0
+    rest = raw[m.end():]
+    if token.startswith("[") and rest.startswith("@"):
+        rest = rest[2:] if rest.startswith("@@") else rest[1:]
+    hm = re.match(r"H(\d*)", rest)
+    explicit_h = 0
+    if hm:
+        explicit_h = int(hm.group(1)) if hm.group(1) else 1
+        rest = rest[hm.end():]
     charge = 0
-    for sign, n in re.findall(r"([+-])(\d*)", raw[m.end():]):
-        charge += (1 if sign == "+" else -1) * (int(n) if n else 1)
+    while rest:
+        cm = re.match(r"([+-])(\d*)", rest)
+        if not cm:
+            raise ValueError(f"unsupported bracket atom content: {token}")
+        charge += (1 if cm.group(1) == "+" else -1) * (int(cm.group(2)) if cm.group(2) else 1)
+        rest = rest[cm.end():]
     return Atom(element, aromatic, charge, explicit_h, token.startswith("["))
 
 
@@ -68,7 +79,8 @@ def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
     This is not a general SMILES validator. The checks below cover documented
     syntax and valence cases, not every rule implemented by chemistry toolkits.
     Rejects dangling or doubled bond symbols ("C=", "C==C", "=C"), empty branches
-    ("C()"), misplaced "." and ring closures onto the same atom or an already
+    ("C()"), bracket atoms with unrecognised trailing content ("[CH4garbage]"),
+    misplaced "." and ring closures onto the same atom or an already
     bonded atom ("C11", "C1C1"). Checks selected valence limits (including neutral pentavalent carbon and
     over-coordinated charged C/N/O). Does not check that aromatic
     rings can be kekulized ("c1cccc1" parses). Tetrahedral
