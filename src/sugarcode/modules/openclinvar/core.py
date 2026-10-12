@@ -488,7 +488,7 @@ def reasoning_graph(gene,variant,consequence,phenotypes=(),pathways=(),structure
     return {'nodes':nodes,'edges':edges,'causal_chain':[variant,consequence,*pathways,*phenotypes]}
 
 def phenotype_match(patient_hpo,disease_hpo,ancestor_map=None):
-    p=set(patient_hpo); d=set(disease_hpo); exact=len(p&d); ancestors=ancestor_map or {}; partial=sum(.5 for x in p for y in d if y in ancestors.get(x,()) or x in ancestors.get(y,())); return {'exact_matches':exact,'semantic_partial':partial,'score':(exact+partial)/max(1,len(p|d)),'patient_terms':list(patient_hpo),'disease_terms':list(disease_hpo)}
+    p=set(patient_hpo); d=set(disease_hpo); exact=len(p&d); ancestors=ancestor_map or {}; partial=sum(.5 for x in p for y in d if y in ancestors.get(x,()) or x in ancestors.get(y,())); return {'exact_matches':exact,'semantic_partial':partial,'score':min(1.0,(exact+partial)/max(1,len(p|d))),'patient_terms':list(patient_hpo),'disease_terms':list(disease_hpo)}
 
 def reverse_inference(patient_hpo,candidates):
     ranked=[]
