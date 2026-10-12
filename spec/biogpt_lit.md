@@ -1,3 +1,5 @@
+> **Current claim-local scope at 7ff2dc87:** the correction section below supersedes the original aspirational wording for its named row IDs only. The original text is retained for traceability, not as a shipped-capability claim. Existing corrections for other rows remain in force.
+
 > **Spec vs implementation:** this file is the original aspirational product-spec
 > text. The shipped module is deterministic/statistical/mechanistic computation
 > (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
@@ -95,3 +97,24 @@ Verdict: OVERSTATED (previous ledger: SCOPED).
 Correction: Publication ingestion and validation are manually invoked helpers; no autonomous experiment/publication feedback loop.
 
 Evidence: `src/sugarcode/modules/biogpt_lit/core.py:172-188,248-249`, probes `B11` at base `99cb2d329690cf946ae491cb3ca027ee66b7f656`.
+
+
+## Claim-local wording corrections at 7ff2dc87
+
+Pinned implementation: `src/sugarcode/modules/biogpt_lit/core.py` at `7ff2dc8748965fcfc55f6ffd3a2efcab4e592368`. These are wording corrections only. They do not implement missing capabilities, establish biological validation, or change runtime behavior.
+
+### Pin-scoped S5-053.01.C03
+
+Original claim (historical): "scientific reasoning engine"
+
+Current wording: BioGPT Lit uses regex tokenization with relation-word dictionary lookup, in-memory triples, heuristic evidence weights, graph traversal and hypothesis templates. No trained reasoning model or autonomous scientific reasoning is bundled.
+
+Source: `src/sugarcode/modules/biogpt_lit/core.py:8 (KnowledgeGraph); src/sugarcode/modules/biogpt_lit/core.py:141 (extract_claims); src/sugarcode/modules/biogpt_lit/core.py:198 (parse_full_text); src/sugarcode/modules/biogpt_lit/core.py:172 (ingest_pubmed)`.
+
+### Pin-scoped S5-053.01.C04
+
+Original claim (historical): "living, multi-layered representation of biological knowledge"
+
+Current wording: Graph stores claims/metadata in process memory. Updates require manual ingestion; there is no persistent living graph, semantic multi-layer model or continuous indexing service.
+
+Source: `src/sugarcode/modules/biogpt_lit/core.py:17 (KnowledgeGraph.__init__); src/sugarcode/modules/biogpt_lit/core.py:21 (KnowledgeGraph.ingest); src/sugarcode/modules/biogpt_lit/core.py:198 (parse_full_text)`.

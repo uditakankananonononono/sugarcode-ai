@@ -1,3 +1,5 @@
+> **Current claim-local scope at 7ff2dc87:** the correction section below supersedes the original aspirational wording for its named row IDs only. The original text is retained for traceability, not as a shipped-capability claim. Existing corrections for other rows remain in force.
+
 > **Spec vs implementation:** this file is the original aspirational product-spec
 > text. The shipped module is deterministic/statistical/mechanistic computation
 > (a small NumPy MLP, SVD, leaky integrate-and-fire and Beta-count updates) -
@@ -46,3 +48,168 @@ Finally, the system could evolve into a self-optimizing research agent by integr
 > connected to any trainer; `pipeline_report` calls it with hard-coded outcomes `[1,0,1]`. The built-in
 > sequence task scores 0.975 train vs 0.562 holdout accuracy (probe, seed 42), and nothing improves it from
 > feedback. Not "biologically grounded", "autonomous" or "self-optimizing". S5-051.03.C05 downgraded to OVERSTATED.
+
+
+## Claim-local wording corrections at 7ff2dc87
+
+Pinned implementation: `src/sugarcode/modules/neuro_pipeline/core.py` at `7ff2dc8748965fcfc55f6ffd3a2efcab4e592368`. These are wording corrections only. They do not implement missing capabilities, establish biological validation, or change runtime behavior.
+
+### Pin-scoped S5-047.01.C01
+
+Original claim (historical): "closed-loop"
+
+Current wording: MLP training, lesions, modality projections and continual_update are callable helpers. pipeline_report invokes a fixed sequence once; no recurring feedback-to-training orchestration exists.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:41 (train); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report); src/sugarcode/modules/neuro_pipeline/core.py:350 (continual_update)`.
+
+### Pin-scoped S5-047.01.C02
+
+Original claim (historical): "neuro-symbolic MLOps system"
+
+Current wording: NumPy two-layer MLP, sequence encoders, numeric analysis and spiking simulation exist. No symbolic rule engine, production MLOps registry/deployment or neuro-symbolic integration is provided.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)`.
+
+### Pin-scoped S5-047.01.C03
+
+Original claim (historical): "biological deep learning models"
+
+Current wording: Model is a two-layer tanh/sigmoid MLP trained on synthetic toy or caller-supplied DNA labels. Biological authenticity/generalization is not established by its architecture.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:203 (synthetic_promoter_dataset); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences)`.
+
+### Pin-scoped S5-047.01.C04
+
+Original claim (historical): "cutting-edge computational neuroscience"
+
+Current wording: Implementation includes simple MLP/lesion/RSA/SVD/LIF-style helpers, without an independent current neuroscience benchmark or validated biological comparison.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:326 (align_modalities); src/sugarcode/modules/neuro_pipeline/core.py:337 (spiking_dynamics)`.
+
+### Pin-scoped S5-047.02.C03
+
+Original claim (historical): "predictive coding frameworks"
+
+Current wording: predictive_coding iteratively moves a zero state toward the mean of supplied observations. It has no hierarchy, generative dynamics or future predictive task.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:343 (predictive_coding)`.
+
+### Pin-scoped S5-047.03.C05
+
+Original claim (historical): "without catastrophic forgetting"
+
+Current wording: continual_update pulls W1/W2 toward previous weights without Fisher information; biases are not anchored and no old-task retention guarantee is checked.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:350 (continual_update)`.
+
+### Pin-scoped S5-048.01
+
+Original claim (historical): "A defining feature would be its ability to map internal model representations to interpretable neurobiological analogues."
+
+Current wording: rsa compares input/hidden Euclidean dissimilarities, align_modalities projects each modality separately, and connectivity uses model weights. No brain correspondence dataset or neurobiological interpretation is validated.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:326 (align_modalities); src/sugarcode/modules/neuro_pipeline/core.py:360 (functional_connectivity)`.
+
+### Pin-scoped S5-048.02.C03
+
+Original claim (historical): "connectomics in the brain"
+
+Current wording: functional_connectivity thresholds products of W1 and W2 magnitudes into input-to-hidden edges. It does not ingest brain connectivity measurements.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:360 (functional_connectivity)`.
+
+### Pin-scoped S5-048.03.C02
+
+Original claim (historical): "manifold alignment"
+
+Current wording: rsa correlates upper triangles of input and hidden Euclidean-distance matrices. It does not learn an alignment transformation or pair manifolds.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa)`.
+
+### Pin-scoped S5-048.04
+
+Original claim (historical): "This would push explainability from visualization into mechanistic insight."
+
+Current wording: RSA geometry correlation, feature clamping and lesion accuracy drops describe numerical model sensitivity. They do not establish a biological mechanism or validated mechanistic explanation.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)`.
+
+### Pin-scoped S5-050.03.C01
+
+Original claim (historical): "Time-resolved"
+
+Current wording: activation_trace records magnitudes from one feedforward pass; lesion_study reports accuracy deltas and causal_intervention reports output changes. These functions have no temporal trajectory.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:99 (activation_trace); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)`.
+
+### Pin-scoped S5-050.03.C04
+
+Original claim (historical): "neural firing sequences"
+
+Current wording: The cited activation trace contains layer magnitudes, not neural spike sequences. Separate spiking_dynamics simulates threshold/decay voltage and spikes but is not wired to MLP inference.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:99 (activation_trace); src/sugarcode/modules/neuro_pipeline/core.py:337 (spiking_dynamics)`.
+
+### Pin-scoped S5-050.04.C02
+
+Original claim (historical): "do-calculus-inspired interventions"
+
+Current wording: causal_intervention replaces one input column with a constant and forwards the MLP. It has no structural causal model, confounding graph or do-calculus identification.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)`.
+
+### Pin-scoped S5-050.04.C03
+
+Original claim (historical): "causal understanding of model behavior"
+
+Current wording: The reported average_causal_effect is mean prediction change after feature clamping. It is a model sensitivity result, not causally identified biological or observational effect.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)`.
+
+### Pin-scoped S5-051.01.C01
+
+Original claim (historical): "self-optimizing research agent"
+
+Current wording: feedback_reward_update returns Beta count statistics for supplied outcomes; it never updates model weights, chooses experiments or controls an autonomous loop.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)`.
+
+### Pin-scoped S5-051.03.C01
+
+Original claim (historical): "biologically grounded"
+
+Current wording: Reward update is generic count arithmetic with no biological variables, external evidence or learned biological mechanism.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)`.
+
+### Pin-scoped S5-051.03.C02
+
+Original claim (historical): "adaptive intelligence in the brain"
+
+Current wording: Beta update does not model brain circuits, plasticity mechanisms or adaptive cognition. No trained adaptive biological intelligence is produced.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)`.
+
+### Pin-scoped S5-051.03.C05
+
+Original claim (historical): "predictive accuracy"
+
+Current wording: Reward helper returns reward mean/standard deviation; pipeline_report does not apply these values to its trained MLP or evaluate an accuracy improvement.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)`.
+
+### Pin-scoped S5-051.04.C01
+
+Original claim (historical): "computational neuroscience-driven"
+
+Current wording: Cited reward function is a generic Beta update; neuroscience-inspired helpers elsewhere do not turn this update into a neuroscience-driven autonomous research system.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)`.
+
+### Pin-scoped S5-051.04.C02
+
+Original claim (historical): "autonomous biological discovery"
+
+Current wording: No autonomous experiment selection, lab execution, biological discovery validation or publication-feedback runtime is implemented.
+
+Source: `src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report); src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)`.

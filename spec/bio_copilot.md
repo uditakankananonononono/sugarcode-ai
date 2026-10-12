@@ -1,3 +1,5 @@
+> **Current claim-local scope at 7ff2dc87:** the correction section below supersedes the original aspirational wording for its named row IDs only. The original text is retained for traceability, not as a shipped-capability claim. Existing corrections for other rows remain in force.
+
 > **Spec vs implementation:** this file is the original aspirational product-spec
 > text. The shipped module is deterministic/statistical/mechanistic computation
 > (PWMs, ODEs, published vendored models, heuristics) - NOT a trained deep
@@ -110,3 +112,80 @@ Correction (UNSUPPORTED): Mutation output contains a fixed experiment list, not 
 Original claim: "refinement".
 
 Correction (PARTIAL): Manual scalar Bayesian update is not autonomous refinement; unchanged prediction reproduced before and after feedback.
+
+
+## Claim-local wording corrections at 7ff2dc87
+
+Pinned implementation: `src/sugarcode/modules/bio_copilot/core.py` at `7ff2dc8748965fcfc55f6ffd3a2efcab4e592368`. These are wording corrections only. They do not implement missing capabilities, establish biological validation, or change runtime behavior.
+
+### Pin-scoped S5-037.04.C06
+
+Original claim (historical): "reverse transcriptase templates"
+
+Current wording: For prime editing, selection returns constant PBS=13 and RTT=16 lengths, with no reverse-transcriptase template sequence or thermodynamic optimization.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:226 (select_editing_strategy)`.
+
+### Pin-scoped S5-038.01.C01
+
+Original claim (historical): "multi-scale"
+
+Current wording: Mutation pipeline chains four scalar heuristic nodes for three embedded genes. It does not couple spatial/time scales or execute SBML, FBA or docking models.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)`.
+
+### Pin-scoped S5-039.01.C01
+
+Original claim (historical): "fully executable"
+
+Current wording: Compiler serializes supplied question/result and generic replay instructions. No notebook, executable code, recorded arguments or runtime environment is emitted.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:267 (compile_research_artifact)`.
+
+### Pin-scoped S5-039.04.C01
+
+Original claim (historical): "strict JSON schemas"
+
+Current wording: json.dumps is used without a schema validator or a strict JSON configuration; schema_version is a string label, not schema enforcement.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:267 (compile_research_artifact)`.
+
+### Pin-scoped S5-040.04.C01
+
+Original claim (historical): "regions of high epistemic uncertainty"
+
+Current wording: Monte Carlo multiplies independently sampled Gaussian node values. Mutation output labels data sparsity medium; neither method infers regions of epistemic uncertainty.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:241 (propagate_uncertainty); src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)`.
+
+### Pin-scoped S5-040.04.C04
+
+Original claim (historical): "pathway perturbations"
+
+Current wording: Mutation result always suggests the same three experiment families, including a catalog pathway reporter. No pathway perturbation is selected or simulated to resolve uncertainty.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)`.
+
+### Pin-scoped S5-040.04.C05
+
+Original claim (historical): "maximally reduce uncertainty"
+
+Current wording: No information-gain objective, posterior experiment simulation, candidate comparison or maximization exists. Feedback suggests replicates based on total pseudo-counts.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:258 (update_from_experiment); src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)`.
+
+### Pin-scoped S5-040.05.C01
+
+Original claim (historical): "continuously improving system"
+
+Current wording: Standalone Beta-binomial feedback returns new counts/mean. Prediction functions do not consume that state and no durable update loop is wired.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:258 (update_from_experiment)`.
+
+### Pin-scoped S5-040.05.C03
+
+Original claim (historical): "optimizes the process of discovering answers"
+
+Current wording: Question handling uses keyword routes, gene-catalog responses or PubMed record retrieval. No search-policy learning, outcome-driven discovery optimization or experiment execution occurs.
+
+Source: `src/sugarcode/modules/bio_copilot/core.py:129 (answer); src/sugarcode/modules/bio_copilot/core.py:157 (literature_route)`.

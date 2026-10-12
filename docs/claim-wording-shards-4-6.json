@@ -1,0 +1,443 @@
+{
+  "pinned_source": "7ff2dc8748965fcfc55f6ffd3a2efcab4e592368",
+  "scope": "claim-local wording only; corrections supersede named aspirational fragments without deleting historical text",
+  "edited_rows": 50,
+  "preserved_rows": 5,
+  "rows": [
+    {
+      "id": "S5-037.04.C06",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "reverse transcriptase templates",
+      "current_wording": "For prime editing, selection returns constant PBS=13 and RTT=16 lengths, with no reverse-transcriptase template sequence or thermodynamic optimization.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:226 (select_editing_strategy)"
+    },
+    {
+      "id": "S5-038.01.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "multi-scale",
+      "current_wording": "Mutation pipeline chains four scalar heuristic nodes for three embedded genes. It does not couple spatial/time scales or execute SBML, FBA or docking models.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)"
+    },
+    {
+      "id": "S5-039.01.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "fully executable",
+      "current_wording": "Compiler serializes supplied question/result and generic replay instructions. No notebook, executable code, recorded arguments or runtime environment is emitted.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:267 (compile_research_artifact)"
+    },
+    {
+      "id": "S5-039.04.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "strict JSON schemas",
+      "current_wording": "json.dumps is used without a schema validator or a strict JSON configuration; schema_version is a string label, not schema enforcement.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:267 (compile_research_artifact)"
+    },
+    {
+      "id": "S5-040.04.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "regions of high epistemic uncertainty",
+      "current_wording": "Monte Carlo multiplies independently sampled Gaussian node values. Mutation output labels data sparsity medium; neither method infers regions of epistemic uncertainty.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:241 (propagate_uncertainty); src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)"
+    },
+    {
+      "id": "S5-040.04.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "pathway perturbations",
+      "current_wording": "Mutation result always suggests the same three experiment families, including a catalog pathway reporter. No pathway perturbation is selected or simulated to resolve uncertainty.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)"
+    },
+    {
+      "id": "S5-040.04.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "maximally reduce uncertainty",
+      "current_wording": "No information-gain objective, posterior experiment simulation, candidate comparison or maximization exists. Feedback suggests replicates based on total pseudo-counts.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:258 (update_from_experiment); src/sugarcode/modules/bio_copilot/core.py:28 (mutation_to_phenotype)"
+    },
+    {
+      "id": "S5-040.05.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "continuously improving system",
+      "current_wording": "Standalone Beta-binomial feedback returns new counts/mean. Prediction functions do not consume that state and no durable update loop is wired.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:258 (update_from_experiment)"
+    },
+    {
+      "id": "S5-040.05.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/bio_copilot.md",
+      "exact_historical_claim": "optimizes the process of discovering answers",
+      "current_wording": "Question handling uses keyword routes, gene-catalog responses or PubMed record retrieval. No search-policy learning, outcome-driven discovery optimization or experiment execution occurs.",
+      "pinned_code_evidence": "src/sugarcode/modules/bio_copilot/core.py:129 (answer); src/sugarcode/modules/bio_copilot/core.py:157 (literature_route)"
+    },
+    {
+      "id": "S5-041.03.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "solid foundations",
+      "current_wording": "Wizard combines embedded product/chassis catalog, weighted scores, GC/diversity proxy, dinucleotide energy surrogate and serial-pathway LP. It has no demonstrated comprehensive biological validation.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:28 (parse_goal); src/sugarcode/modules/synbio_wizard/core.py:36 (score_chassis); src/sugarcode/modules/synbio_wizard/core.py:44 (codon_metrics); src/sugarcode/modules/synbio_wizard/core.py:52 (rbs_thermodynamics); src/sugarcode/modules/synbio_wizard/core.py:74 (flux_balance)"
+    },
+    {
+      "id": "S5-041.03.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "standardized laboratory execution",
+      "current_wording": "Assembly helper returns a method/standard name and explicitly says architecture only. No validated procedures, laboratory control or execution protocol is produced.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:168 (assembly_recommendation); src/sugarcode/modules/synbio_wizard/core.py:172 (plasmid_architecture)"
+    },
+    {
+      "id": "S5-041.04.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "self-evolving",
+      "current_wording": "Catalog parameters and design pipeline are fixed. Feedback is a separately invoked count update, not modification of models, code or objectives.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project); src/sugarcode/modules/synbio_wizard/core.py:194 (ingest_experimental_feedback)"
+    },
+    {
+      "id": "S5-041.04.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "full-stack biological intelligence system",
+      "current_wording": "logic_circuit evaluates Boolean AND/OR/NOT and returns an implementation label. Broader wizard composes catalog/surrogate helpers, not a full-stack biological intelligence system.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:110 (logic_circuit); src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project)"
+    },
+    {
+      "id": "S5-041.04.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "continuously learning",
+      "current_wording": "Manual successes/total updates change caller-carried Beta parameters. There is no persistent learning service or feedback consumption by chassis/flux/yield predictions.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:190 (feedback_posterior); src/sugarcode/modules/synbio_wizard/core.py:194 (ingest_experimental_feedback); src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project)"
+    },
+    {
+      "id": "S5-041.05.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "constraint-aware biological compiler",
+      "current_wording": "Boolean circuit evaluator and project aggregator run. parts_max is not enforced against generated part count, so project output is not a constraint-valid biological compiler.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:110 (logic_circuit); src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project); src/sugarcode/modules/synbio_wizard/core.py:216 (run_wizard)"
+    },
+    {
+      "id": "S5-041.06.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "codon adaptation index (CAI)",
+      "current_wording": "cai_proxy depends on total GC deviation from a chassis target and codon diversity. It does not compute geometric-mean relative synonymous-codon adaptiveness from host usage tables.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:44 (codon_metrics)"
+    },
+    {
+      "id": "S5-041.06.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "ribosome binding site (RBS) strength (ΔG folding)",
+      "current_wording": "RBS energy adds dinucleotide GC/CG and AU/UA counts to a constant and converts this to accessibility. No RNA folding ensemble or ribosome-binding thermodynamics is solved.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:52 (rbs_thermodynamics)"
+    },
+    {
+      "id": "S5-042.01.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "biology-as-code",
+      "current_wording": "deterministic_expression solves a fixed two-state mRNA/protein ODE. This is not a biology programming language or genetic-code compiler.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:93 (deterministic_expression)"
+    },
+    {
+      "id": "S5-042.01.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "executable genetic constructs",
+      "current_wording": "Boolean circuit evaluation, forward guide enumeration, codon proxy and plasmid module labels are produced. No complete DNA construct or laboratory-executable artifact is compiled.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:110 (logic_circuit); src/sugarcode/modules/synbio_wizard/core.py:118 (scan_guides); src/sugarcode/modules/synbio_wizard/core.py:128 (variant_effect); src/sugarcode/modules/synbio_wizard/core.py:172 (plasmid_architecture)"
+    },
+    {
+      "id": "S5-042.03.C03",
+      "action": "PRESERVED_EXISTING_CORRECTION",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "off-target prediction via mismatch tolerance scoring and seed-region specificity",
+      "current_wording": "an off-target proxy score from guide GC and seed-region nucleotide diversity (no mismatch scoring, no genome search)"
+    },
+    {
+      "id": "S5-042.04.C04",
+      "action": "PRESERVED_EXISTING_CORRECTION",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "folding stability (ΔΔG)",
+      "current_wording": "a variant module maps a user-supplied conservation score to a heuristic ΔΔG and applies an active-site flag (no protein structure is predicted or used)"
+    },
+    {
+      "id": "S5-043.02.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "COBRA/FBA",
+      "current_wording": "flux_balance solves a serial-pathway SciPy HiGHS LP under uptake and aggregate ATP/redox inequalities. No stoichiometric equality matrix or COBRA metabolic network is loaded.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:74 (flux_balance)"
+    },
+    {
+      "id": "S5-043.03.C01",
+      "action": "PRESERVED_EXISTING_CORRECTION",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "SBML-compatible engines",
+      "current_wording": "an SBML-style XML export is written (it fails libsbml checks for SBML L3V2)"
+    },
+    {
+      "id": "S5-043.04.C02",
+      "action": "PRESERVED_EXISTING_CORRECTION",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "fitness landscapes",
+      "current_wording": "a single burden-minus-selection term (there is no fitness landscape)"
+    },
+    {
+      "id": "S5-044.01.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "continuously updating knowledge graph",
+      "current_wording": "knowledge_graph rebuilds nodes/edges from an embedded fixed product catalog. environment_response is a standalone formula; there is no graph persistence or publication update stream.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:184 (knowledge_graph); src/sugarcode/modules/synbio_wizard/core.py:200 (environment_response)"
+    },
+    {
+      "id": "S5-044.04.C05",
+      "action": "PRESERVED_EXISTING_CORRECTION",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "ensuring reproducibility",
+      "current_wording": "seeded runs repeat numerically but nothing here ensures lab reproducibility"
+    },
+    {
+      "id": "S5-045.02.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "confidence intervals",
+      "current_wording": "uncertainty_distribution reports normal-sampling 5th/95th quantiles as ci90; run_wizard reports 5th/195th sorted values of 200 simulated draws with a corrected approximate-95% label. Neither is fitted confidence coverage.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:150 (uncertainty_distribution); src/sugarcode/modules/synbio_wizard/core.py:216 (run_wizard)"
+    },
+    {
+      "id": "S5-045.04.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "high epistemic uncertainty",
+      "current_wording": "epistemic_fraction is defined as 1/sqrt(data_n), and project uncertainty labels are derived from catalog difficulty. No identifiable epistemic/aleatoric decomposition is fitted.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:150 (uncertainty_distribution); src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project)"
+    },
+    {
+      "id": "S5-045.04.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "reduce uncertainty",
+      "current_wording": "suggest_experiments ranks supplied uncertainty numbers and returns domain templates; expected_information_gain is uncertainty times sensitivity, not predicted posterior reduction.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:163 (suggest_experiments)"
+    },
+    {
+      "id": "S5-045.05.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "preventing overconfidence",
+      "current_wording": "Sampling and a sample-count proxy produce intervals but no calibration, out-of-distribution rejection or overconfidence evaluation exists.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:150 (uncertainty_distribution)"
+    },
+    {
+      "id": "S5-046.01.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "experimentation",
+      "current_wording": "suggest_experiments returns short domain-template descriptions. No experiments are conducted, ingested automatically or evaluated against hypothesis acceptance criteria.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:163 (suggest_experiments)"
+    },
+    {
+      "id": "S5-046.03.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "truly predictive",
+      "current_wording": "feedback_posterior computes a supplied-count Beta posterior; compile_project uses fixed catalog/surrogate formulas and does not consume that feedback. Predictive accuracy has not been validated.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:190 (feedback_posterior); src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project)"
+    },
+    {
+      "id": "S5-046.03.C07",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/synbio_wizard.md",
+      "exact_historical_claim": "rigor and reproducibility",
+      "current_wording": "Project compiler aggregates deterministic/seeded helpers without verified model correctness, recorded environment manifest or laboratory replication. Statistical feedback is manual.",
+      "pinned_code_evidence": "src/sugarcode/modules/synbio_wizard/core.py:211 (compile_project); src/sugarcode/modules/synbio_wizard/core.py:190 (feedback_posterior)"
+    },
+    {
+      "id": "S5-047.01.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "closed-loop",
+      "current_wording": "MLP training, lesions, modality projections and continual_update are callable helpers. pipeline_report invokes a fixed sequence once; no recurring feedback-to-training orchestration exists.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:41 (train); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report); src/sugarcode/modules/neuro_pipeline/core.py:350 (continual_update)"
+    },
+    {
+      "id": "S5-047.01.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "neuro-symbolic MLOps system",
+      "current_wording": "NumPy two-layer MLP, sequence encoders, numeric analysis and spiking simulation exist. No symbolic rule engine, production MLOps registry/deployment or neuro-symbolic integration is provided.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)"
+    },
+    {
+      "id": "S5-047.01.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "biological deep learning models",
+      "current_wording": "Model is a two-layer tanh/sigmoid MLP trained on synthetic toy or caller-supplied DNA labels. Biological authenticity/generalization is not established by its architecture.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:203 (synthetic_promoter_dataset); src/sugarcode/modules/neuro_pipeline/core.py:246 (train_on_sequences)"
+    },
+    {
+      "id": "S5-047.01.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "cutting-edge computational neuroscience",
+      "current_wording": "Implementation includes simple MLP/lesion/RSA/SVD/LIF-style helpers, without an independent current neuroscience benchmark or validated biological comparison.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:5 (MLP); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:326 (align_modalities); src/sugarcode/modules/neuro_pipeline/core.py:337 (spiking_dynamics)"
+    },
+    {
+      "id": "S5-047.02.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "predictive coding frameworks",
+      "current_wording": "predictive_coding iteratively moves a zero state toward the mean of supplied observations. It has no hierarchy, generative dynamics or future predictive task.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:343 (predictive_coding)"
+    },
+    {
+      "id": "S5-047.03.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "without catastrophic forgetting",
+      "current_wording": "continual_update pulls W1/W2 toward previous weights without Fisher information; biases are not anchored and no old-task retention guarantee is checked.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:350 (continual_update)"
+    },
+    {
+      "id": "S5-048.01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "A defining feature would be its ability to map internal model representations to interpretable neurobiological analogues.",
+      "current_wording": "rsa compares input/hidden Euclidean dissimilarities, align_modalities projects each modality separately, and connectivity uses model weights. No brain correspondence dataset or neurobiological interpretation is validated.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:326 (align_modalities); src/sugarcode/modules/neuro_pipeline/core.py:360 (functional_connectivity)"
+    },
+    {
+      "id": "S5-048.02.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "connectomics in the brain",
+      "current_wording": "functional_connectivity thresholds products of W1 and W2 magnitudes into input-to-hidden edges. It does not ingest brain connectivity measurements.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:360 (functional_connectivity)"
+    },
+    {
+      "id": "S5-048.03.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "manifold alignment",
+      "current_wording": "rsa correlates upper triangles of input and hidden Euclidean-distance matrices. It does not learn an alignment transformation or pair manifolds.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa)"
+    },
+    {
+      "id": "S5-048.04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "This would push explainability from visualization into mechanistic insight.",
+      "current_wording": "RSA geometry correlation, feature clamping and lesion accuracy drops describe numerical model sensitivity. They do not establish a biological mechanism or validated mechanistic explanation.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:112 (rsa); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)"
+    },
+    {
+      "id": "S5-050.03.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "Time-resolved",
+      "current_wording": "activation_trace records magnitudes from one feedforward pass; lesion_study reports accuracy deltas and causal_intervention reports output changes. These functions have no temporal trajectory.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:99 (activation_trace); src/sugarcode/modules/neuro_pipeline/core.py:68 (lesion_study); src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)"
+    },
+    {
+      "id": "S5-050.03.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "neural firing sequences",
+      "current_wording": "The cited activation trace contains layer magnitudes, not neural spike sequences. Separate spiking_dynamics simulates threshold/decay voltage and spikes but is not wired to MLP inference.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:99 (activation_trace); src/sugarcode/modules/neuro_pipeline/core.py:337 (spiking_dynamics)"
+    },
+    {
+      "id": "S5-050.04.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "do-calculus-inspired interventions",
+      "current_wording": "causal_intervention replaces one input column with a constant and forwards the MLP. It has no structural causal model, confounding graph or do-calculus identification.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)"
+    },
+    {
+      "id": "S5-050.04.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "causal understanding of model behavior",
+      "current_wording": "The reported average_causal_effect is mean prediction change after feature clamping. It is a model sensitivity result, not causally identified biological or observational effect.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:367 (causal_intervention)"
+    },
+    {
+      "id": "S5-051.01.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "self-optimizing research agent",
+      "current_wording": "feedback_reward_update returns Beta count statistics for supplied outcomes; it never updates model weights, chooses experiments or controls an autonomous loop.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)"
+    },
+    {
+      "id": "S5-051.03.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "biologically grounded",
+      "current_wording": "Reward update is generic count arithmetic with no biological variables, external evidence or learned biological mechanism.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)"
+    },
+    {
+      "id": "S5-051.03.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "adaptive intelligence in the brain",
+      "current_wording": "Beta update does not model brain circuits, plasticity mechanisms or adaptive cognition. No trained adaptive biological intelligence is produced.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)"
+    },
+    {
+      "id": "S5-051.03.C05",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "predictive accuracy",
+      "current_wording": "Reward helper returns reward mean/standard deviation; pipeline_report does not apply these values to its trained MLP or evaluate an accuracy improvement.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)"
+    },
+    {
+      "id": "S5-051.04.C01",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "computational neuroscience-driven",
+      "current_wording": "Cited reward function is a generic Beta update; neuroscience-inspired helpers elsewhere do not turn this update into a neuroscience-driven autonomous research system.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update); src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report)"
+    },
+    {
+      "id": "S5-051.04.C02",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/neuro_pipeline.md",
+      "exact_historical_claim": "autonomous biological discovery",
+      "current_wording": "No autonomous experiment selection, lab execution, biological discovery validation or publication-feedback runtime is implemented.",
+      "pinned_code_evidence": "src/sugarcode/modules/neuro_pipeline/core.py:378 (pipeline_report); src/sugarcode/modules/neuro_pipeline/core.py:375 (feedback_reward_update)"
+    },
+    {
+      "id": "S5-053.01.C03",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/biogpt_lit.md",
+      "exact_historical_claim": "scientific reasoning engine",
+      "current_wording": "BioGPT Lit uses regex tokenization with relation-word dictionary lookup, in-memory triples, heuristic evidence weights, graph traversal and hypothesis templates. No trained reasoning model or autonomous scientific reasoning is bundled.",
+      "pinned_code_evidence": "src/sugarcode/modules/biogpt_lit/core.py:8 (KnowledgeGraph); src/sugarcode/modules/biogpt_lit/core.py:141 (extract_claims); src/sugarcode/modules/biogpt_lit/core.py:198 (parse_full_text); src/sugarcode/modules/biogpt_lit/core.py:172 (ingest_pubmed)"
+    },
+    {
+      "id": "S5-053.01.C04",
+      "action": "EDITED_CLAIM_LOCAL_WORDING",
+      "file": "spec/biogpt_lit.md",
+      "exact_historical_claim": "living, multi-layered representation of biological knowledge",
+      "current_wording": "Graph stores claims/metadata in process memory. Updates require manual ingestion; there is no persistent living graph, semantic multi-layer model or continuous indexing service.",
+      "pinned_code_evidence": "src/sugarcode/modules/biogpt_lit/core.py:17 (KnowledgeGraph.__init__); src/sugarcode/modules/biogpt_lit/core.py:21 (KnowledgeGraph.ingest); src/sugarcode/modules/biogpt_lit/core.py:198 (parse_full_text)"
+    }
+  ]
+}
