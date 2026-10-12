@@ -117,7 +117,7 @@ def score_off_targets(guide: str, background: str, max_mismatches: int = 4) -> l
 
 def design_guides(seq: str, pam: str = "NGG", background: str | None = None,
                   top_n: int = 5, regulatory_tracks: list[dict] | None = None) -> dict:
-    """Full design pass: enumerate, filter GC 40-60%, score on/off-target, rank."""
+    """Full design pass: enumerate, filter GC 20-80%, score on/off-target, rank."""
     cands = _extract_guides(seq, pam)
     s = clean_dna(seq)
     graded = []
@@ -156,7 +156,7 @@ def design_guides(seq: str, pam: str = "NGG", background: str | None = None,
         else:
             offs = []
         off_risk = sum(o["cfd_score"] for o in offs)
-        # GC filter per spec (40-60% optimal window), hairpin suppresses folding
+        # GC filter keeps guides with GC 20-80% (the 40-60% window only affects the on-target score), hairpin suppresses folding
         composite = on * (1.0 - 0.5 * hairpin) / (1.0 + off_risk)
         if not (0.20 <= gc <= 0.80):
             continue
