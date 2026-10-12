@@ -9,7 +9,11 @@ def _norm(value: str) -> str:
 
 
 def deduplicate(records: Iterable[EvidenceRecord]) -> list[EvidenceRecord]:
-    """Deduplicate by source ID, DOI, then normalized title, preserving order."""
+    """Deduplicate by source ID, DOI, then normalized title, preserving order.
+
+    DOI matching is case-insensitive and strips only a leading "https://doi.org/".
+    Other forms ("http://dx.doi.org/", "doi:", trailing spaces) are not
+    normalized and will not match."""
     seen: set[tuple[str, str]] = set()
     out = []
     for r in records:

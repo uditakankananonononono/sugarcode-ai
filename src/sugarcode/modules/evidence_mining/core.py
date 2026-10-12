@@ -1,4 +1,6 @@
-"""Cross-source evidence mining facade for downstream SugarCode modules."""
+"""Cross-source evidence mining facade over PubMed and ClinicalTrials.gov.
+
+No other module under src/ imports it yet; it is listed in omega/registry.py."""
 from __future__ import annotations
 from pathlib import Path
 from .client import EvidenceAPIError
@@ -12,7 +14,8 @@ class EvidenceMiner:
 
     ``strict=True`` is fail-closed: either source failing aborts the result. A
     caller may explicitly choose partial results with ``strict=False``; source
-    errors are then returned in-band and are never silently discarded.
+    errors are then returned in-band. Only EvidenceAPIError and ValueError are
+    collected; any other exception still propagates and aborts the call.
     """
     def __init__(self, cache_dir: str | Path, *, pubmed_email: str | None = None,
                  pubmed_api_key: str | None = None):

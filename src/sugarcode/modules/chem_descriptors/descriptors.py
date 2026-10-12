@@ -130,7 +130,14 @@ def _aliphatic_in(mol, k, symbols):
 def hba(mol: Molecule) -> int:
     """RDKit NumHAcceptors:
     [$([O,S;H1;v2]-[!$(*=[O,N,P,S])]), $([O,S;H0;v2]), $([O,S;-]),
-     $([N;v3;!$(N-*=!@[O,N,P,S])]), $([nH0,o,s;+0])]"""
+     $([N;v3;!$(N-*=!@[O,N,P,S])]), $([nH0,o,s;+0])]
+
+    The [nH0,o,s;+0] term counts N-substituted aromatic n atoms, as in
+    caffeine (6 under RDKit 2024.09.6). On seed 20261012 and the 2,500-molecule
+    corpus (SHA-256 1f2256b7cfbe8d41fa3b2be9f2726e9a392ae076f82da1359630dc7737fb66c7),
+    the result matches RDKit 2024.09.6 for all molecules. Current RDKit 2026.9.1
+    differs on N-substituted aromatic heterocycles: it matches 2,030/2,500 and
+    does not count the relevant aromatic n in caffeine (3)."""
     n = 0
     heteros = {"O", "N", "P", "S"}
     for i, a in enumerate(mol.atoms):
@@ -460,7 +467,9 @@ def compute_descriptors(smiles_or_mol) -> dict:
 def lipinski_rule_of_five(desc: dict, logp: float | None = None) -> dict:
     """Lipinski 1997/2001. Donors = OH+NH hydrogens, acceptors = N+O atoms.
     Passes with at most one violation. Without ``logp`` the logP criterion is
-    Missing and ``complete`` is False."""
+    Missing and ``complete`` is False. Without ``logp``, a result with exactly
+    one violation has ``passes`` set to "Undetermined" (not True), because the
+    missing logP could add a second violation."""
     checks = {"mol_wt_le_500": desc["mol_wt"] <= 500,
               "hbd_le_5": desc["nhoh_count"] <= 5,
               "hba_le_10": desc["no_count"] <= 10,

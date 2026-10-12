@@ -1,4 +1,10 @@
-"""Conservative extraction: report only values explicitly stated in source text."""
+"""Regex extraction from source text. Heuristic: it does not report only values
+explicitly stated.
+
+sample_size is the largest regex match anywhere in the text, so counts from
+earlier trials can be picked up. effect_direction is set by keyword matching on
+the first sentence that contains one, whether or not that sentence reports the
+study's own result."""
 from __future__ import annotations
 import re
 from .models import MISSING

@@ -18,7 +18,12 @@ from urllib.request import Request, urlopen
 
 
 class EvidenceAPIError(RuntimeError):
-    """A public API request failed or returned malformed data."""
+    """A public API request failed or returned malformed data.
+
+    Raised for transport failures, non-JSON or non-object JSON, and malformed
+    PubMed responses. Structurally wrong nested fields in a ClinicalTrials.gov
+    study (for example a string where an object is expected) currently raise
+    AttributeError instead."""
 
 
 class OfflineCacheMiss(EvidenceAPIError):
@@ -44,9 +49,13 @@ class CacheRecord:
 
 
 class CachedHTTPClient:
-    """Throttled GET client with a tamper-evident disk cache.
+    """Throttled GET client with a disk cache that checks body integrity.
 
-    Offline mode never falls back to the network. Corrupt cache entries are
+    Each body is stored with its SHA-256 in a sidecar file next to it. A body
+    edited without updating the sidecar is detected; a body and sidecar rewritten
+    together are accepted, so this is corruption detection, not protection
+    against deliberate tampering. Offline mode never falls back to the network.
+    Entries whose body fails the hash, or whose sidecar is not a JSON object, are
     rejected rather than interpreted as evidence.
     """
 

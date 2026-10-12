@@ -1,4 +1,5 @@
-"""PubMed ESearch/EFetch client and conservative XML normalizer."""
+"""PubMed ESearch/EFetch client and XML normalizer. Sample size, endpoints and
+effect direction come from the keyword extractor in extract.py and are heuristic."""
 from __future__ import annotations
 import re
 from pathlib import Path

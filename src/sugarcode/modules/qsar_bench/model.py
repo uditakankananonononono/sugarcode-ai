@@ -1,4 +1,8 @@
-"""Ridge QSAR with leakage-aware validation and applicability-domain output."""
+"""Ridge QSAR with holdout validation and applicability-domain output.
+
+Only the scaffold strategy (the default) keeps identical SMILES together. The
+random and time strategies do not check for duplicates, so identical compounds
+can sit in both train and test."""
 from __future__ import annotations
 from dataclasses import dataclass
 import math
@@ -64,10 +68,15 @@ def predict(model: QSARModel, smiles):
 
 
 def _murcko_like_scaffold(smiles):
-    """Deterministic ring/branch graph signature for grouped split.
+    """Deterministic graph signature for grouped split: ring count, the
+    aromatic or branching (degree > 2) atoms, and the heteroatom multiset.
 
     This is explicitly a Murcko-like grouping surrogate, not RDKit's Bemis-
-    Murcko implementation. Acyclic compounds are grouped by heteroatom profile.
+    Murcko implementation. Ring systems are not compared, only ring count
+    (cyclohexane and cyclopentane share a group). Acyclic compounds are grouped
+    by branching atoms plus heteroatom profile. The scaffold split fills the test
+    set with the largest groups until test_fraction is reached or passed, so the
+    test share can exceed test_fraction.
     """
     m=parse_smiles(smiles); deg=[0]*len(m.atoms)
     for i,j,_ in m.bonds: deg[i]+=1; deg[j]+=1

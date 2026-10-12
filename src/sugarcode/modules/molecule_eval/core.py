@@ -49,9 +49,12 @@ def _ci(values, statistic, seed, samples=400):
 
 
 def evaluate_library(smiles,*,reference_smiles=None,n_bits=256,seed=29,max_pairs=10000):
-    """Evaluate validity, graph-key uniqueness, diversity and reference novelty.
+    """Evaluate parser acceptance, graph-key uniqueness, diversity and reference novelty.
 
-    Pair sampling is deterministic and bounded. Novelty is fingerprint novelty,
+    "valid" means the qsar_bench parser accepted the string: tokens, brackets and
+    bond-symbol placement and maximum valence are checked, aromatic-ring
+    kekulizability is not ("c1cccc1" counts as valid). Pair sampling is deterministic for a fixed seed and at most
+    max_pairs pairs are scored. Novelty is fingerprint novelty,
     reported as 1 minus maximum reference Tanimoto; it does not prove chemical
     novelty or patent freedom-to-operate.
     """

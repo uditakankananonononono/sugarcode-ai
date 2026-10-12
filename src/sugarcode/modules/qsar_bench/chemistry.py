@@ -1,8 +1,11 @@
-"""Transparent molecular graph descriptors and Morgan-style fingerprints.
+"""Molecular graph descriptors and Morgan-style hashed fingerprints.
 
-This is not a replacement for a sanitising chemistry toolkit. It provides a
-strict, deterministic graph representation for common drug-like SMILES and
-fails closed on unsupported syntax rather than silently inventing chemistry.
+This is not a replacement for a sanitising chemistry toolkit. The parser is
+deterministic, rejects unknown atom tokens, unbalanced or empty branches, unclosed
+rings, dangling bond symbols and atoms above their maximum valence, and lists
+stereo marks it does not model in ``Molecule.ignored``. It does not check
+aromatic-ring kekulizability ("c1cccc1" parses). Kekule and aromatic spellings
+of one molecule give different graphs and fingerprints.
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -65,7 +68,8 @@ def parse_smiles(smiles: str, *, strict_stereo: bool = False) -> Molecule:
     Rejects dangling or doubled bond symbols ("C=", "C==C", "=C"), empty branches
     ("C()"), misplaced "." and ring closures onto the same atom or an already
     bonded atom ("C11", "C1C1"). Rejects valence-impossible atoms (for example
-    pentavalent carbon). Tetrahedral
+    pentavalent carbon). Does not check that aromatic
+    rings can be kekulized ("c1cccc1" parses). Tetrahedral
     chirality (@, @@) and cis/trans marks (/, \\) are not represented in the graph:
     they are listed in ``Molecule.ignored``, or raise ValueError when
     ``strict_stereo=True``."""
@@ -206,7 +210,15 @@ def descriptors(smiles: str) -> dict[str,float]:
 
 
 def morgan_fingerprint(smiles: str, radius: int=2, n_bits: int=2048) -> np.ndarray:
-    """Hashed circular fingerprint following Morgan/ECFP neighbourhood updates.
+    """Hashed circular fingerprint with Morgan/ECFP-style neighbourhood updates.
+
+    Not RDKit's Morgan implementation: duplicate environments are not removed,
+    aromatic and Kekule spellings differ, and chirality is ignored. On the
+    first 60 molecules (1,770 pairs) and first 120 molecules (7,140 pairs) from
+    seed 20261012, both comparisons against RDKit Morgan radius 2, 2048 bits
+    produced Spearman 1.0 (maximum absolute difference 0.0) with RDKit 2024.09.6.
+    Corpus SHA-256: 1f2256b7cfbe8d41fa3b2be9f2726e9a392ae076f82da1359630dc7737fb66c7;
+    60-molecule pair-list SHA-256: b6b39cbce33c9003e96def5262f1c5ebdd51cac11c33e7d57c16b09cff4348b7.
 
     Uses stable SHA-256 folding, avoiding Python's process-randomised hash.
     Collisions are expected and exposed through ``n_bits``.

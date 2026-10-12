@@ -32,8 +32,8 @@ class ChEMBLQSARClient:
         Duplicates are aggregated by median pChEMBL per canonical SMILES and
         years are retained for temporal validation. Records lacking pChEMBL,
         canonical SMILES, an exact '=' relation, or a requested standard type
-        are counted and excluded rather than imputed. The type is checked on
-        each returned row as well as in the server query.
+        are counted and excluded rather than imputed. Only the latest document
+        year per compound is kept.
         """
         if not target_chembl_id.startswith("CHEMBL"): raise ValueError("target ID must start CHEMBL")
         page=self._get("activity.json",{"target_chembl_id":target_chembl_id,"standard_type__in":",".join(standard_types),
