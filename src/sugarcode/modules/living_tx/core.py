@@ -41,6 +41,7 @@ def design_living_therapeutic(indication_payload: str, chassis: str | None = Non
         "microbiome_impact": impact,
         "delivery_model": _delivery(pay),
         "predicted_clinical_success": success,
+        "model_status": "hand-set heuristic, uncalibrated",
         "regulatory_path": "Live Biotherapeutic Product (FDA LBP guidance)",
     }
 
