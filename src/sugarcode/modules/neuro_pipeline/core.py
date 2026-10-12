@@ -60,7 +60,8 @@ def train(n_in: int = 6, n_hidden: int = 12, epochs: int = 300, lr: float = 0.5,
         "stdp_modulation": stdp_mod,
         "plasticity_note": ("stdp_mod applies STDP-style co-activation potentiation "
                             "to W1; it is NOT an EWC penalty. For continual learning "
-                            "with an EWC anchor penalty, use continual_update()."),
+                            "with a weight-anchor penalty (no Fisher term), use "
+                            "continual_update()."),
     }
 
 
@@ -296,7 +297,8 @@ def train_on_sequences(sequences=None, labels=None, k: int = 3,
         "n_sequences": len(sequences), "n_features": int(X.shape[1]),
         "dataset": dataset_note,
         "plasticity_note": ("stdp_mod applies STDP-style co-activation potentiation; "
-                            "use continual_update() for EWC."),
+                            "use continual_update() for a weight-anchor penalty "
+                            "(no Fisher term)."),
     }
 
 
@@ -346,6 +348,9 @@ def predictive_coding(observations,steps=20,learning_rate=.1):
     return {'latent_state':state.tolist(),'prediction_error':errors,'trajectory':trajectory}
 
 def continual_update(model,X,y,previous=None,lr=.1,epochs=20,ewc_lambda=1):
+    """Train with a weight-anchor penalty: each step pulls W1 and W2 back toward the
+    previous weights, scaled by ewc_lambda. There is no Fisher term, so this is not
+    full EWC; the output key keeps the name ewc_lambda."""
     old=[model.W1.copy(),model.W2.copy()] if previous is None else previous
     losses=[]
     for _ in range(epochs):
