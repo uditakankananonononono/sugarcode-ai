@@ -11,7 +11,7 @@ def screen(tissue: str, compounds: list[str], mutations: list[str] | None = None
     return {
         "tissue": tissue, "mutations": mutations or [],
         "screened": len(compounds),
-        "ranking": [{"compound": c, "ic50_uM": d["ic50_uM"]} for c, d in ranked],
+        "ranking": _ranking(ranked),
         "hit": resp["most_effective"],
         "uncurated_compounds": resp.get("uncurated_compounds", []),
         "synergy": synergies,
@@ -20,6 +20,17 @@ def screen(tissue: str, compounds: list[str], mutations: list[str] | None = None
         "clinical_efficacy_prediction": (round(0.4 + 0.3 * (1 / (1 + resp["responses"][resp["most_effective"]]["ic50_uM"])), 3)
                                          if resp["most_effective"] else None),
     }
+
+
+def _ranking(ranked: list) -> list[dict]:
+    """Curated compounds first (by IC50), then uncurated ones on the default curve."""
+    rows = []
+    for c, d in ranked:
+        row = {"compound": c, "ic50_uM": d["ic50_uM"], "curated": bool(d.get("curated"))}
+        if not row["curated"]:
+            row["curve_source"] = "default (kill 0.4, 1.0 uM base)"
+        rows.append(row)
+    return sorted(rows, key=lambda r: not r["curated"])  # stable: IC50 order kept within each group
 
 
 def _synergy(responses: dict, ref_dose_uM: float = 1.0) -> list[dict]:
