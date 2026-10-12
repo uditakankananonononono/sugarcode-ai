@@ -20,13 +20,13 @@ _ACCEPTOR_SITES = [
 SEED_DONOR_LOD = log_odds_matrix(build_pwm(_DONOR_SITES))
 SEED_ACCEPTOR_LOD = log_odds_matrix(build_pwm(_ACCEPTOR_SITES))
 
-# Default matrices: learned from 1,170 real GT-AG junctions across 29
+# Default matrices: learned from 1,170 GT-AG junctions across 29
 # RefSeqGene records (bio/splice.py, data/splice_sites/PROVENANCE.md).
 try:
     DONOR_LOD = _splice.donor_lod()
     ACCEPTOR_LOD = _splice.acceptor_lod()
     GC_DONOR_LOD = _splice.gc_donor_lod()
-    PWM_SOURCE = "real RefSeqGene junctions (1,170 GT-AG sites, 29 genes, title-verified)"
+    PWM_SOURCE = "RefSeqGene junctions (1,170 GT-AG sites, 29 genes, title-verified)"
 except _splice.SpliceDataMissing:
     DONOR_LOD = SEED_DONOR_LOD
     ACCEPTOR_LOD = SEED_ACCEPTOR_LOD
@@ -417,10 +417,10 @@ def cryptic_scan(ref_seq: str, alt_seq: str, site_threshold: float = 0.75,
 def live_splice_assessment(gene: str, notation: str, offline: bool = False,
                            transcript: str | None = None) -> dict:
     """Splice assessment of one ClinVar-style notation (c.N+k / c.N-k SNV)
-    against the gene's REAL RefSeqGene junction map.
+    against the gene's RefSeqGene junction map.
 
     Natural-site variants (donor +1..+6, acceptor -1..-14): window delta via
-    the learned PWM. Deeper variants: cryptic_scan on +/-60 nt of real intronic
+    the learned PWM. Deeper variants: cryptic_scan on +/-60 nt of intronic
     context. Everything else: named out-of-scope, never guessed.
 
     transcript: optional NM_ accession - builds the junction map for THAT
@@ -545,7 +545,7 @@ def live_splice_assessment(gene: str, notation: str, offline: bool = False,
 
 def _outcome_context(jm: dict, site_type: str, n: int, natural_ref: float) -> dict | None:
     """Alternative outcomes of natural-site loss (drop 34), alongside the
-    exon-skipping prediction: intron retention (real intron length from the
+    exon-skipping prediction: intron retention (intron length from the record's
     RefSeqGene CDS spans; frame + honest PTC/NMD note) and cryptic-site use
     (strongest pre-existing same-type site in the +/-60 nt flank, in
     transcript orientation, excluding the natural site itself; use of an
