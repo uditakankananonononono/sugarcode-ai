@@ -3,9 +3,10 @@ from __future__ import annotations
 import re
 from .models import MISSING
 
+_NUM = r"(\d{1,3}(?:,\d{3})+|\d{1,8})"  # "3,649" is one number, not 3
 _SAMPLE_PATTERNS = [
-    re.compile(r"\b(?:n\s*=\s*|enrolled\s+|included\s+|randomi[sz]ed\s+)(\d{1,8})\b", re.I),
-    re.compile(r"\b(\d{1,8})\s+(?:patients|participants|subjects|individuals|adults|children)\b", re.I),
+    re.compile(r"\b(?:n\s*=\s*|enrolled\s+|included\s+|randomi[sz]ed\s+)" + _NUM + r"\b", re.I),
+    re.compile(r"\b" + _NUM + r"\s+(?:patients|participants|subjects|individuals|adults|children)\b", re.I),
 ]
 _ENDPOINT = re.compile(r"(?:primary|secondary)\s+(?:outcome|endpoint)s?\s*(?:was|were|:)?\s*([^.;]{3,180})", re.I)
 _SENTENCES = re.compile(r"(?<=[.!?])\s+")
@@ -16,7 +17,7 @@ _NEGATIVE = re.compile(r"\b(?:worsened|inferior|increased (?:risk|mortality|adve
 
 def extract_text_evidence(text: str) -> dict:
     compact = " ".join((text or "").split())
-    sizes = [int(m.group(1)) for p in _SAMPLE_PATTERNS for m in p.finditer(compact)]
+    sizes = [int(m.group(1).replace(",", "")) for p in _SAMPLE_PATTERNS for m in p.finditer(compact)]
     endpoints = []
     for m in _ENDPOINT.finditer(compact):
         endpoint = m.group(1).strip(" :-")
