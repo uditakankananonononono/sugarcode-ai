@@ -233,7 +233,7 @@ Status per module: **verified** = implemented with passing named tests;
 | living_computer | boolean expression -> circuit compiler with fidelity scoring, parts registry, stochastic noise analysis (CV) |
 | omega_stats | metric recording, per-metric aggregates, sub-network rollup |
 | ecosystem | SDK snippet generation, plugin manifest contract, machine-readable API reference |
-| dna_to_code | 6 biology->Python concept translations (analogy text plus illustrative Python source strings; five of the six strings call helper names that core.py does not define), with separate executable transcription, translation and point-mutation helpers |
+| dna_to_code | 6 biology->Python concept translations (analogy text plus illustrative Python source strings; each source block carries its own stdlib/local string helpers and executes standalone - educational analogies, not biological prediction), with separate executable transcription, translation and point-mutation helpers |
 | gene_analysis | Sequence/live annotation integration plus hand-set variant and pathway surrogates; not a causally validated digital twin |
 | crispr_cargo | hard-coded vehicle/tissue ranking (LNP/AAV/VLP/PNP) per payload+tissue, illustrative one-compartment PK plus a plasma/target/cleared ODE model, fixed delivery blueprints with composition specs; uncalibrated delivery and immune proxies |
 | crispr_muse | policy-gradient gRNA generator with GC/off-target rewards and simulated NGS feedback loop |
