@@ -493,7 +493,7 @@ def architecture_variants(spacer,edit_seq,pbs_lengths=range(10,17),rtt_lengths=r
     designs=[]
     for pbs in pbs_lengths:
         for rtt in rtt_lengths:
-            if len(edit_seq)<max(pbs,rtt): continue
+            if len(edit_seq)<rtt: continue
             peg=design_pegrna(spacer,edit_seq,pbs,rtt); thermo=pbs_thermodynamics(peg['pbs']); process=rt_processivity(peg['rt_template']); structure=secondary_structure(peg['pegrna_3p_extension']); repair=repair_competition(peg['rt_template']); efficiency=thermo['annealing_probability']*process['completion_probability']*(1-structure['structure_penalty']*.5); precision=outcome_distribution(peg,repair)['intended_edit']; designs.append({**peg,"predicted_efficiency":efficiency,"predicted_precision":precision,"thermodynamics":thermo,"processivity":process,"secondary_structure":structure,"repair":repair,"score":.55*efficiency+.45*precision})
     return sorted(designs,key=lambda x:(-x['score'],x['pbs_length'],x['rtt_length']))
 
@@ -511,8 +511,8 @@ def export_design(design,format='json'):
 def validation_strategy(edit_length,outcome=None):
     outcome=outcome or {}; expected=max(1e-4,float(outcome.get('intended_edit',.1))); depth=math.ceil(100/max(expected,.001)); return {"assay":"amplicon sequencing","minimum_read_depth":depth,"amplicon_span_bp":max(250,edit_length+200),"report":["intended allele fraction","partial RT alleles","indel spectrum","unedited fraction"],"orthogonal_confirmation":"independent sequencing chemistry for selected clones","model_status":"Planning guidance only; validate under institutional procedures."}
 
-def compile_prime_edit(spacer,edit_seq,background=None,nicking_candidates=None):
+def compile_prime_edit(spacer,edit_seq,background=None,nicking_candidates=None,*,primary_position=0):
     variants=architecture_variants(spacer,edit_seq)
     if not variants: raise ValueError("edit sequence must support requested PBS/RTT design ranges")
-    top=variants[0]; nick=nicking_strategy(0,nicking_candidates or [])[:5]; selected_nick=nick[0] if nick else None; outcomes=outcome_distribution(top,top['repair'],selected_nick); diagnostics=pegrna_diagnostics(top,background)
+    top=variants[0]; nick=nicking_strategy(primary_position,nicking_candidates or [])[:5]; selected_nick=nick[0] if nick else None; outcomes=outcome_distribution(top,top['repair'],selected_nick); diagnostics=pegrna_diagnostics(top,background)
     return {"recommended":top,"alternatives":variants[1:10],"nicking_strategies":nick,"outcome_distribution":outcomes,"diagnostics":diagnostics,"validation":validation_strategy(len(edit_seq),outcomes),"export":export_design({"spacer":top['spacer'],"pbs":top['pbs'],"rt_template":top['rt_template'],"outcomes":outcomes}),"model_status":"Explicit thermodynamic/repair surrogates; no trained sequence model and not clinically validated."}
