@@ -354,11 +354,14 @@ def interpret_variant_live(gene: str, variant: str, offline: bool = False,
         except Exception as e:
             r["gnomad_frequency"] = {"status": f"lookup failed: {type(e).__name__}: {e}"}
     # splice evidence (drop 27, mirrors the rarenet panel): natural-site
-    # delta on the gene's real RefSeqGene junction map; deep-intronic ->
+    # delta on the gene's RefSeqGene junction map (bio.splice.junction_map: NCBI
+    # record via Entrez, disk-cached; vendored-accession genes only); deep-intronic ->
     # cryptic_scan; AT-AC sites named out-of-scope; weak perturbations add
-    # ZERO (BRCA1-validated non-discriminating). Weights are calibrated
-    # against the 28-gene golden: 2,405/2,405 canonical U2 sites called
-    # loss, benign specificity 85/86.
+    # ZERO (fixed zero weight; weak natural-site deltas are treated as
+    # non-discriminating). The evidence weights are fixed constants. The -0.15
+    # delta band was fit on the BRCA1 fixture (deepsplice/core.py:294-300). The
+    # PWMs are built from junctions of the same gene records, so the fixture
+    # figures are in-sample, not held out.
     import re as _re
     clean = variant.split(":")[-1].replace(" ", "")
     if _re.fullmatch(r"c\.(?:-?\d+|\*\d+)[+-]\d+[ACGT]>[ACGT]", clean):
