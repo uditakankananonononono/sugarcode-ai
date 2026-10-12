@@ -133,6 +133,14 @@ def functional_impact(frameshift,exonic=True,essentiality=0.5):
  return frameshift*(1.0 if exonic else .15)*(.5+.5*essentiality)
 
 def reward_decomposition(guide,background=None,chromatin=0.5,repair=None,desired="HDR",weights=None,length=20):
+ """Reward components for one guide.
+
+ Specificity ignores exact (0-mismatch) background hits, so the on-target site itself is not
+ counted as an off-target. A second exact copy is ignored the same way: a background with two
+ exact copies gives specificity 1.0, while one exact copy plus one 1-mismatch hit gives 0.65.
+ off_target_hits still counts exact hits (two exact copies -> off_target_hits 2; one exact plus
+ one 1-mismatch copy -> 2, specificity 0.65). Only hits with at least one mismatch lower specificity.
+ """
  g=_guide(guide,length); repair=repair or {"NHEJ":.7,"MMEJ":.2,"HDR":.1}; weights=weights or {"on_target":.3,"specificity":.2,"chromatin":.15,"repair":.2,"folding":.1,"functional":.05}
  if any(v<0 for v in weights.values()) or sum(weights.values())<=0: raise ValueError("reward weights must be non-negative with positive sum")
  off=score_off_targets(g,background,max_mismatches=3) if background else []; risk=min(1.0,sum(float(h["risk"]) for h in off if h["mismatches"]>0))
