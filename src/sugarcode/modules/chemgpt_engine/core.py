@@ -64,24 +64,48 @@ def assemble_smiles(fragments: list[str]) -> str:
 
 
 def _parse_smiles(smiles: str) -> tuple[list[dict], list[dict]]:
-    """Atoms and bonds for the small SMILES subset used here (no charges, one-digit rings)."""
+    """Atoms/bonds for a bounded lexical subset (no charges, one-digit rings).
+
+    Refuses out-of-subset tokens and incomplete syntax; no chemical sanitization
+    or valence/geometry assessment is provided."""
+    if not isinstance(smiles, str) or not smiles or len(smiles) > 10000:
+        raise ValueError("nonempty subset SMILES within 10000 characters required")
+    tokens = re.findall(r"\[nH\]|[CNOSFcn]|\d|[()=]", smiles)
+    if "".join(tokens) != smiles:
+        raise ValueError("unsupported subset SMILES token; no charges or stereochemistry")
     nodes, edges, stack, rings = [], [], [], {}
     prev, order = None, 1.0
-    for t in re.findall(r"\[nH\]|[CNOSFcn]|\d|[()=]", smiles):
+    pending = False
+    for index, t in enumerate(tokens):
         if t == "(":
-            stack.append(prev)
+            if prev is None or pending:
+                raise ValueError("branch requires an atom")
+            stack.append((prev, len(nodes)))
         elif t == ")":
-            prev = stack.pop()
+            if not stack or pending:
+                raise ValueError("unmatched or unfinished branch")
+            parent, before = stack.pop()
+            if len(nodes) == before:
+                raise ValueError("empty branch")
+            prev = parent
         elif t == "=":
-            order = 2.0
+            if prev is None or pending:
+                raise ValueError("bond requires a preceding atom")
+            order, pending = 2.0, True
         elif t.isdigit():
+            if prev is None:
+                raise ValueError("ring requires an atom")
             if t in rings:
                 a, o = rings.pop(t)
+                if a == prev or any({e["source"], e["target"]} == {a, prev} for e in edges):
+                    raise ValueError("ring closure must add a distinct edge")
+                if pending and o != 1.0 and o != order:
+                    raise ValueError("conflicting ring bond")
                 edges.append({"source": a, "target": prev,
-                              "bond_order": 1.5 if nodes[a]["aromatic"] and nodes[prev]["aromatic"] else max(o, order)})
+                              "bond_order": 1.5 if nodes[a]["aromatic"] and nodes[prev]["aromatic"] and max(o, order) == 1.0 else max(o, order)})
             else:
                 rings[t] = (prev, order)
-            order = 1.0
+            order, pending = 1.0, False
         else:
             aromatic = t[0] in "cn" or t == "[nH]"
             el = {"[nH]": "N", "c": "C", "n": "N"}.get(t, t)
@@ -89,10 +113,11 @@ def _parse_smiles(smiles: str) -> tuple[list[dict], list[dict]]:
             if prev is not None:
                 edges.append({"source": prev, "target": len(nodes) - 1,
                               "bond_order": 1.5 if aromatic and nodes[prev]["aromatic"] and order == 1.0 else order})
-            prev, order = len(nodes) - 1, 1.0
-    if rings or stack:
-        raise ValueError(f"unbalanced SMILES {smiles!r}")
+            prev, order, pending = len(nodes) - 1, 1.0, False
+    if rings or stack or pending:
+        raise ValueError("unbalanced or unfinished subset SMILES")
     return nodes, edges
+
 
 
 CYP_RISK_FRAGMENTS = {"aniline": 0.4, "benzene": 0.2, "imidazole": 0.5}
