@@ -186,7 +186,10 @@ def _retro(fragments: list[str]) -> list[dict]:
 def similarity_check(smiles: str, cutoff: int = 80, limit: int = 10,
                      offline: bool = False) -> dict:
     """Check a designed molecule against live ChEMBL: nearest known compounds
-    (server-side Tanimoto), closest approved drug, and an honest novelty call.
+    (server-side Tanimoto), the neighbors annotated max_phase 4, and a similarity-threshold
+    novelty label. `closest` is the top similarity hit whatever its phase;
+    `approved_neighbors` keeps only max_phase == 4 (ChEMBL's approved-drug annotation, not
+    current market status); phase 1-3 compounds stay in `neighbors` only.
     Failures are reported, never hidden."""
     from ...bio import chembl
     try:
@@ -199,7 +202,7 @@ def similarity_check(smiles: str, cutoff: int = 80, limit: int = 10,
                 "novelty": f"no known molecule >= {cutoff}% similar in ChEMBL (novel scaffold space)",
                 "closest": None}
     closest = hits[0]
-    approved = [h for h in hits if (h.get("max_phase") or 0) and h["max_phase"] >= 3]
+    approved = [h for h in hits if (h.get("max_phase") or 0) == 4]
     novelty = ("close analog of known compounds" if closest["similarity"] >= 90
                else "related to known chemotypes" if closest["similarity"] >= 80
                else "novel at cutoff")

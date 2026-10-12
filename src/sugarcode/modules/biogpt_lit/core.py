@@ -148,24 +148,31 @@ def extract_claims(text: str) -> list[dict]:
     claims = []
     for sent in re.split(r"[.!?;]", text):
         words = re.findall(r"[A-Za-z0-9'-]+", sent)
-        for i, w in enumerate(words):
-            rel = _RELATION_WORDS.get(w.lower())
-            if rel and 0 < i < len(words) - 1:
-                subj, obj = words[i - 1], words[i + 1]
+        i = 0
+        while i < len(words):
+            # two-token relations ("interacts with", "associated with") are tried first,
+            # then single tokens; the lookup key is the lower-cased token sequence
+            span, rel = 1, _RELATION_WORDS.get(words[i].lower())
+            if i + 1 < len(words):
+                bigram = _RELATION_WORDS.get(words[i].lower() + " " + words[i + 1].lower())
+                if bigram:
+                    span, rel = 2, bigram
+            if rel and 0 < i and i + span < len(words):
+                subj, obj = words[i - 1], words[i + span]
                 # Negated ("Neither drug inhibits X", "not", "no") or about the subject's loss
                 # ("Loss of PTEN activates AKT", "PTEN knockdown ..."): the literal triple would
                 # state the opposite of the sentence, so leave it out.
                 before = [x.lower() for x in words[max(0, i - 4):i]]
-                if any(x in _NEGATORS for x in before) or subj.lower() in _LOSS_WORDS:
-                    continue
-                if i >= 3 and words[i - 2].lower() == "of" and words[i - 3].lower() in _LOSS_WORDS:
-                    continue
+                skip = any(x in _NEGATORS for x in before) or subj.lower() in _LOSS_WORDS
+                if not skip and i >= 3 and words[i - 2].lower() == "of" and words[i - 3].lower() in _LOSS_WORDS:
+                    skip = True
                 # Stopword subjects ("... and inhibits BDNF"): the token before the relation is
                 # a conjunction/function word, not an entity - the triple would be garbage.
-                if subj.lower() in _STOP_SUBJ:
-                    continue
-                if subj[:1].isupper() or obj[:1].isupper() or subj.isupper() or obj.isupper():
+                if not skip and subj.lower() in _STOP_SUBJ:
+                    skip = True
+                if not skip and (subj[:1].isupper() or obj[:1].isupper() or subj.isupper() or obj.isupper()):
                     claims.append({"subject": subj, "relation": rel, "object": obj})
+            i += span
     return claims
 
 
