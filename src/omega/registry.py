@@ -233,7 +233,7 @@ _MODULES: list[tuple[str, str, str, str]] = [
     ("qsar_bench", "QSAR Bench", "fabrication-evolution",
      "QSAR baseline benchmarking on caller-supplied compounds and activities: Morgan-like fingerprint ridge model, random, scaffold-like and temporal holdout splits, applicability-domain check; holdout metrics only, not external validation. An optional ChEMBL client (live or cached) fetches pChEMBL data, but the benchmark path does not call it."),
     ("molecule_eval", "Molecule Eval", "fabrication-evolution",
-     "Auditable evaluation of generated molecular libraries: validity (SMILES parser acceptance), novelty and Pareto fronts. Novelty and distribution comparison score a library against a caller-supplied reference set; a ChEMBL fetch client is included but is not used by the evaluation path."),
+     "Auditable evaluation of generated molecular libraries: SMILES parser acceptance, graph-key uniqueness, novelty and Pareto fronts. Novelty and distribution comparison score a library against a caller-supplied reference set; a ChEMBL fetch client is included but is not used by the evaluation path."),
     ("report_studio", "Report Studio", "platform",
      "Lab-grade export engine: HTML/Markdown reports with provenance, CSV/TSV exporters, a generated Jupyter notebook (one deepsplice assessment call, structure-checked, not executed here) and sha256-checksummed evidence bundles."),
 ]

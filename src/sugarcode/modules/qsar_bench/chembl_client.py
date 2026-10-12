@@ -30,10 +30,9 @@ class ChEMBLQSARClient:
         """Fetch equality-qualified binding data with structures and pChEMBL.
 
         Duplicates are aggregated by median pChEMBL per canonical SMILES and
-        years are retained for temporal validation. Records lacking pChEMBL,
-        canonical SMILES, an exact '=' relation, or a requested standard type
-        are counted and excluded rather than imputed. Only the latest document
-        year per compound is kept.
+        each compound keeps only its latest document year. Records lacking
+        pChEMBL, canonical SMILES, an exact '=' relation, or a requested
+        standard type are counted and excluded rather than imputed.
         """
         if not target_chembl_id.startswith("CHEMBL"): raise ValueError("target ID must start CHEMBL")
         page=self._get("activity.json",{"target_chembl_id":target_chembl_id,"standard_type__in":",".join(standard_types),
