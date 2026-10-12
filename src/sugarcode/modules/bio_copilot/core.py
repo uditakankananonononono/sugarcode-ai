@@ -265,7 +265,7 @@ def update_from_experiment(prior_mean, prior_strength, successes, trials):
 
 
 def compile_research_artifact(question, result):
-    """Serialize inputs, result, provenance, parameters, and replay steps."""
+    """Serialize inputs, result, provenance, and replay steps."""
     import json
     if not question.strip(): raise ValueError("question must be non-empty")
     payload={"schema_version":"1.0","question":question,"result":result,

@@ -2,7 +2,7 @@
 
 Models are transparent mechanistic/heuristic surrogates with no trained model
 and are not clinically validated. Outputs support design review, not physical
-execution. Concentration is mM, flux mmol/gDW/h, time hours, and energy kJ/mol.
+execution. Concentration is mM, flux mmol/gDW/h, time hours, and energy kcal/mol.
 """
 from __future__ import annotations
 import json, math, random

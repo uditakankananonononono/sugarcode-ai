@@ -5,7 +5,7 @@ from ..neuro_hub.core import dashboard as legacy_dashboard, initiate_search, rec
 def platform_health(module_records):
  total=len(module_records); online=sum(bool(x.get('importable',False)) for x in module_records); latency=[float(x.get('latency_ms',0)) for x in module_records]; return {'modules_total':total,'modules_online':online,'global_flux':online/max(1,total),'latency_mean_ms':sum(latency)/max(1,total),'latency_max_ms':max(latency,default=0),'degraded':[x.get('module',x.get('slug')) for x in module_records if not x.get('importable',False)]}
 def compute_flux_series(samples):
- """Flux time series in timestamp order (input order used to decide the trend sign)."""
+ """Flux time series in timestamp order (trend = last minus first in timestamp order; input order does not decide the sign)."""
  samples=sorted(samples,key=lambda x:x['timestamp'])
  return {'timestamps':[x['timestamp'] for x in samples],'global_flux':[x['modules_online']/max(1,x['modules_total']) for x in samples],'trend':(samples[-1]['modules_online']/max(1,samples[-1]['modules_total'])-samples[0]['modules_online']/max(1,samples[0]['modules_total'])) if samples else 0}
 _TOK=re.compile(r'[a-z0-9]+')

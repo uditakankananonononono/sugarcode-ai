@@ -6,7 +6,7 @@ _PROJECTS: list[dict] = []  # in-memory project state store
 
 
 def dashboard() -> dict:
-    """Unified platform view: compute flux, sub-network status, project states."""
+    """Unified platform view: module-import flux (fraction of modules importable), sub-network status, project states."""
     flux = compute_flux()
     return {
         "platform": "SugarCode AI / Omega OS v7.0",

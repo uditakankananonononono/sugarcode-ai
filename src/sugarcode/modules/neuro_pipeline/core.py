@@ -97,7 +97,7 @@ def lesion_study(model: MLP, n_in: int | None = None, seed: int = 42,
 
 
 def activation_trace(model: MLP, x: np.ndarray) -> dict:
-    """Time-resolved forward trace for one input (information propagation)."""
+    """Per-layer forward trace for one input (activation magnitudes, single forward pass)."""
     model.forward(x, record=True)
     h, y = model.trace
     return {
