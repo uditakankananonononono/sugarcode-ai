@@ -179,3 +179,22 @@ uniform 0.25 placeholder at column 14 (+1 exonic). Replaced with the U2 acceptor
 (1,170-junction harvest) as a documented approximation: the exonic +1 base preference is
 spliceosome-independent. Verified no U12-golden fixture case sits at acceptor +1 exonic, so no
 existing delta changes; U2 matrix untouched.
+
+## Test data origins recorded for the validation matrix (added for review, base 7ff2dc87)
+
+- `tests/data/uci_ecoli_promoters.data` (sha256
+  edd5f6f266ee04a78d4a8d88594e335fb8b5e8f204e63244eec3c2a9e5befd9d, 106 lines): E. coli
+  promoter gene sequences, UCI Machine Learning Repository dataset 67 ("Molecular Biology
+  (Promoter Gene Sequences)", Harley/Reynolds/Towell; 53 promoters + 53 non-promoters, 57 nt),
+  https://archive.ics.uci.edu/dataset/67/molecular+biology+promoter+gene+sequences. The repo
+  history shows it first added in commit 6cecd96 (2026-09-25). Not re-downloaded and compared
+  at the time of this entry: the line count matches the UCI instance count (106), and the
+  origin is taken from the dataset description in `tests/test_neuro_pipeline_realdata.py`.
+- `tests/fixtures/brca1_splice_golden.json` (sha256
+  dd8f887fa79ba166a8737573f5e87bf1f6b75c97925e6e818988b37c8238eff6): origin per the file's own
+  `source` field and `scripts/validate_brca1_splice.py`: a live ClinVar query of 2026-09-21
+  (NM_007294 splice SNVs) mapped onto RefSeqGene NG_005905.2 junction windows. The variant
+  list is therefore a ClinVar snapshot; the `ref_score`/`alt_score`/`delta` fields are outputs
+  of this repo's deepsplice scorer, and later commits (b7c3020, 5876e94) rewrote them. So it
+  is a regression lock on the scorer over a ClinVar-derived variant list, not an independent
+  external golden. The ClinVar pull itself was not re-fetched and verified for this entry.
