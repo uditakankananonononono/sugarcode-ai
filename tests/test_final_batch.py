@@ -179,7 +179,7 @@ def test_synbio_wizard_full_pipeline():
     r = run_wizard("vanillin", seed=9)
     assert r["steps"]["4_selected_chassis"]["chassis"] in CHASSIS_KEYS
     assert r["steps"]["5_assembly"]["method"] in ("Golden Gate", "Gibson")
-    lo, hi = r["steps"]["6_yield_simulation"]["90pct_CI"]
+    lo, hi = r["steps"]["6_yield_simulation"]["approx_95pct_interval_5th_195th_of_200_draws"]
     assert lo <= r["steps"]["6_yield_simulation"]["mean_titer_fraction"] <= hi
     assert 0.0 <= r["feasibility_score"] <= 1.0
 

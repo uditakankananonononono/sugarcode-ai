@@ -95,4 +95,4 @@ def test_compiler_covers_multiscale_stack():
  assert 'no trained model and not clinically validated' in r['model_status']
 
 def test_legacy_run_wizard_shape_and_ci():
- r=run_wizard('vanillin',seed=9); lo,hi=r['steps']['6_yield_simulation']['90pct_CI']; assert r['steps']['4_selected_chassis']['chassis'] in CHASSIS and lo<=r['steps']['6_yield_simulation']['mean_titer_fraction']<=hi and 0<=r['feasibility_score']<=1
+ r=run_wizard('vanillin',seed=9); lo,hi=r['steps']['6_yield_simulation']['approx_95pct_interval_5th_195th_of_200_draws']; assert r['steps']['4_selected_chassis']['chassis'] in CHASSIS and lo<=r['steps']['6_yield_simulation']['mean_titer_fraction']<=hi and 0<=r['feasibility_score']<=1
