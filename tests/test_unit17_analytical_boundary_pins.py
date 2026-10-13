@@ -73,3 +73,66 @@ def test_isoform_negative_tolerance_exact(monkeypatch,value):
     else:
         with pytest.raises(ValueError,match='probability'):m.safe_isoform_distribution(.5)
 
+
+@pytest.mark.parametrize('lo,hi',[(-10,10),(-100,100),(0,1),(0,1000000),(-1,1)])
+def test_every_numeric_range_endpoints_and_near_outside(lo,hi):
+    for x in [lo,hi]:assert m._num('x',x,lo,hi)==x
+    for x in [lo-1e-9,hi+1e-9,lo-.001*max(1,abs(lo)),hi+.001*max(1,abs(hi))]:
+        with pytest.raises(ValueError,match='out of range'):m._num('x',x,lo,hi)
+
+@pytest.mark.parametrize('lo,hi',[(0,59),(0,1),(1,10**9)])
+def test_integer_range_exact(lo,hi):
+    assert m._int('x',lo,lo,hi)==lo and m._int('x',hi,lo,hi)==hi
+    for x in [lo-1,hi+1]:
+        with pytest.raises(ValueError):m._int('x',x,lo,hi)
+
+def test_public_numeric_endpoints_delegate(monkeypatch):
+    monkeypatch.setattr(m.core,'isoform_distribution',lambda p,f,c,i:{'isoforms':{'canonical':p,'other':1-p},'args':(p,f,c,i)})
+    for p in [0,1]:
+        for c in [0,1]:
+            for i in [0,1]:assert m.safe_isoform_distribution(p,cryptic_strength=c,intron_retention=i)['args']==(p,True,c,i)
+    for key in ['psi','cryptic_strength','intron_retention']:
+        for x in [-1e-9,1+1e-9,-.001,1.001]:
+            kw={'psi':.5,'cryptic_strength':.5,'intron_retention':.5};kw[key]=x
+            with pytest.raises(ValueError):m.safe_isoform_distribution(**kw)
+    monkeypatch.setattr(m.core,'active_learning',lambda c:c)
+    for p in [0,1]:assert m.safe_active_learning([{'probability':p,'impact':0}])
+    for x in [-1e-9,1+1e-9]:
+        with pytest.raises(ValueError):m.safe_active_learning([{'probability':x}])
+    monkeypatch.setattr(m.core,'intervention_simulation',lambda w,a,s:(w,a,s))
+    assert m.safe_intervention_simulation(0,1,[{'psi_shift':-1,'offtarget_risk':0}])==(0,1,[{'psi_shift':-1,'offtarget_risk':0}])
+    assert m.safe_intervention_simulation(1,0,[{'psi_shift':1,'offtarget_risk':1}])==(1,0,[{'psi_shift':1,'offtarget_risk':1}])
+    for key in ['wild_psi','aberrant_psi','psi_shift','offtarget_risk']:
+        lo=-1 if key=='psi_shift' else 0
+        for x in [lo-1e-9,1+1e-9]:
+            w,a=.5,.5;s={'psi_shift':0,'offtarget_risk':.5}
+            if key=='wild_psi':w=x
+            elif key=='aberrant_psi':a=x
+            else:s[key]=x
+            with pytest.raises(ValueError):m.safe_intervention_simulation(w,a,[s])
+
+def test_zero_index_and_exon_calibration_caps(monkeypatch):
+    monkeypatch.setattr(m.core,'variant_at',lambda s,i,b,*a:i)
+    assert m.safe_variant_at('AC',0,'G')==0
+    with pytest.raises(ValueError):m.safe_variant_at('AC',-1,'G')
+    monkeypatch.setattr(m.core,'branchpoint_variant_effect',lambda s,i,b:i)
+    assert m.safe_branchpoint_variant_effect('A'*60,0,'G')==0
+    with pytest.raises(ValueError):m.safe_branchpoint_variant_effect('A'*60,-1,'G')
+    for n in [1,10**9]:
+        r=m.safe_exon_inclusion(0,0,{'exon_definition_support':.25},calibration_n=n)
+        radius=1.96*.5/math.sqrt(n)
+        assert r['interval95']==pytest.approx([max(0,.5-radius),min(1,.5+radius)])
+    for n in [0,10**9+1]:
+        with pytest.raises(ValueError):m.safe_exon_inclusion(0,0,{'exon_definition_support':.25},calibration_n=n)
+
+def test_isoform_optional_defaults_forward(monkeypatch):
+    monkeypatch.setattr(m.core,'isoform_distribution',lambda p,f,c,i:{'isoforms':{'a':1},'args':(p,f,c,i)})
+    assert m.safe_isoform_distribution(.5)['args']==(.5,True,0,.05)
+
+def test_probability_sum_tolerance_neighbors(monkeypatch):
+    # Binary64 cannot represent1+1e-9 exactly. Adjacent sums bracket it.
+    for total,accepted in [(math.nextafter(1+1e-9,1),True),(1+1e-9,False)]:
+        monkeypatch.setattr(m.core,'isoform_distribution',lambda *a:{'isoforms':{'a':total}})
+        if accepted:assert m.safe_isoform_distribution(.5)['isoforms']['a']==total
+        else:
+            with pytest.raises(ValueError):m.safe_isoform_distribution(.5)
