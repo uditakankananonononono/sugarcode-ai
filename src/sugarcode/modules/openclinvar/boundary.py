@@ -23,11 +23,16 @@ ValueError, and TypeError for bool, non-number or wrong container types):
   MAX_ITEMS = 10000 (updates, records, candidates), MAX_EVIDENCE = 100,
   MAX_TERMS = 1000 (phenotype/pathway terms), MAX_AGES = 100,
   MAX_COUNT = 1e12 (counts, sample_size), _PRE = 1e15 (absolute-value cap
-  applied to numeric inputs before arithmetic).
-  Ranges: prior in [1e-6, 1 - 1e-6]; prior_alpha and prior_beta in >0..MAX_COUNT; total and supporting in 0..MAX_COUNT;
+  applied to numeric inputs before arithmetic), MIN_PRIOR = 0.000001 (floor for
+  prior_alpha and prior_beta), MAX_ANCESTOR_KEYS = 1000, MAX_ANCESTORS_PER_KEY = 100,
+  MAX_ANCESTOR_TERMS = 10000 (all ancestor terms in one call), MAX_PAIRS = 100000
+  (patient x disease term pairs in one call; summed over candidates in reverse_inference).
+  Ranges: prior in [1e-6, 1 - 1e-6]; prior_alpha and prior_beta in MIN_PRIOR..MAX_COUNT; total and supporting in 0..MAX_COUNT;
   supporting <= total; penetrance, quality, variant_probability in [0, 1];
   age <= 120 (and >= 0); years 1900..2026.  Strengths, directions and
   classes outside the named sets are refused, not defaulted.
+  federated_evidence is also refused when the posterior would not be interior (computed beta <= 0 after
+  float cancellation, or mean not strictly between 0 and 1).
   Also refused: duplicate phenotype or pathway terms and duplicate graph node ids.
 """
 from __future__ import annotations
@@ -42,13 +47,18 @@ MAX_EVIDENCE = 100          # 350**100 * 1e6 stays far below float max
 MAX_TERMS = 1000
 MAX_AGES = 100
 MAX_COUNT = 1e12
+MIN_PRIOR = 1e-6
+MAX_ANCESTOR_KEYS = 1000
+MAX_ANCESTORS_PER_KEY = 100
+MAX_ANCESTOR_TERMS = 10_000
+MAX_PAIRS = 100_000
 _PRE = 1e15
 STRENGTHS = ("very_strong", "strong", "moderate", "supporting")
 DIRECTIONS = ("pathogenic", "benign")
 CLASSES = ("pathogenic", "likely_pathogenic", "uncertain_significance", "likely_benign", "benign")
 
 
-def _num(v, name, lo=None, hi=None, *, lo_open=False):
+def _num(v, name, lo=None, hi=None):
     if isinstance(v, bool):
         raise TypeError(f"{name} must be a number, not bool")
     if not isinstance(v, (int, float)):
@@ -61,7 +71,7 @@ def _num(v, name, lo=None, hi=None, *, lo_open=False):
         raise ValueError(f"{name} magnitude too large")
     if not math.isfinite(v):
         raise ValueError(f"{name} must be finite")
-    if lo is not None and (v <= lo if lo_open else v < lo):
+    if lo is not None and v < lo:
         raise ValueError(f"{name} below allowed range")
     if hi is not None and v > hi:
         raise ValueError(f"{name} above allowed range")
@@ -109,14 +119,17 @@ def bayesian_acmg_checked(evidence, prior=0.1):
 
 def federated_evidence_checked(updates, prior_alpha=1, prior_beta=1):
     ups = _seq(updates, "updates", MAX_ITEMS)
-    a0 = _num(prior_alpha, "prior_alpha", 0.0, MAX_COUNT, lo_open=True)
-    b0 = _num(prior_beta, "prior_beta", 0.0, MAX_COUNT, lo_open=True)
+    a0 = _num(prior_alpha, "prior_alpha", MIN_PRIOR, MAX_COUNT)
+    b0 = _num(prior_beta, "prior_beta", MIN_PRIOR, MAX_COUNT)
     for i, u in enumerate(ups):
         if not isinstance(u, Mapping) or "supporting" not in u or "total" not in u:
             raise TypeError(f"updates[{i}] needs supporting and total")
         t = _num(u["total"], "total", 0.0, MAX_COUNT)
         _num(u["supporting"], "supporting", 0.0, t)
-    return core.federated_evidence([dict(u) for u in ups], a0, b0)
+    out = core.federated_evidence([dict(u) for u in ups], a0, b0)
+    if not (out["alpha"] > 0 and out["beta"] > 0 and 0 < out["posterior_mean"] < 1):
+        raise ValueError("posterior is not interior: beta or mean degenerate after float cancellation")
+    return out
 
 
 def forward_trajectory_checked(classification, penetrance=0.5, ages=(20, 40, 60)):
@@ -150,16 +163,26 @@ def evidence_consensus_checked(records):
     return core.evidence_consensus([dict(r) for r in rs])
 
 
-def _ancestors(m):
+def _ancestors(m, budget=None):
+    """budget: one-element list holding the ancestor terms still allowed in this call (shared across maps)."""
     if m is None:
         return None
     if not isinstance(m, Mapping):
         raise TypeError("ancestor_map must be a mapping")
+    if len(m) > MAX_ANCESTOR_KEYS:
+        raise ValueError(f"ancestor_map has more than {MAX_ANCESTOR_KEYS} keys")
+    if budget is None:
+        budget = [MAX_ANCESTOR_TERMS]
     out = {}
     for k, v in m.items():
         _text(k, "ancestor_map key")
         if not isinstance(v, (list, tuple, set, frozenset)):
             raise TypeError("ancestor_map values must be collections of text")
+        if len(v) > MAX_ANCESTORS_PER_KEY:
+            raise ValueError(f"ancestor_map entry has more than {MAX_ANCESTORS_PER_KEY} terms")
+        budget[0] -= len(v)
+        if budget[0] < 0:
+            raise ValueError(f"ancestor_map has more than {MAX_ANCESTOR_TERMS} terms in total")
         for t in v:
             _text(t, "ancestor_map term")
         out[k] = v
@@ -169,17 +192,24 @@ def _ancestors(m):
 def phenotype_match_checked(patient_hpo, disease_hpo, ancestor_map=None):
     p = _terms(patient_hpo, "patient_hpo")
     d = _terms(disease_hpo, "disease_hpo")
+    if len(p) * len(d) > MAX_PAIRS:
+        raise ValueError(f"phenotype comparison has more than {MAX_PAIRS} term pairs")
     return core.phenotype_match(p, d, _ancestors(ancestor_map))
 
 
 def reverse_inference_checked(patient_hpo, candidates):
     p = _terms(patient_hpo, "patient_hpo")
     cs = _seq(candidates, "candidates", MAX_ITEMS)
+    pairs = 0
+    budget = [MAX_ANCESTOR_TERMS]
     for i, c in enumerate(cs):
         if not isinstance(c, Mapping):
             raise TypeError(f"candidates[{i}] must be a mapping")
-        _terms(c.get("phenotypes", []), "candidate phenotypes")
-        _ancestors(c.get("ancestor_map"))
+        ph = _terms(c.get("phenotypes", []), "candidate phenotypes")
+        pairs += len(p) * len(ph)
+        if pairs > MAX_PAIRS:
+            raise ValueError(f"candidates need more than {MAX_PAIRS} phenotype term pairs in total")
+        _ancestors(c.get("ancestor_map"), budget)
         if "variant_probability" in c:
             _num(c["variant_probability"], "variant_probability", 0.0, 1.0)
     return core.reverse_inference(p, [dict(c) for c in cs])

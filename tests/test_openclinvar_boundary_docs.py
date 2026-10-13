@@ -5,7 +5,7 @@ in this wrapper, not spec values."""
 import re
 from sugarcode.modules.openclinvar import boundary as M
 
-EXTRA = ["prior in [1e-6, 1 - 1e-6]", "age <= 120", "years 1900..2026", "penetrance, quality, variant_probability in [0, 1]", "supporting <= total", "prior_alpha and prior_beta in >0..MAX_COUNT", "total and supporting in 0..MAX_COUNT", "TypeError for bool", "duplicate phenotype or pathway terms", "duplicate graph node ids"]
+EXTRA = ["prior in [1e-6, 1 - 1e-6]", "age <= 120", "years 1900..2026", "penetrance, quality, variant_probability in [0, 1]", "supporting <= total", "prior_alpha and prior_beta in MIN_PRIOR..MAX_COUNT", "computed beta <= 0 after\n  float cancellation", "total and supporting in 0..MAX_COUNT", "TypeError for bool", "duplicate phenotype or pathway terms", "duplicate graph node ids"]
 
 
 def _consts():
