@@ -169,3 +169,50 @@ def test_stability_hydro_window_forwarded(monkeypatch):
     monkeypatch.setattr(m,'hydrophobicity_profile',lambda s,w:seen.append(w) or [0])
     m._stability('AAA',['C']*3)
     assert seen==[7]
+
+def test_tm_exact19_with_internal_gap_and_terminal_gap():
+    for seq in ['A'*9+'G'+'A'*10,'G'+'A'*18+'G']:
+        assert m.cellular_compatibility(seq)['transmembrane_propensity']==18/19
+    assert m.cellular_compatibility('CC')['folding_risk']==0
+    assert m.cellular_compatibility('CCC')['folding_risk']==.3
+
+def test_single_residue_expression_and_cysteine_count():
+    r=m.expression_construct('C')
+    assert r['coding_dna']=='TGC' and r['codon_diversity']==1 and r['gc_fraction']==2/3
+    assert r['expression_burden']==pytest.approx(.001+.3*(2/3-.5)+.1)
+    r=m.expression_construct('CC')
+    assert r['codon_diversity']==.5 and r['expression_burden']==pytest.approx(.002+.05+.2)
+    assert m.expression_construct('W')['expression_burden']==pytest.approx(.051)
+
+def test_stability_exact_core_edge_and_classes(monkeypatch):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[1,1.0000001,-1])
+    r=m._stability('AAA',['H','E','C'])
+    assert r['hydrophobic_core_fraction']==.333
+    assert r['folding_dg_estimate']==-2.67 and r['stability_class']=='low'
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[0])
+    assert m._stability('AA',['H','H'])['stability_class']=='low'
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2,0])
+    assert m._stability('AA',['H','H'])['stability_class']=='moderate'
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2])
+    assert m._stability('AA',['H','H'])['stability_class']=='high'
+
+def test_odd_length_mid_and_tie_site_residues():
+    import random
+    seq,sites,complete=m._design_sequence('CCHCC','HDE',random.Random(1))
+    assert sites==[0,1,3] and [seq[i] for i in sites]==list('HDE') and complete
+    # Empty active residues with coils is behaviorally identical if and -> or:
+    # ordered[:0] is empty; no coils with nonempty active is also empty.
+
+@pytest.mark.parametrize('host,dna',[('ecoli','GCGTGCGATGAATTTGGTCATATTAAACTGATGAACCCGCAACGTAGCACCGTTTGGTAT'),('yeast','GCTTGTGACGAGTTCGGACACATCAAGTTGATGAATCCACAGAGATCTACTGTCTGGTAC')])
+def test_codon_table_all_amino_acids(host,dna):
+    assert m.codon_optimize('ACDEFGHIKLMNPQRSTVWY',host)==dna
+    assert m.codon_optimize(' c! ',host)==('TGC' if host=='ecoli' else 'TGT')
+
+def test_single_residue_geometry_and_empty_sites():
+    r=m.active_site_geometry('W',[0],substrate_charge=0)
+    assert r['hydrophobic_fraction']==1 and r['aromatic_contacts']==1 and r['transition_state_complementarity']==1
+    r=m.active_site_geometry('D',[],substrate_charge=0)
+    assert r['hydrophobic_fraction']==0 and r['net_charge']==0 and r['transition_state_complementarity']==.5
+    # mutational_scan clean_protein guarantees length>=1 and every local
+    # slice includes its centre, so max(1,len(local)) -> len(local) equivalent.
+    assert m.mutational_scan('A')['positions'][0]['functional_sensitivity']==.45
