@@ -46,7 +46,7 @@ def _num(v, name, lo, hi):
         raise ValueError(f"{name} must be finite")
     if v < lo or v > hi:
         raise ValueError(f"{name} must be between {lo:g} and {hi:g}")
-    return v
+    return float(v)
 
 
 def _series(v, name, min_len, hi):
