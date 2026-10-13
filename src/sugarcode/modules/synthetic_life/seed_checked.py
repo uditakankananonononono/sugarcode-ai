@@ -26,6 +26,4 @@ def _guard(fn):
     return wrapper
 
 
-stochastic_control = _guard(core.stochastic_control)
-ale_trajectory = _guard(core.ale_trajectory)
 compile_synthetic_life = _guard(core.compile_synthetic_life)

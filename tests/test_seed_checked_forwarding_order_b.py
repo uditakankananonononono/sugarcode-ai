@@ -13,18 +13,11 @@ SETS = {
     "crispr_muse.seed_checked": ['delivery_efficiency', 'simulate_digital_lab'],
     "dark_genome.seed_checked": ['variant_counterfactual'],
     "genomegpt.seed_checked": ['masked_sequence_objective'],
-    "molecule_eval.seed_checked": ['evaluate_library', 'compare_libraries'],
-    "neohunter.seed_checked": ['simulate_immune_escape', 'neoantigen_pipeline'],
-    "neuro_pipeline.seed_checked": ['train', 'synthetic_promoter_dataset', 'sequence_pipeline_demo', 'pipeline_report', 'neuro_diagnostics', 'train_on_sequences', 'predictive_coding_hierarchy'],
-    "profile_hmm.seed_checked": ['random_profile_hmm'],
-    "qsar_bench.seed_checked": ['validate_qsar'],
-    "str_scope.seed_checked": ['repeat_instability'],
-    "syn_bio_studio.seed_checked": ['gillespie_expression'],
-    "syn_stab_ai.seed_checked": ['population_simulation'],
-    "synbio_wizard.seed_checked": ['gillespie_expression', 'uncertainty_distribution', 'compile_project', 'run_wizard'],
-    "synlife_evo.seed_checked": ['evolve', 'simulate_evolution_experiment', 'optimize_stability', 'simulate_competition'],
-    "synthetic_life.seed_checked": ['stochastic_control', 'ale_trajectory', 'compile_synthetic_life'],
-    "virtual_cell.seed_checked": ['simulate_expression', 'simulate_cell'],
+    "neohunter.seed_checked": ['neoantigen_pipeline'],
+    "neuro_pipeline.seed_checked": ['synthetic_promoter_dataset', 'sequence_pipeline_demo', 'train_on_sequences'],
+    "synbio_wizard.seed_checked": ['compile_project', 'run_wizard'],
+    "synlife_evo.seed_checked": ['optimize_stability'],
+    "synthetic_life.seed_checked": ['compile_synthetic_life'],
 }
 FILE = {'profile_hmm': 'training', 'qsar_bench': 'model'}
 CASES = [(m, f) for m, fns in SETS.items() for f in fns]

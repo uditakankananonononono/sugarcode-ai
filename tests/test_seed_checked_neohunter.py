@@ -17,7 +17,6 @@ def _split(argstr):
     exec('def _f(*a, **k): return a, k', ns)
     return eval('_f(' + argstr + ')', ns)
 CASES = [
-    ('simulate_immune_escape', "[{'peptide':'SIINFEKL'}], generations=3, population=50", *_split("[{'peptide':'SIINFEKL'}], generations=3, population=50")),
     ('neoantigen_pipeline', "'MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSY', [{'type':'snv','position':12,'ref':'G','alt':'V'}], ['A*02:01']", *_split("'MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSY', [{'type':'snv','position':12,'ref':'G','alt':'V'}], ['A*02:01']")),
 ]
 

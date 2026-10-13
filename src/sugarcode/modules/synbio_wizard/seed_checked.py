@@ -26,7 +26,5 @@ def _guard(fn):
     return wrapper
 
 
-gillespie_expression = _guard(core.gillespie_expression)
-uncertainty_distribution = _guard(core.uncertainty_distribution)
 compile_project = _guard(core.compile_project)
 run_wizard = _guard(core.run_wizard)

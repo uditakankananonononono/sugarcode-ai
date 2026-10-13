@@ -17,13 +17,9 @@ def _split(argstr):
     exec('def _f(*a, **k): return a, k', ns)
     return eval('_f(' + argstr + ')', ns)
 CASES = [
-    ('train', 'epochs=3', *_split('epochs=3')),
     ('synthetic_promoter_dataset', 'n=20, seq_len=12', *_split('n=20, seq_len=12')),
     ('sequence_pipeline_demo', '', *_split('')),
-    ('pipeline_report', '', *_split('')),
-    ('neuro_diagnostics', '', *_split('')),
     ('train_on_sequences', 'epochs=3', *_split('epochs=3')),
-    ('predictive_coding_hierarchy', "__import__('numpy').ones((6,4)), steps=2, epochs=2", *_split("__import__('numpy').ones((6,4)), steps=2, epochs=2")),
 ]
 
 

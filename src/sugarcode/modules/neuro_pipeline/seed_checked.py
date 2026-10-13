@@ -1,7 +1,8 @@
 """Seed-checked entry points for neuro_pipeline functions that pass `seed` to numpy.random.default_rng.
 
 Only the seed is checked (shared helper: int or numpy integer, not bool, 0..2**63-1); every other argument goes to core unchanged.
-A nested-list seed crashes the interpreter in core (rc -11, checked for all 7 wrapped functions on 3.10); the gate refuses it first.
+A nested-list seed crashes the interpreter in core (rc -11, checked for all 3 wrapped functions on 3.10); the gate refuses it first.
+Functions already wrapped by seed_gate.py are not wrapped here.
 Design generators are out of scope and not wrapped.
 """
 from __future__ import annotations
@@ -27,10 +28,6 @@ def _guard(fn):
     return wrapper
 
 
-train = _guard(core.train)
 synthetic_promoter_dataset = _guard(core.synthetic_promoter_dataset)
 sequence_pipeline_demo = _guard(core.sequence_pipeline_demo)
-pipeline_report = _guard(core.pipeline_report)
-neuro_diagnostics = _guard(core.neuro_diagnostics)
 train_on_sequences = _guard(core.train_on_sequences)
-predictive_coding_hierarchy = _guard(core.predictive_coding_hierarchy)

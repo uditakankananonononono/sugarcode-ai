@@ -17,8 +17,6 @@ def _split(argstr):
     exec('def _f(*a, **k): return a, k', ns)
     return eval('_f(' + argstr + ')', ns)
 CASES = [
-    ('stochastic_control', 'hours=1', *_split('hours=1')),
-    ('ale_trajectory', 'generations=5', *_split('generations=5')),
     ('compile_synthetic_life', '', *_split('')),
 ]
 

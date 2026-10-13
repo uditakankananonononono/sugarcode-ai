@@ -26,5 +26,4 @@ def _guard(fn):
     return wrapper
 
 
-simulate_immune_escape = _guard(core.simulate_immune_escape)
 neoantigen_pipeline = _guard(core.neoantigen_pipeline)

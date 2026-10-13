@@ -17,10 +17,7 @@ def _split(argstr):
     exec('def _f(*a, **k): return a, k', ns)
     return eval('_f(' + argstr + ')', ns)
 CASES = [
-    ('evolve', "['g1','g2'], generations=5, pop_size=20", *_split("['g1','g2'], generations=5, pop_size=20")),
-    ('simulate_evolution_experiment', "['g1','g2'], generations=12, population=200, sample_every=2", *_split("['g1','g2'], generations=12, population=200, sample_every=2")),
     ('optimize_stability', "['g1','g2'], generations=60, population=200", *_split("['g1','g2'], generations=60, population=200")),
-    ('simulate_competition', "['g1','g2'], generations=12, population=200, sample_every=2", *_split("['g1','g2'], generations=12, population=200, sample_every=2")),
 ]
 
 

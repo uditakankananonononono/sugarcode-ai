@@ -26,7 +26,4 @@ def _guard(fn):
     return wrapper
 
 
-evolve = _guard(core.evolve)
-simulate_evolution_experiment = _guard(core.simulate_evolution_experiment)
 optimize_stability = _guard(core.optimize_stability)
-simulate_competition = _guard(core.simulate_competition)

@@ -17,8 +17,6 @@ def _split(argstr):
     exec('def _f(*a, **k): return a, k', ns)
     return eval('_f(' + argstr + ')', ns)
 CASES = [
-    ('gillespie_expression', 'hours=2', *_split('hours=2')),
-    ('uncertainty_distribution', '1.0, samples=20', *_split('1.0, samples=20')),
     ('compile_project', "'vanillin'", *_split("'vanillin'")),
     ('run_wizard', "'vanillin'", *_split("'vanillin'")),
 ]
