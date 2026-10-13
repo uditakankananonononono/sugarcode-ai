@@ -10,6 +10,7 @@ WRAPPERS = {
     "bioprint_pro.seed_checked": ["oldroyd_b_extrusion", "optimize_print"],
     "biosimvr.seed_checked": ["simulate_protocol", "molecular_docking_experiment", "run_experiment"],
     "cellfatenet.seed_checked": ["identify_attractors", "stochastic_validate", "simulate_fate"],
+    "cellpainter_4d.seed_checked": ["simulate_population_4d"],
     "dti_bench.seed_checked": ["validate_dti"],
     "evofold_4d.seed_checked": ["langevin_dynamics", "dynamics_report"],
     "liquid_biopsy.seed_checked": ["bootstrap_haplotype_weights", "fragment_length_model"],
