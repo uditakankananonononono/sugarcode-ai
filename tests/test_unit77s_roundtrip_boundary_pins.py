@@ -68,3 +68,47 @@ def test_declared_dump_character_cap_without_large_allocation(monkeypatch,size,v
     if valid:assert len(m.TicketStore.loads(text))==0
     else:
         with pytest.raises(ValueError,match='dump too large'):m.TicketStore.loads(text)
+
+def test_whitespace_and_default_now(monkeypatch):
+    class Clock(datetime):
+        @classmethod
+        def now(cls,tz):return T
+    monkeypatch.setattr(m,'datetime',Clock)
+    with pytest.raises(ValueError):m.TicketStore().open_ticket('   ')
+    r=m.TicketStore().open_ticket('question')
+    assert r['submitted_at']==T.isoformat() and r['response_due_at']==(T+timedelta(hours=24)).isoformat()
+
+
+def test_latest_transition_time_and_first_response_value():
+    s=m.TicketStore();r=s.open_ticket('question',submitted_at=T);tid=r['ticket_id']
+    s.transition(tid,'triaged',T+timedelta(hours=2))
+    with pytest.raises(ValueError,match='previous event'):s.transition(tid,'in_progress',T+timedelta(hours=1))
+    s.transition(tid,'in_progress',T+timedelta(hours=3))
+    s.transition(tid,'waiting_customer',T+timedelta(hours=30))
+    assert s.sla_status(tid,T+timedelta(hours=31))['first_response_at']==(T+timedelta(hours=3)).isoformat()
+    assert s.breaches(T+timedelta(hours=25))==[]
+
+@pytest.mark.parametrize('document',[{'version':1,'tickets':{}},{'version':1,'tickets':None}])
+def test_nonlist_persisted_tickets_are_value_error(document):
+    with pytest.raises(ValueError,match='unsupported store document'):m.TicketStore.loads(json.dumps(document))
+
+@pytest.mark.parametrize('field,value',[('priority_score',True),('priority_score','1'),('sla_hours',True),('sla_hours','1')])
+def test_persisted_numbers_type_refusal(field,value):
+    r=m.TicketStore().open_ticket('question',submitted_at=T);r[field]=value
+    with pytest.raises(ValueError,match='finite number'):m.TicketStore()._ingest(r)
+
+
+def test_nondict_first_history_and_unhashable_state_refusal():
+    r=m.TicketStore().open_ticket('question',submitted_at=T)
+    r['history']=[1]
+    with pytest.raises(ValueError,match='history must start'):m.TicketStore()._ingest(r)
+    r=m.TicketStore().open_ticket('question',submitted_at=T)
+    r['history'].append({'state':[1],'at':T.isoformat()})
+    with pytest.raises(ValueError,match='malformed history event'):m.TicketStore()._ingest(r)
+
+
+def test_exact_one_hour_sla_accepted():
+    r=m.TicketStore().open_ticket('question',submitted_at=T)
+    r['sla_hours']=1.;r['response_due_at']=(T+timedelta(hours=1)).isoformat()
+    s=m.TicketStore.loads(json.dumps({'version':1,'tickets':[r]}))
+    assert s.get(r['ticket_id'])['sla_hours']==1.
