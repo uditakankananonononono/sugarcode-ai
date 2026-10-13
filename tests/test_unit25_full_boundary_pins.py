@@ -140,3 +140,32 @@ def test_stability_high_low_thresholds_and_fraction_precision(monkeypatch):
     assert m._stability('AA',['H','H'])['stability_class']=='low' # exact score .4
     monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[0,2])
     assert m._stability('AA',['H','H'])['stability_class']=='moderate' # exact score .55
+
+def test_distinct_codon_triplet_diversity():
+    r=m.expression_construct('ACDAC')
+    assert r['coding_dna']=='GCGTGCGATGCGTGC'
+    assert r['codon_diversity']==.6 and r['gc_fraction']==11/15
+    assert r['expression_burden']==pytest.approx(.005+.3*(11/15-.5)+.2)
+
+def test_tm_terminal_window_and_catalytic_temperature_width():
+    assert m.cellular_compatibility('G'*5+'A'*19)['transmembrane_propensity']==1
+    assert m.cellular_compatibility('A'*19+'G'*5)['transmembrane_propensity']==1
+    r=m.enzyme_kinetics('DW',[0,1],temperature_c=54.5,substrate_charge=1)
+    assert r['kcat_s']==pytest.approx(10**1.25*math.exp(-.25))
+
+def test_active_coil_tie_both_sides():
+    import random
+    _,sites,complete=m._design_sequence('CCCHCCCC','HDE',random.Random(0))
+    assert sites==[2,4,5] and complete is True
+
+def test_binding_mismatched_hydrophobic_packing():
+    r=m.binding_interface('DA',[0,1],ligand_hydrophobic=.9,ligand_charge=0)
+    score=.45*.6+.35*.75/math.e
+    assert r['packing_complementarity']==pytest.approx(.6)
+    assert r['binding_score']==pytest.approx(score)
+
+def test_stability_hydro_window_forwarded(monkeypatch):
+    seen=[]
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda s,w:seen.append(w) or [0])
+    m._stability('AAA',['C']*3)
+    assert seen==[7]
