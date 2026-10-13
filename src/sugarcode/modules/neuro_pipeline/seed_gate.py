@@ -1,4 +1,7 @@
-"""Explicit-import seed gates only; legacy entry points remain unchanged."""
+"""Verified named functions; other entries excluded by scope.
+
+Explicit-import seed gates only; legacy entry points remain unchanged.
+"""
 from . import core
 from ...seed_check import check_seed
 
@@ -25,3 +28,10 @@ def pipeline_report(seed=42):
 def neuro_diagnostics(seed=42):
     seed=check_seed(seed)
     return core.neuro_diagnostics(seed)
+
+
+class MLP(core.MLP):
+    """Seed-checked numerical network constructor; no sequence generation."""
+    def __init__(self,n_in,n_hidden,n_out,seed=42):
+        seed=check_seed(seed)
+        super().__init__(n_in,n_hidden,n_out,seed=seed)
