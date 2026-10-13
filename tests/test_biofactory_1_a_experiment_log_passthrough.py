@@ -1,6 +1,6 @@
 """Documents (does not endorse) how experiment_log_checked treats -0.0 and numpy floats (PARTIAL).
 
-Parent ruling: leave verbatim, pin with a test. Expected values are hand-derived literals:
+Current behaviour is left as is; these tests pin it. Expected values are hand-derived literals:
 json.dumps(-0.0) == '-0.0'; np.float64 subclasses float so it is accepted and passed through
 unchanged (same object); np.float32 is not a float subclass so it is refused."""
 import json
