@@ -180,3 +180,6 @@ def test_rotation_precision_determinant(d,valid):
 
 def test_charge_precision1000point5_refusal():
     with pytest.raises(ValueError):m._charges([1000.5],1)
+
+def test_empty_coordinate_shape_refusal_is_owned_by_wrapper():
+    with pytest.raises(ValueError,match='coords: shape'):m._coords(np.zeros((0,3)))
