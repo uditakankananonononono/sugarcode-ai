@@ -5,7 +5,13 @@ n_constructs=0 or 10**9 is accepted (0 plates; 10**9 gives a 10.4 million plate 
 observations tuple silently returns the prior, NaN observations return a NaN posterior, one assay
 replicate or equal means raise ZeroDivisionError; factory_diagnostics raises a raw KeyError or
 TypeError on a malformed report. Unknown workflow names keep the module's KeyError.
-Ranges are choices made here, not spec values."""
+Ranges are choices made here, not spec values.
+
+Enforced limits (choices made here, not spec values; the core accepts wider inputs):
+  MAX_CONSTRUCTS = 100000 (n_constructs in 1..MAX_CONSTRUCTS; the core accepted 0),
+  MAX_OBS = 1000 (observations and assay series, 1..MAX_OBS for observations),
+  MAX_VALUE = 1e6 (observation and assay values within +-MAX_VALUE), _PRE = 1e15.
+"""
 from __future__ import annotations
 from collections.abc import Mapping
 

@@ -6,7 +6,16 @@ RecursionError and emits invalid JSON ('NaN') for non-finite results; pid_contro
 IndexError and dt=0 ZeroDivisionError, NaN passes silently; assay_quality with one replicate or equal
 means raises ZeroDivisionError and NaN passes; reroute_on_failure accepts a failed_step that is not in
 the DAG, a bool step, and a fallback whose own 'id' overrides the new node id.
-All ranges and caps are choices made here, not spec values."""
+All ranges and caps are choices made here, not spec values.
+
+Enforced limits (choices made here, not spec values; the core accepts wider inputs):
+  MAX_SERIES = 10000, MAX_STEPS = 10000, MAX_VALUE = 1e6, MAX_DEPTH = 64,
+  MAX_NODES = 100000, MAX_FALLBACK_KEYS = 50, _PRE = 1e15.
+  pid_control: kp, ki and kd in 0..1000.  NEGATIVE GAINS ARE REFUSED although the
+  core accepts them; reverse-acting loops are therefore not supported here (a
+  narrowing decision kept on purpose, not a claim that negative gains are invalid);
+  dt in 1e-6..1e6; setpoint and measurements within +-MAX_VALUE.
+"""
 from __future__ import annotations
 import math
 from collections.abc import Mapping
