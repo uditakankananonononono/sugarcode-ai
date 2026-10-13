@@ -216,3 +216,40 @@ def test_single_residue_geometry_and_empty_sites():
     # mutational_scan clean_protein guarantees length>=1 and every local
     # slice includes its centre, so max(1,len(local)) -> len(local) equivalent.
     assert m.mutational_scan('A')['positions'][0]['functional_sensitivity']==.45
+
+@pytest.mark.parametrize('residue,charge',[('K',1),('R',1),('E',-1),('D',-1),('H',.1),('A',0)])
+def test_each_charged_residue_default_substrate(residue,charge):
+    r=m.active_site_geometry(residue,[0])
+    assert r['net_charge']==charge
+    assert r['transition_state_complementarity']==pytest.approx(math.exp(-abs(charge))*(1 if residue=='A' else .5))
+
+def test_salt_bridge_saturation():
+    r=m.binding_interface('KK',[0,1],ligand_charge=2,ligand_hydrophobic=0)
+    assert r['net_charge']==2 and r['salt_bridge_score']==1
+    score=.45+.35*.5*math.exp(-abs(2-2))+.2
+    assert r['binding_score']==pytest.approx(score)
+
+def test_nonmethionine_signal_default_compartment_and_zero_risk():
+    r=m.cellular_compatibility('A'*20)
+    assert r['signal_peptide_proxy'] is False
+    assert r['compartment']=='cytosol' and r['disulfide_capacity']==0 and r['degron_count']==0 and r['folding_risk']==0
+    r=m.cellular_compatibility('PESTKENDGN'*8+'CCCC')
+    # degrons counts presence of three motifs, not multiplicity: .45+.3
+    assert r['degron_count']==3 and r['folding_risk']==pytest.approx(.75)
+    assert m.cellular_compatibility('G'*20)['transmembrane_propensity']==0
+    assert m.cellular_compatibility('A'*18)['transmembrane_propensity']==18/19
+
+def test_expression_burden_saturation_and_cysteine_weight():
+    assert m.expression_construct('C'*1000)['expression_burden']==1
+    r=m.expression_construct('CCC')
+    assert r['expression_burden']==pytest.approx(.003+.05+.3)
+
+def test_stability_independent_weight_mix(monkeypatch):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2,2,0,0])
+    r=m._stability('AAAA',['H','E','E','C'])
+    # .4*.25+.3*.5+.3*.5=.4, ddG=-3.2.
+    assert r['folding_dg_estimate']==-3.2 and r['stability_class']=='low'
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2,2,2,0])
+    r=m._stability('AAAA',['H','H','E','C'])
+    # .2+.075+.225=.5, ddG=-4.
+    assert r['folding_dg_estimate']==-4 and r['stability_class']=='moderate'
