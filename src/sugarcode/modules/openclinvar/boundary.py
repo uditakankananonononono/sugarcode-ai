@@ -22,7 +22,9 @@ accepts wider inputs; out-of-range, oversized or duplicate inputs are refused wi
 ValueError, and TypeError for bool, non-number or wrong container types):
   MAX_ITEMS = 10000 (updates, records), MAX_CANDIDATES = 1000 (reverse_inference candidates),
   MAX_TOTAL_KEYS = 10000 (ancestor-map keys across all candidates in one call), MAX_TEXT = 256
-  (characters in any term, id or label), MAX_EVIDENCE = 100,
+  (characters in any term, id, label, mapping key or string field value in evidence/updates/records/candidates),
+  MAX_FIELDS = 32 (keys per evidence/update/record/candidate mapping), MAX_TOTAL_CHARS = 1_000_000 (key and string-value
+  characters over all such mappings in one call), MAX_EVIDENCE = 100,
   MAX_TERMS = 1000 (phenotype/pathway terms), MAX_AGES = 100,
   MAX_COUNT = 1e12 (counts, sample_size), _PRE = 1e15 (absolute-value cap
   applied to numeric inputs before arithmetic), MIN_PRIOR = 0.000001 (floor for
@@ -35,6 +37,9 @@ ValueError, and TypeError for bool, non-number or wrong container types):
   classes outside the named sets are refused, not defaulted.
   federated_evidence is also refused when the posterior would not be interior (computed beta <= 0 after
   float cancellation, or mean not strictly between 0 and 1).
+  Mapping items (evidence, updates, records, candidates) are copied by the core into its output, so every field is
+  checked: keys must be text, values must be text, a finite number, bool or None (nested containers are refused with
+  TypeError, except a candidate's phenotypes and ancestor_map, which have their own checks).
   Also refused: duplicate phenotype or pathway terms and duplicate graph node ids.
   Scope: these limits apply to the *_checked wrappers only. The unchanged core (importable directly, opt-in)
   is out of scope and stays unsafe for oversized, nested or non-finite inputs.
@@ -50,6 +55,8 @@ MAX_ITEMS = 10_000
 MAX_CANDIDATES = 1000
 MAX_TOTAL_KEYS = 10_000
 MAX_TEXT = 256
+MAX_FIELDS = 32
+MAX_TOTAL_CHARS = 1_000_000
 MAX_EVIDENCE = 100          # 350**100 * 1e6 stays far below float max
 MAX_TERMS = 1000
 MAX_AGES = 100
@@ -85,6 +92,34 @@ def _num(v, name, lo=None, hi=None):
     return v
 
 
+def _fields(m, name, budget, nested=()):
+    """Bound every key and value of a mapping the core will copy into its output. budget: one-element list."""
+    if len(m) > MAX_FIELDS:
+        raise ValueError(f"{name} has more than {MAX_FIELDS} fields")
+    for k, v in m.items():
+        if not isinstance(k, str):
+            raise TypeError(f"{name} keys must be text")
+        if len(k) > MAX_TEXT:
+            raise ValueError(f"{name} key longer than {MAX_TEXT} characters")
+        budget[0] -= len(k)
+        if k in nested:
+            continue
+        if isinstance(v, str):
+            if len(v) > MAX_TEXT:
+                raise ValueError(f"{name}[{k!r}] longer than {MAX_TEXT} characters")
+            budget[0] -= len(v)
+        elif v is None or isinstance(v, bool):
+            pass
+        elif isinstance(v, (int, float)):
+            _num(v, f"{name}[{k!r}]")
+        else:
+            raise TypeError(f"{name}[{k!r}] must be text, a number, bool or None")
+        if budget[0] < 0:
+            raise ValueError(f"mapping fields exceed {MAX_TOTAL_CHARS} characters in total")
+    if budget[0] < 0:
+        raise ValueError(f"mapping fields exceed {MAX_TOTAL_CHARS} characters in total")
+
+
 def _seq(v, name, cap):
     if not isinstance(v, (list, tuple)):
         raise TypeError(f"{name} must be a list or tuple")
@@ -116,6 +151,7 @@ def _terms(v, name):
 def bayesian_acmg_checked(evidence, prior=0.1):
     ev = _seq(evidence, "evidence", MAX_EVIDENCE)
     p = _num(prior, "prior", 1e-6, 1 - 1e-6)
+    budget = [MAX_TOTAL_CHARS]
     for i, e in enumerate(ev):
         if not isinstance(e, Mapping):
             raise TypeError(f"evidence[{i}] must be a mapping")
@@ -123,6 +159,7 @@ def bayesian_acmg_checked(evidence, prior=0.1):
             raise ValueError(f"evidence[{i}] strength must be one of {STRENGTHS}")
         if "direction" in e and e["direction"] not in DIRECTIONS:
             raise ValueError(f"evidence[{i}] direction must be one of {DIRECTIONS}")
+        _fields(e, f"evidence[{i}]", budget)
     return core.bayesian_acmg([dict(e) for e in ev], prior if isinstance(prior, float) else p)
 
 
@@ -130,11 +167,13 @@ def federated_evidence_checked(updates, prior_alpha=1, prior_beta=1):
     ups = _seq(updates, "updates", MAX_ITEMS)
     a0 = _num(prior_alpha, "prior_alpha", MIN_PRIOR, MAX_COUNT)
     b0 = _num(prior_beta, "prior_beta", MIN_PRIOR, MAX_COUNT)
+    budget = [MAX_TOTAL_CHARS]
     for i, u in enumerate(ups):
         if not isinstance(u, Mapping) or "supporting" not in u or "total" not in u:
             raise TypeError(f"updates[{i}] needs supporting and total")
         t = _num(u["total"], "total", 0.0, MAX_COUNT)
         _num(u["supporting"], "supporting", 0.0, t)
+        _fields(u, f"updates[{i}]", budget)
     out = core.federated_evidence([dict(u) for u in ups], a0, b0)
     if not (out["alpha"] > 0 and out["beta"] > 0 and 0 < out["posterior_mean"] < 1):
         raise ValueError("posterior is not interior: beta or mean degenerate after float cancellation")
@@ -155,6 +194,7 @@ def forward_trajectory_checked(classification, penetrance=0.5, ages=(20, 40, 60)
 
 def evidence_consensus_checked(records):
     rs = _seq(records, "records", MAX_ITEMS)
+    budget = [MAX_TOTAL_CHARS]
     for i, r in enumerate(rs):
         if not isinstance(r, Mapping):
             raise TypeError(f"records[{i}] must be a mapping")
@@ -169,6 +209,7 @@ def evidence_consensus_checked(records):
                 raise TypeError("year must be an integer")
             if not 1900 <= y <= 2026:
                 raise ValueError("year must be between 1900 and 2026")
+        _fields(r, f"records[{i}]", budget)
     return core.evidence_consensus([dict(r) for r in rs])
 
 
@@ -214,6 +255,7 @@ def reverse_inference_checked(patient_hpo, candidates):
     cs = _seq(candidates, "candidates", MAX_CANDIDATES)
     pairs = 0
     budget = [MAX_ANCESTOR_TERMS, MAX_TOTAL_KEYS]
+    chars = [MAX_TOTAL_CHARS]
     for i, c in enumerate(cs):
         if not isinstance(c, Mapping):
             raise TypeError(f"candidates[{i}] must be a mapping")
@@ -224,6 +266,7 @@ def reverse_inference_checked(patient_hpo, candidates):
         _ancestors(c.get("ancestor_map"), budget)
         if "variant_probability" in c:
             _num(c["variant_probability"], "variant_probability", 0.0, 1.0)
+        _fields(c, f"candidates[{i}]", chars, nested=("phenotypes", "ancestor_map"))
     return core.reverse_inference(p, [dict(c) for c in cs])
 
 
