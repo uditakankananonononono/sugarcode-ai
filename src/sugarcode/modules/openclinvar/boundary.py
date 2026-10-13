@@ -20,7 +20,9 @@ evidence-arithmetic guards, not clinical validation.
 Enforced limits (choices made in this wrapper, not spec values; the core
 accepts wider inputs; out-of-range, oversized or duplicate inputs are refused with
 ValueError, and TypeError for bool, non-number or wrong container types):
-  MAX_ITEMS = 10000 (updates, records, candidates), MAX_EVIDENCE = 100,
+  MAX_ITEMS = 10000 (updates, records), MAX_CANDIDATES = 1000 (reverse_inference candidates),
+  MAX_TOTAL_KEYS = 10000 (ancestor-map keys across all candidates in one call), MAX_TEXT = 256
+  (characters in any term, id or label), MAX_EVIDENCE = 100,
   MAX_TERMS = 1000 (phenotype/pathway terms), MAX_AGES = 100,
   MAX_COUNT = 1e12 (counts, sample_size), _PRE = 1e15 (absolute-value cap
   applied to numeric inputs before arithmetic), MIN_PRIOR = 0.000001 (floor for
@@ -34,6 +36,8 @@ ValueError, and TypeError for bool, non-number or wrong container types):
   federated_evidence is also refused when the posterior would not be interior (computed beta <= 0 after
   float cancellation, or mean not strictly between 0 and 1).
   Also refused: duplicate phenotype or pathway terms and duplicate graph node ids.
+  Scope: these limits apply to the *_checked wrappers only. The unchanged core (importable directly, opt-in)
+  is out of scope and stays unsafe for oversized, nested or non-finite inputs.
 """
 from __future__ import annotations
 
@@ -43,6 +47,9 @@ from collections.abc import Mapping
 from . import core
 
 MAX_ITEMS = 10_000
+MAX_CANDIDATES = 1000
+MAX_TOTAL_KEYS = 10_000
+MAX_TEXT = 256
 MAX_EVIDENCE = 100          # 350**100 * 1e6 stays far below float max
 MAX_TERMS = 1000
 MAX_AGES = 100
@@ -89,6 +96,8 @@ def _seq(v, name, cap):
 def _text(v, name):
     if not isinstance(v, str) or not v:
         raise TypeError(f"{name} must be non-empty text")
+    if len(v) > MAX_TEXT:
+        raise ValueError(f"{name} longer than {MAX_TEXT} characters")
     return v
 
 
@@ -172,7 +181,10 @@ def _ancestors(m, budget=None):
     if len(m) > MAX_ANCESTOR_KEYS:
         raise ValueError(f"ancestor_map has more than {MAX_ANCESTOR_KEYS} keys")
     if budget is None:
-        budget = [MAX_ANCESTOR_TERMS]
+        budget = [MAX_ANCESTOR_TERMS, MAX_TOTAL_KEYS]
+    budget[1] -= len(m)
+    if budget[1] < 0:
+        raise ValueError(f"ancestor_map has more than {MAX_TOTAL_KEYS} keys in total")
     out = {}
     for k, v in m.items():
         _text(k, "ancestor_map key")
@@ -199,9 +211,9 @@ def phenotype_match_checked(patient_hpo, disease_hpo, ancestor_map=None):
 
 def reverse_inference_checked(patient_hpo, candidates):
     p = _terms(patient_hpo, "patient_hpo")
-    cs = _seq(candidates, "candidates", MAX_ITEMS)
+    cs = _seq(candidates, "candidates", MAX_CANDIDATES)
     pairs = 0
-    budget = [MAX_ANCESTOR_TERMS]
+    budget = [MAX_ANCESTOR_TERMS, MAX_TOTAL_KEYS]
     for i, c in enumerate(cs):
         if not isinstance(c, Mapping):
             raise TypeError(f"candidates[{i}] must be a mapping")
