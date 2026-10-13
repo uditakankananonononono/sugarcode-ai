@@ -78,7 +78,8 @@ class TicketStore:
         tid = tri["ticket_id"]
         if tid in self._t:
             raise ValueError(f"duplicate ticket {tid}")
-        due = datetime.fromisoformat(tri["response_due_at"])
+        # Persist the displayed SLA contract, not triage's unrounded deadline.
+        due = when + timedelta(hours=tri["sla_hours"])
         self._t[tid] = {
             "ticket_id": tid, "inquiry": inquiry, "state": "new",
             "classification": tri["classification"], "priority": tri["priority"],
