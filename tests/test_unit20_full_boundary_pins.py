@@ -178,3 +178,57 @@ def test_partial_codon_sbml_and_odd_folding_window():
     for window in [2,3]:
         r=m.folding_accessibility('AGCTAG',window=window)
         assert r['local_delta_g_kcal_mol']==pytest.approx([0,-1.05,-2.6,-1.05,-.5,-1.05])
+
+def test_design_positive_copy_one():
+    assert m._validate_design(' MA ','ecoli_k12',.4,.6,1)=='MA'
+
+def test_declared_defaults_forward_or_report(monkeypatch):
+    class Stop(Exception):pass
+    seen={}
+    class Rng:
+        def exponential(self,scale):seen['scale']=scale;raise Stop
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    with pytest.raises(Stop):m.tasep_simulate('ATG')
+    assert seen['scale']==.5
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:np.random.RandomState(seed))
+    assert m.sequence_attention('ATG')['heads']==4
+
+def test_two_site_tasep_four_events(monkeypatch):
+    class Rng:
+        choices=iter([0,1,2,0])
+        def exponential(self,scale):return scale
+        def choice(self,n,p):return next(self.choices)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{'ATG':.5,'GCT':.25})
+    r=m.tasep_simulate('ATGGCT',ribosome_init_rate=2,steps=4)
+    assert r['proteins_completed']==1
+    assert r['sim_time_s']==1.42
+    assert r['density_profile']==[.333,.333] and r['mean_density']==.3333
+
+
+def test_synonymous_landscape_and_default_trial_count(monkeypatch):
+    class Rng:
+        def integers(self,n):return 2
+        def choice(self,choices):return 'C'
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    r=m.evolutionary_robustness('GCT')
+    assert r['trials']==200 and r['synonymous_fraction']==1 and r['mean_mutation_effect']==0
+
+def test_optimize_closed_form_stubbed_cost_and_rounding(monkeypatch):
+    monkeypatch.setattr(m.codonlib,'optimize_sequence',lambda *a:'ATGGCT')
+    monkeypatch.setattr(m,'tasep_simulate',lambda *a,**kw:{})
+    monkeypatch.setattr(m,'_trna_strain',lambda *a:.123456)
+    monkeypatch.setattr(m,'gc_content',lambda dna:.543216)
+    monkeypatch.setattr(m,'gc_windows',lambda dna,window:[(0,.543216)])
+    values=iter([.812345,.792345,.654321])
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:next(values))
+    r=m.optimize('MA')
+    assert r['cai_gc_repair_cost']==.02 and r['gc_repair_note'] is None
+    assert r['cai_before']==.6543 and r['cai_after']==.7923 and r['chi_score']==.1235
+    assert r['gc_content']==.5432 and r['gc_windows']==[{'start':0,'gc':.543}]
+
+
+def test_strain_floor_and_nontrivial_dwell_rounding(monkeypatch):
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{'ATG':0,'GCT':.3})
+    assert m._trna_strain('ATG',{})==pytest.approx(-math.log(1e-6))
+    assert m.tasep_simulate('GCT',steps=0)['dwell_times_s']==[.3333]
