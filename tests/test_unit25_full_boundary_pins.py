@@ -253,3 +253,23 @@ def test_stability_independent_weight_mix(monkeypatch):
     r=m._stability('AAAA',['H','H','E','C'])
     # .2+.075+.225=.5, ddG=-4.
     assert r['folding_dg_estimate']==-4 and r['stability_class']=='moderate'
+
+def test_same_prefix_distinct_triplets():
+    r=m.expression_construct('DE')
+    assert r['coding_dna']=='GATGAA' and r['codon_diversity']==1
+    r=m.expression_construct('DEDED')
+    assert r['coding_dna']=='GATGAAGATGAAGAT' and r['codon_diversity']==2/5
+
+@pytest.mark.parametrize('n,h,e,d,c,ddg',[(3,2,1,8,3,-3.83),(4,1,3,37,13,-3.44),(7,1,5,37,13,-3.01),(2,1,1,7,1,-3.14)])
+def test_weight_rounding_separates_small_changes(monkeypatch,n,h,e,d,c,ddg):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2]*c+[0]*(d-c))
+    r=m._stability('A'*n,['H']*h+['E']*e+['C']*(n-h-e))
+    # Independent weighted fractions: .4*h/n + .3*e/n + .3*c/d.
+    assert r['folding_dg_estimate']==ddg
+
+@pytest.mark.parametrize('hydro,expected',[([0,2],'moderate'),([0],'low')])
+def test_stability_cutoff_small_shifts(monkeypatch,hydro,expected):
+    # all H=.4; half-core adds.15 giving.55 exactly. A downward
+    # threshold shift changes each strict classification.
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:hydro)
+    assert m._stability('AA',['H','H'])['stability_class']==expected
