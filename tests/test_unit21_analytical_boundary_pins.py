@@ -139,3 +139,44 @@ def test_public_charge_magnitude1000_vs1001(monkeypatch):
     monkeypatch.setattr(m.core,'physical_energy',lambda c,q,s,e:{'charges':q.tolist()})
     assert m.safe_physical_energy([[0,0,0]],charges=[1000])['charges']==[1000]
     with pytest.raises(ValueError):m.safe_physical_energy([[0,0,0]],charges=[1001])
+
+@pytest.mark.parametrize('sequence',[None,[],5,''])
+def test_mutation_input_guard_stage(sequence):
+    with pytest.raises(ValueError,match='sequence: non-empty'):m.safe_mutation_stability(sequence,0,'A')
+
+
+def test_mutation_zero_and_empty_cleaned_index(monkeypatch):
+    monkeypatch.setattr(m.core,'mutation_stability',lambda s,p,b:p)
+    assert m.safe_mutation_stability('AC',0,'G')==0
+    with pytest.raises(ValueError,match='position'):m.safe_mutation_stability('!!!',0,'G')
+    with pytest.raises(ValueError,match='position'):m.safe_mutation_stability('AC',2,'G')
+    with pytest.raises(ValueError,match='mutant'):m.safe_mutation_stability('AC',0,'GG')
+
+@pytest.mark.parametrize('r,t',[(np.zeros((2,3)),[0,0,0]),(np.eye(3),[0,0]),(np.diag([float('nan'),1,1]),[0,0,0])])
+def test_rotation_shape_and_finite_guard_stage(r,t):
+    with pytest.raises(ValueError,match='rotation must be finite'):m.safe_rigid_transform([[0,0,0]],r,t)
+
+
+def test_tree_string_metadata_and_nested_nan_refinement(monkeypatch):
+    assert m._tree_ok({'metadata':'ok','flag':None})
+    monkeypatch.setattr(m.core,'refine_coordinates',lambda *a:{'coordinates':[[0,0,0],[1,0,0]],'energy':float('nan')})
+    with pytest.raises(ValueError,match='non-finite'):m.safe_refine_coordinates([[0,0,0],[1,0,0]])
+
+@pytest.mark.parametrize('d,valid',[(.9995e-8,True),(1.0005e-8,False)])
+def test_rotation_precision_orthogonality(d,valid):
+    scale=np.sqrt(1+d);r=np.diag([scale,1/scale,1])
+    if valid:m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+    else:
+        with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+
+@pytest.mark.parametrize('d,valid',[(.9995e-8,True),(1.0005e-8,False)])
+def test_rotation_precision_determinant(d,valid):
+    r=np.eye(3)*(1+d)**(1/3)
+    assert np.allclose(r@r.T,np.eye(3),rtol=0,atol=1e-8)
+    if valid:m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+    else:
+        with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+
+
+def test_charge_precision1000point5_refusal():
+    with pytest.raises(ValueError):m._charges([1000.5],1)
