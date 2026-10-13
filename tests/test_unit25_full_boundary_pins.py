@@ -63,3 +63,35 @@ def test_stability_weighted_score_and_rounding(monkeypatch):
     monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[1,1.01,0,2])
     r=m._stability('AAAA',['H','H','E','C'])
     assert r=={'helix_fraction':.5,'strand_fraction':.25,'hydrophobic_core_fraction':.5,'folding_dg_estimate':-3.4,'stability_class':'moderate'}
+
+def test_candidate_defaults_and_ranking_independent_stubs(monkeypatch):
+    calls=[]
+    def sequence(pattern,active,rng):calls.append(pattern);return 'A'*len(pattern),[],False
+    monkeypatch.setattr(m,'_design_sequence',sequence)
+    monkeypatch.setattr(m,'chou_fasman',lambda s:['H']*len(s))
+    monkeypatch.setattr(m,'_stability',lambda *a:{'folding_dg_estimate':-4})
+    r=m.design_protein('enzyme',length=2)
+    assert len(calls)==8 and calls==['HH']*8
+    assert r['best']['fold_match']==1 and r['best']['design_score']==.8
+    assert len(r['alternates'])==3 and r['verification']['fold_verified'] is True
+    assert r['applications']=='industrial biocatalyst'
+    calls.clear();r=m.design_protein('enzyme',length=1,candidates=1)
+    assert len(calls)==1 and r['target_pattern']=='H'
+    calls.clear();r=m.design_protein('enzyme',length=10,candidates=1)
+    assert r['best']['fold_match']==.5 and r['verification']['fold_verified'] is False
+
+def test_histidine_charge_and_default_binding():
+    assert m.active_site_geometry('H',[0])['net_charge']==.1
+    g=m.binding_interface('DA',[0,1])
+    score=.45+.35*.75/math.e
+    assert g['binding_score']==pytest.approx(score)
+    assert m.enzyme_kinetics('DW',[0,1])['kcat_s']==pytest.approx(10**(-1+3*.75/math.e))
+
+def test_default_epitope_and_signal_prefix_limits():
+    r=m.immunogenicity_scan('W'*10)
+    assert len(r['epitopes'])==2 and all(len(x['peptide'])==9 for x in r['epitopes'])
+    assert m.cellular_compatibility('M'+'G'*15+'A'*9)['signal_peptide_proxy'] is True
+    assert m.cellular_compatibility('M'+'G'*16+'A'*9)['signal_peptide_proxy'] is False
+    assert m.cellular_compatibility('M'+'G'*23+'A'*9)['signal_peptide_proxy'] is False
+    r=m.cellular_compatibility('CCCCKEN',compartment='ER')
+    assert r['disulfide_capacity']==2 and r['degron_count']==1 and r['folding_risk']==.15
