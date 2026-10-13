@@ -82,3 +82,15 @@ def test_refinement_output_caps_and_finite_arrays(monkeypatch):
 def test_rotation_both_orthogonality_and_determinant_required():
     with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],np.diag([-1,1,1]),[0,0,0])
     with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],np.diag([2,.5,1]),[0,0,0])
+
+def test_rotation_small_scaling_and_small_reflection_deviation():
+    # Scale1.01 retains determinant1.01 but fails both1e-8 checks.
+    with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],np.diag([1.01,1,1]),[0,0,0])
+    # det1 shear: orthogonality is the only failing check.
+    with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],[[1,.01,0],[0,1,0],[0,0,1]],[0,0,0])
+    # Each row norm-squared differs8e-9 (passes1e-8 orthogonality),
+    # determinant differs about1.2e-8 (fails1e-8 determinant).
+    r=np.eye(3)*np.sqrt(1+8e-9)
+    assert np.allclose(r@r.T,np.eye(3),rtol=0,atol=1e-8)
+    assert not np.isclose(np.linalg.det(r),1,rtol=0,atol=1e-8)
+    with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
