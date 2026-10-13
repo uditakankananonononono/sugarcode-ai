@@ -232,3 +232,98 @@ def test_strain_floor_and_nontrivial_dwell_rounding(monkeypatch):
     monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{'ATG':0,'GCT':.3})
     assert m._trna_strain('ATG',{})==pytest.approx(-math.log(1e-6))
     assert m.tasep_simulate('GCT',steps=0)['dwell_times_s']==[.3333]
+
+@pytest.mark.parametrize('cost,note',[(.01994,False),(.02006,True),(.023456,True)])
+def test_gc_repair_sides_and_rounding(monkeypatch,cost,note):
+    monkeypatch.setattr(m.codonlib,'optimize_sequence',lambda *a:'ATGGCT')
+    monkeypatch.setattr(m,'tasep_simulate',lambda *a,**k:{})
+    vals=iter([.9,.9-cost,.6])
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:next(vals))
+    r=m.optimize('MA')
+    assert r['cai_gc_repair_cost']==round(cost,4)
+    assert (r['gc_repair_note'] is not None)==note
+
+def test_window_and_table_fallbacks(monkeypatch):
+    windows=[];tables=[]
+    monkeypatch.setattr(m,'gc_windows',lambda dna,size:windows.append(size) or [(0,.5)])
+    original=m.codonlib.relative_adaptiveness
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:tables.append(table) or original(table))
+    m.optimize('MA')
+    assert windows==[60]
+    m.tasep_simulate('ATG',{},steps=0)
+    assert tables[-1] is m.codonlib.ECOLI_K12
+
+def test_tasep_seed_default_count_and_burn(monkeypatch):
+    seen={'events':0,'seed':None}
+    class Rng:
+        def exponential(self,scale):return scale
+        def choice(self,n,p):
+            seen['events']+=1;return 0 if seen['events']%2 else 1
+    def factory(seed):seen['seed']=seed;return Rng()
+    monkeypatch.setattr(m.np.random,'default_rng',factory)
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.5})
+    r=m.tasep_simulate('ATG')
+    assert seen=={'events':4000,'seed':42}
+    assert r['proteins_completed']==2000 and r['mean_density']==.5
+    seen['events']=0
+    r=m.tasep_simulate('ATG',steps=5)
+    assert r['density_profile']==[.5] and r['proteins_completed']==2
+
+@pytest.mark.parametrize('profile,jams',[([.1,.7,.7,.2],[1]),([.1,.6,.6,.2],[]),([.7,.7,.7,.2],[]),([.1,.7,.8,.2],[2])])
+def test_jam_plateaus_and_point6_edge(monkeypatch,profile,jams):
+    zeros=np.zeros
+    def make(n,*a,**kw):
+        return zeros(n,*a,**kw) if kw.get('dtype') is int else np.array(profile,dtype=float)
+    monkeypatch.setattr(m.np,'zeros',make)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:None)
+    r=m.tasep_simulate('ATG'*4,steps=0)
+    assert r['density_profile']==profile and r['jam_sites']==jams
+
+def test_unsupported_residue_and_default_folding_window():
+    with pytest.raises(ValueError,match='unsupported residues'):m._validate_design('MAX','ecoli_k12',.4,.6,1)
+    dna='A'*15+'G'*15+'C'*15
+    r=m.folding_accessibility(dna)
+    # i0 has15 A; i15 has15 A/15 G; i44 has1 G/15 C and1 pair.
+    assert r['local_delta_g_kcal_mol'][0]==0
+    assert r['local_delta_g_kcal_mol'][15]==-1.05
+    assert r['local_delta_g_kcal_mol'][44]==-2.6
+
+def test_mutations_across_codon_indices_and_repeat_count(monkeypatch):
+    class Rng:
+        def __init__(self):self.indices=iter([2,5,8]);self.bases=iter(['C','T','T'])
+        def integers(self,n):return next(self.indices)
+        def choice(self,choices):return next(self.bases)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    # GCT -> GCC
+    # synonymous; GAA->GAT missense; TGG->TGT missense.
+    r=m.evolutionary_robustness('GCTGAATGGAAAA',trials=3)
+    assert r['synonymous_fraction']==1/3 and r['stop_gain_fraction']==0
+    assert r['mean_mutation_effect']==pytest.approx(-.2)
+    assert r['homopolymer_risk']==1
+
+def test_diagnostic_thresholds_with_three_codons(monkeypatch):
+    windows=[]
+    monkeypatch.setattr(m,'gc_windows',lambda dna,size:windows.append(size) or [(0,.4),(1,.6)])
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.2,'GCT':.8,'GAA':.9})
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:.7)
+    flow={'dwell_times_s':[1,2,3],'density_profile':[.6,.7,.1],'output_rate_per_s':1,'mean_density':.4667,'jam_sites':[]}
+    load={'atp_molecules_per_cell_per_cycle':12,'estimated_host_flux_diversion':0}
+    fold={'accessibility':[.1,.2,.3,.2,.3,.4,.3,.4,.5],'initiation_accessibility':.3}
+    evo={'synonymous_fraction':.5,'stop_gain_fraction':0,'mean_mutation_effect':0,'homopolymer_risk':0}
+    r=m._design_diagnostics('ATGGCTGAA',flow,load,fold,evo,{'context_score':[1/3]*3},{},1)
+    assert windows==[60] and r['GC_window_range']==pytest.approx(.2)
+    assert r['rare_codon_fraction']==0 and r['optimal_codon_fraction']==1/3
+    assert r['queue_fraction']==1/3 and r['CAI']==.7
+    assert len(r)==51 # >=50 assertion mutations to >50 or >=49 equivalent here.
+
+def test_naive_missing_codon_frequency_zero(monkeypatch):
+    class Table(dict):
+        def get(self,key,default=None):
+            assert default==0
+            return super().get(key,default)
+    monkeypatch.setitem(m.codonlib.HOST_TABLES,'test',Table(ATG=1))
+    monkeypatch.setattr(m.codonlib,'optimize_sequence',lambda *a:'ATGGCT')
+    monkeypatch.setattr(m,'_trna_strain',lambda *a:0)
+    monkeypatch.setattr(m,'tasep_simulate',lambda *a:{})
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:1)
+    assert m.optimize('MA',host='test')['protein_length']==2
