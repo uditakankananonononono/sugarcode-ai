@@ -273,3 +273,14 @@ def test_stability_cutoff_small_shifts(monkeypatch,hydro,expected):
     # threshold shift changes each strict classification.
     monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:hydro)
     assert m._stability('AA',['H','H'])['stability_class']==expected
+
+@pytest.mark.parametrize('n,h,e,d,c,ddg',[(3,2,1,7,1,-3.28),(6,1,3,7,1,-2.08),(7,1,3,8,3,-2.39)])
+def test_downward_weight_rounding_edges(monkeypatch,n,h,e,d,c,ddg):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2]*c+[0]*(d-c))
+    assert m._stability('A'*n,['H']*h+['E']*e+['C']*(n-h-e))['folding_dg_estimate']==ddg
+
+def test_float_boundary_classification_is_preserved(monkeypatch):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[2]*2+[0]*9)
+    r=m._stability('A'*11,['H']*8+['E']*2+['C'])
+    assert .4*(8/11)+.3*(2/11)+.3*(2/11)==.4000000000000001
+    assert r['stability_class']=='moderate'
