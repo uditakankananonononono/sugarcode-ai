@@ -136,3 +136,21 @@ def test_probability_sum_tolerance_neighbors(monkeypatch):
         if accepted:assert m.safe_isoform_distribution(.5)['isoforms']['a']==total
         else:
             with pytest.raises(ValueError):m.safe_isoform_distribution(.5)
+
+def test_calibration_one_floor_with_unclamped_upper_interval():
+    # logit log(1/99) => psi1/100. n1 gives radius1.96*sqrt(.0099)
+    # upper interval stays below1 and separates max(2,n) from max(1,n).
+    support=(math.log(1/99)+.5)/2
+    r=m.safe_exon_inclusion(0,0,{'exon_definition_support':support},calibration_n=1)
+    assert r['psi']==pytest.approx(.01)
+    assert r['interval95']==pytest.approx([0,.01+1.96*math.sqrt(.0099)])
+
+
+def test_public_probability_and_impact_small_refusals():
+    for psi in [-1e-9,1.001]:
+        with pytest.raises(ValueError,match='psi: out of range'):m.safe_isoform_distribution(psi)
+    with pytest.raises(ValueError,match='impact: out of range'):m.safe_active_learning([{'probability':.5,'impact':-1e-9}])
+
+@pytest.mark.parametrize('x',[-.0001,.0001,-1,1])
+def test_logistic_branch_nonzero_closed_form(x):
+    assert m._stable_logistic(x)==pytest.approx(1/(1+math.exp(-x)),abs=1e-15)
