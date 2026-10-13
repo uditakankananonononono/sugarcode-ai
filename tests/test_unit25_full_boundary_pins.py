@@ -95,3 +95,48 @@ def test_default_epitope_and_signal_prefix_limits():
     assert m.cellular_compatibility('M'+'G'*23+'A'*9)['signal_peptide_proxy'] is False
     r=m.cellular_compatibility('CCCCKEN',compartment='ER')
     assert r['disulfide_capacity']==2 and r['degron_count']==1 and r['folding_risk']==.15
+
+def test_cellular_compatibility_closed_form_cases():
+    r=m.cellular_compatibility('PESTKENDGNCCCC',compartment='cytosol')
+    assert r['degron_count']==3 and r['disulfide_capacity']==0
+    assert r['folding_risk']==pytest.approx(.75)
+    for compartment in ['ER','secreted']:
+        r=m.cellular_compatibility('PESTKENDGNCCCCC',compartment=compartment)
+        assert r['disulfide_capacity']==2 and r['folding_risk']==pytest.approx(.45)
+    assert m.cellular_compatibility('CC')['folding_risk']==0
+    assert m.cellular_compatibility('CCC')['folding_risk']==.3
+    assert m.cellular_compatibility('A'*19)['transmembrane_propensity']==1
+    assert m.cellular_compatibility('G'+'A'*18+'G')['transmembrane_propensity']==18/19
+    assert m.cellular_compatibility('A'*18)['transmembrane_propensity']==18/19
+
+def test_epitope_exact_point33_cutoff():
+    r=m.immunogenicity_scan('W'*33+'A'*67,window=100)
+    assert r=={'epitopes':[{'start':0,'peptide':'W'*33+'A'*67,'risk':.33}],'max_risk':.33,'burden':.33}
+
+def test_sensitivity_exact_half_and_six_tenths():
+    # local HYDRO fractions 2/9 and1 for a G/P centre. Defaults i+-3
+    # give seven residues, so construct .5 with active-site .4 + .45*(2/9)
+    # is not attainable here. .6 is exactly .45 + .15 in binary64.
+    r=m.mutational_scan('AAAPAAA')
+    # P isn't HYDRO, local6/7: .45*6/7+.15.
+    assert r['positions'][3]['functional_sensitivity']==pytest.approx(.45*6/7+.15)
+    r=m.mutational_scan('G',active_positions=[0])
+    assert r['positions'][0]['functional_sensitivity']==.55
+    assert r['positions'][0]['suggested_class']=='conservative' and r['high_sensitivity']==[]
+    r=m.mutational_scan('AAAAA')
+    assert all(x['functional_sensitivity']==.45 for x in r['positions'])
+    assert r['high_sensitivity']==[]
+    r=m.mutational_scan('AAAAGGGGAAAA',[4])
+    expected=[.45*sum(a=='A' for a in 'AAAAGGGGAAAA'[max(0,i-3):i+4])/len('AAAAGGGGAAAA'[max(0,i-3):i+4])+.4*(i==4)+.15*(a=='G') for i,a in enumerate('AAAAGGGGAAAA')]
+    assert [x['functional_sensitivity'] for x in r['positions']]==pytest.approx(expected)
+
+def test_stability_high_low_thresholds_and_fraction_precision(monkeypatch):
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[0,2,2])
+    assert m._stability('AAA',['H']*3)=={'helix_fraction':1,'strand_fraction':0,'hydrophobic_core_fraction':.667,'folding_dg_estimate':-4.8,'stability_class':'high'}
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[0])
+    assert m._stability('AAA',['C']*3)['stability_class']=='low'
+    r=m._stability('AAA',['H','E','C'])
+    assert r['helix_fraction']==.333 and r['strand_fraction']==.333 and r['folding_dg_estimate']==-1.87
+    assert m._stability('AA',['H','H'])['stability_class']=='low' # exact score .4
+    monkeypatch.setattr(m,'hydrophobicity_profile',lambda *a:[0,2])
+    assert m._stability('AA',['H','H'])['stability_class']=='moderate' # exact score .55
