@@ -61,11 +61,14 @@ def flux_variability(model, objective=None, fraction_of_optimum=1.0, bounds_over
     c = np.zeros(n); c[oi] = -1.0
     base = linprog(c, A_eq=S, b_eq=beq, bounds=list(zip(lb, ub)), method="highs")
     note = ("PARTIAL: LP-based flux variability of the module's toy stoichiometric models; "
+            "objective constraint is objective >= optimum - (1 - fraction) * |optimum| "
+            "(equals fraction * optimum when optimum >= 0); "
             "no genome-scale network, no gene-protein-reaction rules, no wet-lab claim")
     if not base.success:
-        return {"status": "infeasible", "objective": obj, "optimum": None, "ranges": {}, "status_note": note}
+        return {"status": "infeasible", "objective": obj, "optimum": None, "objective_bound": None, "ranges": {}, "status_note": note}
     opt = float(-base.fun)
-    lb2 = lb.copy(); lb2[oi] = max(lb2[oi], f * opt - 1e-9 * max(1.0, abs(opt)))
+    bound = opt - (1.0 - f) * abs(opt)  # = f*opt when opt >= 0; stays <= opt when opt < 0
+    lb2 = lb.copy(); lb2[oi] = max(lb2[oi], bound - 1e-9 * max(1.0, abs(opt)))
     ranges = {}
     for i, name in enumerate(model.reactions):
         vals = []
@@ -79,4 +82,4 @@ def flux_variability(model, objective=None, fraction_of_optimum=1.0, bounds_over
         ranges[name] = {"min": lo, "max": hi, "fixed": bool(hi - lo <= tol),
                         "blocked": bool(abs(lo) <= tol and abs(hi) <= tol)}
     return {"status": "optimal", "objective": obj, "optimum": opt, "fraction_of_optimum": f,
-            "ranges": ranges, "status_note": note}
+            "objective_bound": bound, "ranges": ranges, "status_note": note}
