@@ -14,10 +14,10 @@ import pytest
 
 import sugarcode.modules as modules_pkg
 
-# cannot be routed at package level, with the reason
-NOT_ROUTABLE = {
-    ("docking_studio", "dock"): "package name `dock` is core.dock (a different, unseeded function); the seeded one is vina_real.dock",
-    ("docking_studio", "prepare_ligand_from_smiles"): "vina_real.prepare_ligand_from_smiles is not exported by the package (optional vina backend)",
+# package-level names that cannot be the wrapper's own name: the wrapper is exported under a distinct alias instead
+ALIASES = {
+    ("docking_studio", "dock"): "dock_vina_real",  # package `dock` is core.dock, a different unseeded function
+    ("docking_studio", "prepare_ligand_from_smiles"): "prepare_ligand_vina_real",  # not exported before; alias keeps the vina names distinct
 }
 
 
@@ -46,12 +46,12 @@ def scan():
 
 
 ROWS = scan()
-ROUTED = [r for r in ROWS if (r[0], r[2]) not in NOT_ROUTABLE]
+ROUTED = [r for r in ROWS if (r[0], r[2]) not in ALIASES]
 
 
 def test_scan_counts():
     assert len(ROWS) == 74 and len(ROUTED) == 72
-    assert {(r[0], r[2]) for r in ROWS if (r[0], r[2]) in NOT_ROUTABLE} == set(NOT_ROUTABLE)
+    assert {(r[0], r[2]) for r in ROWS if (r[0], r[2]) in ALIASES} == set(ALIASES)
 
 
 def test_each_package_function_has_exactly_one_wrapper():
@@ -78,13 +78,24 @@ def test_package_name_refuses_bad_seed_before_the_implementation(m, s, n, impl):
         f(*args, seed=2**63)
 
 
-@pytest.mark.parametrize("m,n", sorted(NOT_ROUTABLE))
-def test_not_routable_names_are_recorded_with_the_current_state(m, n):
+@pytest.mark.parametrize("m,n", sorted(ALIASES))
+def test_alias_is_the_wrapper_and_core_name_is_untouched(m, n):
     pkg = importlib.import_module(f"sugarcode.modules.{m}")
+    row = [r for r in ROWS if (r[0], r[2]) == (m, n)][0]
+    w = getattr(importlib.import_module(f"sugarcode.modules.{m}.{row[1]}"), n)
+    assert getattr(pkg, ALIASES[(m, n)]) is w and w.__wrapped__ is row[3]
+    assert ALIASES[(m, n)] in pkg.__all__
     if n == "dock":
         assert pkg.dock is importlib.import_module(f"sugarcode.modules.{m}.core").dock
     else:
         assert not hasattr(pkg, n)
+    req = [p for p in inspect.signature(w).parameters.values()
+           if p.default is inspect.Parameter.empty and p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    args = [None] * len(req)
+    with pytest.raises(TypeError, match=r"^seed must be an integer$"):
+        w(*args, seed=True)
+    with pytest.raises(ValueError, match=r"^seed must be between 0 and 9223372036854775807$"):
+        w(*args, seed=2**63)
 
 
 def test_deep_list_seed_through_a_package_name_is_refused_in_a_subprocess():
