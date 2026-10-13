@@ -27,7 +27,8 @@ CASES = [("stochastic_gene_expression", "['a'], minutes=1"), ("evolutionary_stab
 
 @pytest.mark.parametrize("fn,args", CASES)
 def test_unchecked_core_crashes_on_nested_list_seed(fn, args):
-    assert run("core", fn, args).returncode in (-11, 139)
+    # environment-robust: older numpy segfaults (rc -11/139), newer numpy may raise TypeError; either way no valid result
+    assert run("core", fn, args).returncode != 0
 
 
 @pytest.mark.parametrize("fn,args", CASES)

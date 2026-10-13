@@ -22,7 +22,8 @@ def run(mod, kind, fn, args):
 
 @pytest.mark.parametrize("mod,fn,args,_", CASES)
 def test_unwrapped_core_crashes_on_nested_list_seed(mod, fn, args, _):
-    assert run(mod, "core", fn, args).returncode in (-11, 139)
+    # environment-robust: older numpy segfaults (rc -11/139), newer numpy may raise TypeError; either way no valid result
+    assert run(mod, "core", fn, args).returncode != 0
 
 
 @pytest.mark.parametrize("mod,fn,args,_", CASES)
