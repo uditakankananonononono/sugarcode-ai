@@ -131,15 +131,15 @@ def test_tol_semantics():
     assert FVA(m, tol=4.5)["ranges"]["P1"]["blocked"] is False and FVA(m, tol=6)["ranges"]["P1"]["blocked"] is True
 
 
-def test_characterization_tol_zero_never_reports_fixed_because_of_objective_slack():
-    """CHARACTERIZATION of current behavior (not a claim it is desired): the objective constraint is relaxed by
-    1e-9*max(1,|opt|), so a truly fixed reaction at f=1 reports min about opt-1e-9 and tol=0 gives fixed=False."""
+def test_tol_zero_reports_fixed_after_slack_leak_fix():
+    """v4: was a characterization of the defect (objective relaxation leaked into min/max). Now pins the fix:
+    a truly fixed reaction at f=1 reports min == max == opt exactly, so tol=0 gives fixed=True."""
     r = FVA(parallel(), tol=0)["ranges"]["UP"]
-    assert r["fixed"] is False and r["min"] == pytest.approx(10, abs=2e-8) and r["min"] < 10
+    assert r["fixed"] is True and r["min"] == 10 and r["max"] == 10
     big = model([[1, -1, -1, 0], [0, 1, 1, -1]], [0] * 4, [1e9, 6e8, 6e8, 1e12], ["UP", "P1", "P2", "BIO"])
     rb = FVA(big)["ranges"]["UP"]
-    assert 1e9 - 1.5 < rb["min"] < 1e9 - 0.5                               # widened by about 1e-9*1e9 = 1 flux unit
-    assert rb["fixed"] is False                                          # even at the default tol=1e-6
+    assert rb["min"] == pytest.approx(1e9, abs=1e-3) and rb["max"] == pytest.approx(1e9, abs=1e-3)
+    assert rb["fixed"] is True                                           # at the default tol=1e-6
 
 
 # ---- exhaustive vs integer enumeration ----

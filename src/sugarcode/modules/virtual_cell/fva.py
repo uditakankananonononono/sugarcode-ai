@@ -68,13 +68,18 @@ def flux_variability(model, objective=None, fraction_of_optimum=1.0, bounds_over
         return {"status": "infeasible", "objective": obj, "optimum": None, "objective_bound": None, "ranges": {}, "status_note": note}
     opt = float(-base.fun)
     bound = opt - (1.0 - f) * abs(opt)  # = f*opt when opt >= 0; stays <= opt when opt < 0
-    lb2 = lb.copy(); lb2[oi] = max(lb2[oi], bound - 1e-9 * max(1.0, abs(opt)))
+    # The objective floor is applied EXACTLY (so reported min/max are the true bounds and tol=0 can give
+    # fixed=True). A 1e-9*max(1,|opt|) relaxation is used only as a fallback if an LP fails with the exact floor.
+    lb2 = lb.copy(); lb2[oi] = max(lb2[oi], bound)
+    lb3 = lb.copy(); lb3[oi] = max(lb3[oi], bound - 1e-9 * max(1.0, abs(opt)))
     ranges = {}
     for i, name in enumerate(model.reactions):
         vals = []
         for sign in (1.0, -1.0):  # minimise v, then minimise -v (= maximise v)
             ci = np.zeros(n); ci[i] = sign
             r = linprog(ci, A_eq=S, b_eq=beq, bounds=list(zip(lb2, ub)), method="highs")
+            if not r.success:
+                r = linprog(ci, A_eq=S, b_eq=beq, bounds=list(zip(lb3, ub)), method="highs")
             if not r.success:
                 raise ValueError(f"FVA LP failed for {name}: {r.message}")
             vals.append(float(r.x[i]))
