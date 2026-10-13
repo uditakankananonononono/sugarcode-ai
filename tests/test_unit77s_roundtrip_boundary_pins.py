@@ -48,3 +48,23 @@ def test_breach_at_latest_event_equality():
     now=T+timedelta(hours=30)
     s.transition(r['ticket_id'],'triaged',now)
     assert s.breaches(now)==[r['ticket_id']]
+
+def test_store_capacity_declared10000(monkeypatch):
+    class Records(dict):
+        def __init__(self,size):super().__init__();self.size=size
+        def __len__(self):return self.size
+    s=m.TicketStore();s._t=Records(9999)
+    assert s.open_ticket('question',submitted_at=T)['state']=='new'
+    s._t=Records(10000)
+    with pytest.raises(ValueError,match='store is full'):s.open_ticket('question',submitted_at=T)
+
+@pytest.mark.parametrize('size,valid',[(50000000,True),(50000001,False)])
+def test_declared_dump_character_cap_without_large_allocation(monkeypatch,size,valid):
+    class SizedText(str):
+        def __len__(self):return size
+    text=SizedText('{"version":1,"tickets":[]}')
+    loads=json.loads
+    monkeypatch.setattr(m.json,'loads',lambda value:loads(str(value)))
+    if valid:assert len(m.TicketStore.loads(text))==0
+    else:
+        with pytest.raises(ValueError,match='dump too large'):m.TicketStore.loads(text)
