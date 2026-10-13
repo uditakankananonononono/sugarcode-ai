@@ -15,3 +15,9 @@ __all__ += ["fit_multiomics_classifier", "predict_multiomics_classifier", "evalu
 
 from .core import bootstrap_haplotype_weights
 __all__ += ["bootstrap_haplotype_weights"]
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_checked import bootstrap_haplotype_weights  # noqa: E402,F401
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_checked import fragment_length_model  # noqa: E402,F401

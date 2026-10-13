@@ -2,3 +2,15 @@
 from .core import (analyze_stability_v2, molecular_stability_profile, optimize_stability_v2, sequence_risk_map, stochastic_drift_v2, analyze_stability, enhancement_features, optimize_stability,
  stability_forecast, stochastic_drift, validate_construct)
 __all__=["analyze_stability_v2","molecular_stability_profile","optimize_stability_v2","sequence_risk_map","stochastic_drift_v2","analyze_stability","enhancement_features","optimize_stability","stability_forecast","stochastic_drift","validate_construct"]
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_guard import analyze_stability  # noqa: E402,F401
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_guard import analyze_stability_v2  # noqa: E402,F401
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_gate import stochastic_drift  # noqa: E402,F401
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_gate import stochastic_drift_v2  # noqa: E402,F401

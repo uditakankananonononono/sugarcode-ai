@@ -9,3 +9,6 @@ __all__ = ["REFERENCE", "ProfileHMM", "brute_force", "brute_force_expected_count
            "brute_force_paths", "build_profile_hmm", "forward", "forward_local", "infer_alphabet", "viterbi",
            "baum_welch", "expected_counts", "log_likelihood", "log_prior", "maximize",
            "random_profile_hmm"]
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_gate import random_profile_hmm  # noqa: E402,F401

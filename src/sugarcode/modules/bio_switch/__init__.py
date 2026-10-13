@@ -35,3 +35,6 @@ __all__ = [
 	"synthesize_biosensor",
 	"temporal_filter",
 ]
+
+# Seed-checked entry point: replaces the raw core function at package level.
+from .seed_checked import gillespie_sensor_noise  # noqa: E402,F401
