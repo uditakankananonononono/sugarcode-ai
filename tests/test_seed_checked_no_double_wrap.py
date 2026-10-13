@@ -97,12 +97,12 @@ def _names_in(path, mod):
 
 def _all_guards():
     result = {}
-    for pkg_dir in sorted(ROOT.iterdir()):
+    for pkg_dir in sorted(ROOT.iterdir()) + [ROOT.parent / "llm"]:
         if not pkg_dir.is_dir():
             continue
         per_file = {}
         for p in _guard_files(pkg_dir):
-            mod = importlib.import_module(f"sugarcode.modules.{pkg_dir.name}.{p.stem}")
+            mod = importlib.import_module(f"sugarcode.{'llm' if pkg_dir.name == 'llm' else 'modules.' + pkg_dir.name}.{p.stem}")
             per_file[p.name] = _names_in(p, mod)
         if per_file:
             result[pkg_dir.name] = per_file
@@ -129,3 +129,13 @@ def test_no_function_guarded_by_two_files(pkg):
 @pytest.mark.parametrize("pkg", sorted(EXPECTED_GUARD))
 def test_seed_guard_py_exports_exactly_the_expected_functions(pkg):
     assert GUARDS[pkg]["seed_guard.py"] - {"check_seed", "MAX_SEED"} == EXPECTED_GUARD[pkg]
+
+
+def test_train_softmax_is_guarded_exactly_once_by_llm_seed_checked_router():
+    assert GUARDS["llm"] == {"seed_checked_router.py": {"train_softmax"}}
+
+
+def test_study_residual_file_is_gone_and_lesion_study_rsa_are_gate_only():
+    assert not (ROOT / "neuro_pipeline" / "seed_checked_study.py").exists()
+    assert {"lesion_study", "rsa"} <= GUARDS["neuro_pipeline"]["seed_gate.py"]
+    assert not {"lesion_study", "rsa"} & GUARDS["neuro_pipeline"]["seed_checked.py"]

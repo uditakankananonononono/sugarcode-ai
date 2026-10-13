@@ -10,7 +10,7 @@ from sugarcode.seed_check import MAX_SEED
 
 PKG = "sugarcode.modules.neuro_pipeline"
 core = importlib.import_module(PKG + ".core")
-sc = importlib.import_module(PKG + ".seed_checked_study")
+sc = importlib.import_module(PKG + ".seed_gate")
 CAP = 2**63 - 1
 CASES = [
     ('lesion_study', "__import__('sugarcode.modules.neuro_pipeline.core',fromlist=['x']).train(epochs=3)['model']"),
@@ -38,7 +38,7 @@ def outcome(fn, args, kw, seed):
 
 
 def run(modname, fn, argstr):
-    imp = f"from {PKG} import {modname} as m" if modname == "seed_checked_study" else f"from {PKG} import core as m"
+    imp = f"from {PKG} import {modname} as m" if modname == "seed_gate" else f"from {PKG} import core as m"
     body = ("import sys; sys.setrecursionlimit(10**7); s = []\nfor _ in range(100000): s = [s]\n"
             f"{imp}\nm.{fn}({argstr + ', ' if argstr else ''}seed=s)\n")
     return subprocess.run([sys.executable, "-c", body], capture_output=True, text=True, timeout=120)
@@ -50,12 +50,12 @@ def test_unchecked_core_gives_no_valid_result_on_nested_list_seed(fn, argstr):
     assert subprocess.run([sys.executable, "-c", f"from {PKG} import core"], capture_output=True, timeout=120).returncode == 0
     r = run("core", fn, argstr)
     # environment-robust: older numpy segfaults (-11), newer numpy raises TypeError or RecursionError; either is a failure on the seed
-    assert r.returncode == -11 or (r.returncode == 1 and r.stderr.strip().splitlines()[-1].split(":")[0] in ("TypeError", "RecursionError"))
+    assert r.returncode == -11 or (r.returncode == 1 and any(l.split(":")[0] in ("TypeError", "RecursionError") for l in r.stderr.splitlines()) and "seed must be an integer" not in r.stderr)
 
 
 @pytest.mark.parametrize("fn,argstr", CASES)
 def test_checked_entry_refuses_with_helper_message(fn, argstr):
-    r = run("seed_checked_study", fn, argstr)
+    r = run("seed_gate", fn, argstr)
     assert r.returncode == 1
     assert r.stderr.strip().splitlines()[-1] == "TypeError: seed must be an integer"
 

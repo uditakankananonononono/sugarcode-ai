@@ -7,11 +7,9 @@ import pytest
 from sugarcode.seed_check import MAX_SEED
 
 WRAPPERS = {
-    'modules.neuro_pipeline.seed_checked_study': ['lesion_study', 'rsa'],
     'llm.seed_checked_router': ['train_softmax'],
 }
 CORES = {
-    'modules.neuro_pipeline.seed_checked_study': 'sugarcode.modules.neuro_pipeline.core',
     'llm.seed_checked_router': 'sugarcode.llm.router',
 }
 MODS = sorted(WRAPPERS)

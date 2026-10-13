@@ -49,7 +49,7 @@ def test_unchecked_core_gives_no_valid_result_on_nested_list_seed(fn, argstr):
     assert subprocess.run([sys.executable, "-c", f"from {PKG} import router"], capture_output=True, timeout=120).returncode == 0
     r = run("router", fn, argstr)
     # environment-robust: older numpy segfaults (-11), newer numpy raises TypeError or RecursionError; either is a failure on the seed
-    assert r.returncode == -11 or (r.returncode == 1 and r.stderr.strip().splitlines()[-1].split(":")[0] in ("TypeError", "RecursionError"))
+    assert r.returncode == -11 or (r.returncode == 1 and any(l.split(":")[0] in ("TypeError", "RecursionError") for l in r.stderr.splitlines()) and "seed must be an integer" not in r.stderr)
 
 
 @pytest.mark.parametrize("fn,argstr", CASES)
