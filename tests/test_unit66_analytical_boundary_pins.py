@@ -30,3 +30,9 @@ def test_point_cap_and_equal_concentrations():
     r=response(1,concentrations=[0]*10000)
     assert len(r['curve'])==10000 and all(x['occupancy']==0 for x in r['curve'])
     with pytest.raises(ValueError):response(1,concentrations=[1])
+
+def test_base_boundary_default_hill_independent_of_finite_wrapper():
+    r=response(2,concentrations=[1,2,4])
+    assert r['hill_coefficient']==1.5
+    odds=[(1/2)**1.5,1,2**1.5]
+    assert [x['occupancy'] for x in r['curve']]==pytest.approx([x/(1+x) for x in odds])
