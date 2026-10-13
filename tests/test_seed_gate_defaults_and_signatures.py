@@ -2,8 +2,11 @@
 
 1. Signature equality with core: parameter names, kinds and defaults (an edited default in the gate would otherwise only change
    behavior when the caller omits that argument).
-2. Default-seed / default-argument call equals core's own call with the same explicit arguments (calls use only the arguments
-   that are required or shrink the run; every parameter that has a default is left at its default).
+2. Default-seed call equals core's own call. Exactly what is covered: each CASES entry passes the required arguments plus,
+   for slow functions, explicit run-shrinking overrides (for example epochs, generations, hours, trajectories, samples,
+   replicates, population, duration, n_stimuli; see the argument strings below). Every parameter NOT named in the entry,
+   and in particular `seed`, is left at its default, so the seed default and all non-overridden defaults are exercised
+   by running the call. The defaults of the overridden parameters are pinned only by the signature tests (1), not by a run.
 """
 import importlib
 import inspect
@@ -125,6 +128,13 @@ def test_default_call_equals_core(m, f, argstr):
     b = outcome(getattr(core, f), argstr)
     assert a[0] == "ok", a  # compared path is a real result, not a shared error
     assert a == b
+
+
+@pytest.mark.parametrize("m,f,argstr", CASES)
+def test_default_call_leaves_seed_at_default(m, f, argstr):
+    import ast
+    call = ast.parse("f(" + argstr + ")", mode="eval").body
+    assert "seed" not in {k.arg for k in call.keywords}, (m, f)  # nested train(seed=1) inside an argument is allowed
 
 
 def test_helpers_equal_core_with_explicit_seed():
