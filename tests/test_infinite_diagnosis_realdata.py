@@ -73,3 +73,12 @@ def test_roadmap_uses_rarenet_angle():
     r, _ = _angles("cystic fibrosis")
     assert r["experimental_roadmap"][0]["modules"] == ["RareNet AI"]
     assert r["experimental_roadmap"][-1]["angle"] == "synthesis"
+
+
+def test_curated_bridge_survives_crowded_keyword_cluster():
+    r, mods = _angles("duchenne md")
+    therapeutic = next(c for c in r["hidden_clusters"] if c["angle"] == "therapeutics")
+    assert therapeutic["relevant_modules"][0] == "RareNet AI"
+    assert len(therapeutic["relevant_modules"]) <= 3
+    assert "RareNet AI" in mods
+    assert r["curated_disease_matches"][0]["disease"] == "duchenne_md"

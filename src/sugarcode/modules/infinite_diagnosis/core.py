@@ -30,6 +30,11 @@ def cross_domain_diagnosis(case: str, limit: int = 8, offline: bool = False) -> 
     clusters: dict[str, list[dict]] = {}
     for h in hits:
         clusters.setdefault(h["subnetwork"], []).append(h)
+    # A structured disease match must survive the per-cluster display cap.
+    # Keep keyword-only hits in their original order after that match.
+    if curated:
+        for mods in clusters.values():
+            mods.sort(key=lambda h: h["slug"] != "rarenet_ai")
     perspectives = []
     for sn, mods in sorted(clusters.items(), key=lambda kv: -len(kv[1])):
         perspectives.append({
