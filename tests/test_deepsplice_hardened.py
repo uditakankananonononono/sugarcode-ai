@@ -109,7 +109,7 @@ def test_green_active_learning_and_sim_oracle():
 
 
 def test_v2_admitted_extreme_exon_inclusion_no_overflow():
-    # auditor case: passes the input limits, core.exon_inclusion raises OverflowError here
+    # Input limits pass, but core.exon_inclusion raises OverflowError here
     out = ei(10, -10, {"exon_definition_support": 100})
     assert 0 <= out["psi"] <= 1 and math.isfinite(out["psi"])
     with pytest.raises(OverflowError):

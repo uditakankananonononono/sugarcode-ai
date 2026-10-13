@@ -177,7 +177,7 @@ def test_loads_rejects_out_of_order_history_times():
         TicketStore.loads(json.dumps(d))
 
 
-# ---- v2: aware timestamps and due-date consistency (auditor-7 finding) ----
+# ---- v2: aware timestamps and due-date consistency ----
 def _doc(store):
     return json.loads(store.dumps())
 

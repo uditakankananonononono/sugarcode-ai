@@ -101,7 +101,7 @@ def test_green_refine_keeps_bonds():
     assert np.allclose(b, 3.8, atol=1e-6)
 
 
-# ---- v2 (auditor-7) ----
+# ---- v2 ----
 HUGE = 10**1000
 
 
