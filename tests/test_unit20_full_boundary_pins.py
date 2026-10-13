@@ -380,3 +380,56 @@ def test_two_codon_diagnostic_correlation_branch(monkeypatch):
     assert r['folding_pause_balance']==0 and r['protein_length_aa']==2 and r['internal_stop_count']==0
     assert r['rare_codon_fraction']==.5 and r['optimal_codon_fraction']==.5
     assert r['start_codon_valid'] is True and r['structured_fraction']==1/6
+
+def test_three_site_hops_go_right_not_wrap_left(monkeypatch):
+    class Rng:
+        def __init__(self):self.i=0
+        def exponential(self,scale):return scale
+        def choice(self,n,p):
+            expect=[[1,0,0,0],[0,1,0,0],[2/7,0,5/7,0],[2/7,0,0,5/7]]
+            assert p.tolist()==pytest.approx(expect[self.i])
+            x=[0,1,2,3][self.i];self.i+=1;return x
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.5})
+    r=m.tasep_simulate('ATG'*3,steps=4)
+    assert r['proteins_completed']==1 and r['density_profile']==[0,.333,.333]
+
+
+def test_three_base_homopolymer_is_not_four(monkeypatch):
+    class Rng:
+        def integers(self,n):return 2
+        def choice(self,choices):return 'C'
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    assert m.evolutionary_robustness('AAAGCT',trials=1)['homopolymer_risk']==0
+
+
+def test_mutation_codon_slice_sizes_both_stops_and_synonyms(monkeypatch):
+    class Rng:
+        def __init__(self):self.i=iter([0,1,2,3,4,5,6,7,8]);self.b=iter('TTCTTCTTC')
+        def integers(self,n):return next(self.i)
+        def choice(self,choices):return next(self.b)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    # GAA substitutions: TAA stop, GTA valine, GAC aspartate.
+    # Repeated three times: no synonym, stop1/3, effect(-1-.3-.3)/3.
+    r=m.evolutionary_robustness('GAAGAAGAA',trials=9)
+    assert r['synonymous_fraction']==0 and r['stop_gain_fraction']==1/3
+    assert r['mean_mutation_effect']==pytest.approx(-1.6/3)
+
+def test_metabolic_integer_amino_acid_length():
+    r=m.metabolic_load('ATGGCTA')
+    assert type(r['aa_length']) is int and repr(r['aa_length'])=='2'
+
+def test_diagnostic_internal_stop_false_start_entropy_precision(monkeypatch):
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'GCT':.19,'TAA':.81,'ATG':.5})
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:.5)
+    # Non-constant dwell and codon-start accessibility produce correlation1.
+    flow={'dwell_times_s':[1,2,3],'density_profile':[.59,.61,.9],'output_rate_per_s':1,'mean_density':.7,'jam_sites':[]}
+    load={'atp_molecules_per_cell_per_cycle':12,'estimated_host_flux_diversion':0}
+    fold={'accessibility':[.1,.2,.3,.2,.3,.4,.3,.4,.5],'initiation_accessibility':.2}
+    evo={'synonymous_fraction':.5,'stop_gain_fraction':0,'mean_mutation_effect':0,'homopolymer_risk':0}
+    r=m._design_diagnostics('GCTTAAATG',flow,load,fold,evo,{'context_score':[.5]*3},{},1)
+    assert r['start_codon_valid'] is False and r['internal_stop_count']==1
+    assert r['rare_codon_fraction']==1/3 and r['optimal_codon_fraction']==1/3
+    assert r['folding_pause_balance']==pytest.approx(1)
+    assert r['codon_entropy']==pytest.approx(-math.log(1/3+1e-12),abs=1e-13,rel=0)
+    assert r['structured_fraction']==1/9 and r['queue_fraction']==2/3
