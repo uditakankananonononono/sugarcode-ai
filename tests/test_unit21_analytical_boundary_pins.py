@@ -99,3 +99,43 @@ def test_refinement61_cap_stops_before_backend(monkeypatch):
     def forbidden(*a,**k):raise AssertionError('oversize reached backend')
     monkeypatch.setattr(m.core,'refine_coordinates',forbidden)
     with pytest.raises(ValueError,match='60 residues'):m.safe_refine_coordinates(np.zeros((61,3)))
+
+def test_public_zero_lower_bounds_and_just_negative(monkeypatch):
+    monkeypatch.setattr(m.core,'physical_energy',lambda c,q,s,e:{'epsilon':e,'sigma':s})
+    assert m.safe_physical_energy([[0,0,0]],epsilon=0)['epsilon']==0
+    with pytest.raises(ValueError):m.safe_physical_energy([[0,0,0]],epsilon=-1e-12)
+    assert m.safe_physical_energy([[0,0,0]],sigma=.001)['sigma']==.001
+    with pytest.raises(ValueError):m.safe_physical_energy([[0,0,0]],sigma=.000999999999)
+    monkeypatch.setattr(m.core,'residue_graph',lambda c,k:k)
+    assert m.safe_residue_graph([[0,0,0]],cutoff=0)==0
+    with pytest.raises(ValueError):m.safe_residue_graph([[0,0,0]],cutoff=-1e-12)
+    monkeypatch.setattr(m.core,'refine_coordinates',lambda c,q,n,lr,rb,bl,kb:{'coordinates':c.tolist(),'args':(n,lr,bl,kb)})
+    r=m.safe_refine_coordinates([[0,0,0],[1,0,0]],steps=1,learning_rate=0,bond_length=.5,k_bond=0)
+    assert r['args']==(1,0,.5,0)
+    for kw in [{'steps':0},{'learning_rate':-1e-12},{'bond_length':.4995},{'k_bond':-1e-12}]:
+        with pytest.raises(ValueError):m.safe_refine_coordinates([[0,0,0],[1,0,0]],**kw)
+
+@pytest.mark.parametrize('difference,valid',[(.9e-8,True),(1.1e-8,False)])
+def test_orthogonality_tolerance_both_sides(difference,valid):
+    # det exactly1; reciprocal diagonal scaling changes row-norm squares
+    # by difference and -difference/(1+difference), isolating orthogonality.
+    scale=np.sqrt(1+difference);r=np.diag([scale,1/scale,1])
+    if valid:assert np.asarray(m.safe_rigid_transform([[0,0,0]],r,[0,0,0])).tolist()==[[0,0,0]]
+    else:
+        with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+
+@pytest.mark.parametrize('difference,valid',[(.9e-8,True),(1.1e-8,False)])
+def test_determinant_tolerance_both_sides(difference,valid):
+    # Uniform scale cubed=1+difference; row-norm discrepancy about2d/3
+    # stays below1e-8, so determinant alone rejects1.1e-8.
+    r=np.eye(3)*(1+difference)**(1/3)
+    assert np.allclose(r@r.T,np.eye(3),rtol=0,atol=1e-8)
+    if valid:assert np.asarray(m.safe_rigid_transform([[0,0,0]],r,[0,0,0])).tolist()==[[0,0,0]]
+    else:
+        with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+
+
+def test_public_charge_magnitude1000_vs1001(monkeypatch):
+    monkeypatch.setattr(m.core,'physical_energy',lambda c,q,s,e:{'charges':q.tolist()})
+    assert m.safe_physical_energy([[0,0,0]],charges=[1000])['charges']==[1000]
+    with pytest.raises(ValueError):m.safe_physical_energy([[0,0,0]],charges=[1001])
