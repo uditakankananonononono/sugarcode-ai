@@ -16,6 +16,17 @@ Defects probed at b363c3b9 in openclinvar/core.py (all reproduced):
   may collide (duplicate nodes/edges).
 Wrappers validate then delegate to unchanged core. These are illustrative
 evidence-arithmetic guards, not clinical validation.
+
+Enforced limits (choices made in this wrapper, not spec values; the core
+accepts wider inputs, and these inputs are refused with ValueError):
+  MAX_ITEMS = 10000 (updates, records, candidates), MAX_EVIDENCE = 100,
+  MAX_TERMS = 1000 (phenotype/pathway terms), MAX_AGES = 100,
+  MAX_COUNT = 1e12 (counts, sample_size), _PRE = 1e15 (absolute-value cap
+  applied to numeric inputs before arithmetic).
+  Ranges: prior in [1e-6, 1 - 1e-6]; prior_alpha and prior_beta > 0;
+  supporting <= total; penetrance, quality, variant_probability in [0, 1];
+  age <= 120 (and >= 0); years 1900..2026.  Strengths, directions and
+  classes outside the named sets are refused, not defaulted.
 """
 from __future__ import annotations
 
