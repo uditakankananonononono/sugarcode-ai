@@ -15,6 +15,8 @@ CASES = [
     ("simulate_protocol", "[{'action': 'pipette', 'sample': 'A', 'volume_uL': 50, 'cv': 0.01}, {'action': 'incubate', 'sample': 'A', 'minutes': 240, 'temp_C': 37}, {'action': 'measure', 'sample': 'A', 'assay': 'fluorescence'}]", ([{'action': 'pipette', 'sample': 'A', 'volume_uL': 50, 'cv': 0.01}, {'action': 'incubate', 'sample': 'A', 'minutes': 240, 'temp_C': 37}, {'action': 'measure', 'sample': 'A', 'assay': 'fluorescence'}],), dict()),
     ("molecular_docking_experiment", "np.array([[0, 0, 0], [1.4, 0, 0]], float), np.array([[0, 0, 0], [6, 0, 0], [0, 6, 0], [0, 0, 6], [6, 6, 0], [6, 0, 6], [0, 6, 6], [6, 6, 6]], float), steps=10", (np.array([[0, 0, 0], [1.4, 0, 0]], float), np.array([[0, 0, 0], [6, 0, 0], [0, 6, 0], [0, 0, 6], [6, 6, 0], [6, 0, 6], [0, 6, 6], [6, 6, 6]], float)), dict(steps=10)),
 ]
+# run_experiment takes the same protocol as simulate_protocol
+CASES.append(("run_experiment",) + CASES[0][1:])
 
 
 def msg(s):

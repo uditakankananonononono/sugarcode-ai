@@ -27,3 +27,4 @@ def _guard(fn):
 
 simulate_protocol = _guard(core.simulate_protocol)
 molecular_docking_experiment = _guard(core.molecular_docking_experiment)
+run_experiment = _guard(core.run_experiment)

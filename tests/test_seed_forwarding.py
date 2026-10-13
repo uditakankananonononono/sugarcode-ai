@@ -8,11 +8,11 @@ from sugarcode.seed_check import MAX_SEED, check_seed
 
 WRAPPERS = {
     "bioprint_pro.seed_checked": ["oldroyd_b_extrusion", "optimize_print"],
-    "biosimvr.seed_checked": ["simulate_protocol", "molecular_docking_experiment"],
+    "biosimvr.seed_checked": ["simulate_protocol", "molecular_docking_experiment", "run_experiment"],
     "cellfatenet.seed_checked": ["identify_attractors", "stochastic_validate", "simulate_fate"],
     "dti_bench.seed_checked": ["validate_dti"],
     "evofold_4d.seed_checked": ["langevin_dynamics", "dynamics_report"],
-    "liquid_biopsy.seed_checked": ["bootstrap_haplotype_weights"],
+    "liquid_biopsy.seed_checked": ["bootstrap_haplotype_weights", "fragment_length_model"],
     "living_computer.seed_checked": ["stochastic_simulate", "monte_carlo_robustness"],
     "syndroid.seed_checked": ["stochastic_gene_expression", "evolutionary_stability"],
     "syndroid.seed_guard": ["mechanistic_cell_program", "design_syndroid"],

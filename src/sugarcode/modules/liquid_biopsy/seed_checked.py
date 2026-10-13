@@ -26,3 +26,4 @@ def _guard(fn):
 
 
 bootstrap_haplotype_weights = _guard(core.bootstrap_haplotype_weights)
+fragment_length_model = _guard(core.fragment_length_model)

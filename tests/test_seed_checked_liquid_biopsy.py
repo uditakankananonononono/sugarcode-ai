@@ -14,6 +14,7 @@ CAP = 2**63 - 1
 CASES = [
     ("bootstrap_haplotype_weights", '[[0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]], replicates=10', ([[0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]],), dict(replicates=10)),
 ]
+CASES.append(("fragment_length_model", "0.3, 2000", (0.3, 2000), dict()))
 
 
 def msg(s):
