@@ -148,3 +148,33 @@ def test_synthetic_construct_diagnostics_closed_form(monkeypatch):
     assert r['bottleneck_codon_index']==9 and r['bottleneck_codon']=='TCC'
     assert r['synthesis_complexity_score']==pytest.approx(2.2)
     assert r['start_codon_valid'] is True and r['internal_stop_count']==0
+
+def test_exact_burden_boundary_and_display_digits():
+    # copies=3, ATP/aa=2; 3 aa => 18 molecules. Choosing the binary64
+    # denominator one adjacent step above/below the division boundary tests it.
+    cost=18*1.66e-9
+    flux=cost/.05
+    while cost/flux<.05:flux=math.nextafter(flux,0)
+    while cost/flux>.05:flux=math.nextafter(flux,math.inf)
+    assert cost/flux==.05
+    r=m.metabolic_load('ATG'*3,copies=3,atp_per_aa=2,host_flux_mmol_gdw_h=flux)
+    assert r['burden_class']=='high' and repr(r['estimated_host_flux_diversion'])=='0.05'
+    r=m.metabolic_load('ATG'*3,copies=3,atp_per_aa=2,host_flux_mmol_gdw_h=cost/.0499)
+    assert r['burden_class']=='moderate' and repr(r['estimated_host_flux_diversion'])=='0.0499'
+    assert r['fba_constraint_row']['stoichiometry']=={'ATP':-6,'AA_POOL':-3}
+    assert repr(r['fba_constraint_row']['upper_bound'])=='3e-08'
+    r=m.metabolic_load('ATG'*101,copies=3,atp_per_aa=2,host_flux_mmol_gdw_h=.01)
+    assert repr(r['estimated_host_flux_diversion'])=='0.000101'
+    assert repr(r['fba_constraint_row']['upper_bound'])=='1.006e-06'
+
+def test_partial_codon_sbml_and_odd_folding_window():
+    import xml.etree.ElementTree as ET
+    root=ET.fromstring(m._sbml_export('ATGGC',2))
+    ns={'s':'http://www.sbml.org/sbml/level3/version2/core'}
+    p={x.attrib['id']:x.attrib['value'] for x in root.findall('.//s:parameter',ns)}
+    assert p['k_translate']=='0.033333' and p['construct_nt']=='5'
+    refs=root.find(".//s:reaction[@id='translation']/s:listOfReactants",ns)
+    assert {x.attrib['species']:x.attrib['stoichiometry'] for x in refs}=={'SYNTH_mRNA':'1','ATP':'4','AA_POOL':'1'}
+    for window in [2,3]:
+        r=m.folding_accessibility('AGCTAG',window=window)
+        assert r['local_delta_g_kcal_mol']==pytest.approx([0,-1.05,-2.6,-1.05,-.5,-1.05])
