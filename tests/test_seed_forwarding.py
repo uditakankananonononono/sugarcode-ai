@@ -17,7 +17,7 @@ WRAPPERS = {
     "living_computer.seed_checked": ["stochastic_simulate", "monte_carlo_robustness"],
     "syndroid.seed_checked": ["stochastic_gene_expression", "evolutionary_stability"],
     "syndroid.seed_guard": ["mechanistic_cell_program", "design_syndroid"],
-    "stability_ai.seed_guard": ["stochastic_drift", "stochastic_drift_v2", "analyze_stability", "analyze_stability_v2"],
+    "stability_ai.seed_guard": ["analyze_stability", "analyze_stability_v2"],
 }
 MODS = sorted(WRAPPERS)
 

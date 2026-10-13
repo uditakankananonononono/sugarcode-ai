@@ -8,8 +8,6 @@ STAB = "{'mode':'plasmid','burden':0.1,'size_kb':5}"
 CASES = [
     ("syndroid", "mechanistic_cell_program", "None, hours=1", ""),
     ("syndroid", "design_syndroid", "", ""),
-    ("stability_ai", "stochastic_drift", STAB, ""),
-    ("stability_ai", "stochastic_drift_v2", STAB, ""),
     ("stability_ai", "analyze_stability", STAB, ""),
     ("stability_ai", "analyze_stability_v2", STAB, ""),
 ]

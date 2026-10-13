@@ -75,3 +75,57 @@ def test_wrapper_chain_depth_is_one(m):
         inner = getattr(mod, n).__wrapped__
         assert not hasattr(inner, "__wrapped__"), (m, n)
         assert inner is getattr(importlib.import_module(f"sugarcode.modules.{m}.core"), n)
+
+
+# ---- scan of every guard file in every module (seed_checked*.py, seed_guard.py, seed_gate.py) ----
+EXPECTED_GUARD = {"stability_ai": {"analyze_stability", "analyze_stability_v2"}, "syndroid": {"mechanistic_cell_program", "design_syndroid"}}
+
+
+def _guard_files(pkg_dir):
+    return sorted(p for pat in ("seed_checked*.py", "seed_guard.py", "seed_gate.py") for p in pkg_dir.glob(pat))
+
+
+def _names_in(path, mod):
+    out = set()
+    for n, v in vars(mod).items():
+        if n.startswith("_") or not callable(v):
+            continue
+        if getattr(v, "__wrapped__", None) is not None or getattr(v, "__module__", None) == mod.__name__:
+            out.add(n)
+    return out
+
+
+def _all_guards():
+    result = {}
+    for pkg_dir in sorted(ROOT.iterdir()):
+        if not pkg_dir.is_dir():
+            continue
+        per_file = {}
+        for p in _guard_files(pkg_dir):
+            mod = importlib.import_module(f"sugarcode.modules.{pkg_dir.name}.{p.stem}")
+            per_file[p.name] = _names_in(p, mod)
+        if per_file:
+            result[pkg_dir.name] = per_file
+    return result
+
+
+GUARDS = _all_guards()
+
+
+def test_scan_sees_the_known_guard_files():
+    assert "seed_gate.py" in GUARDS["neuro_pipeline"] and "seed_checked.py" in GUARDS["neuro_pipeline"]
+    assert "seed_guard.py" in GUARDS["stability_ai"] and "seed_gate.py" in GUARDS["stability_ai"]
+
+
+@pytest.mark.parametrize("pkg", sorted(GUARDS))
+def test_no_function_guarded_by_two_files(pkg):
+    files = GUARDS[pkg]
+    names = sorted(files)
+    for i, a in enumerate(names):
+        for b in names[i + 1:]:
+            assert files[a].isdisjoint(files[b]), (pkg, a, b, files[a] & files[b])
+
+
+@pytest.mark.parametrize("pkg", sorted(EXPECTED_GUARD))
+def test_seed_guard_py_exports_exactly_the_expected_functions(pkg):
+    assert GUARDS[pkg]["seed_guard.py"] - {"check_seed", "MAX_SEED"} == EXPECTED_GUARD[pkg]

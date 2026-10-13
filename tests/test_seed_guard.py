@@ -25,7 +25,7 @@ def test_check_seed_pins(g):
 
 
 def test_cap_applies_through_every_wrapped_function():
-    for fn in (sg.stochastic_drift, sg.stochastic_drift_v2, sg.analyze_stability, sg.analyze_stability_v2):
+    for fn in (sg.analyze_stability, sg.analyze_stability_v2):
         with pytest.raises(ValueError, match=msg(f"seed must be between 0 and {CAP}")):
             fn(STAB, seed=CAP + 1)
         with pytest.raises(ValueError, match=msg(f"seed must be between 0 and {CAP}")):
@@ -42,10 +42,8 @@ def test_cap_applies_through_every_wrapped_function():
 
 
 def test_valid_seed_results_equal_core_called_directly():
-    kw = dict(generations=5, population=50, replicates=4)
-    assert sg.stochastic_drift(STAB, seed=CAP, **kw) == score.stochastic_drift(STAB, seed=CAP, **kw)
-    assert sg.stochastic_drift(STAB, seed=0, **kw) == score.stochastic_drift(STAB, seed=0, **kw)
-    assert sg.stochastic_drift(STAB, **kw) == score.stochastic_drift(STAB, **kw)
+    assert sg.analyze_stability(STAB, seed=CAP) == score.analyze_stability(STAB, seed=CAP)
+    assert sg.analyze_stability(STAB, seed=0) == score.analyze_stability(STAB, seed=0)
     assert yg.design_syndroid(hours=1, seed=7) == ycore.design_syndroid(hours=1, seed=7)
     assert yg.design_syndroid(hours=1) == ycore.design_syndroid(hours=1)
     assert yg.mechanistic_cell_program(None, hours=1, seed=CAP) == ycore.mechanistic_cell_program(None, hours=1, seed=CAP)
@@ -53,15 +51,13 @@ def test_valid_seed_results_equal_core_called_directly():
 
 def test_core_errors_pass_through_unchanged():
     with pytest.raises(ValueError, match=msg("burden must be in [0, 1]")):
-        sg.stochastic_drift({"mode": "plasmid", "burden": 5, "size_kb": 5}, seed=1)
+        sg.analyze_stability({"mode": "plasmid", "burden": 5, "size_kb": 5}, seed=1)
 
 
 def test_shared_helper_range_and_numpy_ints_through_guards():
     import numpy as np
-    kw = dict(generations=5, population=50, replicates=4)
     for s in (2**32, 2**32 - 1, 2**40, CAP, np.int64(9), np.uint32(9)):
-        assert sg.stochastic_drift(STAB, seed=s, **kw) == score.stochastic_drift(STAB, seed=int(s), **kw)
+        assert sg.analyze_stability(STAB, seed=s) == score.analyze_stability(STAB, seed=int(s))
     assert yg.design_syndroid(hours=1, seed=np.int64(7)) == ycore.design_syndroid(hours=1, seed=7)
-    for fn in (sg.stochastic_drift,):
-        with pytest.raises(TypeError, match=msg("seed must be an integer")):
-            fn(STAB, seed=np.float64(1.0), **kw)
+    with pytest.raises(TypeError, match=msg("seed must be an integer")):
+        sg.analyze_stability(STAB, seed=np.float64(1.0))
