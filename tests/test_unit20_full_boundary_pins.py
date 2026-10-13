@@ -327,3 +327,56 @@ def test_naive_missing_codon_frequency_zero(monkeypatch):
     monkeypatch.setattr(m,'tasep_simulate',lambda *a:{})
     monkeypatch.setattr(m.codonlib,'cai',lambda *a:1)
     assert m.optimize('MA',host='test')['protein_length']==2
+
+def test_none_table_is_ecoli_and_drops_are_not_none():
+    a=m.tasep_simulate('ATGGCTGAA',table=None,steps=10)
+    b=m.tasep_simulate('ATGGCTGAA',table=m.codonlib.ECOLI_K12,steps=10)
+    assert a==b
+
+def test_default_folding_long_nonuniform_gc():
+    for dna in ['ATG'*40,'A'*30+'GC'*45]:
+        r=m.folding_accessibility(dna)
+        assert r==m.folding_accessibility(dna,window=30)
+        assert r==m.folding_accessibility(dna,window=31) # integer half identical
+        assert r['initiation_accessibility']==pytest.approx(sum(r['accessibility'][:30])/30)
+    # local-window defaults30vs29 differs at GC onset.
+    r=m.folding_accessibility('A'*30+'GC'*45)
+    assert r['local_delta_g_kcal_mol'][15]==0
+    assert r['local_delta_g_kcal_mol'][16]==pytest.approx(-2.1/30)
+
+def test_three_mutations_synonymous_stop_and_missense(monkeypatch):
+    class Rng:
+        def __init__(self):self.i=iter([2,3,8]);self.b=iter(['C','T','A'])
+        def integers(self,n):return next(self.i)
+        def choice(self,choices):return next(self.b)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    # GCT->GCC synonymous; GAA->TAA stop; TGG->TGA stop.
+    r=m.evolutionary_robustness('GCTGAATGG',trials=3)
+    assert r['synonymous_fraction']==1/3 and r['stop_gain_fraction']==2/3
+    assert r['mean_mutation_effect']==pytest.approx(-2/3)
+
+def test_tasep_blocked_hop_and_two_protein_schedule(monkeypatch):
+    class Rng:
+        def __init__(self):self.k=0
+        def exponential(self,scale):return scale
+        def choice(self,n,p):
+            expected=[[1,0,0],[0,1,0],[2/7,0,5/7],[0,0,1],[0,1,0],[2/7,0,5/7]]
+            assert p.tolist()==pytest.approx(expected[self.k])
+            choice=[0,1,0,2,1,2][self.k];self.k+=1;return choice
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.5,'GCT':.5})
+    r=m.tasep_simulate('ATGGCT',steps=6,ribosome_init_rate=2)
+    assert r['proteins_completed']==2 and r['density_profile']==[.4,.6]
+    assert r['sim_time_s']==1.39 and r['mean_density']==.5
+
+def test_two_codon_diagnostic_correlation_branch(monkeypatch):
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.1,'TAA':.9})
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:.5)
+    flow={'dwell_times_s':[1,2],'density_profile':[.6,.7],'output_rate_per_s':1,'mean_density':.65,'jam_sites':[]}
+    load={'atp_molecules_per_cell_per_cycle':8,'estimated_host_flux_diversion':0}
+    fold={'accessibility':[.1,.2,.3,.4,.5,.6],'initiation_accessibility':.2}
+    evo={'synonymous_fraction':.5,'stop_gain_fraction':0,'mean_mutation_effect':0,'homopolymer_risk':0}
+    r=m._design_diagnostics('ATGTAA',flow,load,fold,evo,{'context_score':[.5,.5]},{},1)
+    assert r['folding_pause_balance']==0 and r['protein_length_aa']==2 and r['internal_stop_count']==0
+    assert r['rare_codon_fraction']==.5 and r['optimal_codon_fraction']==.5
+    assert r['start_codon_valid'] is True and r['structured_fraction']==1/6
