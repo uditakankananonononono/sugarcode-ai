@@ -154,3 +154,12 @@ def test_public_probability_and_impact_small_refusals():
 @pytest.mark.parametrize('x',[-.0001,.0001,-1,1])
 def test_logistic_branch_nonzero_closed_form(x):
     assert m._stable_logistic(x)==pytest.approx(1/(1+math.exp(-x)),abs=1e-15)
+
+def test_candidate_generator_owned_refusal():
+    with pytest.raises(ValueError):m.safe_active_learning((x for x in []))
+
+def test_strategy_generator_owned_refusal():
+    with pytest.raises(ValueError):m.safe_intervention_simulation(.5,.2,(x for x in []))
+
+def test_nonstr_branchpoint_window_owned_refusal():
+    with pytest.raises(ValueError):m.safe_branchpoint_variant_effect(5,0,'A')
