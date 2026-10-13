@@ -1,5 +1,6 @@
 """Closed-form and boundary checks for held codon mechanics."""
 import math
+import numpy as np
 import pytest
 from sugarcode.modules.codon_opt import core as m
 
@@ -54,3 +55,96 @@ def test_uniform_codons_attention_symmetry_and_folding():
     f=m.folding_accessibility('AAAAAA',window=6)
     assert f['local_delta_g_kcal_mol']==[0]*6
     assert f['accessibility']==[.5]*6 and f['initiation_accessibility']==.5
+
+def test_custom_trna_average_and_dwell(monkeypatch):
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{'ATG':.125,'GCT':.5})
+    assert m._trna_strain('ATGGCT',{})==pytest.approx((-math.log(.125)-math.log(.5))/2)
+    r=m.tasep_simulate('ATGGCTAAA',steps=0)
+    assert r['dwell_times_s']==[.8,.2,2]
+    assert r['output_rate_per_s']==0 and r['mean_density']==0
+    assert r['density_profile']==[0,0,0] and r['jam_sites']==[]
+    r=m.tasep_simulate('ATGGCT',steps=10,ribosome_init_rate=0)
+    assert r['sim_time_s']==0 and r['proteins_completed']==0
+
+def test_design_default_arguments_are_forwarded(monkeypatch):
+    calls={}
+    def flow(dna,table=None,ribosome_init_rate=2,steps=4000):
+        calls['steps']=steps;return {}
+    def load(dna,host_flux_mmol_gdw_h=10,copies=100,atp_per_aa=4):
+        calls['copies']=copies;return {}
+    def evo(dna,trials=200,seed=7):
+        calls['seed']=seed;return {}
+    monkeypatch.setattr(m,'tasep_simulate',flow);monkeypatch.setattr(m,'metabolic_load',load);monkeypatch.setattr(m,'evolutionary_robustness',evo)
+    monkeypatch.setattr(m,'_design_diagnostics',lambda *a:{'jam_site_count':0,'host_flux_diversion':0,'initiation_accessibility':1})
+    m.design_expression_construct('MA')
+    assert calls=={'steps':2000,'copies':100,'seed':7}
+
+@pytest.mark.parametrize('lo,hi',[(.5,.5),(.5,1),(0,.5)])
+def test_gc_equal_and_upper_end_refusal(lo,hi):
+    with pytest.raises(ValueError,match='GC bounds'):m._validate_design('MA','ecoli_k12',lo,hi,1)
+
+def test_context_attention_two_codons_closed_form():
+    # ATG is (1/3,1/3,1/3,0), CCC is (0,0,0,1).
+    vectors=[np.array([1/3,1/3,1/3,0,0,1]),np.array([0,0,0,1,math.sin(.1),math.cos(.1)])]
+    dot=np.array([[float(x@y)/math.sqrt(6) for y in vectors] for x in vectors])
+    expected=[[1/(1+math.exp(row[1]-row[0])),1/(1+math.exp(row[0]-row[1]))] for row in dot]
+    assert np.array(m.sequence_attention('ATGCCC')['attention'])==pytest.approx(np.array(expected))
+
+def test_gc_folding_pair_energy_closed_form():
+    r=m.folding_accessibility('GCGCGC',window=6)
+    assert r['local_delta_g_kcal_mol']==pytest.approx([-2.1,-3.1,-2.1,-3.6,-2.1,-3.1])
+    assert r['accessibility']==pytest.approx([1/(1+math.exp(-e)) for e in r['local_delta_g_kcal_mol']])
+
+def test_tasep_four_events_exact_single_site(monkeypatch):
+    class Rng:
+        choices=iter([0,1,0,1])
+        def exponential(self,scale):return scale
+        def choice(self,n,p):return next(self.choices)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{'ATG':.5})
+    r=m.tasep_simulate('ATG',ribosome_init_rate=2,steps=4)
+    # initiation .5s, exit .2s, repeated; burn-in excludes step0.
+    assert r['sim_time_s']==1.4 and r['proteins_completed']==2
+    assert r['density_profile']==[.333] and r['mean_density']==.3333
+    assert r['output_rate_per_s']==1.4286
+
+def test_mutation_landscape_three_defined_events(monkeypatch):
+    class Rng:
+        positions=iter([2,0,0]);bases=iter(['C','T','C'])
+        def integers(self,n):return next(self.positions)
+        def choice(self,choices):
+            x=next(self.bases);assert x in choices;return x
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    # GAA -> GAC nonsynonymous; GAA -> TAA stop; GAA -> CAA nonsynonymous.
+    r=m.evolutionary_robustness('GAA',trials=3)
+    assert r['synonymous_fraction']==0 and r['stop_gain_fraction']==1/3
+    assert r['mean_mutation_effect']==pytest.approx(-1.6/3)
+    assert r['homopolymer_risk']==0 and r['trials']==3 and r['seed']==7
+
+def test_synthetic_construct_diagnostics_closed_form(monkeypatch):
+    dna='ATGGCTGAGACCGCGCGCGAATTCGGATCC'
+    codons=[dna[i:i+3] for i in range(0,len(dna),3)]
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda table:{c:v for c,v in zip(codons,[.1,.2,.8,.9,1,.3,.4,.5,.6,.7])})
+    monkeypatch.setattr(m.codonlib,'cai',lambda *a:.75)
+    flow={'dwell_times_s':[1,2,3,4,5,6,7,8,9,10],'density_profile':[.6,.7,.8,0,0,0,0,0,0,0],'output_rate_per_s':2,'mean_density':.21,'jam_sites':[2]}
+    load={'atp_molecules_per_cell_per_cycle':800,'estimated_host_flux_diversion':.25}
+    fold={'accessibility':[.1,.2,.3]*10,'initiation_accessibility':.2}
+    evo={'synonymous_fraction':.5,'stop_gain_fraction':.1,'mean_mutation_effect':-.4,'homopolymer_risk':2}
+    attention={'context_score':[.1,.2,.3,.4,.5,.6,.7,.8,.9,1]}
+    r=m._design_diagnostics(dna,flow,load,fold,evo,attention,{},2)
+    assert len(r)==51
+    assert r['rare_codon_fraction']==.1 and r['optimal_codon_fraction']==.2
+    assert r['codon_diversity']==10 and r['codon_entropy']==pytest.approx(-math.log(.1+1e-12))
+    assert r['CpG_fraction']==dna.count('CG')/30
+    assert r['restriction_BsaI_count']==1 and r['restriction_EcoRI_count']==1 and r['restriction_BamHI_count']==1
+    assert r['repeat_GC_count']==1
+    assert r['mean_dwell_s']==5.5 and r['max_dwell_s']==10
+    assert r['dwell_CV']==pytest.approx(math.sqrt(8.25)/5.5)
+    assert r['queue_fraction']==.2 and r['ribosome_peak_density']==.8
+    assert r['structured_fraction']==1/3 and r['minimum_mRNA_accessibility']==.1
+    assert r['attention_peak']==1 and r['attention_mean']==pytest.approx(.55)
+    assert r['translation_time_s']==55 and r['proteins_per_hour']==7200 and r['ATP_per_protein']==40
+    assert r['resource_efficiency']==1.6 and r['design_score']==pytest.approx(.06)
+    assert r['bottleneck_codon_index']==9 and r['bottleneck_codon']=='TCC'
+    assert r['synthesis_complexity_score']==pytest.approx(2.2)
+    assert r['start_codon_valid'] is True and r['internal_stop_count']==0
