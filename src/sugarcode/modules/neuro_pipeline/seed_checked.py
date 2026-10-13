@@ -1,6 +1,7 @@
-"""Seed-checked entry points for neuro_pipeline functions that pass `seed` to random.Random.
+"""Seed-checked entry points for neuro_pipeline functions that pass `seed` to numpy.random.default_rng.
 
 Only the seed is checked (shared helper: int or numpy integer, not bool, 0..2**63-1); every other argument goes to core unchanged.
+A nested-list seed crashes the interpreter in core (rc -11, checked for all 7 wrapped functions on 3.10); the gate refuses it first.
 Design generators are out of scope and not wrapped.
 """
 from __future__ import annotations
