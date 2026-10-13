@@ -94,3 +94,8 @@ def test_rotation_small_scaling_and_small_reflection_deviation():
     assert np.allclose(r@r.T,np.eye(3),rtol=0,atol=1e-8)
     assert not np.isclose(np.linalg.det(r),1,rtol=0,atol=1e-8)
     with pytest.raises(ValueError):m.safe_rigid_transform([[0,0,0]],r,[0,0,0])
+
+def test_refinement61_cap_stops_before_backend(monkeypatch):
+    def forbidden(*a,**k):raise AssertionError('oversize reached backend')
+    monkeypatch.setattr(m.core,'refine_coordinates',forbidden)
+    with pytest.raises(ValueError,match='60 residues'):m.safe_refine_coordinates(np.zeros((61,3)))
