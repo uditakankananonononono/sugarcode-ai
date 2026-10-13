@@ -1,7 +1,7 @@
 """Seed validation in front of core functions that pass `seed` to numpy default_rng.
 
 numpy.random.default_rng crashes the interpreter (SIGSEGV) on a deeply nested list seed, so the
-seed is checked before core runs: an int (not bool) in 0..MAX_SEED. Nothing else is validated or changed;
+seed is checked before core runs by the shared helper (int or numpy integer, not bool, 0..2**63-1). Nothing else is validated or changed;
 all other arguments are passed to core untouched.
 """
 from __future__ import annotations
@@ -11,15 +11,7 @@ import inspect
 
 from . import core
 
-MAX_SEED = 2**32 - 1
-
-
-def check_seed(seed):
-    if isinstance(seed, bool) or not isinstance(seed, int):
-        raise TypeError("seed must be an integer")
-    if not 0 <= seed <= MAX_SEED:
-        raise ValueError(f"seed must be between 0 and {MAX_SEED}")
-    return seed
+from sugarcode.seed_check import MAX_SEED, check_seed  # noqa: F401  (shared helper, 0..2**63-1)
 
 
 def _guard(fn):
@@ -29,8 +21,8 @@ def _guard(fn):
     def wrapper(*args, **kwargs):
         bound = sig.bind(*args, **kwargs)
         if "seed" in bound.arguments:
-            check_seed(bound.arguments["seed"])
-        return fn(*args, **kwargs)
+            bound.arguments["seed"] = check_seed(bound.arguments["seed"])
+        return fn(*bound.args, **bound.kwargs)
 
     return wrapper
 

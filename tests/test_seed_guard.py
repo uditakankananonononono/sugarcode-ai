@@ -5,7 +5,7 @@ import pytest
 from sugarcode.modules.stability_ai import core as score, seed_guard as sg
 from sugarcode.modules.syndroid import core as ycore, seed_guard as yg
 
-CAP = 2**32 - 1
+CAP = 2**63 - 1
 STAB = {"mode": "plasmid", "burden": 0.1, "size_kb": 5}
 
 
@@ -54,3 +54,14 @@ def test_valid_seed_results_equal_core_called_directly():
 def test_core_errors_pass_through_unchanged():
     with pytest.raises(ValueError, match=msg("burden must be in [0, 1]")):
         sg.stochastic_drift({"mode": "plasmid", "burden": 5, "size_kb": 5}, seed=1)
+
+
+def test_shared_helper_range_and_numpy_ints_through_guards():
+    import numpy as np
+    kw = dict(generations=5, population=50, replicates=4)
+    for s in (2**32, 2**32 - 1, 2**40, CAP, np.int64(9), np.uint32(9)):
+        assert sg.stochastic_drift(STAB, seed=s, **kw) == score.stochastic_drift(STAB, seed=int(s), **kw)
+    assert yg.design_syndroid(hours=1, seed=np.int64(7)) == ycore.design_syndroid(hours=1, seed=7)
+    for fn in (sg.stochastic_drift,):
+        with pytest.raises(TypeError, match=msg("seed must be an integer")):
+            fn(STAB, seed=np.float64(1.0), **kw)
