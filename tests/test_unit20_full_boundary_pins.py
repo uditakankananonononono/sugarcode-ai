@@ -433,3 +433,28 @@ def test_diagnostic_internal_stop_false_start_entropy_precision(monkeypatch):
     assert r['folding_pause_balance']==pytest.approx(1)
     assert r['codon_entropy']==pytest.approx(-math.log(1/3+1e-12),abs=1e-13,rel=0)
     assert r['structured_fraction']==1/9 and r['queue_fraction']==2/3
+
+def test_three_site_queue_blocks_middle_hop(monkeypatch):
+    class Rng:
+        def __init__(self):self.i=0
+        def exponential(self,scale):return scale
+        def choice(self,n,p):
+            expected=[[1,0,0,0],[0,1,0,0],[2/7,0,5/7,0],[2/7,0,0,5/7],[0,.5,0,.5],[2/7,0,0,5/7]]
+            assert p.tolist()==pytest.approx(expected[self.i])
+            x=[0,1,2,0,1,3][self.i];self.i+=1;return x
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    monkeypatch.setattr(m.codonlib,'relative_adaptiveness',lambda t:{'ATG':.5})
+    r=m.tasep_simulate('ATG'*3,steps=6)
+    assert r['proteins_completed']==1 and r['density_profile']==[.2,.6,.6]
+
+
+def test_mixed_codon_mutation_translation(monkeypatch):
+    class Rng:
+        def __init__(self):self.i=iter([2,5,8]);self.b=iter(['C','A','A'])
+        def integers(self,n):return next(self.i)
+        def choice(self,choices):return next(self.b)
+    monkeypatch.setattr(m.np.random,'default_rng',lambda seed:Rng())
+    # GCT->GCC Ala retained; GAG->GAA Glu retained; TGG->TGA stop.
+    r=m.evolutionary_robustness('GCTGAGTGG',trials=3)
+    assert r['synonymous_fraction']==2/3 and r['stop_gain_fraction']==1/3
+    assert r['mean_mutation_effect']==pytest.approx(-1/3)
