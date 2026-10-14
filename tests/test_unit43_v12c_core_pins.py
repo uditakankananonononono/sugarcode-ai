@@ -1,4 +1,4 @@
-"""Unit 43 v12c: tests-only pins from auditor-10 on v12b (PARTIAL).
+"""Unit 43 v12c: tests-only pins for the tiny-glucose floor and the glucose clamp in simulate_growth (PARTIAL).
 
  - L181 floor max(biomass, 1e-9): tiny glucose so the bound is below the cap. glucose0=1e-10, dt=0.25, objective -50
    drives biomass negative after step 1, so step 2 bound = 1e-10 / 1e-9 / 0.25 = 0.4 (a 2e-9 floor gives 0.2).
