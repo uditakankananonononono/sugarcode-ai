@@ -302,3 +302,250 @@ def test_legacy_rounding_places_and_missing_diet_default():
     fin = ref_legacy(C6, 2, diet={"fiber": 2.0})
     for s in C6:
         assert d["trajectory"][s][-1] == pytest.approx(fin[s], abs=2e-3)
+
+
+def test_shift_zero_total_guards_and_missing_final():
+    assert core._shift({"A": 0, "B": 0}, {"A": 1, "B": 1}) == {"A": 0.5, "B": 0.5}        # initial total 0 -> divisor 1
+    assert core._shift({"A": 1}, {"A": 0}) == {"A": -1.0}                                 # final total 0 -> divisor 1
+    assert core._shift({"A": 0}, {"A": 0}) == {"A": 0.0}
+    assert core._shift({"A": 2, "B": 2}, {}) == {"A": -0.5, "B": -0.5}                    # keys absent from final count as 0
+
+
+def test_legacy_zero_and_negative_start():
+    z = simulate_community({"Bacteroides": 0.0}, days=1)
+    assert z["final_relative"] == {"Bacteroides": 0.0} and z["metabolite_flux"] == {"acetate": 0.0, "succinate": 0.0}
+    assert z["dysbiosis_shift"] == {"Bacteroides": 0.0}
+    n = simulate_community({"Bacteroides": -0.5, "Escherichia": 1.0}, days=1)           # negative final is clamped at 0
+    assert n["final_relative"]["Bacteroides"] == 0.0 and n["final_relative"]["Escherichia"] == 1.0
+    assert n["metabolite_flux"].get("acetate") == 0.0
+
+
+def test_design_intervention_defaults_when_metabolites_absent():
+    r = design_intervention(current_profile={"Bacteroides": 0.3, "Lactobacillus": 0.2})
+    for o in r["interventions_ranked"]:
+        assert o["butyrate_flux"] == 0 and o["escherichia_fraction"] == 0 and o["benefit_score"] == 0
+    assert [o["intervention"] for o in r["interventions_ranked"]] == ["high-fiber diet (30g/d)", "inulin prebiotic", "low-sugar diet"]
+    assert r["recommended"]["intervention"] == "high-fiber diet (30g/d)"
+
+
+def test_design_intervention_score_has_three_places():
+    for prof in (PROFILE, C6, {"Faecalibacterium": 0.3, "Escherichia": 0.3, "Bacteroides": 0.1}):
+        for o in design_intervention(current_profile=prof)["interventions_ranked"]:
+            assert abs(o["benefit_score"] * 1000 - round(o["benefit_score"] * 1000)) < 1e-9
+            assert o["benefit_score"] == round(o["butyrate_flux"] - 0.5 * o["escherichia_fraction"], 3)
+
+
+def test_empty_consumption_list_uses_half(monkeypatch):
+    monkeypatch.setitem(core.SPECIES_TRAITS, "Ghost", {"growth": 0.4, "consumes": [], "produces": []})
+    r = simulate_community({"Ghost": 1.0}, days=1)
+    a, b = 0.4 * 0.5, 0.1 / 5                     # x' = x (a - b x): logistic, exact solution
+    x1 = a / (b + (a / 1.0 - b) * math.exp(-a * 1.0))
+    assert r["trajectory"]["Ghost"][-1] == pytest.approx(round(x1, 3), abs=1e-3)
+    assert r["trajectory"]["Ghost"] == [1.0, pytest.approx(round(x1, 3), abs=1e-3)]
+
+
+def test_sample_hours_lower_boundary_and_wide_values():
+    s = simulate_metabolic_community(C6, days=1, sample_hours=1)
+    assert len(s["trajectory"]) == 25 and s["trajectory"][1]["day"] == pytest.approx(1 / 24)
+    t = simulate_metabolic_community(C6, days=1, sample_hours=2)
+    assert len(t["trajectory"]) == 13
+    u = simulate_metabolic_community(C6, days=0.25, sample_hours=0.5)
+    assert len(u["trajectory"]) == 13 and u["trajectory"][-1]["day"] == 0.25
+
+
+def test_legacy_default_tolerance_characterization_30_days():
+    """Characterization of the current numbers at scipy rtol=1e-6 (scipy 1.15.3, numpy 2.2.6); looser or tighter rtol changes them.
+    Values are produced by the module as coded, not by an independent oracle."""
+    r = simulate_community(C6, days=30)
+    assert r["metabolite_flux"] == {"butyrate": 278.349, "acetate": 19.973, "succinate": 9.979, "lactate": 12.499, "propionate": 0.727}
+    assert r["trajectory"]["Faecalibacterium"][-3:] == [555.715, 556.303, 556.697]
+    assert r["trajectory"]["Akkermansia"][-3:] == [1.256, 1.353, 1.454]
+    assert len(r["trajectory"]["t_d"]) == 31
+
+
+class _Fit:
+    def __init__(self, x, fun, nfev, success): self.x, self.fun, self.nfev, self.success = x, fun, nfev, success
+
+
+def test_optimizer_configuration_objective_and_selection_with_mocked_de(monkeypatch):
+    import scipy.optimize as so
+    seen = {}
+    def fake_de(func, bounds, **kw):
+        seen["func"], seen["bounds"], seen["kw"] = func, bounds, kw
+        return _Fit(np.array([1.25, 2.5]), 0.123, 77, False)
+    monkeypatch.setattr(so, "differential_evolution", fake_de)
+    calls = []
+    real = core.simulate_metabolic_community
+    def spy(initial, **kw):
+        calls.append(kw); return real(initial, **kw)
+    monkeypatch.setattr(core, "simulate_metabolic_community", spy)
+    tgt = {"butyrate": 0.05, "acetate": 0.1}
+    r = core.optimize_intervention(C6, tgt, days=2)
+    assert list(seen["bounds"]) == [(0, 3), (0, 3)]
+    assert seen["kw"] == dict(seed=4, maxiter=20, popsize=6, polish=True)
+    # selection and pass-through of the fit
+    assert r["diet"] == {"fiber": 1.25, "sugar": 2.5} and all(type(v) is float for v in r["diet"].values())
+    assert r["objective"] == 0.123 and r["evaluations"] == 77 and r["converged"] is False
+    assert r["solver"] == "differential_evolution"
+    assert calls[-1] == dict(days=2, diet={"fiber": 1.25, "sugar": 2.5}) and "sample_hours" not in calls[-1]
+    # the objective handed to DE: independent recomputation at two points, with sample_hours=24 and the 1e-6 per-gram penalty
+    for z in ((1.5, 2.0), (0.0, 3.0)):
+        calls.clear()
+        got = seen["func"](np.array(z))
+        assert calls == [dict(days=2, diet={"fiber": z[0], "sugar": z[1]}, sample_hours=24)]
+        fm = real(C6, days=2, diet={"fiber": z[0], "sugar": z[1]}, sample_hours=24)["final_metabolites"]
+        want = sum((fm[m] - v) ** 2 for m, v in tgt.items()) + 1e-6 * (z[0] + z[1])
+        assert got == pytest.approx(want, rel=1e-9, abs=1e-12)
+    # penalty is exactly 1e-6 per unit of input: two z with equal metabolites would differ only by it; check the zero-target case
+    zero = seen["func"](np.array((0.0, 0.0)))
+    fm0 = real(C6, days=2, diet={"fiber": 0.0, "sugar": 0.0}, sample_hours=24)["final_metabolites"]
+    assert zero == pytest.approx(sum((fm0[m] - v) ** 2 for m, v in tgt.items()), rel=1e-9, abs=1e-12)
+    r2 = core.optimize_intervention(C6, {"butyrate": 0.05}, days=3)
+    assert r2["simulation"]["trajectory"][-1]["day"] == 3.0
+    assert r["target_vs_achieved"]["butyrate"]["target"] == 0.05
+
+
+def test_optimizer_swapped_outputs_are_detected(monkeypatch):
+    import scipy.optimize as so
+    monkeypatch.setattr(so, "differential_evolution", lambda f, b, **kw: _Fit(np.array([0.5, 2.75]), 1.0, 5, True))
+    r = core.optimize_intervention(C6, {"butyrate": 0.05}, days=1)
+    assert r["diet"]["fiber"] == 0.5 and r["diet"]["sugar"] == 2.75 and r["converged"] is True
+    assert r["simulation"]["trajectory"][0]["metabolites"]["fiber"] == 0.5
+    assert r["simulation"]["trajectory"][0]["metabolites"]["sugar"] == 2.75
+
+
+def test_keyword_only_signatures():
+    with pytest.raises(TypeError):
+        simulate_metabolic_community(C6, 2)
+    with pytest.raises(TypeError):
+        optimize_intervention(C6, {"butyrate": 0.05}, 2)
+    with pytest.raises(TypeError):
+        core.analyze_microbiome(C6, {"butyrate": 0.05}, 2)
+
+
+import types as _types
+
+
+def _fake_solver(calls, last=None, zero=False, fail=False):
+    def solve(rhs, span, y0, **kw):
+        calls.append(dict(kw, span=span))
+        if fail:
+            return _types.SimpleNamespace(success=False, message="backend-boom")
+        ts = kw["t_eval"]
+        Y = np.zeros((len(y0), len(ts))) if zero else np.tile(np.array(y0, float)[:, None], (1, len(ts)))
+        if last is not None:
+            Y[0, -1] = last
+        return _types.SimpleNamespace(y=Y, t=ts, success=True, nfev=9)
+    return solve
+
+
+def test_solver_arguments_and_rounding_via_backend_spy(monkeypatch):
+    calls = []
+    monkeypatch.setattr(core, "solve_ivp", _fake_solver(calls, last=0.123456789))
+    r = core.simulate_community({"Bacteroides": 1, "Escherichia": 0.5}, days=1.333)
+    assert calls[-1]["rtol"] == 1e-6 and calls[-1]["span"] == (0, 1.333)
+    # final = round(0.123456789, 4) = 0.1235; Escherichia stays 0.5; total 0.6235
+    assert r["final_relative"] == {"Bacteroides": round(0.1235 / 0.6235, 3), "Escherichia": round(0.5 / 0.6235, 3)}
+    assert r["final_relative"]["Bacteroides"] == 0.198
+    assert r["trajectory"]["t_d"] == [0.0, 1.07]
+    assert r["trajectory"]["Bacteroides"] == [1.0, 1.0]  # stride-4 samples skip the faked last point
+    calls.clear()
+    core.simulate_metabolic_community({"Bacteroides": 1}, days=1)
+    assert (calls[-1]["rtol"], calls[-1]["atol"], calls[-1]["method"]) == (1e-8, 1e-9, "BDF")
+    assert calls[-1]["span"] == (0, 1)
+
+
+def test_zero_totals_and_backend_failure(monkeypatch):
+    calls = []
+    monkeypatch.setattr(core, "solve_ivp", _fake_solver(calls, zero=True))
+    assert core.simulate_community({"Bacteroides": 0.0}, days=1)["final_relative"] == {"Bacteroides": 0}
+    assert core.simulate_metabolic_community({"Bacteroides": 1}, days=1)["final_relative"] == {"Bacteroides": 0}
+    monkeypatch.setattr(core, "solve_ivp", _fake_solver([], fail=True))
+    with pytest.raises(RuntimeError, match="backend-boom"):
+        core.simulate_metabolic_community({"Bacteroides": 1}, days=1)
+
+
+def test_fractional_sample_hours_accepted():
+    r = simulate_metabolic_community({"Bacteroides": 1}, days=1, sample_hours=0.5)
+    assert len(r["trajectory"]) == 49 and r["trajectory"][1]["day"] == pytest.approx(0.5 / 24)
+    r = simulate_metabolic_community({"Bacteroides": 1}, days=1, sample_hours=1)
+    assert len(r["trajectory"]) == 25
+
+
+def test_feature_thresholds_and_zero_start_fold():
+    sp = ["Faecalibacterium", "Bacteroides", "Escherichia", "Lactobacillus", "Akkermansia", "Bifidobacterium"]
+    rows = [{"day": t, "species": dict.fromkeys(sp, 0 if t == 0 else 0.1), "metabolites": dict.fromkeys(core.METABOLITES, 0)} for t in (0, 1)]
+    fin = dict(zip(sp, [0, 1e-6, 0.2, 0.3, 0.2, 0.299999]))
+    sim = {"trajectory": rows, "solver": {"nfev": 1}, "final_relative": fin}
+    out = core.enhancement_features(sim, {"objective": 0, "diet": {"fiber": 0, "sugar": 0}, "evaluations": 1})
+    # richness counts strictly > 1e-6: 1e-6 itself excluded, 0 excluded
+    assert out["final_richness"] == 4
+    assert out["Bacteroides_fold_change"] == pytest.approx(0.1 / 1e-12)
+    want_h = -sum(v * math.log(v) for v in fin.values() if v > 0)
+    assert out["final_shannon"] == pytest.approx(want_h, rel=1e-12)
+    assert out["dominant_fraction"] == 0.3
+    fin2 = dict(fin, Bacteroides=1.0000001e-6)
+    out2 = core.enhancement_features(dict(sim, final_relative=fin2), {"objective": 0, "diet": {"fiber": 0, "sugar": 0}, "evaluations": 1})
+    assert out2["final_richness"] == 5
+
+
+def test_design_stubbed_backend_missing_metabolites_and_rounding(monkeypatch):
+    monkeypatch.setattr(core, "simulate_community", lambda initial, **kw: {"metabolite_flux": {}, "final_relative": {"Bacteroides": 1}})
+    r = core.design_intervention(current_profile={"Bacteroides": 1})
+    assert all(o["benefit_score"] == 0 for o in r["interventions_ranked"])
+    monkeypatch.setattr(core, "simulate_community", lambda initial, **kw: {"metabolite_flux": {"butyrate": .123456}, "final_relative": {"Escherichia": .123456}})
+    # score = round(0.123456 - 0.5*0.123456, 3) = round(0.061728, 3) = 0.062
+    assert core.design_intervention()["recommended"]["benefit_score"] == 0.062
+
+
+def test_tiny_day_grid_and_final_precision(monkeypatch):
+    r = simulate_metabolic_community({"Bacteroides": 1}, days=1e-10, sample_hours=.5)
+    assert [x["day"] for x in r["trajectory"]] == [0, 1e-10]
+    def solve(rhs, span, y0, **kw):
+        Y = np.tile(np.array([.123456, .234567])[:, None], (1, len(kw["t_eval"])))
+        return _types.SimpleNamespace(y=Y)
+    monkeypatch.setattr(core, "solve_ivp", solve)
+    ini = {"Bacteroides": 1, "Escherichia": 1}
+    r = core.simulate_community(ini, days=1)
+    assert r["dysbiosis_shift"] == core._shift(ini, {"Bacteroides": .1235, "Escherichia": .2346})
+
+
+def test_grid_stop_value_is_days_plus_1e9(monkeypatch):
+    orig = np.arange
+    stops = []
+    def arange(*a, **kw):
+        if len(a) == 3:
+            stops.append(a[1])
+        return orig(*a, **kw)
+    monkeypatch.setattr(core.np, "arange", arange)
+    simulate_metabolic_community({"Bacteroides": 1}, days=1, sample_hours=24)
+    assert stops == [1 + 1e-9]
+
+
+def test_generic_species_features_fill_and_single_row():
+    opt = {"objective": 0, "diet": {"fiber": 1, "sugar": 2}, "evaluations": 1}
+    rows = [{"day": t, "species": {"s%d" % i: i + 1 + t for i in range(12)}, "metabolites": dict.fromkeys(core.METABOLITES, 0)} for t in (0, 1)]
+    sim = {"trajectory": rows, "solver": {"nfev": 1}, "final_relative": {"s%d" % i: 1 / 12 for i in range(12)}}
+    r = core.enhancement_features(sim, opt)
+    assert len(r) == 50 and {"optimization_objective", "optimized_fiber", "optimized_sugar", "optimization_evaluations"} <= set(r)
+    sp = ["s%d" % i for i in range(6)]
+    row = {"day": 0, "species": dict.fromkeys(sp, 1), "metabolites": dict.fromkeys(core.METABOLITES, 0)}
+    one = {"trajectory": [row], "solver": {"nfev": 1}, "final_relative": dict.fromkeys(sp, 1 / 6)}
+    assert len(core.enhancement_features(one, opt)) == 50
+
+
+def test_shift_zero_total_with_nonzero_components_and_missing_final_key():
+    # initial total 0 (1 + -1): denominators fall back to 1, not 2 or 0.5
+    # A: 1/3 - 1/1 = -0.667 ; B: 2/3 - (-1)/1 = 1.667
+    assert core._shift({"A": 1, "B": -1}, {"A": 1, "B": 2}) == {"A": -0.667, "B": 1.667}
+    # final total 0 (1 + -1): A: 1/1 - 1/3 = 0.667 ; B: -1/1 - 2/3 = -1.667
+    assert core._shift({"A": 1, "B": 2}, {"A": 1, "B": -1}) == {"A": 0.667, "B": -1.667}
+    # missing final key defaults to 0 (not 1 or 2): B: 0 - 2/3
+    assert core._shift({"A": 1, "B": 2}, {"A": 3}) == {"A": round(1 - 1 / 3, 3), "B": -0.667}
+
+
+def test_tiny_total_relative_uses_1e12_floor(monkeypatch):
+    monkeypatch.setattr(core, "solve_ivp", _fake_solver([], last=1e-13, zero=True))
+    r = core.simulate_metabolic_community({"Bacteroides": 1}, days=1)
+    # total 1e-13 < 1e-12 floor -> 1e-13 / 1e-12 = 0.1 (floor 5e-13 gives 0.2, 2e-12 gives 0.05)
+    assert r["final_relative"]["Bacteroides"] == pytest.approx(0.1, rel=1e-9)
