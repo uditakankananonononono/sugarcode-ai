@@ -66,3 +66,10 @@ def test_option_nonsequence_type(options):
 def test_rectangle_nonsequence_type(rectangle):
     with pytest.raises(ValueError) as exc:solve(4,4,[[rectangle]])
     assert str(exc.value)=='placements must contain x y width height cost'
+
+
+def test_independent_geometry_lower_bounds_exact_error():
+    assert solve(2,2,[[(0,0,1,1,0)]])['rectangles']==[[0,0,1,1]]
+    for rectangle in [(-1,0,1,1,0),(0,-1,1,1,0),(0,0,0,1,0),(0,0,1,0,0)]:
+        with pytest.raises(ValueError) as exc:solve(2,2,[[rectangle]])
+        assert str(exc.value)=='placement geometry must be inside room bounds'

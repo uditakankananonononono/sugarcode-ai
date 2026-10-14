@@ -3,7 +3,8 @@
 Selects one supplied placement (x,y,width,height,cost) per furniture item,
 inside an integer room, forbidding positive-area overlap. Edge contact is
 allowed. Minimizes total supplied functional cost, first product-order tie.
-At most six items/four options each/4096 candidate plans.
+Implementation-selected caps: six items/four options each/4096 candidate
+plans. These caps are not stated by the requirement row.
 NOT_CLAIMED: building-code compliance, ergonomics validation, aesthetics,
 accessibility, arbitrary CAD modeling, fabrication or deployment.
 """
