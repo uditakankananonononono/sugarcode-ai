@@ -40,3 +40,9 @@ def test_errors(args,error,message):
 @pytest.mark.parametrize('value',[2**32,F(2**32),F(1,2**32)])
 def test_next_bit(value):
     with pytest.raises(ValueError,match='^values must fit 32 bits$'):solve(value,1,1,0)
+
+@pytest.mark.parametrize('dimension',range(3))
+def test_each_zero_hull_dimension_declared_error(dimension):
+    args=[1,1,1,0];args[dimension]=0
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)=='hull dimensions must be positive'
