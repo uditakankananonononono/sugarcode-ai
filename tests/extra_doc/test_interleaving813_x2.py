@@ -1,0 +1,43 @@
+import copy,itertools,random
+from fractions import Fraction as F
+import pytest
+from sugarcode.extra_doc.interleaving813_x2 import round_robin_practice as raw_run
+class L(list):pass
+class T(tuple):pass
+class S(str):pass
+class I(int):pass
+ROWS=[('a', 0), ('b', 1)]
+def run(rows):return raw_run(rows)
+@pytest.mark.parametrize('C',[L,T])
+def test_container_subclasses(C):
+    with pytest.raises(TypeError,match='^categories: exact list or tuple required$'):run(C(ROWS))
+    with pytest.raises(TypeError,match='^categories: exact list or tuple row required$'):run([ROWS[0],C(ROWS[1])])
+@pytest.mark.parametrize('bad,error,msg',[(S('b'),TypeError,'exact string label required'),('',ValueError,'label must be 1..24 ASCII word characters'),('x'*25,ValueError,'label must be 1..24 ASCII word characters'),('bad!',ValueError,'label must be 1..24 ASCII word characters'),('é',ValueError,'label must be 1..24 ASCII word characters')])
+def test_label_slot(bad,error,msg):
+    r=list(ROWS[1]);r[0]=bad
+    with pytest.raises(error,match='^'+msg+'$'):run([ROWS[0],tuple(r)])
+def test_shapes_caps_unique_maxlabel_plain():
+    for records,msg in [([], 'categories: row count outside declared range'),([None]*33,'categories: row count outside declared range'),
+                       ([ROWS[0],ROWS[1][:-1]],'categories: wrong row arity'),([ROWS[0],ROWS[1],ROWS[0]],'category labels must be unique')]:
+        with pytest.raises(ValueError,match='^'+msg+'$'):run(records)
+    r=list(ROWS[0]);r[0]='x'*24;assert run((r,))
+
+@pytest.mark.parametrize('slot,lo,hi',[(1, 0, 32)])
+def test_integer_slots(slot,lo,hi):
+    for bad,error,msg in [(I(1),TypeError,'exact nonbool integer required'),(True,TypeError,'exact nonbool integer required'),(lo-1,ValueError,'integer outside declared range'),(hi+1,ValueError,'integer outside declared range')]:
+        r=list(ROWS[1]);r[slot]=bad
+        with pytest.raises(error,match='^'+msg+'$'):run([ROWS[0],tuple(r)])
+
+
+def test_independent_event_sort_oracle():
+    for counts in itertools.product((0,1,2,32),repeat=3):
+        rows=list(zip(('c','a','b'),counts));events=[(j+1,label) for label,n in rows for j in range(n)]
+        assert run(rows)=={'sequence':[(label,j) for j,label in sorted(events)],'practice_optimized':False}
+    rows=[('c_'+str(i).zfill(2),32) for i in reversed(range(32))];result=run(rows)['sequence']
+    assert len(result)==1024 and result[:32]==[(r[0],1) for r in sorted(rows)] and result[-32:]==[(r[0],32) for r in sorted(rows)]
+    from sugarcode.extra_doc import interleaving813_x2 as m
+    assert 'NOT_CLAIMED: effective practice, optimal mixing, task validity, learning' in m.__doc__
+
+def test_identity_key_independent_fields():
+    with pytest.raises(ValueError,match='^category labels must be unique$'):run([('a',0),('a',1)])
+    assert run([('a',1),('b',1)])['sequence']==[('a',1),('b',1)]
