@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -138,9 +139,20 @@ def _late(m):
     _raises(ValueError, 'duration must be a nonbool integer between 1 and 1000', m.schedule_jobs, [('j%d' % i, 1) for i in range(29)] + [('z', 1001)], 1)
 
 
+def _sym(m):
+    OUT = 'jobs must be a list or tuple'
+    ROW = 'each job must be a (name, duration) pair'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.schedule_jobs, K([('a', 1)]), 1)
+        _raises(ValueError, ROW, m.schedule_jobs, [K(('a', 1))], 1)
+        _raises(ValueError, ROW, m.schedule_jobs, [('a', 1), K(('a', 1))], 1)
+        _raises(ValueError, ROW, m.schedule_jobs, [K(('a', 1)), ('a', 1)], 1)
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(jobs) not in (list, tuple)', 'not isinstance(jobs, (list, tuple))'),
