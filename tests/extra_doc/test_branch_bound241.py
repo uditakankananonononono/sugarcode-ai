@@ -49,3 +49,20 @@ def test_exact_pruning_statistics_and_bound_witness_values():
     r=solve([2,3,4],[4,5,5],5)
     assert r['nodes_visited']==6 and r['nodes_pruned_by_bound']==2
     assert r['pruning_trace']==[dict(depth=2,upper_bound_fraction='31/4',incumbent_fraction='9'),dict(depth=1,upper_bound_fraction='15/2',incumbent_fraction='9')]
+
+
+def test_later_equal_value_larger_bits_cannot_replace_earlier_incumbent():
+    # Ratio DFS order [2,1,3,0]: [0,0,1,1] is found before [0,1,0,0].
+    r=solve([5,4,2,3],[2,5,3,2],5)
+    assert r['item_order']==[2,1,3,0] and r['selected_bits']==[0,0,1,1]
+    assert r['value_fraction']=='5' and r['weight_fraction']=='5'
+
+
+def test_capacity_zero_all_zero_value_optimum_and_exact_counters():
+    r=solve([1,2,3],[0,0,0],0)
+    assert r['value_fraction']=='0' and r['selected_bits']==[0,0,0] and r['weight_fraction']=='0'
+    assert r['nodes_visited']==4 and r['nodes_pruned_by_bound']==0 and r['pruning_trace']==[]
+
+
+def test_just_below_minimum_weight_exact_refusal():
+    with pytest.raises(ValueError,match='^strict finite bounded knapsack number$'):solve([.00000099],[1],1)
