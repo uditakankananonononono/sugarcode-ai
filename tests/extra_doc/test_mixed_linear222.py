@@ -95,3 +95,11 @@ def test_signed_asymmetric_integer_box_count_first_overcap_and_decimal_curvature
     assert r['integer_assignments_checked']==9 and r['feasible_integer_assignments']==9 and r['point_fraction']==['-3','2','0']
     with pytest.raises(ValueError,match='^at most 1000 integer assignments before scan$'):solve([[0,6],[0,10],[0,12]],[0,1],[0]*4,[],'min')
     assert solve([[0,0]],[0,2],[0,1],[dict(coefficients=[0,.5],relation='>=',rhs=.5)],'min')['point_fraction']==['0','1']
+
+
+def test_negative_fractional_objective_and_constraint_sign_witnesses():
+    r=solve([[0,0]],[0,2],[0,-.5],[],'min')
+    assert r['point_fraction']==['0','2'] and r['objective_fraction']=='-1'
+    r=solve([[0,0]],[0,2],[0,1],[{'coefficients':[0,-.5],'relation':'<=','rhs':-.5}],'min')
+    assert r['point_fraction']==['0','1'] and r['objective_fraction']=='1'
+    assert -.5*F(r['point_fraction'][1])<=F('-.5')
