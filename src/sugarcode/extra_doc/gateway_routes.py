@@ -20,41 +20,41 @@ STATUS_NOTE = ("PARTIAL: route-table lookup on supplied strings only; nothing is
 
 
 def route(routes, method, path):
-    if not isinstance(method, str):
+    if type(method) is not str:
         raise ValueError("method: string required")
     if method not in METHODS:
         raise ValueError("method: must be one of GET, POST, PUT, PATCH, DELETE")
-    if not isinstance(path, str):
+    if type(path) is not str:
         raise ValueError("path: string required")
     if not path.startswith("/") or len(path) > MAX_PATH:
         raise ValueError(f"path: must start with / and be at most {MAX_PATH} characters")
-    if not isinstance(routes, (list, tuple)):
+    if type(routes) not in (list, tuple):
         raise ValueError("routes: list required")
     if not 1 <= len(routes) <= MAX_ROUTES:
         raise ValueError(f"routes: 1 to {MAX_ROUTES} entries required")
     table = []
     seen = set()
     for i, r in enumerate(routes):
-        if not isinstance(r, (list, tuple)):
+        if type(r) not in (list, tuple):
             raise ValueError(f"routes[{i}]: (prefix, methods, target) required")
         if len(r) != 3:
             raise ValueError(f"routes[{i}]: 3 entries required")
         prefix, methods, target = r
-        if (not isinstance(prefix, str) or not prefix.startswith("/") or len(prefix) > MAX_PREFIX
+        if (type(prefix) is not str or not prefix.startswith("/") or len(prefix) > MAX_PREFIX
                 or any(c.isspace() for c in prefix) or (prefix != "/" and prefix.endswith("/"))):
             raise ValueError(f"routes[{i}] prefix: must start with /, have no whitespace or trailing / and be at "
                              f"most {MAX_PREFIX} characters")
         if prefix in seen:
             raise ValueError(f"routes[{i}] prefix: duplicate")
         seen.add(prefix)
-        if not isinstance(methods, (list, tuple)) or not 1 <= len(methods) <= len(METHODS):
+        if type(methods) not in (list, tuple) or not 1 <= len(methods) <= len(METHODS):
             raise ValueError(f"routes[{i}] methods: list of 1 to {len(METHODS)} entries required")
         for m in methods:
-            if m not in METHODS:
+            if type(m) is not str or m not in METHODS:
                 raise ValueError(f"routes[{i}] methods: each must be one of GET, POST, PUT, PATCH, DELETE")
         if len(set(methods)) != len(methods):
             raise ValueError(f"routes[{i}] methods: duplicate entry")
-        if not isinstance(target, str) or not target or len(target) > MAX_TARGET:
+        if type(target) is not str or not target or len(target) > MAX_TARGET:
             raise ValueError(f"routes[{i}] target: non-empty string up to {MAX_TARGET} characters required")
         table.append((prefix, tuple(methods), target))
     matching = [t for t in table if t[0] == "/" or path == t[0] or path.startswith(t[0] + "/")]

@@ -144,3 +144,128 @@ def test_validation_messages_and_types():
         R("bad", "GET", None)
     with pytest.raises(ValueError, match=r"^routes: list required$"):
         R("bad", "GET", "/")
+
+
+# ---- exact-type hardening (v2): subclasses of str, list and tuple are refused at every slot ----
+class S(str):
+    pass
+
+
+class LyingS(str):
+    """Equal to and hashing like 'GET' whatever its text."""
+    def __eq__(self, other):
+        return True
+
+    def __ne__(self, other):
+        return False
+
+    __hash__ = str.__hash__
+
+
+class L(list):
+    pass
+
+
+class T(tuple):
+    pass
+
+
+GOOD = ("/a", ["GET"], "t")
+M_ROUTES = r"^routes: list required$"
+
+
+def _bad(msg, *args):
+    with pytest.raises(ValueError, match=msg):
+        R(*args)
+
+
+def test_exact_builtin_acceptance_for_list_and_tuple_shapes():
+    assert st(R([("/a", ["GET", "POST"], "t")], "POST", "/a")) == (200, "t", "/a", None)
+    assert st(R((("/a", ("GET", "POST"), "t"),), "POST", "/a")) == (200, "t", "/a", None)
+    assert st(R((["/a", ("GET",), "t"],), "GET", "/a")) == (200, "t", "/a", None)
+    assert st(R([("/a", ["GET"], "t"), ["/b", ("POST", "GET"), "u"]], "PUT", "/b")) == (405, None, None, ["GET", "POST"])
+
+
+def test_str_subclass_method_and_path_refused_before_membership():
+    _bad(r"^method: string required$", [GOOD], S("GET"), "/a")
+    _bad(r"^method: string required$", [GOOD], LyingS("zzz"), "/a")
+    _bad(r"^method: string required$", [GOOD], LyingS("GET"), "/a")
+    _bad(r"^path: string required$", [GOOD], "GET", S("/a"))
+    _bad(r"^path: string required$", [GOOD], "GET", LyingS("zzz"))
+
+
+def test_routes_list_and_tuple_subclass_refused():
+    for K in (L, T):
+        _bad(M_ROUTES, K([GOOD]), "GET", "/a")
+    _bad(M_ROUTES, L(), "GET", "/a")
+    _bad(M_ROUTES, T(), "GET", "/a")
+    _bad(M_ROUTES, L([GOOD] * 51), "GET", "/a")          # subclass refused before the size cap
+
+
+def test_row_list_and_tuple_subclass_refused_first_and_later():
+    for K in (L, T):
+        row = K(GOOD)
+        _bad(r"^routes\[0\]: \(prefix, methods, target\) required$", [row], "GET", "/a")
+        _bad(r"^routes\[1\]: \(prefix, methods, target\) required$", [("/b", ["GET"], "u"), row], "GET", "/a")
+        _bad(r"^routes\[0\]: \(prefix, methods, target\) required$", [K(("/a", ["GET"])), GOOD], "GET", "/a")
+
+
+def test_methods_list_and_tuple_subclass_refused_first_and_later():
+    for K in (L, T):
+        _bad(r"^routes\[0\] methods: list of 1 to 5 entries required$", [("/a", K(["GET"]), "t")], "GET", "/a")
+        _bad(r"^routes\[1\] methods: list of 1 to 5 entries required$", [("/b", ["GET"], "u"), ("/a", K(["GET"]), "t")], "GET", "/a")
+        _bad(r"^routes\[0\] methods: list of 1 to 5 entries required$", [("/a", K(), "t")], "GET", "/a")
+
+
+def test_methods_element_str_subclass_refused_first_and_later_and_lying_eq():
+    msg = r"^routes\[0\] methods: each must be one of GET, POST, PUT, PATCH, DELETE$"
+    for bad in (S("GET"), LyingS("GET"), LyingS("zzz")):
+        _bad(msg, [("/a", [bad], "t")], "GET", "/a")
+        _bad(msg, [("/a", ["GET", bad], "t")], "GET", "/a")
+        _bad(msg, [("/a", ("POST", bad), "t")], "POST", "/a")
+    # a lying object may not pass the duplicate check or the membership check as a plain name
+    _bad(msg, [("/a", [LyingS("GET"), LyingS("GET")], "t")], "GET", "/a")
+
+
+def test_prefix_and_target_str_subclass_refused_first_and_later():
+    pm = r"^routes\[%d\] prefix: must start with /, have no whitespace or trailing / and be at most 60 characters$"
+    tm = r"^routes\[%d\] target: non-empty string up to 30 characters required$"
+    for bad in (S("/a"), LyingS("/a"), LyingS("zzz")):
+        _bad(pm % 0, [(bad, ["GET"], "t")], "GET", "/a")
+        _bad(pm % 1, [("/b", ["GET"], "u"), (bad, ["GET"], "t")], "GET", "/a")
+    for bad in (S("t"), LyingS("t"), LyingS("")):
+        _bad(tm % 0, [("/a", ["GET"], bad)], "GET", "/a")
+        _bad(tm % 1, [("/b", ["GET"], "u"), ("/a", ["GET"], bad)], "GET", "/a")
+
+
+def test_prefix_boundaries_and_full_messages():
+    pm = r"^routes\[0\] prefix: must start with /, have no whitespace or trailing / and be at most 60 characters$"
+    assert st(R([("/", ["GET"], "t")], "GET", "/x")) == (200, "t", "/", None)
+    assert st(R([("/" + "a" * 59, ["GET"], "t")], "GET", "/" + "a" * 59)) == (200, "t", "/" + "a" * 59, None)
+    for bad in ("/" + "a" * 60, "/a/", "//", "/a b", "/a\u00a0b", "/a\nb", "a", ""):
+        _bad(pm, [(bad, ["GET"], "t")], "GET", "/a")
+    assert R([("/a/b", ["GET"], "t")], "GET", "/a/b")["status"] == 200
+
+
+def test_full_anchored_messages_for_remaining_validation_paths():
+    _bad(r"^routes\[0\]: 3 entries required$", [("/a", ["GET"])], "GET", "/a")
+    _bad(r"^routes\[0\] methods: duplicate entry$", [("/a", ("GET", "GET"), "t")], "GET", "/a")
+    _bad(r"^routes\[2\] prefix: duplicate$", [("/a", ["GET"], "t"), ("/b", ["GET"], "t"), ("/a", ["GET"], "t")], "GET", "/a")
+    _bad(r"^routes\[0\] methods: each must be one of GET, POST, PUT, PATCH, DELETE$", [("/a", ["get"], "t")], "GET", "/a")
+    _bad(r"^routes: 1 to 50 entries required$", [], "GET", "/a")
+    _bad(r"^routes: 1 to 50 entries required$", [GOOD] * 51, "GET", "/a")
+    assert st(R([(f"/p{i}", ["GET"], "t") for i in range(50)], "GET", "/p0")) == (200, "t", "/p0", None)
+
+
+def test_validation_order_method_path_routes_then_rows():
+    _bad(r"^method: string required$", S("GET"), S("GET"), S("/"))
+    _bad(r"^path: string required$", S("x"), "GET", S("/"))
+    _bad(r"^path: must start with / and be at most 200 characters$", S("x"), "GET", "x")
+    _bad(M_ROUTES, S("x"), "GET", "/")
+
+
+def test_405_union_and_result_shape_with_tuples():
+    r = R((("/a", ("POST", "GET"), "t"), ("/", ["PUT"], "u")), "DELETE", "/a/x")
+    assert r == {"status": 405, "target": None, "prefix": None, "allowed": ["GET", "POST", "PUT"],
+                 "status_note": gr.STATUS_NOTE}
+    assert set(R(TABLE, "GET", "/")) == {"status", "target", "prefix", "allowed", "status_note"}
