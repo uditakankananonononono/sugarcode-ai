@@ -68,9 +68,9 @@ def test_regulatory_steady_state_and_converged_flag():
     assert chain["trajectory"] == [{"A": 1.0, "B": 0.0}, {"A": 0.0, "B": 1.0}, {"A": 0.0, "B": 0.0},
                                    {"A": 0.0, "B": 0.0}]
     assert chain["steady_state"] == {"A": 0.0, "B": 0.0} and chain["converged"] is True
-    # characterization: converging exactly on the last allowed step is reported converged=False
+    # v9: converging exactly on the last allowed step is reported converged=True
     edge = core.regulatory_state(["A", "B"], [], {"A": 1}, steps=2)
-    assert edge["trajectory"][-1] == edge["trajectory"][-2] and edge["converged"] is False
+    assert edge["trajectory"][-1] == edge["trajectory"][-2] and edge["converged"] is True
 
 
 # ---- environment_response (stubbed fba, hand ratios) ----

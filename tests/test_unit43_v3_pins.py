@@ -103,8 +103,9 @@ def test_boolean_chain_shifts_then_dies_and_breaks_on_first_repeat():
     r = m.regulatory_state(["a", "b", "c"], ch, initial={"a": 1}, steps=10)
     assert r["trajectory"] == [{"a": 1, "b": 0, "c": 0}, {"a": 0, "b": 1, "c": 0}, {"a": 0, "b": 0, "c": 1}, {"a": 0, "b": 0, "c": 0}, {"a": 0, "b": 0, "c": 0}]
     assert r["converged"] is True
-    # boundary of the converged flag: the repeat is the last of steps+1 rows -> flag False; one more step -> True
-    assert m.regulatory_state(["a", "b", "c"], ch, initial={"a": 1}, steps=4)["converged"] is False
+    # converged = the last two states are equal, including when the repeat is on the last allowed step (v9 fix)
+    assert m.regulatory_state(["a", "b", "c"], ch, initial={"a": 1}, steps=4)["converged"] is True
+    assert m.regulatory_state(["a", "b", "c"], ch, initial={"a": 1}, steps=3)["converged"] is False
     assert len(traj(genes=["a", "b", "c"], interactions=ch, initial={"a": 1}, steps=4)) == 5
     assert m.regulatory_state(["a", "b", "c"], ch, initial={"a": 1}, steps=5)["converged"] is True
     assert len(traj(genes=["a", "b", "c"], interactions=ch, initial={"a": 1}, steps=3)) == 4

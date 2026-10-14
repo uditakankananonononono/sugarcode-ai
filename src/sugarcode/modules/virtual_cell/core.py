@@ -223,7 +223,7 @@ def regulatory_state(genes, interactions, initial=None, steps=12, threshold=0.5)
         if len(trajectory) >= 2 and trajectory[-1] == trajectory[-2]:
             break
     return {"genes": list(genes), "trajectory": trajectory, "steady_state": trajectory[-1],
-            "converged": len(trajectory) < steps + 1, "model_status": "computational prediction; requires experimental validation"}
+            "converged": trajectory[-1] == trajectory[-2], "model_status": "computational prediction; requires experimental validation"}
 
 
 def environment_response(model, conditions=None):
