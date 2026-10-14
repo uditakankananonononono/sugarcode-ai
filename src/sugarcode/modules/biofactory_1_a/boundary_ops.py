@@ -15,6 +15,8 @@ Enforced limits (choices made here, not spec values; the core accepts wider inpu
   core accepts them; reverse-acting loops are therefore not supported here (a
   narrowing decision kept on purpose, not a claim that negative gains are invalid);
   dt in 1e-6..1e6; setpoint and measurements within +-MAX_VALUE.
+  assay_quality: signal and background series of 2..MAX_SERIES values, each within +-1e9.
+  experiment_log: the node cap is checked before a container's children are queued.
 """
 from __future__ import annotations
 import math
@@ -135,6 +137,9 @@ def _check_json(v):
             if not math.isfinite(x):
                 raise ValueError("results must be finite")
             continue
+        if isinstance(x, (list, tuple, dict)) and count + len(stack) + len(x) > MAX_NODES:
+            # visited + pending + about to be added already exceeds the cap: refuse before allocating the children
+            raise ValueError(f"results has more than {MAX_NODES} values")
         if isinstance(x, (list, tuple)):
             stack.extend((y, depth + 1) for y in x)
         elif isinstance(x, dict):

@@ -10,7 +10,9 @@ Ranges are choices made here, not spec values.
 Enforced limits (choices made here, not spec values; the core accepts wider inputs):
   MAX_CONSTRUCTS = 100000 (n_constructs in 1..MAX_CONSTRUCTS; the core accepted 0),
   MAX_OBS = 1000 (observations and assay series, 1..MAX_OBS for observations),
-  MAX_VALUE = 1e6 (observation and assay values within +-MAX_VALUE), _PRE = 1e15.
+  MAX_VALUE = 1e6 (observation values within +-MAX_VALUE; assay_signal and assay_background values are bounded
+  by +-1e9, the bound boundary_ops uses for assay series), _PRE = 1e15.
+  Series length caps (MAX_OBS) are checked before any value is scanned.
 """
 from __future__ import annotations
 from collections.abc import Mapping
@@ -34,13 +36,13 @@ def dbtl_report_checked(workflow, n_constructs=8, observations=(0.6, 0.8, 0.9),
         raise TypeError("n_constructs must be an int")
     if not 1 <= n_constructs <= MAX_CONSTRUCTS:
         raise ValueError(f"n_constructs must be in [1, {MAX_CONSTRUCTS}]")
-    obs = _series(observations, "observations", 1, MAX_VALUE)
-    if len(obs) > MAX_OBS:
+    if isinstance(observations, (list, tuple)) and len(observations) > MAX_OBS:
         raise ValueError(f"observations must have at most {MAX_OBS} values")
+    if any(isinstance(v, (list, tuple)) and len(v) > MAX_OBS for v in (assay_signal, assay_background)):
+        raise ValueError(f"assay series must have at most {MAX_OBS} values")
+    obs = _series(observations, "observations", 1, MAX_VALUE)
     sig = _series(assay_signal, "assay_signal", 2, 1e9)
     bg = _series(assay_background, "assay_background", 2, 1e9)
-    if len(sig) > MAX_OBS or len(bg) > MAX_OBS:
-        raise ValueError(f"assay series must have at most {MAX_OBS} values")
     if sum(sig) / len(sig) == sum(bg) / len(bg):
         raise ValueError("signal and background means are equal")
     return core.dbtl_report(workflow, n_constructs, obs, sig, bg)
