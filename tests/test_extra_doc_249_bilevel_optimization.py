@@ -68,3 +68,7 @@ def test_lower_upper_interior_zero_gradient_kkt_branches():
     assert r['follower_kkt']==[[True]]*5
     # Interior gradient exactzero,and upperendpointgradientexactzero.
     assert solve([3],[[1]],[0],[[0]],[-2],[2])['follower_kkt']==[[True]]
+
+@pytest.mark.parametrize('linear',[-8,8])
+def test_fixed_coordinate_all_gradient_signs(linear):
+    assert solve([1],[[linear]],[0],[[0]],[3],[3])['follower_kkt']==[[True]]
