@@ -86,3 +86,11 @@ def test_adversarial_coefficient_witness_positive_zero_negative_sign_and_fractio
     r=choose([dict(id='a',point=[.5,0,-.5])],[2,3,4],[1,2,3],[])
     assert r['scores'][0]['adversarial_objective_coefficients_fraction']==['3','5','1']
     assert r['scores'][0]['worst_objective_fraction']=='1'
+
+
+def test_constraint_closed_endpoints_nominal_radius_and_rhs_accepted():
+    for v in (-1000,1000,-1000.,1000.):
+        r=choose([dict(id='x',point=[1])],[0],[0],[dict(nominal=[v],radius=[0],rhs=v)])
+        assert r['selected_id']=='x' and r['scores'][0]['worst_constraint_lhs_fraction']==[str(F(str(v)))] and r['scores'][0]['robust_slack_fraction']==['0']
+    r=choose([dict(id='x',point=[-1])],[0],[0],[dict(nominal=[1000],radius=[1000],rhs=0)])
+    assert r['selected_id']=='x' and r['scores'][0]['worst_constraint_lhs_fraction']==['0'] and r['scores'][0]['robust_slack_fraction']==['0']
