@@ -206,3 +206,39 @@ def test_outputs_rounded_to_exactly_four_places_over_samples():
 
 def test_lightness_exactly_point_seven():
     assert A(["#b4b1b1", "#000000"])["colors"][0]["effect"] == "balanced"     # (180+177)/510 = 0.7
+
+
+def test_knee_value_takes_the_linear_branch():
+    # at the knee the linear branch gives 0.0031308049535603713, the power branch 0.0031308072830676845: they differ at 1e-9
+    knee = 0.04045 * 255
+    assert knee / 255 == 0.04045
+    assert c._lin(knee) == 0.04045 / 12.92
+    assert c._lin(knee) != ((0.04045 + 0.055) / 1.055) ** 2.4
+    assert c._lin(knee + 0.01) == ((0.04045 + 0.01 / 255 + 0.055) / 1.055) ** 2.4
+
+
+def test_relations_with_non_red_references():
+    def rel(a, b):
+        return A([a, b])["pairs"][0]["relation"]
+    # same hue is gap 0 (analogous): a sum instead of a difference would give 120 (triadic) or 240 for these
+    for hx in ("#ffff00", "#00ff00", "#0000ff", "#00ffff", "#ff00ff"):
+        assert rel(hx, hx) == "analogous"
+    assert rel("#ffff00", "#ff0000") == "none"          # 60 apart
+    assert rel("#ffff00", "#00ff00") == "none"          # 60 apart
+    assert rel("#ffff00", "#0000ff") == "complementary"  # 60 vs 240 = 180
+    assert rel("#00ff00", "#ff00ff") == "complementary"  # 120 vs 300
+    assert rel("#00ff00", "#0000ff") == "triadic"       # 120 vs 240
+    assert rel("#0000ff", "#00ff00") == "triadic"
+
+
+def test_exact_ratio_flag_semantics(monkeypatch):
+    monkeypatch.setattr(c, "contrast_ratio", lambda a, b: 4.5)
+    row = A(["#000000", "#ffffff"])["pairs"][0]
+    assert row["aa"] is True and row["aaa"] is False
+    monkeypatch.setattr(c, "contrast_ratio", lambda a, b: 7)
+    row = A(["#000000", "#ffffff"])["pairs"][0]
+    assert row["aa"] is True and row["aaa"] is True
+    monkeypatch.setattr(c, "contrast_ratio", lambda a, b: 4.4999)
+    assert A(["#000000", "#ffffff"])["pairs"][0]["aa"] is False
+    monkeypatch.setattr(c, "contrast_ratio", lambda a, b: 6.9999)
+    assert A(["#000000", "#ffffff"])["pairs"][0]["aaa"] is False
