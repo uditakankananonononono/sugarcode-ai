@@ -49,7 +49,9 @@ def loss_gradient(features, labels, theta):
 def fit(features, labels, theta=0.0, learning_rate=0.1, steps=100):
     """Fixed-step gradient descent; history includes initial and final loss.
 
-    No convergence guarantee. Threshold ties at 0.5 are assigned class 1.
+    No convergence guarantee. Training refuses with the real-magnitude ValueError
+    after an update moves theta outside the supported domain; no silent clamp.
+    Threshold ties at 0.5 are assigned class 1.
     """
     _data(features, labels); _real(theta); _real(learning_rate)
     if not 0 < learning_rate <= 1:

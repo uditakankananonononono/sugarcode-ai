@@ -183,3 +183,8 @@ def tolerance_contract(self):
     with self.assertRaises(ValueError) as caught:a.recover_bit_flip(1+2e-12,0,[0]*3)
     self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
 QuantumTests.test_tolerance_contract=tolerance_contract
+
+def training_domain_refusal(self):
+    with self.assertRaises(ValueError) as caught:b.fit([0],[0],theta=1e6,learning_rate=1,steps=3)
+    self.assertEqual(str(caught.exception),'real magnitude must be <=1e6')
+QuantumTests.test_training_domain_refusal=training_domain_refusal
