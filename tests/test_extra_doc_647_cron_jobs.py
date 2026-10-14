@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -181,9 +182,15 @@ def _late(m):
     _raises(ValueError, 'count must be a nonbool integer between 1 and 20', m.next_runs, '* * * * *', D(2026, 1, 1), I(2))
 
 
+def _sym(m):
+    for K in (S,):
+        _raises(TypeError, 'expression must be a string', m.next_runs, K('* * * * *'), __import__('datetime').datetime(2024, 1, 1), 1)
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('range(1462)', 'range(1463)'), ('len(expression) > 64', 'len(expression) >= 64'),
