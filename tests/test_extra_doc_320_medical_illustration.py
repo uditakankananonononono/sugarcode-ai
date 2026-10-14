@@ -102,3 +102,33 @@ def test_edges_accepted_and_messages():
                     (dict(anchors=[(0, 0)], height=1, label_x=float("nan"), gap=0), "finite")]:
         with pytest.raises(ValueError, match=msg):
             L(**kw)
+
+
+def _ref_cross(p, q, r, s):
+    d = (q[0] - p[0]) * (s[1] - r[1]) - (q[1] - p[1]) * (s[0] - r[0])
+    if d == 0:
+        return False
+    t = Fr((r[0] - p[0]) * (s[1] - r[1]) - (r[1] - p[1]) * (s[0] - r[0]), d)
+    u = Fr((r[0] - p[0]) * (q[1] - p[1]) - (r[1] - p[1]) * (q[0] - p[0]), d)
+    return 0 < t < 1 and 0 < u < 1
+
+
+def test_anchor_on_label_column_touching_leaders():
+    # leaders (0,0)-(50,0), (1,0)-(50,10), (50,0)-(50,20): the vertical one has an end on another's line (d4 == 0 case)
+    r = L([(0, 0), (1, 0), (50, 0)], 100, 50, 10)
+    assert r["slots"] == [0, 10, 20]
+    ls = [((0, 0), (50, 0)), ((1, 0), (50, 10)), ((50, 0), (50, 20))]
+    want = sum(_ref_cross(*ls[i], *ls[j]) for i in range(3) for j in range(i + 1, 3))
+    assert r["crossings"] == want == 0
+
+
+def test_collinear_and_touching_leaders_random_small_grid():
+    rnd = random.Random(99)
+    for _ in range(400):
+        n = rnd.randint(2, 4)
+        a = [(rnd.choice([0, 1, 25, 50]), rnd.randint(0, 6)) for _ in range(n)]
+        g = rnd.randint(0, 4)
+        r = L(a, 20, 50, g)
+        ls = [(a[i], (50, r["slots"][i])) for i in range(n)]
+        want = sum(_ref_cross(*ls[i], *ls[j]) for i in range(n) for j in range(i + 1, n))
+        assert r["crossings"] == want, (a, g)
