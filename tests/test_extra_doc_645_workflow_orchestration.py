@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -149,9 +150,23 @@ def _late(m):
     _raises(ValueError, 'failing must be unique declared step names', m.run_workflow, [ok, ('b', 'abort')], ['a', 'b', 'a'])
 
 
+def _sym(m):
+    OUT = 'steps must be a list or tuple'
+    ROW = 'each step must be a (name, policy) pair'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.run_workflow, K([('a', 'abort')]))
+        _raises(ValueError, ROW, m.run_workflow, [K(('a', 'abort'))])
+        _raises(ValueError, ROW, m.run_workflow, [('a', 'abort'), K(('a', 'abort'))])
+        _raises(ValueError, ROW, m.run_workflow, [K(('a', 'abort')), ('a', 'abort')])
+    for K in (L, T):
+        _raises(TypeError, 'failing must be a list or tuple', m.run_workflow, [('a', 'abort')], K(['a']))
+        _raises(TypeError, 'failing must be a list or tuple', m.run_workflow, [('a', 'abort'), ('b', 'continue')], K(['a', 'b']))
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(steps) not in (list, tuple)', 'not isinstance(steps, (list, tuple))'),
