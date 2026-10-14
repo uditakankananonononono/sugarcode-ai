@@ -70,3 +70,9 @@ def test_duplicates_identifiers_endpoints_and_row_caps():
     assert run([('c_'+str(i),list(range(16)),list(range(16))) for i in range(32)])['failed_cases']==0
     for case in ('','A','a b','a'*25):
         with pytest.raises(ValueError,match='^bounded lowercase case identifier required$'):run([(case,[],[])])
+
+
+@pytest.mark.parametrize('row',[['case',[],[]],None,True,{},'case',1,set()])
+def test_exact_tuple_case_boundary(row):
+    with pytest.raises(TypeError,match='^exact tuple case required$'):
+        run([row])
