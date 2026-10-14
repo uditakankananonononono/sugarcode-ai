@@ -23,7 +23,7 @@ def _leap(y):
 
 
 def extract(text):
-    if not isinstance(text, str):
+    if type(text) is not str:
         raise ValueError("text: string required")
     if not 1 <= len(text) <= MAX_TEXT:
         raise ValueError(f"text: 1 to {MAX_TEXT} characters required")
