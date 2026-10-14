@@ -178,3 +178,11 @@ def test_gap_closers():
     for bad in ('\x1f', '\x7f'):
         err(V, 'description must be printable ASCII', [[('a' + bad, [])]], 1, 1, 1, 0, 1)
         err(V, 'line must be printable ASCII', [[('a', [('s', 'a' + bad)])]], 1, 1, 1, 0, 1)
+
+
+def test_whitespace_normalised_in_speakers_and_lines():
+    r = chk([[('a   b', [('X   Y', 'hello    there')])]], 1, 5, 5, 0, 1)
+    assert r['text'] == 'PAGE 1 (1 PANEL)\n\nPANEL 1\na b\nX Y: hello there'.replace('X Y', 'X Y'.upper())
+    assert r['pages'][0]['dialogue_words'] == 2 and r['pages'][0]['description_words'] == 2
+    r = chk([[('d', [('  lo  ', '  hi   yo  ')])]], 1, 5, 5, 0, 1)
+    assert r['text'].splitlines()[-1] == 'LO: hi yo'
