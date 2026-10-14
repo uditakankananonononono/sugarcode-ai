@@ -12,7 +12,7 @@ or None when it passed every layer), "residual" (the power it had on reaching th
 what was left after the last layer)}; "blocked_counts" (per layer, how many attacks it blocked);
 "breached" (attacks that passed every layer); "blocked" (attacks stopped).
 
-Scope: PARTIAL for the Security Architecture line. A subtraction model on plain numbers. No threat
+Scope: bounded for the Security Architecture line. A subtraction model on plain numbers. No threat
 model, no real controls, no real attacker.
 
 Not claimed: that this designs defenses, that strength numbers measure real security, that the model
