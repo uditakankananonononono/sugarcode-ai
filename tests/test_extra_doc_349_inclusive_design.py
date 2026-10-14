@@ -36,3 +36,23 @@ def test_zero_minimum_empty_tie_feature_count_then_index_and_caps():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_later_cheaper_subset_replaces_first_feasible():
+    r=solve([[1],[1]],[9,1],[1])
+    assert r['feature_indices']==[1] and r['cost']==1
+
+
+def test_equal_cost_prefers_fewer_features_then_lex_indices():
+    #mask3 first covers both at cost2;mask4 later covers both alone at cost2.
+    assert solve([[1,0],[0,1],[1,1]],[1,1,2],[1,1])['feature_indices']==[2]
+    #mask6=(1,2) appears before mask9=(0,3),but lex chooses(0,3).
+    assert solve([[1,0],[1,0],[0,1],[0,1]],[1,1,1,1],[1,1])['feature_indices']==[0,2]
+    #Force only mask6 and mask9 by four perspective signatures.
+    r=solve([[1,1,0,0],[1,0,1,0],[0,1,0,1],[0,0,1,1]],[1,1,1,1],[1,1,1,1])
+    assert r['feature_indices']==[0,3]
+
+@pytest.mark.parametrize('row',[{0:1,1:1},range(2)])
+def test_coverage_row_nonsequence_refusal(row):
+    with pytest.raises(ValueError) as exc:solve([row],[1],[1,1])
+    assert str(exc.value)=='coverage rows must match perspectives'
