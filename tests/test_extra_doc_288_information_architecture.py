@@ -49,3 +49,16 @@ def test_errors(args,error,message):
 @pytest.mark.parametrize('v',[2**32,F(2**32),F(1,2**32)])
 def test_bit_refusal(v):
     with pytest.raises(ValueError,match='^weights must fit 32 bits$'):solve([v],[[-1]])
+
+
+def test_dict_weights_and_nonsequence_options_declared_errors():
+    with pytest.raises(TypeError) as exc:solve({0:1},[[-1]])
+    assert str(exc.value)=='inputs must be lists or tuples'
+    for options in ({-1},range(-1,0)):
+        with pytest.raises(ValueError) as exc:solve([1],[options])
+        assert str(exc.value)=='each node must have between 1 and 4 parent options'
+
+
+def test_first_feasible_initialization_and_product_tie_contract():
+    assert solve([1],[[-1]])['parents']==[-1]
+    assert solve([0,0],[[1,-1],[-1,0]])['parents']==[1,-1]

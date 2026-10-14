@@ -3,6 +3,8 @@
 Chooses a parent for each supplied content node from finite allowed choices,
 rejects cycles, and minimizes weighted click-depth from an external root -1.
 One coherent rooted navigation tree is generated, with explicit node depths.
+Caps: 1..6 nodes and 1..4 parent options per node. Equal-cost ties retain
+the first feasible tuple in supplied product order.
 NOT_CLAIMED: semantic content grouping, discoverability validation, intuitive
 labels, universal organization quality, visual sitemap, or deployment.
 """
