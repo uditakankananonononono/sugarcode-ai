@@ -3,6 +3,7 @@
 Assigns supplied zone codes to up to six cells, honoring per-zone minimum
 counts and forbidden adjacent zone pairs. Minimizes supplied per-cell costs;
 ties retain supplied product order. Returns a coherent zone configuration.
+Self adjacency (i,i) with forbidden (z,z) blocks zone z at cell i.
 NOT_CLAIMED: ecology, drainage, horticulture, aesthetic quality, physical site
 survey, rendered landscape or autonomous deployment.
 """
