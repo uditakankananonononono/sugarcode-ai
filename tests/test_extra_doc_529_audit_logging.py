@@ -120,3 +120,37 @@ def test_upper_bounds_green():
     assert len(r["events"]) == n and r["events"][-1]["seq"] == n      # 1000 entries, seq at its cap
     rows = [(e["seq"], e["ts"], e["action"], e["digest"]) for e in r["events"]]
     assert V(rows)["ok"] is True
+
+
+def test_v2_lone_surrogate_refused_in_chain_and_verify():
+    import hashlib
+    for bad in ("\ud800", "\udfff", "a\udc00b", "ok\ud83d"):
+        with pytest.raises(ValueError, match=r"^events\[0\] action: lone surrogate characters are not allowed$"):
+            C([(1, 0, bad)])
+        with pytest.raises(ValueError, match=r"^events\[1\] action: lone surrogate characters are not allowed$"):
+            C([(1, 0, "fine"), (2, 0, bad)])
+        with pytest.raises(ValueError, match=r"^rows\[0\] action: lone surrogate characters are not allowed$"):
+            V([(1, 0, bad, "0" * 64)])
+    for ok in ("\ud7ff", "\ue000", "\U0001f600", "caf\u00e9"):      # just outside the surrogate range, and astral
+        want = hashlib.sha256(("0" * 64 + "|1|0|" + ok).encode("utf-8")).hexdigest()
+        assert C([(1, 0, ok)])["events"][0]["digest"] == want
+        assert V([(1, 0, ok, want)])["ok"] is True
+    # length is checked before the surrogate rule, type before both
+    with pytest.raises(ValueError, match=r"action: non-empty string up to 60 characters required$"):
+        C([(1, 0, "\ud800" * 61)])
+    with pytest.raises(ValueError, match=r"action: non-empty string up to 60 characters required$"):
+        C([(1, 0, 5)])
+
+
+def test_v2_verify_reports_only_digest_mismatch_as_first_bad():
+    rows = [(1, 100, "login", D1), (2, 100, "read", "f" * 64), (3, 250, "logout", D3)]
+    assert V(rows)["first_bad"] == 1                                     # tampered digest: reported by index
+    # tampered row 1 followed by a malformed row: the whole call raises instead of reporting first_bad
+    with pytest.raises(ValueError, match=r"^rows\[2\] seq: must be 3$"):
+        V([rows[0], rows[1], (9, 250, "logout", D3)])
+    with pytest.raises(ValueError, match=r"^rows\[2\] ts: must not decrease$"):
+        V([rows[0], rows[1], (3, 50, "logout", D3)])
+    with pytest.raises(ValueError, match=r"^rows\[2\] digest: 64 lowercase hex characters required$"):
+        V([rows[0], rows[1], (3, 250, "logout", "XYZ")])
+    assert "Only a digest mismatch is reported as first_bad" in " ".join(al.__doc__.split())
+    assert "lone surrogate" in al.__doc__

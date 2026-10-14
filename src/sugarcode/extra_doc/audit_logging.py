@@ -5,7 +5,10 @@ timestamp from 0 to 1e12 that never decreases, and action a non-empty string up 
 digest of an event is sha256 of "PREV|SEQ|TS|ACTION" in UTF-8, where PREV is the previous event's digest as
 lowercase hex and the first event's PREV is 64 zero characters; the digest is the lowercase hex of that hash.
 chain(events) returns the events with their digests. verify(rows) checks the digest format, the seq positions,
-the timestamp order and every recomputed digest, reporting the index of the first bad row (None when all pass).
+the timestamp order and every recomputed digest. Only a digest mismatch is reported as first_bad (the index of the
+first row whose digest does not recompute, None when all do); a row with a malformed shape, seq, ts, action or
+digest raises ValueError for the whole call, even if an earlier row was tampered with. An action may not contain a
+lone surrogate character (U+D800 to U+DFFF), which cannot be hashed as UTF-8.
 This detects edits to stored rows; it does not say whether the events were worth logging."""
 import hashlib
 
@@ -51,6 +54,8 @@ def _shape(events, with_digests):
             raise ValueError(f"{label}[{i}] ts: must not decrease")
         if not isinstance(action, str) or not action or len(action) > MAX_ACTION:
             raise ValueError(f"{label}[{i}] action: non-empty string up to {MAX_ACTION} characters required")
+        if any("\ud800" <= ch <= "\udfff" for ch in action):
+            raise ValueError(f"{label}[{i}] action: lone surrogate characters are not allowed")
         row = [seq, ts, action]
         if with_digests:
             d = e[3]
