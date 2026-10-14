@@ -110,3 +110,18 @@ def test_contrast_exactly_at_threshold_is_ok(monkeypatch):
 def test_consistency_fraction():
     us = [U("a", "#000000", "#ffffff"), U("b", "#000000", "#ffffff"), U("c", "#000000", "#ffffff", "X")]
     assert A(PAL, ["Sans"], us)["consistency"] == pytest.approx(2 / 3)
+
+
+def test_distances_use_differences_not_sums_for_non_black_palettes():
+    # (1,2,3) vs (3,5,7): 2^2 + 3^2 + 4^2 = 29 (a sum instead of a difference would give 152)
+    r = A(["#010203", "#030507"], ["F"], [U("a", "#010203", "#030507", "F")])
+    assert r["min_palette_distance_sq"] == 29
+    # (16,32,48) vs (64,80,96): 3 * 48^2 = 6912 ; vs (255,0,0) far away
+    r = A(["#102030", "#405060", "#ff0000"], ["F"], [U("a", "#102030", "#405060", "F")])
+    assert r["min_palette_distance_sq"] == 3 * 48 ** 2
+    # nearest uses the same difference: usage (2,4,6) is 14 from (1,2,3) and 3 from (3,5,7)
+    r = A(["#010203", "#030507"], ["F"], [U("a", "#020406", "#010203", "F")])
+    assert r["usages"][0]["nearest_color"] == "#030507" and r["usages"][0]["nearest_background"] is None
+    # asymmetric: usage (200,10,10) vs palette (190,20,20) and (250,0,0): 100+100+100=300 vs 2500+100+100 -> first
+    r = A(["#be1414", "#fa0000"], ["F"], [U("a", "#c80a0a", "#be1414", "F")])
+    assert r["usages"][0]["nearest_color"] == "#be1414"
