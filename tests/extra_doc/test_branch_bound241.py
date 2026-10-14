@@ -66,3 +66,7 @@ def test_capacity_zero_all_zero_value_optimum_and_exact_counters():
 
 def test_just_below_minimum_weight_exact_refusal():
     with pytest.raises(ValueError,match='^strict finite bounded knapsack number$'):solve([.00000099],[1],1)
+
+
+def test_narrow_weight_gap_999e_minus9_refused():
+    with pytest.raises(ValueError,match='^strict finite bounded knapsack number$'):solve([.000000999],[1],1)
