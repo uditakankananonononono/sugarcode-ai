@@ -126,3 +126,9 @@ def test_in_range_coordinates_just_outside_declared_box_refuse_at_bound_stage():
     for donors in (None,(),[],[[1,2,3]]*3):
         inputs=args();inputs[3]=donors
         with pytest.raises(ValueError,match='^three distinct nonself donor indices per point$'):evolve(*inputs)
+
+
+@pytest.mark.parametrize('row',[[1,2,-1],[1,2,4],[1,2,1.0],[1,2,True]])
+def test_donor_population_index_lower_upper_and_strict_type_refusals(row):
+    inputs=args();inputs[3][0]=row
+    with pytest.raises(ValueError,match='^three distinct nonself donor indices per point$'):evolve(*inputs)
