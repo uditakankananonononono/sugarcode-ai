@@ -16,6 +16,7 @@ def optimize(diagonal,linear,lower,upper,initial,barriers,newton_steps):
         return [num(v,lo,100) for v in row]
     a=vector(diagonal,.001);b=vector(linear,-100);lo=vector(lower,-100);hi=vector(upper,-100);x=vector(initial,-100)
     if any(not l<v<u or u-l<.001 for l,v,u in zip(lo,x,hi)):raise ValueError('strict interior point with box width at least .001')
+    if any(min(v-l,u-v)<1e-12 for l,v,u in zip(lo,x,hi)):raise ValueError('interior slack margin must be at least 1e-12')
     if type(barriers) is not list or not 1<=len(barriers)<=10:raise ValueError('1..10 barriers before scan')
     mus=[num(v,.000001,100) for v in barriers]
     if any(next_mu>=mu for mu,next_mu in zip(mus,mus[1:])):raise ValueError('strict decreasing positive barriers')
@@ -25,6 +26,7 @@ def optimize(diagonal,linear,lower,upper,initial,barriers,newton_steps):
     trace=[]
     for mu in mus:
         for k in range(newton_steps):
+            if any(min(v-l,u-v)<1e-12 for l,v,u in zip(lo,x,hi)):raise ValueError('interior slack margin must be at least 1e-12')
             g=[q*z+c-mu/(z-l)+mu/(u-z) for q,c,z,l,u in zip(a,b,x,lo,hi)]
             h=[q+mu/(z-l)**2+mu/(u-z)**2 for q,z,l,u in zip(a,x,lo,hi)];p=[-v/q for v,q in zip(g,h)]
             if max(abs(v) for v in g)<=1e-8:break

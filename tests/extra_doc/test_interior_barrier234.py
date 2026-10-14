@@ -106,3 +106,22 @@ def test_synthetic_log_fault_backtracking_failure_exact_attempt_budget(monkeypat
     with pytest.raises(ValueError,match='^interior Armijo step not found within 40 reductions$'):
         optimize([1],[1],[-1],[1],[0],[1],1)
     assert count[0]==82
+
+
+def test_subnormal_margin_coded_refusal_and_margin_acceptance():
+    for x in (math.nextafter(0,1),1e-13):
+        with pytest.raises(ValueError,match='^interior slack margin must be at least 1e-12$'):optimize([1],[0],[0],[1],[x],[1],1)
+    optimize([1],[0],[0],[1],[1e-12],[1],1)
+
+
+def test_negative_endpoint_upper_and_initial_and_small_directions():
+    r=optimize([1],[0],[-100],[-99.5],[-99.75],[1],1)
+    assert r['strict_interior'] and -100<r['point'][0]<-99.5
+    for args in (([1],[-1],[0],[.5],[.25],[1e-6],1),([1],[1],[-.5],[0],[-.25],[1e-6],1)):
+        r=optimize(*args);s=r['steps'][0]
+        assert 0<s['step_size']<1 and s['point']==pytest.approx([.4975 if s['direction'][0]>0 else -.4975],abs=1e-12)
+
+
+def test_mixed_coordinate_margin_refusal():
+    with pytest.raises(ValueError,match='^interior slack margin must be at least 1e-12$'):
+        optimize([1,1],[0,0],[0,0],[1,1],[.5,math.nextafter(0,1)],[1],1)
