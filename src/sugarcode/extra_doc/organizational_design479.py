@@ -16,13 +16,6 @@ def _label(value):
         raise ValueError('label must be 1..24 lowercase identifier characters')
 
 
-def _integer(value, low, high):
-    if type(value) is not int:
-        raise TypeError('exact nonbool integer required')
-    if not low <= value <= high:
-        raise ValueError('integer outside declared range')
-
-
 def _rows(rows, arity):
     if type(rows) is not list:
         raise TypeError('exact list required')
