@@ -114,3 +114,34 @@ def test_invalid_seed_is_refused_before_core(m, f, bad, exc, text, monkeypatch):
         fn(**sent)
     assert str(e.value) == text
     assert seen == []
+
+
+@pytest.mark.parametrize("m,f", ALL)
+def test_omitted_parameters_reach_core_with_core_defaults(m, f, monkeypatch):
+    """Call with only the required parameters: every omitted parameter, seed included, must reach core equal to core's own default."""
+    fn, params, seen, _ = setup(m, f, monkeypatch)
+    required = {p.name: (GOOD_SEED if p.name == "seed" else object()) for p in params if p.default is inspect.Parameter.empty}
+    pos = [required[p.name] for p in params if p.name in required and p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)]
+    kw = {p.name: required[p.name] for p in params if p.name in required and p.kind is p.KEYWORD_ONLY}
+    fn(*pos, **kw)
+    assert len(seen) == 1
+    got = seen[0]
+    defaults = [p for p in params if p.default is not inspect.Parameter.empty]
+    assert defaults, (m, f)  # every callable has at least one default (the seed), so this test is never vacuous
+    for p in defaults:
+        assert got[p.name] == p.default and type(got[p.name]) is type(p.default), (m, f, p.name)
+        if p.default is None:
+            assert got[p.name] is None
+    for name, obj in required.items():
+        assert got[name] == obj if name == "seed" else got[name] is obj
+
+
+@pytest.mark.parametrize("m,f", ALL)
+def test_gate_signature_defaults_equal_core(m, f, monkeypatch):
+    gate = importlib.import_module(f"sugarcode.modules.{m}.seed_gate")
+    core = importlib.import_module(f"sugarcode.modules.{m}.{FILE.get(m, 'core')}")
+    g = gate.MLP.__init__ if f == "MLP" else getattr(gate, f)
+    c = core.MLP.__init__ if f == "MLP" else getattr(core, f)
+    gs = [(p.name, p.kind, p.default) for p in inspect.signature(g).parameters.values()]
+    cs = [(p.name, p.kind, p.default) for p in inspect.signature(c).parameters.values()]
+    assert gs == cs
