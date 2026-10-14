@@ -96,3 +96,33 @@ def test_probability_upper_cap_plus_decimal_refused(index):
 def test_each_bound_endpoint_numerical_cap_refused(which,value):
     inputs=args();inputs[1][0][which]=value
     with pytest.raises(ValueError,match='^strict finite bounded DE number$'):evolve(*inputs)
+
+
+@pytest.mark.parametrize('index,value',[(0,-1000.01),(0,1000.01),(2,-1000.01),(2,1000.01),(6,-.01),(6,2.01),(7,-.01),(7,1.01)])
+def test_decimal_just_outside_numerical_bounds_precise_stage_refusal(index,value):
+    inputs=args()
+    if index==0:inputs[0][0][0]=value
+    elif index==2:inputs[2][0]=value
+    else:inputs[index]=value
+    with pytest.raises(ValueError,match='^strict finite bounded DE number$'):evolve(*inputs)
+
+
+@pytest.mark.parametrize('index,value',[(0,-1000.01),(1,1000.01)])
+def test_decimal_bound_endpoint_just_outside_numeric_cap(index,value):
+    inputs=args();inputs[1][0][index]=value
+    with pytest.raises(ValueError,match='^strict finite bounded DE number$'):evolve(*inputs)
+
+
+@pytest.mark.parametrize('value',[-.01,1.01])
+def test_decimal_draw_just_outside_probability_bound(value):
+    inputs=args();inputs[4][0][0]=value
+    with pytest.raises(ValueError,match='^strict finite bounded DE number$'):evolve(*inputs)
+
+
+def test_in_range_coordinates_just_outside_declared_box_refuse_at_bound_stage():
+    for index in (0,1):
+        inputs=args();inputs[0][0][0]=(-5.01 if index==0 else 5.01)
+        with pytest.raises(ValueError,match='^population inside bounds$'):evolve(*inputs)
+    for donors in (None,(),[],[[1,2,3]]*3):
+        inputs=args();inputs[3]=donors
+        with pytest.raises(ValueError,match='^three distinct nonself donor indices per point$'):evolve(*inputs)
