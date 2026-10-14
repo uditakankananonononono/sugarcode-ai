@@ -13,21 +13,21 @@ STATUS_NOTE = ("PARTIAL: orders supplied scores only; no judgment of whether the
 
 
 def rank(items):
-    if not isinstance(items, (list, tuple)):
+    if type(items) not in (list, tuple):
         raise ValueError("items: list required")
     if not 1 <= len(items) <= MAX_ITEMS:
         raise ValueError(f"items: 1 to {MAX_ITEMS} entries required")
     seen = set()
     rows = []
     for i, it in enumerate(items):
-        if not isinstance(it, (list, tuple)):
+        if type(it) not in (list, tuple):
             raise ValueError(f"items[{i}]: (name, score) required")
         if len(it) != 2:
             raise ValueError(f"items[{i}]: 2 entries required")
         name, score = it
-        if not isinstance(name, str) or not name or len(name) > MAX_NAME:
+        if type(name) is not str or not name or len(name) > MAX_NAME:
             raise ValueError(f"items[{i}] name: non-empty string up to {MAX_NAME} characters required")
-        if isinstance(score, bool) or not isinstance(score, int):
+        if type(score) is not int:
             raise ValueError(f"items[{i}] score: integer required")
         if not -MAX_SCORE <= score <= MAX_SCORE:
             raise ValueError(f"items[{i}] score: must be within -{MAX_SCORE} to {MAX_SCORE}")

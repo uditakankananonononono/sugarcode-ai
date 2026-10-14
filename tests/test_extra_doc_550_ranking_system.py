@@ -78,7 +78,7 @@ def test_type_refusals():
         with pytest.raises(ValueError, match=r"^items\[1\]: 2 entries required$"):
             R([("ok", 1), bad])
     for bad in ("", None, 5, True, b"a", ["a"]):
-        with pytest.raises(ValueError, match=r"^items\[0\] name: non-empty string"):
+        with pytest.raises(ValueError, match=r"^items\[0\] name: non-empty string up to 40 characters required$"):
             R([(bad, 1)])
     for bad in (True, False, 1.0, "1", None, [1]):
         with pytest.raises(ValueError, match=r"^items\[0\] score: integer required$"):
@@ -90,9 +90,9 @@ def test_type_refusals():
 
 
 def test_validation_order_bool_before_cap():
-    with pytest.raises(ValueError, match="integer required"):
+    with pytest.raises(ValueError, match=r"^items\[0\] score: integer required$"):
         R([("a", True)])
-    with pytest.raises(ValueError, match=r"^items\[0\] score: must be within"):
+    with pytest.raises(ValueError, match=r"^items\[0\] score: must be within -1000000000 to 1000000000$"):
         R([("a", 10**30)])
     with pytest.raises(ValueError, match=r"^items\[1\] name: duplicate$"):
         R([("a", 1), ("a", 10**9)])
