@@ -52,3 +52,27 @@ def test_widest_shape_and_scalar_admission():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_exact_step_default_and_initial_validation():
+    import inspect
+    assert inspect.signature(solve).parameters['step_size'].default==1
+    for upper,initial,error,message in [([1],[],ValueError,'vector dimensions must agree'),([], [0],ValueError,'vector dimensions must agree'),([1],None,TypeError,'inputs must be lists or tuples')]:
+        with pytest.raises(error) as exc:solve([[0]],[0],upper,initial)
+        assert str(exc.value)==message
+
+@pytest.mark.parametrize('field',range(5))
+def test_exact_boundary_all_numeric_fields(field):
+    edge=2**32-1
+    args=[[[0]], [0], [edge], [0], 1]
+    if field==0:args[0]=[[edge]]
+    elif field==1:args[1]=[edge];args[3]=[edge]
+    elif field==2:pass
+    elif field==3:args[3]=[edge]
+    else:args[4]=edge
+    assert solve(*args)['certificate_valid'] is True
+
+@pytest.mark.parametrize('value',[F(2**32),F(1,2**32)])
+def test_fraction_component_overflow_refused(value):
+    with pytest.raises(ValueError) as exc:solve([[value]],[0],[1],[0])
+    assert str(exc.value)=='rational values must fit 32 bits'
