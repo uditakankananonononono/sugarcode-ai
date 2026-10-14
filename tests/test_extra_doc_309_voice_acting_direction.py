@@ -55,6 +55,8 @@ def test_counts_over_many_lines():
 
 
 def test_target_and_seconds_edges():
+    with pytest.raises(ValueError, match="seconds: must be within"):
+        D([L(1, 0.0999)])
     assert D([L(1, 0.1, 30)])["lines"][0]["wpm"] == pytest.approx(600.0)
     assert D([L(1, 3600, 400)])["lines"][0]["wpm"] == pytest.approx(1 / 60)
     assert D([L(1, 3600, 30)])["lines"][0]["advice"] == "speed up"

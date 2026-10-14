@@ -1,7 +1,7 @@
 """Row 309 voice acting direction (PARTIAL): pacing notes for recorded lines.
 
 For each line (text, seconds, target words per minute) computes words per minute, the ratio to target and a
-direction note: slower, faster or on pace (tolerance 10 percent). Also pause gaps between consecutive takes.
+direction note: slower, faster or on pace (tolerance 10 percent).
 Pacing only: no judgment of emotion, delivery, accent or acting quality."""
 import math
 
