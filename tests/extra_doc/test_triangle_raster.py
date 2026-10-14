@@ -219,3 +219,46 @@ def test_short_horizontal_edges_with_samples_on_them():
     with_apex_down = ras(4, 4, (1, F(3, 2)), (2, F(3, 2)), (F(3, 2), 0))['pixels']
     assert (1, 1) in with_apex_up and (1, 1) not in with_apex_down
     assert with_apex_up == [(1, 1), (1, 2)] and with_apex_down == [(1, 0)]
+
+
+class IntSub(int):
+    pass
+
+
+class FracSub(F):
+    pass
+
+
+class ListSub(list):
+    pass
+
+
+class TupleSub(tuple):
+    pass
+
+
+def test_subclass_witnesses_everywhere_with_exact_errors():
+    for bad in (IntSub(2),):
+        with pytest.raises(T) as e:
+            ras(bad, 2, (0, 0), (1, 0), (0, 1))
+        assert str(e.value) == 'width must be a nonbool int'
+        with pytest.raises(T) as e:
+            ras(2, bad, (0, 0), (1, 0), (0, 1))
+        assert str(e.value) == 'height must be a nonbool int'
+    base = [[0, 0], [2, 0], [0, 2]]
+    for vi, name in enumerate('abc'):
+        for cls in (ListSub, TupleSub):
+            vs = [list(p) for p in base]
+            vs[vi] = cls(base[vi])
+            with pytest.raises(T) as e:
+                ras(3, 3, *vs)
+            assert str(e.value) == name + ' must be a list or tuple of two numbers'
+        for ci, axis in enumerate('xy'):
+            for sub in (IntSub(base[vi][ci]), FracSub(base[vi][ci])):
+                vs = [list(p) for p in base]
+                vs[vi][ci] = sub
+                with pytest.raises(T) as e:
+                    ras(3, 3, *vs)
+                assert str(e.value) == name + ' ' + axis + ' must be a nonbool int or Fraction'
+    assert ras(3, 3, *base)['count'] == 1
+    assert ras(3, 3, *[tuple(p) for p in base]) == ras(3, 3, *base)
