@@ -175,7 +175,7 @@ def _late(m):
     CT = 'checks must be a list or tuple'
     CS = 'checks must contain at most max_checks entries'
     CP = 'each check must be a (topic, score) pair'
-    TP = 'each topic must be a string of 1 to 12 characters'
+    TP = 'each topic must be an ASCII string of 1 to 12 characters'
     SC = 'score must be a nonbool integer between 0 and 5'
     ok = [('a', 1)]
     for bad in (0, 6, -1, True, False, 1.0, '1', None, I(1), LyingI(1), LyingI(10 ** 30), I(10 ** 30)):
@@ -191,7 +191,7 @@ def _late(m):
     for bad in ('ab', None, 5, ('a',), ('a', 1, 1), (), {'a': 1}, L(['a', 1]), T(('a', 1))):
         _raises(ValueError, CP, f, [bad])
         _raises(ValueError, CP, f, [('a', 1), bad])
-    for bad in ('', 'x' * 13, None, 5, True, S('a'), LyingS('a'), b'a', ['a']):
+    for bad in ('', 'x' * 13, None, 5, True, S('a'), LyingS('a'), b'a', ['a'], '\u00e9', 'caf\u00e9', 'a\u00e9', '\u4e2d', '\u0661'):
         _raises(ValueError, TP, f, [(bad, 1)])
         _raises(ValueError, TP, f, [('a', 1), (bad, 1)])
     for bad in (-1, 6, True, False, 1.0, '1', None, I(1), LyingI(1), LyingI(10 ** 30), I(10 ** 30)):
@@ -199,6 +199,7 @@ def _late(m):
         _raises(ValueError, SC, f, [('a', 1), ('a', bad)])
     f([('a', 0)])
     f([('a', 5)])
+    f([('A~ z', 3)])
     _raises(ValueError, PM, f, None, I(1), I(1))
     _raises(ValueError, MC, f, None, 3, I(1))
     _raises(TypeError, CT, f, None)
@@ -237,16 +238,17 @@ MUTANTS = [
     ("type(c) not in (list, tuple) or len(c) != 2", "not isinstance(c, (list, tuple)) or len(c) != 2"),
     ("type(c) not in (list, tuple) or len(c) != 2", "type(c) not in (list, tuple) or len(c) > 2"),
     ("type(c) not in (list, tuple) or len(c) != 2", "type(c) not in (list, tuple) or len(c) < 2"),
-    ("type(topic) is not str or not 1 <= len(topic) <= 12", "not isinstance(topic, str) or not 1 <= len(topic) <= 12"),
-    ("type(topic) is not str or not 1 <= len(topic) <= 12", "type(topic) is not str or not 0 <= len(topic) <= 12"),
-    ("type(topic) is not str or not 1 <= len(topic) <= 12", "type(topic) is not str or not 1 <= len(topic) < 12"),
-    ("type(topic) is not str or not 1 <= len(topic) <= 12", "type(topic) is not str or not 1 <= len(topic) <= 13"),
+    ("type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12", "not isinstance(topic, str) or not topic.isascii() or not 1 <= len(topic) <= 12"),
+    ("type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12", "type(topic) is not str or not topic.isascii() or not 0 <= len(topic) <= 12"),
+    ("type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12", "type(topic) is not str or not topic.isascii() or not 1 <= len(topic) < 12"),
+    ("type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12", "type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 13"),
     ("type(score) is not int or not 0 <= score <= 5", "not isinstance(score, int) or not 0 <= score <= 5"),
     ("type(score) is not int or not 0 <= score <= 5", "isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 5"),
     ("not 0 <= score <= 5", "not 1 <= score <= 5"),
     ("not 0 <= score <= 5", "not -1 <= score <= 5"),
     ("not 0 <= score <= 5", "not 0 <= score < 5"),
     ("not 0 <= score <= 5", "not 0 <= score <= 6"),
+    ("type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12", "type(topic) is not str or not 1 <= len(topic) <= 12"),
     ("state[topic] = (n + 1, score)", "state[topic] = (n + 1, max(score, state.get(topic, (0, 0))[1]))"),
     ("state[topic] = (n + 1, score)", "state[topic] = (1, score)"),
     ("state[topic] = (n + 1, score)", "state.setdefault(topic, (n + 1, score))"),

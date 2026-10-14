@@ -2,8 +2,8 @@
 
 formative_checks takes checks, a list or tuple of 0 to max_checks (topic,
 score) pairs in time order, pass_mark, a nonbool int from 1 to 5 (default 3),
-and max_checks, a nonbool int from 1 to 20 (default 8). A topic is a string
-of 1 to 12 characters. score is a nonbool int from 0 to 5.
+and max_checks, a nonbool int from 1 to 20 (default 8). A topic is an ASCII
+string of 1 to 12 characters. score is a nonbool int from 0 to 5.
 For each topic, in order of first appearance, the latest score decides: the
 status is 'reteach' when the latest score is below pass_mark, else 'on_track'.
 Returns topics (one (name, count, latest, status) tuple per topic), reteach
@@ -33,8 +33,8 @@ def formative_checks(checks, pass_mark=3, max_checks=8):
         if type(c) not in (list, tuple) or len(c) != 2:
             raise ValueError('each check must be a (topic, score) pair')
         topic, score = c
-        if type(topic) is not str or not 1 <= len(topic) <= 12:
-            raise ValueError('each topic must be a string of 1 to 12 characters')
+        if type(topic) is not str or not topic.isascii() or not 1 <= len(topic) <= 12:
+            raise ValueError('each topic must be an ASCII string of 1 to 12 characters')
         if type(score) is not int or not 0 <= score <= 5:
             raise ValueError('score must be a nonbool integer between 0 and 5')
         n, _ = state.get(topic, (0, 0))
