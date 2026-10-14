@@ -93,3 +93,11 @@ def test_type_refusals_and_order():
         P(10, [True, 10**30])
     with pytest.raises(ValueError, match=r"^steps\[1\]: must be within 1 to 100$"):
         P(10, [50, 10**30])
+
+
+def test_decrease_checked_against_previous_step_not_first():
+    # a mutant comparing with the first step (pcts[0]) would accept these
+    for inst, steps, idx in ((5, [10, 50, 40, 100], 2), (7, [20, 60, 30, 100], 2), (9, [5, 30, 90, 20, 100], 3),
+                             (9, [1, 2, 80, 79, 100], 3), (3, [10, 11, 50, 49, 100], 3)):
+        with pytest.raises(ValueError, match=rf"^steps\[{idx}\]: must be greater than the previous step$"):
+            P(inst, steps)
