@@ -9,7 +9,7 @@ columns are counted from the left margin):
 - character: upper case, column 20, at most 30 characters.
 - parenthetical: wrapped in ( ) if not already, column 15, width 25.
 - dialogue: column 10, width 35.
-- transition: upper case, must end in ':' or '.', right aligned to column 60.
+- transition: upper case, must end in ':' or '.', right aligned to column 60, at most 60 characters (longer is refused, not wrapped).
 Blank line between blocks; no blank line inside a character / parenthetical /
 dialogue block. Words are wrapped greedily; a word longer than the width starts its
 own line and is cut into width-sized pieces (a remainder shorter than the width may
@@ -87,6 +87,8 @@ def format_screenplay(elements):
                 raise ValueError('element %d: scene_heading must start with INT., EXT., INT./EXT., I/E. or EST.' % n)
         if kind == 'character' and len(text) > 30:
             raise ValueError('element %d: character name must be at most 30 characters' % n)
+        if kind == 'transition' and len(text) > PAGE_WIDTH:
+            raise ValueError('element %d: transition must be at most 60 characters' % n)
         if kind == 'transition' and text[-1] not in ':.':
             raise ValueError("element %d: transition must end with ':' or '.'" % n)
         if kind == 'dialogue' and prev not in ('character', 'parenthetical'):

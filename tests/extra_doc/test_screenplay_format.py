@@ -210,3 +210,15 @@ def test_character_class_edges():
 def test_parenthetical_bracket_rule():
     for t, want in [('(a', '((a)'), ('a)', '(a))'), ('(a)', '(a)'), ('a', '(a)')]:
         assert body('parenthetical', t) == [' ' * 15 + want]
+
+
+def test_long_transition_refused_at_61_accepted_at_60():
+    ok = 'a' * 59 + ':'
+    assert fmt([H, ('transition', ok)])['lines'][-1] == ok.upper()
+    bad = 'a' * 60 + ':'
+    with pytest.raises(ValueError) as e:
+        fmt([H, ('transition', bad)])
+    assert str(e.value) == 'element 2: transition must be at most 60 characters'
+    with pytest.raises(ValueError) as e:  # length is checked before the ending rule
+        fmt([H, ('transition', 'a' * 70)])
+    assert str(e.value) == 'element 2: transition must be at most 60 characters'
