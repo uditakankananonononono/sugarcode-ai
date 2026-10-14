@@ -119,3 +119,11 @@ def test_type_refusals_and_order():
         S("bad", True, 1, 1)                                   # params validated before the list
     with pytest.raises(ValueError, match=r"^transactions\[0\] ts: integer required$"):
         S([(True, 10**30)], 1, 1, 1)
+
+
+def test_decrease_detected_against_previous_row_not_first():
+    # tx[-1] is the previous row; a mutant reading tx[0] would accept 1 after 2 because 1 >= 0
+    with pytest.raises(ValueError, match=r"^transactions\[2\] ts: must not decrease$"):
+        S([(0, 0), (2, 0), (1, 0)], 1, 1, 1)
+    with pytest.raises(ValueError, match=r"^transactions\[3\] ts: must not decrease$"):
+        S([(5, 0), (9, 0), (9, 0), (7, 0)], 1, 1, 1)
