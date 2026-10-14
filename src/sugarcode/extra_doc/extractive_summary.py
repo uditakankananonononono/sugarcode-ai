@@ -31,11 +31,11 @@ def _tokens(chunk):
 
 
 def summarize(text, count=1):
-    if isinstance(count, bool) or not isinstance(count, int):
+    if type(count) is not int:
         raise ValueError("count: integer required")
     if not 1 <= count <= MAX_COUNT:
         raise ValueError(f"count: must be within 1 to {MAX_COUNT}")
-    if not isinstance(text, str):
+    if type(text) is not str:
         raise ValueError("text: string required")
     if not 1 <= len(text) <= MAX_TEXT:
         raise ValueError(f"text: 1 to {MAX_TEXT} characters required")
