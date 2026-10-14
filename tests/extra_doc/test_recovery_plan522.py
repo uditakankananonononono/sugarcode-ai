@@ -51,3 +51,43 @@ def test_preflight():
     with pytest.raises(ValueError,match='^service duration weight pair$'):plan([None]*8,[[0]*8]+[[]]*7)
     with pytest.raises(ValueError,match='^at most8 prerequisites before scan$'):plan([None]*8,[[0]*9]+[[]]*7)
     with pytest.raises(ValueError,match='^1..8 services before scan$'):plan([None]*9,[[]]*9)
+
+
+class ListSubclass522(list):
+    pass
+
+
+class TupleSubclass522(tuple):
+    pass
+
+
+class IntSubclass522(int):
+    pass
+
+
+@pytest.mark.parametrize('bad', [(1,), (1, 1, 1), [1, 1], TupleSubclass522((1, 1))])
+def test_pair_shape_exact_message_nonfirst(bad):
+    with pytest.raises(ValueError, match='^service duration weight pair$'):
+        plan([(1, 1), bad], [[], []])
+
+
+@pytest.mark.parametrize('slot,message', [
+    (0, '^duration integer1..1000000$'),
+    (1, '^weight integer1..1000$'),
+])
+def test_integer_subclass_nonfirst(slot, message):
+    row = [1, 1]
+    row[slot] = IntSubclass522(1)
+    with pytest.raises(ValueError, match=message):
+        plan([(1, 1), tuple(row)], [[], []])
+
+
+def test_container_and_prerequisite_subclasses_exact_messages():
+    with pytest.raises(ValueError, match='^1..8 services before scan$'):
+        plan(ListSubclass522([(1, 1)]), [[]])
+    with pytest.raises(ValueError, match='^matching prerequisite lists$'):
+        plan([(1, 1)], ListSubclass522([[]]))
+    with pytest.raises(ValueError, match='^at most8 prerequisites before scan$'):
+        plan([(1, 1), (1, 1)], [[], ListSubclass522([0])])
+    with pytest.raises(ValueError, match='^valid nonself prerequisite indices$'):
+        plan([(1, 1), (1, 1)], [[], [IntSubclass522(0)]])
