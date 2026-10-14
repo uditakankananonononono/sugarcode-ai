@@ -52,3 +52,17 @@ def test_endpoints_and_preflight():
     r=pacing_control([('x'*20,8,8)]*6,[8]*6,48)
     assert r['durations']==[8]*6
     assert pacing_control([('a',1,1)],[0],1)['certificate']['objective']==1
+
+
+def test_isolated_preflight_guards_with_otherwise_valid_inputs():
+    with pytest.raises(ValueError,match='one target per beat required'):
+        pacing_control([('a',1,2)],(1,),1)
+    with pytest.raises(ValueError,match='label/min/max beat required'):
+        pacing_control([['a',1,2]],[1],1)
+    for lo,hi,total in [(0,2,1),(1,9,1),(9,9,9),(1,0,1)]:
+        with pytest.raises(ValueError,match='integer cap or range exceeded'):
+            pacing_control([('a',lo,hi)],[1],total)
+    with pytest.raises(ValueError,match='beat cap 1..6 required'):
+        pacing_control([('a',1,1)]*7,[1]*7,7)
+    assert pacing_control([('a',1,8)],[1],1)['durations']==[1]
+    assert pacing_control([('a',1,8)],[8],8)['durations']==[8]
