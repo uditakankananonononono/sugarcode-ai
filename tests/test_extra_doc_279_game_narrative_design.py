@@ -164,3 +164,36 @@ def test_correlation_sign_and_clamp_exact():
     assert r["correlation"] == 1.0                                          # exactly 1 after clamp, not 0.9999999999999999
     r = A(beats(0, 10, 5), mechs(10, 0, 5), L((0, 0), (1, 1), (2, 2)))
     assert r["correlation"] == -1.0
+
+
+def test_auditor_witness_1e200_correlation_survives_squaring():
+    import decimal
+    e = Fraction(1, 10 ** 200)
+    ys = [Fraction(1), e, 1 + e]
+    b = [{"id": f"b{i}", "tension": x} for i, x in enumerate([0, 1, 2])]
+    m = [{"id": f"m{i}", "intensity": y} for i, y in enumerate(ys)]
+    r = A(b, m, L((0, 0), (1, 1), (2, 2)))
+    with decimal.localcontext() as ctx:
+        ctx.prec = 80
+        ctx.Emin, ctx.Emax = decimal.MIN_EMIN, decimal.MAX_EMAX
+        D = decimal.Decimal
+        xs = [Fraction(0), Fraction(1), Fraction(2)]
+        mx, my = sum(xs) / 3, sum(ys) / 3
+        sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+        sxx = sum((x - mx) ** 2 for x in xs)
+        syy = sum((y - my) ** 2 for y in ys)
+        prod = sxx * syy
+        denom = (D(prod.numerator) / D(prod.denominator)).sqrt()
+        want = float(D(sxy.numerator) / D(sxy.denominator) / denom)
+    assert want > 0 and want == pytest.approx(0.8660254037844386e-200, rel=1e-9, abs=0)
+    assert r["correlation"] == pytest.approx(want, rel=1e-9, abs=0)
+    # negative orientation keeps the sign
+    m2 = [{"id": f"m{i}", "intensity": y} for i, y in enumerate([1 + e, e, Fraction(1)])]
+    assert A(b, m2, L((0, 0), (1, 1), (2, 2)))["correlation"] == pytest.approx(-want, rel=1e-9, abs=0)
+
+
+def test_correlation_below_float_range_rounds_to_zero_not_crash():
+    e = Fraction(1, 10 ** 400)
+    b = [{"id": f"b{i}", "tension": x} for i, x in enumerate([0, 1, 2])]
+    m = [{"id": f"m{i}", "intensity": y} for i, y in enumerate([Fraction(1), e, 1 + e])]
+    assert A(b, m, L((0, 0), (1, 1), (2, 2)))["correlation"] == 0.0         # true value ~0.87e-400 is below the float range

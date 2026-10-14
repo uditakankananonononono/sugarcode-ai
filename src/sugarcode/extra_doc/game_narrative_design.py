@@ -2,6 +2,7 @@
 
 Computes coverage, per-beat gaps and a Pearson correlation from supplied numbers only.
 No story quality, fun, pacing taste or player-experience judgement is made."""
+import decimal
 import math
 from fractions import Fraction
 
@@ -79,8 +80,12 @@ def analyze_alignment(beats, mechanics, links, threshold=DEFAULT_THRESHOLD):
         syy = sum((y - my) ** 2 for y in ys)
         sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
         if sxx and syy:
-            r2 = sxy * sxy / (sxx * syy)      # exact (Cauchy-Schwarz keeps it <= 1); float() of a Fraction cannot underflow the inputs
-            corr = math.copysign(math.sqrt(float(r2)), sxy)
+            r2 = sxy * sxy / (sxx * syy)      # exact (Cauchy-Schwarz keeps it <= 1)
+            with decimal.localcontext() as ctx:       # wide exponent range: a float square would underflow for tiny inputs
+                ctx.prec = 60
+                ctx.Emin, ctx.Emax = decimal.MIN_EMIN, decimal.MAX_EMAX
+                root = (decimal.Decimal(r2.numerator) / decimal.Decimal(r2.denominator)).sqrt()
+            corr = math.copysign(float(root), sxy)
     used = {x for v in linked.values() for x in v}
     return {
         "beats": rows,
