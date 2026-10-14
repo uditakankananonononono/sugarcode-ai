@@ -541,10 +541,26 @@
     {
       "name": "spiking922-L32-value-134",
       "status": "killed"
+    },
+    {
+      "name": "neuromorphic921-scope-key",
+      "status": "killed"
+    },
+    {
+      "name": "neuromorphic921-scope-value",
+      "status": "killed"
+    },
+    {
+      "name": "spiking922-scope-key",
+      "status": "killed"
+    },
+    {
+      "name": "spiking922-scope-value",
+      "status": "killed"
     }
   ],
   "counts": {
-    "killed": 130,
+    "killed": 134,
     "survived": 5,
     "timeout": 0,
     "invalid": 0

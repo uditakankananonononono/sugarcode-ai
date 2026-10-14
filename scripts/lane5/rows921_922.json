@@ -1215,6 +1215,42 @@
       "end": 1739,
       "old": "1",
       "new": "0"
+    },
+    {
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "name": "neuromorphic921-scope-key",
+      "start": 2415,
+      "end": 2423,
+      "old": "'scope':",
+      "new": "'scopecorrupt':"
+    },
+    {
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "name": "neuromorphic921-scope-value",
+      "start": 2423,
+      "end": 2477,
+      "old": "'software synchronous discrete LIF array; no hardware'",
+      "new": "'changed scope'"
+    },
+    {
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "module": "sugarcode.extra_doc.spiking922",
+      "name": "spiking922-scope-key",
+      "start": 2189,
+      "end": 2197,
+      "old": "'scope':",
+      "new": "'scopecorrupt':"
+    },
+    {
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "module": "sugarcode.extra_doc.spiking922",
+      "name": "spiking922-scope-value",
+      "start": 2197,
+      "end": 2249,
+      "old": "'event-driven single LIF neuron; no learned network'",
+      "new": "'changed scope'"
     }
   ]
 }

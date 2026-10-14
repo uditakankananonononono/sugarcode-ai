@@ -128,3 +128,8 @@ QuantumTests.test_final_boundaries=final_boundaries
 def upper_reset_boundary(self):
     b.event_neuron([],threshold=100,reset=99.5)
 QuantumTests.test_upper_reset_boundary=upper_reset_boundary
+
+def scope_contracts(self):
+    self.assertEqual(a.simulate_array([[0]],[[0]])['scope'],'software synchronous discrete LIF array; no hardware')
+    self.assertEqual(b.event_neuron([])['scope'],'event-driven single LIF neuron; no learned network')
+QuantumTests.test_scope_contracts=scope_contracts
