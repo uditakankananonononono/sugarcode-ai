@@ -20,7 +20,7 @@ STATUS_NOTE = ("PARTIAL: minimisation and retention arithmetic over supplied fie
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -29,23 +29,23 @@ def _int(v, name, lo, hi):
 
 def audit(fields, today):
     t = _int(today, "today", 0, MAX_DAY)
-    if not isinstance(fields, (list, tuple)):
+    if type(fields) not in (list, tuple):
         raise ValueError("fields: list required")
     if not 1 <= len(fields) <= MAX_FIELDS:
         raise ValueError(f"fields: 1 to {MAX_FIELDS} entries required")
     rows, seen = [], set()
     for i, f in enumerate(fields):
-        if not isinstance(f, (list, tuple)):
+        if type(f) not in (list, tuple):
             raise ValueError(f"fields[{i}]: (name, needed, sensitivity, collected_day, retention_days) required")
         if len(f) != 5:
             raise ValueError(f"fields[{i}]: 5 entries required")
         name, needed, sens, collected, retention = f
-        if not isinstance(name, str) or not name.strip() or len(name) > MAX_NAME:
+        if type(name) is not str or not name.strip() or len(name) > MAX_NAME:
             raise ValueError(f"fields[{i}] name: non-empty string up to {MAX_NAME} characters required")
         if name in seen:
             raise ValueError(f"fields[{i}]: duplicate field {name}")
         seen.add(name)
-        if not isinstance(needed, bool):
+        if type(needed) is not bool:
             raise ValueError(f"fields[{i}] needed: bool required")
         s = _int(sens, f"fields[{i}] sensitivity", 0, MAX_SENSITIVITY)
         c = _int(collected, f"fields[{i}] collected_day", 0, MAX_DAY)

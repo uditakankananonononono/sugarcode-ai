@@ -56,46 +56,46 @@ def test_validation():
     ok = ("a", True, 0, 0, 5)
     for nm, lo, hi in (("today", 0, 10**6),):
         for bad in (True, 1.0, "1", None, lo - 1, hi + 1):
-            with pytest.raises(ValueError, match=rf"{nm}:"):
+            with pytest.raises(ValueError, match=rf"^{nm}: {'integer required' if type(bad) is not int else 'must be within 0 to 1000000'}$"):
                 A([ok], bad)
         for good in (lo, hi):
             A([ok], good)
     for bad in ("abc", None, 5, {"a": 1}):
-        with pytest.raises(ValueError, match=r"fields: list required"):
+        with pytest.raises(ValueError, match=r"^fields: list required$"):
             A(bad, 10)
-    with pytest.raises(ValueError, match=r"fields: 1 to 200 entries required"):
+    with pytest.raises(ValueError, match=r"^fields: 1 to 200 entries required$"):
         A([], 10)
     many = [(f"f{i}", True, 0, 0, 5) for i in range(201)]
-    with pytest.raises(ValueError, match=r"fields: 1 to 200 entries required"):
+    with pytest.raises(ValueError, match=r"^fields: 1 to 200 entries required$"):
         A(many, 10)
     assert len(A(many[:200], 10)["fields"]) == 200
     for bad in ("abcde", None, 5, {"a": 1}):
-        with pytest.raises(ValueError, match=r"fields\[1\]: \(name, needed, sensitivity, collected_day, retention_days\) required"):
+        with pytest.raises(ValueError, match=r"^fields\[1\]: \(name, needed, sensitivity, collected_day, retention_days\) required$"):
             A([ok, bad], 10)
     for bad in (("b", True, 0, 0), ("b", True, 0, 0, 5, 1), ()):
-        with pytest.raises(ValueError, match=r"fields\[1\]: 5 entries required"):
+        with pytest.raises(ValueError, match=r"^fields\[1\]: 5 entries required$"):
             A([ok, bad], 10)
     for bad in ("", "  ", None, 3, ["b"], "x" * 61):
-        with pytest.raises(ValueError, match=r"fields\[1\] name: non-empty string up to 60 characters required"):
+        with pytest.raises(ValueError, match=r"^fields\[1\] name: non-empty string up to 60 characters required$"):
             A([ok, (bad, True, 0, 0, 5)], 10)
     assert A([ok, ("x" * 60, True, 0, 0, 5)], 10)["fields"][1]["name"] == "x" * 60
-    with pytest.raises(ValueError, match=r"fields\[2\]: duplicate field a"):
+    with pytest.raises(ValueError, match=r"^fields\[2\]: duplicate field a$"):
         A([ok, ("b", True, 0, 0, 5), ("a", False, 1, 0, 5)], 10)
     for bad in (1, 0, None, "x"):
-        with pytest.raises(ValueError, match=r"fields\[1\] needed: bool required"):
+        with pytest.raises(ValueError, match=r"^fields\[1\] needed: bool required$"):
             A([ok, ("b", bad, 0, 0, 5)], 10)
     for i, nm, lo, hi in ((2, "sensitivity", 0, 3), (3, "collected_day", 0, 10**6), (4, "retention_days", 1, 36500)):
         for bad in (True, 1.0, "1", None):
             row = ["b", True, 0, 0, 5]; row[i] = bad
-            with pytest.raises(ValueError, match=rf"fields\[1\] {nm}: integer required"):
+            with pytest.raises(ValueError, match=rf"^fields\[1\] {nm}: integer required$"):
                 A([ok, tuple(row)], 10)
         for bad in (lo - 1, hi + 1):
             row = ["b", True, 0, 0, 5]; row[i] = bad
-            with pytest.raises(ValueError, match=rf"fields\[1\] {nm}: must be within {lo} to {hi}"):
+            with pytest.raises(ValueError, match=rf"^fields\[1\] {nm}: must be within {lo} to {hi}$"):
                 A([ok, tuple(row)], 10**6)
         for good in (lo, hi):
             row = ["b", True, 0, 0, 5]; row[i] = good
             A([ok, tuple(row)], 10**6)
-    with pytest.raises(ValueError, match=r"fields\[1\] collected_day: must not be after today"):
+    with pytest.raises(ValueError, match=r"^fields\[1\] collected_day: must not be after today$"):
         A([ok, ("b", True, 0, 11, 5)], 10)
     assert A([[ "a", True, 0, 0, 5]], 10)["fields"][0]["name"] == "a"   # list rows accepted
