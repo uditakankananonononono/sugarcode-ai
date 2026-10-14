@@ -35,3 +35,25 @@ def test_vacuous_implication_self_constraint_and_unsatisfiable_rules():
 def test_exact_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_exact_label_and_rule_boundaries_with_candidate_count():
+    label='x'*80
+    r=solve({'a':[label],'b':['y','z']},[('a',label,'b','y')]*64,
+            [('a',label,'b','z')]*64)
+    assert r['world']=={'a':label,'b':'y'}
+    assert r['candidate_count']==2 and r['coherent_world_count']==1
+    assert len(r['implication_certificate'])==64 and len(r['exclusion_certificate'])==64
+    assert solve({'a':['x']},[],[])['candidate_count']==1
+
+@pytest.mark.parametrize('args,message',[
+ (({'a':['x','x'],'b':['y','z']},[],[]),'domain values must be unique'),
+ (({'a':[]},[],[]),'each domain must have between 1 and 4 values'),
+ (({'a':['']},[],[]),'label length must be between 1 and 80'),
+ (({'a':['x'*81]},[],[]),'label length must be between 1 and 80'),
+ (({'a':[' ']},[],[]),'labels must not be blank'),
+ (({'a':['x']},[],[None]*65),'each rule set must not exceed 64 rules'),
+])
+def test_remaining_boundaries(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
