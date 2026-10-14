@@ -11,7 +11,7 @@ sorted names with resolved 1; "unresolved", the sorted names with resolved 0; "t
 (null when none is resolved); "heaviest", the name with the most hypotheses (ties to the
 alphabetically first).
 
-Scope: PARTIAL for the Problem-Based Learning line. Counting over a list the caller wrote. It
+Scope: bounded for the Problem-Based Learning line. Counting over a list the caller wrote. It
 does not run a class or judge the problems.
 
 Not claimed: that the problems were worked, that more hypotheses means better learning, that

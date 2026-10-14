@@ -14,7 +14,7 @@ every edge marked stated or inferred, per-node out and in degree over all edges,
 the number of weakly connected components over all edges (every node counts, isolated
 ones are not possible because every node is in some triple).
 
-Scope: PARTIAL for the Knowledge Graph Construction line. An exact in-memory graph with
+Scope: bounded for the Knowledge Graph Construction line. An exact in-memory graph with
 three rule types over the caller's own triples. It is not an ontology reasoner: no
 class hierarchies, no property chains, no entity resolution, no extraction from text.
 

@@ -10,7 +10,7 @@ minutes divided by total as an exact Fraction string (same order); "missing", th
 absent from the lesson (in that same order); and "in_order": true when no segment's phase
 comes earlier in the order explain, model, practice, check than the segment before it.
 
-Scope: PARTIAL for the Direct Instruction line. Counting minutes in a segment list the caller
+Scope: bounded for the Direct Instruction line. Counting minutes in a segment list the caller
 wrote. It does not teach or judge a lesson.
 
 Not claimed: that the lesson took place, that this split is the right one, that the order is

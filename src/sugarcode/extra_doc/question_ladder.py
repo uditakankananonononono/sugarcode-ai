@@ -10,7 +10,7 @@ exact Fraction string; "answered_share" as an exact Fraction string; "deepest_an
 largest depth among answered questions (null when none answered); and "deepening": true when
 no question is shallower than the one before it (depths never fall).
 
-Scope: PARTIAL for the Inquiry-Based Learning line. Counting over labels the caller wrote. It
+Scope: bounded for the Inquiry-Based Learning line. Counting over labels the caller wrote. It
 does not judge the questions or run an inquiry.
 
 Not claimed: that the depth labels are right, that deeper questions mean better learning, that

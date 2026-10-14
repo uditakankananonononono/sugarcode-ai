@@ -9,7 +9,7 @@ The slip of a milestone is done minus planned (negative means early). The result
 number with slip above 0; "on_time_share" as an exact Fraction string; "mean_slip" as an exact
 Fraction string; and "worst", the 0-based index of the first milestone with the largest slip.
 
-Scope: PARTIAL for the Project-Based Learning line. Arithmetic on milestone days the caller
+Scope: bounded for the Project-Based Learning line. Arithmetic on milestone days the caller
 wrote. It does not run a project or judge what students learned from it.
 
 Not claimed: that the days are real, that being on time shows learning, that the milestones

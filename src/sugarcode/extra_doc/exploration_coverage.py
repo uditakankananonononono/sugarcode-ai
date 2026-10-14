@@ -10,7 +10,7 @@ its first visit (null when never visited); "distinct", the number of different i
 visits to an item already visited; "longest_new_run", the longest run of consecutive visits
 that were each a first visit; and "unvisited", the sorted item numbers never visited.
 
-Scope: PARTIAL for the Discovery Learning line. Counting over a path the caller wrote. It does
+Scope: bounded for the Discovery Learning line. Counting over a path the caller wrote. It does
 not run an exploration or judge what was found.
 
 Not claimed: that the path happened, that coverage means discovery, that revisits are wasted,

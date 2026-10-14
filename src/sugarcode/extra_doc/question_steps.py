@@ -10,7 +10,7 @@ The result gives "total_questions"; "solved_steps", the number of steps with sol
 "questions_before_solve", the questions asked in the steps before that one (null when none
 solved); and "questions_per_solved_step" as an exact Fraction string (null when none solved).
 
-Scope: PARTIAL for the Action Learning line. Counting over a step list the caller wrote. It does
+Scope: bounded for the Action Learning line. Counting over a step list the caller wrote. It does
 not run a team or judge the questions.
 
 Not claimed: that the steps happened, that asking more questions led to a solution, that

@@ -10,7 +10,7 @@ Fraction string (null when nothing was correct); "first_correct", the 0-based in
 first correct attempt (null when none); and "fading": true when no attempt used more hints
 than the attempt before it.
 
-Scope: PARTIAL for the Guided Discovery line. Counting over a list the caller wrote. It does not
+Scope: bounded for the Guided Discovery line. Counting over a list the caller wrote. It does not
 guide anyone or judge the hints.
 
 Not claimed: that the hints were good, that fewer hints means learning, that correct flags
