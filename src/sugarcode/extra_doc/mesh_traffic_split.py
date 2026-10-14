@@ -17,7 +17,7 @@ STATUS_NOTE = ("PARTIAL: arithmetic split of a supplied request count only; no r
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -26,19 +26,19 @@ def _int(v, name, lo, hi):
 
 def split(requests, weights):
     requests = _int(requests, "requests", 0, MAX_REQUESTS)
-    if not isinstance(weights, (list, tuple)):
+    if type(weights) not in (list, tuple):
         raise ValueError("weights: list required")
     if not 1 <= len(weights) <= MAX_SERVICES:
         raise ValueError(f"weights: 1 to {MAX_SERVICES} entries required")
     rows = []
     seen = set()
     for i, row in enumerate(weights):
-        if not isinstance(row, (list, tuple)):
+        if type(row) not in (list, tuple):
             raise ValueError(f"weights[{i}]: (service, weight) required")
         if len(row) != 2:
             raise ValueError(f"weights[{i}]: 2 entries required")
         name, w = row
-        if not isinstance(name, str) or not name or len(name) > MAX_NAME:
+        if type(name) is not str or not name or len(name) > MAX_NAME:
             raise ValueError(f"weights[{i}] service: non-empty string up to {MAX_NAME} characters required")
         w = _int(w, f"weights[{i}] weight", 0, MAX_WEIGHT)
         if name in seen:

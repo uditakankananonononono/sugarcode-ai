@@ -103,3 +103,115 @@ def test_type_refusals_and_order():
         S(True, "bad")
     with pytest.raises(ValueError, match=r"^weights\[0\] weight: integer required$"):
         S(1, [("a", True), ("b", 10**30)])
+
+
+# ---- exact-type hardening (v2) ----
+import enum
+
+
+class I(int):
+    pass
+
+
+class LyingI(int):
+    """Compares inside every range whatever its value and is never zero or negative-looking."""
+    def __ge__(self, o): return True
+    def __le__(self, o): return True
+    def __gt__(self, o): return True
+    def __lt__(self, o): return False
+    def __ne__(self, o): return False
+    def __eq__(self, o): return True
+    __hash__ = int.__hash__
+
+
+class E(enum.IntEnum):
+    ONE = 1
+    ZERO = 0
+
+
+class S_(str):
+    pass
+
+
+class LyingS(str):
+    def __eq__(self, o): return False
+    def __ne__(self, o): return True
+    __hash__ = str.__hash__
+
+
+class L(list):
+    pass
+
+
+class T(tuple):
+    pass
+
+
+REQ_INT = r"^requests: integer required$"
+OK = [("a", 1)]
+
+
+def _bad(msg, *args):
+    with pytest.raises(ValueError, match=msg):
+        S(*args)
+
+
+def test_exact_builtin_list_and_tuple_shapes_accepted():
+    assert cnt(S(3, [("a", 1), ["b", 2]])) == [("a", 1), ("b", 2)]
+    assert cnt(S(3, (("a", 1), ["b", 2]))) == [("a", 1), ("b", 2)]
+    assert cnt(S(0, (("a", 0), ("b", 1)))) == [("a", 0), ("b", 0)]
+
+
+def test_requests_int_subclasses_refused_before_range_check():
+    for bad in (I(5), LyingI(5), LyingI(10**30), I(10**30), I(-1), E.ONE, E.ZERO, True, False):
+        _bad(REQ_INT, bad, OK)
+
+
+def test_weight_int_subclasses_refused_first_and_later_and_before_range_check():
+    for bad in (I(1), LyingI(1), LyingI(10**30), I(10**30), E.ONE, E.ZERO, True, False):
+        _bad(r"^weights\[0\] weight: integer required$", 1, [("a", bad)])
+        _bad(r"^weights\[1\] weight: integer required$", 1, [("a", 1), ("b", bad)])
+        _bad(r"^weights\[2\] weight: integer required$", 1, [("a", 1), ("b", 1), ("c", bad)])
+
+
+def test_weights_list_and_tuple_subclasses_refused():
+    for K in (L, T):
+        _bad(r"^weights: list required$", 1, K(OK))
+        _bad(r"^weights: list required$", 1, K())
+    _bad(r"^weights: list required$", 1, L(OK * 21))          # subclass refused before the 1 to 20 cap
+
+
+def test_row_list_and_tuple_subclasses_refused_first_and_later():
+    for K in (L, T):
+        _bad(r"^weights\[0\]: \(service, weight\) required$", 1, [K(("a", 1))])
+        _bad(r"^weights\[1\]: \(service, weight\) required$", 1, [("a", 1), K(("b", 1))])
+        _bad(r"^weights\[0\]: \(service, weight\) required$", 1, [K(("a",)), ("b", 1)])
+
+
+def test_service_str_subclasses_refused_first_and_later():
+    msg = r"^weights\[%d\] service: non-empty string up to 30 characters required$"
+    for bad in (S_("a"), LyingS("a"), LyingS("")):
+        _bad(msg % 0, 1, [(bad, 1)])
+        _bad(msg % 1, 1, [("a", 1), (bad, 1)])
+    _bad(msg % 1, 1, [("a", 1), (S_("a"), 1)])               # not reported as a duplicate
+
+
+def test_service_boundaries_and_remaining_full_messages():
+    msg = r"^weights\[0\] service: non-empty string up to 30 characters required$"
+    assert cnt(S(1, [("x", 1)])) == [("x", 1)]
+    assert cnt(S(1, [("n" * 30, 1)])) == [("n" * 30, 1)]
+    for bad in ("", "n" * 31):
+        _bad(msg, 1, [(bad, 1)])
+    assert cnt(S(0, [("a", 0), ("b", 1)])) == [("a", 0), ("b", 0)]
+    assert cnt(S(0, [("a", 10**6)])) == [("a", 0)]
+    _bad(r"^weights\[2\] service: duplicate$", 1, [("a", 1), ("b", 1), ("a", 1)])
+    _bad(r"^weights\[0\]: 2 entries required$", 1, [("a",)])
+    _bad(r"^weights\[0\]: 2 entries required$", 1, [("a", 1, 1)])
+    _bad(r"^weights\[1\] weight: must be within 0 to 1000000$", 1, [("a", 1), ("b", 10**6 + 1)])
+    _bad(REQ_INT, "1", OK)
+
+
+def test_order_requests_checked_before_weights_and_rows_before_total():
+    _bad(REQ_INT, I(1), L(OK))
+    _bad(r"^weights: list required$", 1, L(OK))
+    _bad(r"^weights\[0\] weight: integer required$", 1, [("a", I(0)), ("b", 0)])   # before the zero-total check
