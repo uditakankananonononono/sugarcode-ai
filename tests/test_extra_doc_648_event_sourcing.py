@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -184,9 +185,26 @@ def _late(m):
     _raises(ValueError, 'each event must be add, remove or clear', m.append, [ok, 'bad'], ok, 2)
 
 
+def _sym(m):
+    OUT = 'events must be a list or tuple'
+    ROW = 'each event must be add, remove or clear'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.replay, K([('clear',)]))
+        _raises(ValueError, ROW, m.replay, [K(('clear',))])
+        _raises(ValueError, ROW, m.replay, [('clear',), K(('clear',))])
+        _raises(ValueError, ROW, m.replay, [K(('clear',)), ('clear',)])
+    for K in (L, T):
+        _raises(TypeError, 'events must be a list or tuple', m.append, K([('clear',)]), ('clear',), 1)
+        _raises(ValueError, 'each event must be add, remove or clear', m.append, [], K(('clear',)), 0)
+        _raises(ValueError, 'each event must be add, remove or clear', m.append, [K(('clear',))], ('clear',), 1)
+    assert m.replay([('add', 'a' * 16, 1000)]) == {'state': {'a' * 16: 1000}, 'version': 1}
+    assert m.replay([('remove', 'a' * 16, 1000)] if False else [('add', 'a' * 16, 1000), ('remove', 'a' * 16, 1000)]) == {'state': {}, 'version': 2}
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(events) not in (list, tuple)', 'not isinstance(events, (list, tuple))'),
@@ -201,6 +219,7 @@ MUTANTS = [
     ('type(expected_version) is not int', 'isinstance(expected_version, bool) or not isinstance(expected_version, int)'), ('type(upto) is not int', 'isinstance(upto, bool) or not isinstance(upto, int)'), ('not 0 <= upto <= len(events)', 'not 0 <= upto < len(events)'),
     ('1 <= e[2] <= 1000', '1 <= e[2] <= 1001'), ('1 <= e[2] <= 1000', '0 <= e[2] <= 1000'), ('type(e[2]) is not int', 'isinstance(e[2], bool) or not isinstance(e[2], int)'),
     ('1 <= len(e[1]) <= 16', '1 <= len(e[1]) <= 17'), ('1 <= len(e[1]) <= 16', '0 <= len(e[1]) <= 16'), ('type(e[1]) is not str or ', ''),
+    ('1 <= len(e[1]) <= 16', '1 <= len(e[1]) < 16'), ('1 <= e[2] <= 1000', '1 <= e[2] < 1000'),
     ('len(e) != 3', 'len(e) != 2'), ('len(e) != 1', 'len(e) != 2'), ("e[0] not in ('add', 'remove', 'clear')", "e[0] not in ('add', 'remove')"),
     ('not e or ', ''), ("version conflict: expected %d, found %d' % (expected_version, len(events))", "version conflict: expected %d, found %d' % (len(events), expected_version)"),
 ]
