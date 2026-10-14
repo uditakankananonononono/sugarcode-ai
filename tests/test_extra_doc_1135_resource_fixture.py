@@ -136,6 +136,15 @@ class LyingI(int):
 
 def _core(m):
     f = m.resource_fixture
+    # All-zero values must leave the empty subset as the lexical/cost winner.
+    for rows in ([('a',1,0)], [('a',0,0)], [('z',0,0),('a',2,0)],
+                 [('z',1,0),('a',2,0),('b',10,0)],
+                 [(str(i),i,0) for i in range(8)]):
+        for capacity in (0,1,5,10):
+            expected={'selected':[],'value':0,'used':0,'remaining':capacity}
+            assert f(rows,capacity)==expected
+            assert f(tuple(map(list,rows)),capacity)==expected
+        assert f(rows)=={'selected':[],'value':0,'used':0,'remaining':5}
     rows=[('z',5,9),('a',2,5),('b',3,5)]
     assert f(rows) == {'selected':['a','b'],'value':10,'used':5,'remaining':0}
     assert f(rows,0)['selected'] == []
@@ -248,6 +257,8 @@ MUTANTS += [('cost <= capacity', 'cost < capacity'), ('(-value, cost, names)', '
 for _v, _lo, _hi in (('capacity',0,10),('x',0,10),('y',0,10)):
     MUTANTS += _ints(_v, _lo, _hi)
 
+
+MUTANTS.append(('best = (0, 0, ())', 'best = (1, 0, ())'))
 
 @pytest.mark.parametrize('old,new', MUTANTS)
 def test_mutant_is_killed(old, new):
