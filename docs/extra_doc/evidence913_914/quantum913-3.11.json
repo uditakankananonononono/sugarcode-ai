@@ -1,0 +1,84 @@
+{
+  "python": "3.11.16",
+  "baseline": "passed",
+  "results": [
+    {
+      "name": "integer-subclass-acceptance",
+      "status": "killed"
+    },
+    {
+      "name": "lower-bound",
+      "status": "killed"
+    },
+    {
+      "name": "upper-bound",
+      "status": "killed"
+    },
+    {
+      "name": "oracle-sign",
+      "status": "killed"
+    },
+    {
+      "name": "diffuser-sign",
+      "status": "killed"
+    },
+    {
+      "name": "diffuser-scale",
+      "status": "killed"
+    },
+    {
+      "name": "default-iterations",
+      "status": "killed"
+    },
+    {
+      "name": "success-squared",
+      "status": "killed"
+    },
+    {
+      "name": "duplicate-rejection",
+      "status": "killed"
+    },
+    {
+      "name": "query-count",
+      "status": "killed"
+    },
+    {
+      "name": "hadamard-phase",
+      "status": "killed"
+    },
+    {
+      "name": "hadamard-scale",
+      "status": "killed"
+    },
+    {
+      "name": "bit-order",
+      "status": "killed"
+    },
+    {
+      "name": "oracle-controls",
+      "status": "killed"
+    },
+    {
+      "name": "cnot-control",
+      "status": "survived"
+    },
+    {
+      "name": "initial-ancilla",
+      "status": "killed"
+    },
+    {
+      "name": "probability-sum",
+      "status": "killed"
+    },
+    {
+      "name": "length-bound",
+      "status": "killed"
+    }
+  ],
+  "counts": {
+    "killed": 17,
+    "survived": 1,
+    "timeout": 0,
+    "invalid": 0
+  }
+}

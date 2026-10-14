@@ -1,0 +1,131 @@
+{
+  "suite": "test_quantum_rows913_914.py",
+  "mutants": [
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "integer-subclass-acceptance",
+      "old": "type(value) is not int",
+      "new": "not isinstance(value, int)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "lower-bound",
+      "old": "not low <= value <= high",
+      "new": "not low < value <= high"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "upper-bound",
+      "old": "not low <= value <= high",
+      "new": "not low <= value < high"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "oracle-sign",
+      "old": "state[index] = -state[index]",
+      "new": "state[index] = state[index]"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "diffuser-sign",
+      "old": "2 * mean - amplitude",
+      "new": "2 * mean + amplitude"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "diffuser-scale",
+      "old": "2 * mean - amplitude",
+      "new": "mean - amplitude"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "default-iterations",
+      "old": "floor(pi / (4 * theta))",
+      "new": "floor(pi / (2 * theta))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "success-squared",
+      "old": "sum(state[index] ** 2 for index in marked)",
+      "new": "sum(state[index] for index in marked)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "duplicate-rejection",
+      "old": "if len(set(marked)) != len(marked):",
+      "new": "if False:"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_application913",
+      "source": "src/sugarcode/extra_doc/quantum_application913.py",
+      "name": "query-count",
+      "old": "'oracle_queries': iterations",
+      "new": "'oracle_queries': iterations + 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "hadamard-phase",
+      "old": "(a - b) / sqrt(2)",
+      "new": "(a + b) / sqrt(2)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "hadamard-scale",
+      "old": "(a + b) / sqrt(2)",
+      "new": "(a + b) / 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "bit-order",
+      "old": "enumerate(reversed(secret))",
+      "new": "enumerate(secret)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "oracle-controls",
+      "old": "if bit == '1'",
+      "new": "if bit == '0'"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "cnot-control",
+      "old": "if i & mask and i & target == 0:",
+      "new": "if not i & mask and i & target == 0:"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "initial-ancilla",
+      "old": "gates = [('X', ancilla)]",
+      "new": "gates = [('H', ancilla)]"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "probability-sum",
+      "old": "state[i] ** 2 + state[i | (1 << bits)] ** 2",
+      "new": "state[i] ** 2 - state[i | (1 << bits)] ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_design914",
+      "source": "src/sugarcode/extra_doc/quantum_design914.py",
+      "name": "length-bound",
+      "old": "1 <= len(secret) <= 11",
+      "new": "1 <= len(secret) < 11"
+    }
+  ]
+}
