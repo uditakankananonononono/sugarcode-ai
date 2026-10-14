@@ -128,3 +128,39 @@ def test_threshold_zero_and_magnitude_boundary():
         A([{"id": "a", "tension": 1e9 + 1000}], mechs(1), [])
     with pytest.raises(ValueError, match=r"within \[0, 10\]"):
         A(beats(1), mechs(1), [], 5e8)
+
+
+def test_tiny_and_huge_fraction_inputs_do_not_underflow():
+    # auditor finding: float(sxx*syy) underflows for 1/10**100 scale values. Correlation of x with x is exactly +1.
+    tiny = [Fraction(i, 10 ** 100) for i in (1, 2, 3)]
+    b = [{"id": f"b{i}", "tension": x} for i, x in enumerate(tiny)]
+    m = [{"id": f"m{i}", "intensity": x} for i, x in enumerate(tiny)]
+    r = A(b, m, L((0, 0), (1, 1), (2, 2)))
+    assert r["correlation"] == pytest.approx(1.0, abs=1e-12)
+    m2 = [{"id": f"m{i}", "intensity": x} for i, x in enumerate(reversed(tiny))]
+    assert A(b, m2, L((0, 0), (1, 1), (2, 2)))["correlation"] == pytest.approx(-1.0, abs=1e-12)
+    assert A(b, m, L((0, 0), (1, 1), (2, 2)))["mean_abs_gap"] == 0.0
+    # nonzero tiny variance on one side only is still a valid correlation, not None
+    mixed = [{"id": f"m{i}", "intensity": x} for i, x in enumerate([Fraction(1), Fraction(2), Fraction(3)])]
+    assert A(b, mixed, L((0, 0), (1, 1), (2, 2)))["correlation"] == pytest.approx(1.0, abs=1e-12)
+
+
+def test_integer_cap_boundaries_then_range():
+    with pytest.raises(ValueError, match=r"within \[0, 10\]"):
+        A([{"id": "a", "tension": 10 ** 9}], mechs(1), [])
+    with pytest.raises(ValueError, match="magnitude above 1e9"):
+        A([{"id": "a", "tension": 10 ** 9 + 1}], mechs(1), [])
+    with pytest.raises(ValueError, match="magnitude above 1e9"):
+        A([{"id": "a", "tension": -(10 ** 9) - 1}], mechs(1), [])
+    with pytest.raises(ValueError, match=r"within \[0, 10\]"):
+        A([{"id": "a", "tension": -(10 ** 9)}], mechs(1), [])
+    with pytest.raises(ValueError, match=r"within \[0, 10\]"):
+        A([{"id": "a", "tension": 10.000001}], mechs(1), [])
+    assert A([{"id": "a", "tension": 10}], mechs(10), [])["beats"][0]["tension"] == 10.0
+
+
+def test_correlation_sign_and_clamp_exact():
+    r = A(beats(0, 10, 5), mechs(0, 10, 5), L((0, 0), (1, 1), (2, 2)))
+    assert r["correlation"] == 1.0                                          # exactly 1 after clamp, not 0.9999999999999999
+    r = A(beats(0, 10, 5), mechs(10, 0, 5), L((0, 0), (1, 1), (2, 2)))
+    assert r["correlation"] == -1.0
