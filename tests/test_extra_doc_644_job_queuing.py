@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -157,9 +158,20 @@ def _late(m):
     _raises(ValueError, 'job names must be unique', m.run_queue, [ok, ('b', 0, 0, 1), ('a', 0, 0, 1)], 1)
 
 
+def _sym(m):
+    OUT = 'jobs must be a list or tuple'
+    ROW = 'each job must be a (name, arrival, priority, duration) tuple'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.run_queue, K([('a', 0, 0, 1)]), 1)
+        _raises(ValueError, ROW, m.run_queue, [K(('a', 0, 0, 1))], 1)
+        _raises(ValueError, ROW, m.run_queue, [('a', 0, 0, 1), K(('a', 0, 0, 1))], 1)
+        _raises(ValueError, ROW, m.run_queue, [K(('a', 0, 0, 1)), ('a', 0, 0, 1)], 1)
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(jobs) not in (list, tuple)', 'not isinstance(jobs, (list, tuple))'),
