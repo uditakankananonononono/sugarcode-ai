@@ -259,3 +259,13 @@ def test_node_limit_boundary_hand_counted(monkeypatch):
     monkeypatch.setattr(p, "NODE_LIMIT", 6)
     with pytest.raises(ValueError, match="search limit"):
         G("couplet", lex, 1)
+
+
+def test_duplicate_spelling_has_exact_lexicon_refusal():
+    entries = [
+        {'word': 'echo', 'syllables': 5, 'rhyme': 'same'},
+        {'word': 'echo', 'syllables': 5, 'rhyme': 'same'},
+    ]
+    with pytest.raises(ValueError) as error:
+        p.generate_verse('couplet', entries)
+    assert str(error.value) == "lexicon[1]: duplicate word 'echo'"
