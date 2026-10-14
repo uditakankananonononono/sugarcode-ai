@@ -141,3 +141,14 @@ for _i,(_function,_args,_text) in enumerate([
  (b.fit,([0],[True]),'labels must be built-in integer 0 or 1'),
  (b.fit,([],[]),'equal nonempty feature/label sequences of at most 10000 required'),
 ]):setattr(QuantumTests,'test_refusal_message_%02d'%_i,_refusal_case(_function,_args,_text))
+
+def test_default_learning_rate_contract():
+    """Pin omitted rate to 0.1 using a nonzero first-step gradient."""
+    implicit = b.fit([0], [1], theta=1, steps=1)
+    explicit = b.fit([0], [1], theta=1, learning_rate=0.1, steps=1)
+    assert implicit == explicit
+    expected = 1-0.1*((1-math.cos(1))/2-1)*math.sin(1)
+    assert abs(implicit['theta']-expected) < 1e-14
+
+# unittest also runs the pin; pytest can run its top-level form.
+QuantumTests.test_default_learning_rate_contract = lambda self: test_default_learning_rate_contract()
