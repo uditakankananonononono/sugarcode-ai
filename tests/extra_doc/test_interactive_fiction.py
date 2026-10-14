@@ -191,3 +191,8 @@ def test_gap_closers():
     for bad in ('\x1f', '\x7f', '\u00e9'):
         err(ValueError, 'node id must be 1 to 20 printable ASCII characters', {'a' + bad: []}, 'a')
         err(ValueError, 'choice label must be 1 to 60 printable ASCII characters', {'a': [('l' + bad, 'a')]}, 'a')
+
+
+def test_parallel_choices_count_as_two_paths():
+    r = analyse_story({'a': [('x', 'b'), ('y', 'b')], 'b': []}, 'a')
+    assert r['simple_paths'] == 2 == oracle({'a': [('x', 'b'), ('y', 'b')], 'b': []}, 'a')[0]['simple_paths']

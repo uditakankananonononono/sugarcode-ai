@@ -8,7 +8,8 @@ with no choices is an ending. analyse_story returns, exactly:
 - has_cycle: some reachable node can return to itself;
 - depth: for each reachable node, the fewest choices from the start (BFS);
 - shortest_to_ending: fewest choices to any ending (None when no ending is reachable);
-- simple_paths: number of start-to-ending paths that never revisit a node (counted by
+- simple_paths: number of start-to-ending paths that never revisit a node; two choices
+  from one node to the same target count as two paths (counted by
   depth first search; the search is bounded by the node cap).
 branching_skeleton(depth, branching) builds the complete tree: node 'n0' at the root,
 nodes numbered breadth first, every non-leaf node has `branching` labelled choices
