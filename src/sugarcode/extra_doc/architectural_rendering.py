@@ -1,4 +1,4 @@
-"""Row 322 architectural rendering (PARTIAL): pinhole projection of building geometry and sun shadow length.
+"""Row 322 architectural rendering: pinhole projection of building geometry and sun shadow length.
 
 Projects 3D points (x east, y up, z north) into an image for a camera with position, yaw about the vertical axis
 and focal length in pixels, and returns a box's 12 projected edges and 2D bounds. Also computes the shadow length

@@ -1,4 +1,4 @@
-"""Row 295 animation principles (PARTIAL): squash-and-stretch and anticipation arithmetic over supplied keyframes.
+"""Row 295 animation principles: squash-and-stretch and anticipation arithmetic over supplied keyframes.
 
 Checks area preservation of scale pairs, counts squash and stretch frames and measures the opposite-direction lead-in.
 No judgement of timing feel, appeal, weight or animation quality."""

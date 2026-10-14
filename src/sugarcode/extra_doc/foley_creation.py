@@ -1,4 +1,4 @@
-"""Row 308 foley creation (PARTIAL): synthesises simple everyday sound effects as sample lists.
+"""Row 308 foley creation: synthesises simple everyday sound effects as sample lists.
 
 An impact is a sum of exponentially damped sines; a layered effect places impacts at time offsets and sums them.
 Reports length, peak, the first sample index where the envelope falls below a threshold, and onset indices.

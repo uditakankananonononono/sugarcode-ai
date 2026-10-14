@@ -1,4 +1,4 @@
-"""Row 347 cultural adaptation (PARTIAL): conversion of measurements and clock times to a locale's convention.
+"""Row 347 cultural adaptation: conversion of measurements and clock times to a locale's convention.
 
 Imperial/US units and metric units are converted with exact factors (Fractions); Fahrenheit and Celsius with the
 exact affine formula. Times convert between 12-hour and 24-hour notation. Only unit and notation conversion:

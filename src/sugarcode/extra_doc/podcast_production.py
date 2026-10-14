@@ -1,4 +1,4 @@
-"""Row 310 podcast production (PARTIAL): episode timeline arithmetic.
+"""Row 310 podcast production: episode timeline arithmetic.
 
 From ordered segments (title, speaker, seconds) computes start offsets, chapter timestamps (H:MM:SS), total
 length and per-speaker talk share as exact fractions. No claim of content quality, audio quality or audience fit."""

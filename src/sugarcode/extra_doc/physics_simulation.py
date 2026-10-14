@@ -1,4 +1,4 @@
-"""Row 298 physics simulation (PARTIAL): fixed-step projectile integration compared with the closed-form answer.
+"""Row 298 physics simulation: fixed-step projectile integration compared with the closed-form answer.
 
 Integrates a point mass under constant gravity with semi-implicit Euler, no drag, flat ground at y = 0.
 Reports landing time, range and apex from the integration and the continuous analytic values with their errors.

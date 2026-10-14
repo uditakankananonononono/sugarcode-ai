@@ -1,4 +1,4 @@
-"""Row 319 scientific illustration (PARTIAL): scale-bar and magnification arithmetic for a figure.
+"""Row 319 scientific illustration: scale-bar and magnification arithmetic for a figure.
 
 Given pixels per micrometre and the image width, picks the largest 1-2-5 scale-bar length (1 nm to 5000 mm) that
 fits within a fraction of the width, and computes figure magnification. Exact Fractions. Says nothing about whether

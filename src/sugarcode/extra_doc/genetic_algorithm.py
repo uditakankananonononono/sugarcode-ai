@@ -18,7 +18,7 @@ generation 0), the final population, and the exact optimum by exhaustive search 
 2^length genomes with the optimum genome (the first in binary counting order), so a
 caller can see how far the run is from it.
 
-Scope: PARTIAL for the Genetic Algorithms line. It is one fixed algorithm on one problem
+Scope: limited to this Genetic Algorithms implementation. It is one fixed algorithm on one problem
 type with a fixed generator; no other encodings, operators, constraints handling beyond a
 zero penalty, no adaptive rates, no parallel islands, no convergence guarantee.
 

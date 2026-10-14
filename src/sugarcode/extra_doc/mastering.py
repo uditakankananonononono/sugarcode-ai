@@ -1,4 +1,4 @@
-"""Row 307 mastering (PARTIAL): measures a mono PCM buffer against distribution targets and computes the gain.
+"""Row 307 mastering: measures a mono PCM buffer against distribution targets and computes the gain.
 
 Reports sample peak and RMS in dBFS, DC offset, clipped-sample count, crest factor and the gain that moves RMS to a
 target without the peak passing a ceiling. Sample-peak only (no true-peak, no LUFS, no K-weighting). No claim of

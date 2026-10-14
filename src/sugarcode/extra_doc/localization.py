@@ -1,4 +1,4 @@
-"""Row 345 localization (PARTIAL): locale-convention formatting of numbers and dates from a small fixed table.
+"""Row 345 localization: locale-convention formatting of numbers and dates from a small fixed table.
 
 Locales: en-US, en-GB, de-DE, fr-FR, en-IN, ja-JP. Numbers use exact Decimal with round-half-up; grouping is 3-3 or
 the Indian 3-2 pattern. Dates follow the table's field order. The table is a coarse convention, not CLDR, and

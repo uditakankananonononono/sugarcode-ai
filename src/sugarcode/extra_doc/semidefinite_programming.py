@@ -17,7 +17,7 @@ and without the extra equality an exact dual certificate: the multiplier w for t
 equality gives S = C - w*I positive semidefinite with <S, X> = 0, so the primal value
 equals t*w.
 
-Scope: PARTIAL for the Semidefinite Programming line. It is a real SDP over 2x2 matrices
+Scope: limited to this Semidefinite Programming implementation. It is a real SDP over 2x2 matrices
 with one or two affine equalities, solved exactly. It is not a general-size solver: no
 n >= 3 matrices, no inequality constraints, no interior-point iteration. With the extra
 equality it reports no dual certificate; optimality there rests on the chord geometry.

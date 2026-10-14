@@ -1,4 +1,4 @@
-"""Row 320 medical illustration (PARTIAL): label-column layout and leader-line crossing count for an annotated figure.
+"""Row 320 medical illustration: label-column layout and leader-line crossing count for an annotated figure.
 
 Labels sit in a column at x = label_x. Each label's y slot is the anchor y pushed apart by a minimum gap and kept
 inside the figure height; leader lines run from anchor to slot. Reports slots, displacement and how many leader

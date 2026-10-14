@@ -1,4 +1,4 @@
-"""Row 297 facial animation (PARTIAL): prototype matching of supplied action-unit intensities.
+"""Row 297 facial animation: prototype matching of supplied action-unit intensities.
 
 Scores a face pose against a fixed table of simplified action-unit prototypes by cosine similarity.
 The table is a coarse convention, not a validated emotion model. No claim about what any face conveys to a viewer."""

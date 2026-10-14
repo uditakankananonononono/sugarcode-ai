@@ -1,4 +1,4 @@
-"""Row 296 character rigging (PARTIAL): 2D forward kinematics and rig validity checks for a supplied bone tree.
+"""Row 296 character rigging: 2D forward kinematics and rig validity checks for a supplied bone tree.
 
 Validates the hierarchy, computes joint positions and reach, and checks optional joint angle limits.
 No judgement of deformation quality, skinning, weight painting or animation suitability."""

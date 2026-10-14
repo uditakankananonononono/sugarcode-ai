@@ -1,4 +1,4 @@
-"""Row 321 technical drawing (PARTIAL): tolerance arithmetic for dimensioned features.
+"""Row 321 technical drawing: tolerance arithmetic for dimensioned features.
 
 Decimal limits for nominal +/- tolerance, a worst-case and a root-sum-square stack-up over a chain of signed
 dimensions, and hole/shaft fit classification. Inputs are limited to 20 decimal places so limits, worst-case sums

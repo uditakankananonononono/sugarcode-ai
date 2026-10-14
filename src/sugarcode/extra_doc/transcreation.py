@@ -1,4 +1,4 @@
-"""Row 346 transcreation (PARTIAL): measurable constraints on a recreated line of copy against its source.
+"""Row 346 transcreation: measurable constraints on a recreated line of copy against its source.
 
 Checks a candidate against the source: protected strings kept verbatim, required phrases present, forbidden terms
 absent, length ratio and a character cap, and a lexical overlap (Jaccard of word sets with protected words removed)
