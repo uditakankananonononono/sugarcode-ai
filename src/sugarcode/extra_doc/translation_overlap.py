@@ -1,4 +1,4 @@
-"""Row 558 machine translation (PARTIAL): clipped n-gram overlap between a candidate translation and a reference.
+"""Row 558 machine translation: clipped n-gram overlap between a candidate translation and a reference.
 
 reference and candidate are strings of up to 2000 characters with 1 to 200 words each (whitespace split,
 lower-cased, punctuation kept as part of a word). overlap(reference, candidate) returns the modified (clipped)

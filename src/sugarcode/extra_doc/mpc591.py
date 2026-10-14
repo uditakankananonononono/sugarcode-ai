@@ -1,6 +1,6 @@
 """Row 591 Secure Multi-Party Computation - Computes jointly.
 
-SCOPED local additive-share sum arithmetic modulo caller supplied modulus.
+Bounded local additive-share sum arithmetic modulo caller supplied modulus.
 Every share is present in this process: this simulator provides NO secrecy,
 party isolation, authenticated communication or malicious-party security.
 It must not be used as a secure multi-party computation deployment.

@@ -1,4 +1,4 @@
-"""Row 494 balanced scorecard (PARTIAL): attainment arithmetic across the four scorecard perspectives.
+"""Row 494 balanced scorecard: attainment arithmetic across the four scorecard perspectives.
 
 Each measure is (perspective, name, actual, target, higher_is_better) with perspective one of financial,
 customer, internal_process or learning_growth, actual a whole number from 0 to 1e9, target a whole number from 1

@@ -1,4 +1,4 @@
-"""Row 555 computer vision (PARTIAL): connected blobs in a small black-and-white image.
+"""Row 555 computer vision: connected blobs in a small black-and-white image.
 
 image is a list of 1 to 50 rows, each a list of the same length (1 to 50) of cells that are the whole numbers 0
 (background) or 1 (foreground). connectivity is 4 (edge neighbours) or 8 (edges and corners). components(image,

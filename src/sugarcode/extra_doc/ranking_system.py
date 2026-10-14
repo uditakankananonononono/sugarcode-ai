@@ -1,4 +1,4 @@
-"""Row 550 ranking system (PARTIAL): orders named items by whole-number score, highest first.
+"""Row 550 ranking system: orders named items by whole-number score, highest first.
 
 items is a list of (name, score) pairs, 1 to 200 of them. name is a non-empty string up to 40 characters, unique
 across the list; score is a whole number from -1e9 to 1e9. The result lists the items by score descending, ties

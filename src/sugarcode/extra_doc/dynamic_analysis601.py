@@ -1,6 +1,6 @@
 """Row601 Dynamic Analysis - Finds bugs by running.
 
-SCOPED bounded arithmetic instruction interpreter with execution trace and
+Bounded bounded arithmetic instruction interpreter with execution trace and
 first runtime fault. Runs only supplied declarative operations, never Python,
 imports, callables or external programs. Not general dynamic code analysis.
 """

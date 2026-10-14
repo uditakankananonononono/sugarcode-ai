@@ -1,4 +1,4 @@
-"""Row 552 anomaly detection (PARTIAL): Tukey interquartile-range fences over a list of whole numbers.
+"""Row 552 anomaly detection: Tukey interquartile-range fences over a list of whole numbers.
 
 values is a list of 4 to 500 whole numbers from -1e9 to 1e9. The quartiles use linear interpolation between the
 sorted values (position (n - 1) * p for p = 1/4 and 3/4, the common "inclusive" definition), as exact Fractions.

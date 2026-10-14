@@ -1,4 +1,4 @@
-"""Row 557 speech synthesis (PARTIAL): the text front end that turns a whole number into words to be spoken.
+"""Row 557 speech synthesis: the text front end that turns a whole number into words to be spoken.
 
 spell(n) takes a whole number from -1e9 to 1e9 and returns it in English words: "minus " for negatives, "zero",
 tens and units joined by a hyphen from twenty-one to ninety-nine, no "and" ("one hundred five"), and the scale

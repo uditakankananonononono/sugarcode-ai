@@ -1,4 +1,4 @@
-"""Row 556 speech recognition (PARTIAL): scoring a transcript against a reference by word error rate.
+"""Row 556 speech recognition: scoring a transcript against a reference by word error rate.
 
 reference and hypothesis are strings of up to 5000 characters. Words are the pieces left by splitting on
 whitespace and are compared after lower-casing (punctuation is part of a word). The reference needs 1 to 400

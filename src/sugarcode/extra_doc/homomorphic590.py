@@ -1,6 +1,6 @@
 """Row 590 Homomorphic Encryption - Computes on encrypted data.
 
-SCOPED Paillier ciphertext multiplication/addition and nonnegative scalar
+Bounded Paillier ciphertext multiplication/addition and nonnegative scalar
 multiplication on supplied ciphertexts. No key generation, encryption or
 private-key access. The caller must validate the key and ciphertext provenance.
 A modulus is accepted syntactically, not proved semiprime or secure. Bounded

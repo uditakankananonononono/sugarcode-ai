@@ -1,6 +1,6 @@
 """Row600 Static Analysis - Finds bugs without running.
 
-SCOPED Python AST diagnostic for duplicate constant dict keys and statements
+Bounded Python AST diagnostic for duplicate constant dict keys and statements
 following unconditional return/raise/break/continue in the same lexical block.
 No source execution, import resolution, control-flow/data-flow proof, general
 bug discovery or security assurance. Findings can be intentional; review them.

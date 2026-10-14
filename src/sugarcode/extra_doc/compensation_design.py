@@ -1,4 +1,4 @@
-"""Row 496 compensation design (PARTIAL): salary-grade structure arithmetic.
+"""Row 496 compensation design: salary-grade structure arithmetic.
 
 pay_grades(first_midpoint, grade_count, progression_bps, spread_bps, salaries=()) builds grade 1 to grade_count.
 Grade 1 midpoint is first_midpoint (whole number 1 to 1e9); each later midpoint is the previous one times

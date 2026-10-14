@@ -1,4 +1,4 @@
-"""Row 531 privacy by design (PARTIAL): data-field minimisation and retention bookkeeping.
+"""Row 531 privacy by design: data-field minimisation and retention bookkeeping.
 
 Each field is (name, needed, sensitivity, collected_day, retention_days): a non-empty name up to 60 characters,
 a real bool saying whether the product still needs it, a whole-number sensitivity from 0 (public) to 3

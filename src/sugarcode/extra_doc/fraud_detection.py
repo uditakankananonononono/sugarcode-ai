@@ -1,4 +1,4 @@
-"""Row 551 fraud detection (PARTIAL): two fixed screening rules over a list of transactions.
+"""Row 551 fraud detection: two fixed screening rules over a list of transactions.
 
 transactions is a list of (ts, amount) pairs, 1 to 500 of them: ts a whole-number second count from 0 to 1e12 that
 never decreases along the list, amount a whole-number minor-unit amount from 0 to 1e9. Rule "large" flags a

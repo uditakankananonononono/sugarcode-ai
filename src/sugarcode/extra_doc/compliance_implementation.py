@@ -1,4 +1,4 @@
-"""Row 530 compliance implementation (PARTIAL): requirement-to-control coverage bookkeeping.
+"""Row 530 compliance implementation: requirement-to-control coverage bookkeeping.
 
 Requirements are (rid, title) pairs and controls are (cid, title, rids) triples, where rids lists the requirement
 ids the control addresses. Every id is a non-empty string up to 20 characters and unique within its own list;

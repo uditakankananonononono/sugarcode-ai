@@ -1,4 +1,4 @@
-"""Row 528 key management (PARTIAL): rotation-schedule bookkeeping for a key inventory.
+"""Row 528 key management: rotation-schedule bookkeeping for a key inventory.
 
 This checks dates only. It does not handle key material and says nothing about how secure any key or process is.
 Each key is (name, created_day, rotation_days, revoked): a non-empty name up to 60 characters, created_day a whole

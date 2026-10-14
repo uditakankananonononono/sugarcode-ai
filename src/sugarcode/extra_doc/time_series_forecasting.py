@@ -1,4 +1,4 @@
-"""Row 553 time series forecasting (PARTIAL): Holt linear-trend exponential smoothing in exact Fractions.
+"""Row 553 time series forecasting: Holt linear-trend exponential smoothing in exact Fractions.
 
 history is a list of 3 to 200 whole numbers from -1e9 to 1e9, oldest first. alpha_bps and beta_bps are the level
 and trend smoothing weights in basis points (1 to 10000, so 5000 means 1/2). The level starts at history[0] and the

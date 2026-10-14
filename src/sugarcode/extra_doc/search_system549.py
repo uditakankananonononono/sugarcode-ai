@@ -1,6 +1,6 @@
 """Row 549 Search System - Finds relevant content.
 
-SCOPED bounded token-overlap search over supplied ASCII document text only.
+Bounded bounded token-overlap search over supplied ASCII document text only.
 No external retrieval, index persistence, stemming or semantic relevance claim.
 Explicit import, no IO. Query/document tokens are exact case-folded words.
 """

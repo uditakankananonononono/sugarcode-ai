@@ -1,6 +1,6 @@
 """Row 599 Formal Verification - Proves correctness.
 
-SCOPED exhaustive reachable-state safety check of a supplied finite transition
+Bounded exhaustive reachable-state safety check of a supplied finite transition
 relation. The checked property is absence of supplied bad states from states
 reachable from a single start. This proves only that finite model property,
 not program refinement, unmodeled behavior, liveness, safety of real systems or

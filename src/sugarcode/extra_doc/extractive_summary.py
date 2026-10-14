@@ -1,4 +1,4 @@
-"""Row 559 text summarization (PARTIAL): choosing the sentences that carry the most frequent words.
+"""Row 559 text summarization: choosing the sentences that carry the most frequent words.
 
 text is a string of 1 to 5000 characters. A token is a maximal run of ASCII letters and digits, lower-cased; a
 sentence is the stretch of text between the characters . ! ? that holds at least one token, stripped of

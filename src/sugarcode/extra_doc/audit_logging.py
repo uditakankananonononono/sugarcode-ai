@@ -1,4 +1,4 @@
-"""Row 529 audit logging (PARTIAL): a tamper-evident hash chain over event rows.
+"""Row 529 audit logging: a tamper-evident hash chain over event rows.
 
 Each event is (seq, ts, action): seq the whole-number position starting at 1 with no gaps, ts a whole-number
 timestamp from 0 to 1e12 that never decreases, and action a non-empty string up to 60 characters. The chain
