@@ -96,3 +96,10 @@ def test_caps():
 def test_refusals(args, exc, msg):
     with pytest.raises(exc, match=msg):
         solve(*args)
+
+
+def test_three_rules_give_three_distinct_winners_without_ties():
+    r = solve([('a', 1), ('b', 1), ('c', 1)], [('x', [0, 0, 10]), ('y', [2, 2, 2]), ('z', [6, 6, 0])])
+    # EV 10/3, 2, 4 ; worst 0, 2, 0 ; column maxima 6, 6, 10 give max regrets 6, 8, 10
+    assert [(o['expected'], o['worst'], o['max_regret']) for o in r['options']] == [(F(10, 3), 0, 6), (2, 2, 8), (4, 0, 10)]
+    assert (r['best_expected'], r['maximin'], r['minimax_regret']) == ('z', 'y', 'x')
