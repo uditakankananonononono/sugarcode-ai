@@ -1,4 +1,5 @@
 """Test-only proc status polling; not a product/reaping helper."""
+import errno
 
 def poll_terminal_status(read_status, *, monotonic, sleep, timeout=2.0,
                          expected_pid=None, expected_name=None):
@@ -15,7 +16,8 @@ def poll_terminal_status(read_status, *, monotonic, sleep, timeout=2.0,
         except FileNotFoundError:
             pass
         except OSError as exc:
-            error = type(exc).__name__
+            if exc.errno != errno.ESRCH:
+                error = type(exc).__name__
         else:
             fields = {}
             for line in snapshot.splitlines():
