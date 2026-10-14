@@ -108,3 +108,11 @@ def test_exact_refusal_schema_and_scalar_boundaries():
     for x,y in [(1000,1000),(-1000,-1000),(1000,-1000),(-1000,1000)]:
         r=contextual_bandit(2,[(0,[x],y)],[1],ridge=1,alpha=0)
         assert r['weights'][0]==[F(x*y,1+x*x)]
+
+
+def test_keyword_defaults_are_literal_and_equal_explicit_call():
+    import inspect
+    sig=inspect.signature(contextual_bandit)
+    assert sig.parameters['ridge'].default==1
+    assert sig.parameters['alpha'].default==1
+    assert contextual_bandit(2,[],[1])==contextual_bandit(2,[],[1],ridge=1,alpha=1)
