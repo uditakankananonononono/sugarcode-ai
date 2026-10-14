@@ -10,7 +10,7 @@ exact Fraction string (null when planned is 0); "shortfall", the sum over sessio
 minus actual where that is above 0; and "longest_met_run", the longest run of consecutive met
 sessions.
 
-Scope: PARTIAL for the Intentional Learning line. Arithmetic on minutes the caller wrote. It
+Scope: bounded for the Intentional Learning line. Arithmetic on minutes the caller wrote. It
 does not track anyone's study or judge a plan.
 
 Not claimed: that the minutes are real, that meeting a plan means learning, that the plans were

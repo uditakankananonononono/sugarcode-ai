@@ -1,4 +1,4 @@
-"""Row 691, Pair Programming (PARTIAL: one exact rotation rule): check a driver and navigator schedule.
+"""Row 691, Pair Programming (Bounded: one exact rotation rule): check a driver and navigator schedule.
 
 check_pairing(turns) takes turns as a list of (start, end, driver, navigator): minutes from the start of the session (exact ints)
 and two names. The rules, applied to each turn i (0-based), are:

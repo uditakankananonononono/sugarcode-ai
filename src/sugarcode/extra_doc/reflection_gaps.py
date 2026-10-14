@@ -9,7 +9,7 @@ The result gives "count"; "total_words"; "mean_words" as an exact Fraction strin
 days between neighbouring entries (later day minus earlier day); "longest_gap" (null with a
 single entry); and "regular": true when there are at least 2 gaps and all gaps are equal.
 
-Scope: PARTIAL for the Reflective Practice line. Arithmetic on a journal summary the caller
+Scope: bounded for the Reflective Practice line. Arithmetic on a journal summary the caller
 wrote. It does not read the entries or judge the quality of anyone's reflection.
 
 Not claimed: that the entries exist, that more words means deeper reflection, that regular

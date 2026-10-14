@@ -1,4 +1,4 @@
-"""Row 690, Code Review (PARTIAL: one exact merge-gate rule): decide from review records whether a change may merge.
+"""Row 690, Code Review (Bounded: one exact merge-gate rule): decide from review records whether a change may merge.
 
 check_review(author, reviews, comments) takes author, a name; reviews, a list of (reviewer, verdict) in time order with verdict
 'approve', 'request_changes' or 'comment'; and comments, a list of (comment, severity, resolved) with severity 'blocker', 'major',

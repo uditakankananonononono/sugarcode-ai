@@ -11,7 +11,7 @@ exact Fraction string or null when the band has no words}; "overall_rate" as an 
 string; and "rising": true when the rates of the bands that have words never fall from one band
 to the next in the order low, mid, high.
 
-Scope: PARTIAL for the Incidental Learning line. Counting over a list the caller wrote. It does
+Scope: bounded for the Incidental Learning line. Counting over a list the caller wrote. It does
 not run a test or say what the learner noticed.
 
 Not claimed: that the exposures happened, that more exposures caused recall, that the bands are
