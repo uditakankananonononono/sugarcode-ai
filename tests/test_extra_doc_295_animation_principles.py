@@ -104,3 +104,10 @@ def test_net_direction_with_unit_and_fractional_motion():
     assert K([F(0, 0), F(1, 0), F(2, Fraction(1, 1000))])["net_direction"] == "up"
     assert K([F(0, 0), F(1, 0), F(2, -Fraction(1, 1000))])["net_direction"] == "down"
     assert K([F(0, 0), F(1, 5), F(2, 0)])["net_direction"] == "none"
+
+
+def test_small_net_down_has_anticipation_lead_in():
+    # net movement is -0.5 (down); the lead-in is the first 2 frames going up by 0.5
+    r = K([F(0, 0), F(1, .5), F(2, -.5)])
+    assert r["net_direction"] == "down"
+    assert r["anticipation"] == {"frames": 2, "duration": 1, "share_of_total": 0.5, "depth": 0.5}
