@@ -1,4 +1,4 @@
-"""Row 400, Segmentation Analysis (PARTIAL: one exact table rule): check that supplied segments divide a customer list.
+"""Row 400, Segmentation Analysis (Bounded: one exact table rule): check that supplied segments divide a customer list.
 
 check_segments(segments) takes segments as a list of 0 to 12 tuples (name, members): name 1 to 24 lowercase identifier
 characters, members a list of 0 to 50 member ids of the same shape. The rules, applied to each segment i (0-based), are:

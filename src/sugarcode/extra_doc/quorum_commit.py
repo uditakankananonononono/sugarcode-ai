@@ -11,7 +11,7 @@ order, so one short entry holds back everything after it). The result gives "quo
 row lengths), "commit_index", and "held_back" (entries after the commit index that are replicated
 but cannot commit yet).
 
-Scope: PARTIAL for the Consensus Algorithm line. A counting rule on supplied acknowledgements. No
+Scope: bounded for the Consensus Algorithm line. A counting rule on supplied acknowledgements. No
 leader election, no terms, no messages, no failure, no network, no real consensus.
 
 Not claimed: that this reaches consensus, that a commit index means the nodes agree on state, that

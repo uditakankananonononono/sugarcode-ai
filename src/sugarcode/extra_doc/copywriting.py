@@ -1,4 +1,4 @@
-"""Row 406, Copywriting (PARTIAL: one exact channel-cap rule): check supplied copy blocks against fixed channel caps.
+"""Row 406, Copywriting (Bounded: one exact channel-cap rule): check supplied copy blocks against fixed channel caps.
 
 check_copy(blocks) takes blocks as a list of 0 to 20 tuples (channel, text): channel one of 'subject', 'headline',
 'button', 'post' (exact strings), text an exact string of 1 to 300 characters. Each channel has a fixed character cap:

@@ -10,7 +10,7 @@ value to its own secret: shared_a = B**a mod p, shared_b = A**b mod p. The resul
 tiny modulus: "recovered_exponent" (the smallest x in 1..p-1 with g**x mod p equal to A, or None),
 "recovered_shared" (B**x mod p, or None) and "attack_matches" (it equals shared_a).
 
-Scope: PARTIAL for the Cryptographic Protocol line. A toy modulus that brute force breaks on purpose.
+Scope: bounded for the Cryptographic Protocol line. A toy modulus that brute force breaks on purpose.
 No real key size, no authentication, no randomness, no network, no real secrecy.
 
 Not claimed: that this secures communication, that any value is a safe key or parameter, that the

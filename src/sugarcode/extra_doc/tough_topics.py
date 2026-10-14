@@ -1,4 +1,4 @@
-"""Row 723 Difficult Conversations (PARTIAL): pack ordered topics into sessions under two caps.
+"""Row 723 Difficult Conversations : pack ordered topics into sessions under two caps.
 
 topics is a tuple of 0..40 entries; each entry is a tuple (name, level) with name a str of 1..40 characters and
 level a whole number 1..5. A topic with level 4 or 5 counts as tough (this module's own cutoff). per_session is

@@ -1,4 +1,4 @@
-"""Row 405, Messaging Framework (PARTIAL: one exact priority rule): check a ranked list of key messages.
+"""Row 405, Messaging Framework (Bounded: one exact priority rule): check a ranked list of key messages.
 
 check_framework(messages) takes messages as a list of 0 to 8 tuples (rank, label, text): rank an exact int from 1 to 8,
 label 1 to 24 lowercase identifier characters, text an exact string of 1 to 120 characters. The rules, applied to each

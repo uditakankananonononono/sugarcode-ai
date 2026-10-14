@@ -1,4 +1,4 @@
-"""Row 724 Feedback Delivery (PARTIAL): interleave strength and improvement notes under a one-to-one rule.
+"""Row 724 Feedback Delivery : interleave strength and improvement notes under a one-to-one rule.
 
 strengths and improvements are tuples of 0..20 notes; each note is a str of 1..60 characters. This module's own
 rule: deliver a strength first, then alternate improvement, strength, improvement, strength while both remain;
