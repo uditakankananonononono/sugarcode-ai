@@ -21,7 +21,7 @@ def refuses(error, msg, a):
 TY = 'blocks must be a list or tuple'
 NINE = 'exactly nine blocks required'
 ROW = 'blocks must be lists or tuples of at most five entries'
-ENT = 'entries must be strings of length 1 through 64'
+ENT = 'entries must be strings of length 1 through 64 without control or unassigned characters'
 
 
 def mk(**kw):
@@ -87,3 +87,11 @@ def test_check_order():
     refuses(ValueError, NINE, [5])
     refuses(ValueError, ROW, [['a'] * 6, 5, 5, 5, 5, 5, 5, 5, 5])
     refuses(ValueError, ENT, [[1]] + [[]] * 8)
+
+
+def test_non_ascii_witnesses():
+    for ch in ('\x00', '\n', '\x7f', '\x85', '\u200b', '\ue000', '\ud800', '\u0378'):
+        refuses(ValueError, ENT, mk(problem=['a' + ch]))
+        refuses(ValueError, ENT, mk(problem=['a', ch]))
+        refuses(ValueError, ENT, mk(unfair_advantage=['b' + ch + 'c']))
+    assert cc(mk(problem=['caf\u00e9 \u4e2d \U0001f600']))['counts'][0] == 1
