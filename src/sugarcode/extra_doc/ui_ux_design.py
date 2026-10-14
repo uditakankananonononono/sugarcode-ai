@@ -3,6 +3,7 @@
 Assigns supplied actions to UI slots minimizing measured weighted interaction
 cost, respecting supplied action/slot incompatibilities. Returns a global
 finite optimum and an exhaustive candidate count, not a rendered UI.
+Equal-cost assignments use lexicographically smallest slot-index tuple.
 NOT_CLAIMED: universal usability, visual design, accessibility certification,
 user-study validation, aesthetic quality, or autonomous deployment.
 """

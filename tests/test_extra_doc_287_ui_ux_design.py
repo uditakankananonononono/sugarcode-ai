@@ -63,3 +63,17 @@ def test_next_bit_refusal(v):
 def test_negative_forbidden_index_refused_not_silently_ignored():
     with pytest.raises(ValueError) as exc:solve([1],[[0]],[(-1,0)])
     assert str(exc.value)=='forbidden indices must be nonbool integers inside action range'
+
+@pytest.mark.parametrize('field',range(3))
+@pytest.mark.parametrize('bad',['x',{},None])
+def test_each_container_independently_refused(field,bad):
+    args=[[1],[[0]],[]];args[field]=bad
+    with pytest.raises(TypeError) as exc:solve(*args)
+    assert str(exc.value)=='inputs must be lists or tuples'
+
+
+def test_long_matrix_row_and_long_forbidden_tuple_errors():
+    with pytest.raises(ValueError) as exc:solve([1],[[0,9]])
+    assert str(exc.value)=='cost matrix must be square and match actions'
+    with pytest.raises(ValueError) as exc:solve([1],[[0]],[(0,0,0)])
+    assert str(exc.value)=='forbidden pairs must contain action and slot indices'
