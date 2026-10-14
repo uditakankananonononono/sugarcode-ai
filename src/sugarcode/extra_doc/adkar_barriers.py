@@ -7,6 +7,7 @@ the threshold (None when none does). Reported: per person the barrier point, per
 mean score (Fraction) and how many people have it as their barrier point, and the most common
 barrier point (first in model order on ties, None when nobody has one). Labels are caller
 strings, not identities. Caps are implementation choices, not spec values. Nothing is surveyed.
+Element names checked against https://www.prosci.com/methodology/adkar on 2026-10-14.
 NOT_CLAIMED: that the scores are measured or meaningful, that the order of elements is how a
 person actually changes, anything about any real individual, that acting on a barrier works,
 employment, consultation or privacy obligations, approval-gate clearance, deployment.
