@@ -1,4 +1,4 @@
-"""Row 611 continuous deployment (PARTIAL): turning canary percentage steps into instance counts for a release.
+"""Row 611 continuous deployment: turning canary percentage steps into instance counts for a release.
 
 instances is the whole number of running instances, 1 to 10000. steps is a list of 1 to 10 whole-number
 percentages from 1 to 100 that strictly increase and end at 100. plan(instances, steps) gives, for each step, the

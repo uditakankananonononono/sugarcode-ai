@@ -1,4 +1,4 @@
-"""Row 615 service mesh (PARTIAL): dividing a whole number of requests among services by weight.
+"""Row 615 service mesh: dividing a whole number of requests among services by weight.
 
 requests is a whole number from 0 to 1e9. weights is a list of 1 to 20 (service, weight) pairs: service a unique
 non-empty string up to 30 characters, weight a whole number from 0 to 1e6, with at least one weight above 0. split

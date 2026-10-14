@@ -1,4 +1,4 @@
-"""Row 616 API gateway (PARTIAL): choosing a backend for a method and path from a route table.
+"""Row 616 API gateway: choosing a backend for a method and path from a route table.
 
 routes is a list of 1 to 50 (prefix, methods, target) triples. prefix starts with "/", is at most 60 characters,
 has no whitespace and no trailing "/" unless it is exactly "/", and is unique in the table; methods is a list of 1
