@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -149,9 +150,17 @@ def _late(m):
     _raises(ValueError, 'override people must be listed people', m.on_call_schedule, ['a'], 3, 1, {0: 'a', 1: 'zed'})
 
 
+def _sym(m):
+    P = 'people must be a list or tuple'
+    for K in (L, T):
+        _raises(TypeError, P, m.on_call_schedule, K(('a', 'b')), 3)
+        _raises(TypeError, P, m.on_call_schedule, K(['a']), 1, 1, None)
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(people) not in (list, tuple)', 'not isinstance(people, (list, tuple))'),
