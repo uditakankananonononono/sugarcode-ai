@@ -1,4 +1,4 @@
-"""Row 666 Singleton Pattern (PARTIAL): replaying a creation log to find where "only one instance" breaks.
+"""Row 666 Singleton Pattern (bounded implementation): replaying a creation log to find where "only one instance" breaks.
 
 events is a list of 1..100 (key, action) tuples. key is 1..30 characters of a-z, 0-9 and underscore starting
 with a letter (ASCII only); action is exactly "create" or "get". The first create of a key makes its instance. A

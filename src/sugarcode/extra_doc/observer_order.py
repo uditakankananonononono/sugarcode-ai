@@ -1,4 +1,4 @@
-"""Row 663 Observer Pattern (PARTIAL): which observers are told about each event, and in what order.
+"""Row 663 Observer Pattern (bounded implementation): which observers are told about each event, and in what order.
 
 subscriptions is a list of 1..32 (name, topic, priority) tuples: name and topic are 1..30 characters of a-z,
 0-9 and underscore starting with a letter (ASCII only), priority a whole number -100..100. Names are distinct.

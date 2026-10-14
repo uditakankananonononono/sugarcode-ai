@@ -1,6 +1,6 @@
 """Quantum Networking - Entanglement distribution.
 
-PARTIAL: exact finite-size routing over independent Werner-state elementary
+Bounded implementation: exact finite-size routing over independent Werner-state elementary
 links with probabilistic Bell swaps. No network hardware or actual entanglement
 distribution. Static route optimization only; no repeat-until-success scheduling.
 """

@@ -1,4 +1,4 @@
-"""Row 662 Facade Pattern (PARTIAL): expanding facade calls into the subsystem calls they stand for.
+"""Row 662 Facade Pattern (bounded implementation): expanding facade calls into the subsystem calls they stand for.
 
 subsystem is a list of 1..32 distinct operation names. facade is a dict of 1..16 facade operation names, each
 mapped to a list of 1..8 subsystem names (repeats allowed, every one must be in subsystem). calls is a list of

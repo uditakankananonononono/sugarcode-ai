@@ -1,4 +1,4 @@
-"""Row 667 Dependency Injection (PARTIAL): lifetime check over a supplied service registration table.
+"""Row 667 Dependency Injection (bounded implementation): lifetime check over a supplied service registration table.
 
 services is a list of 1..32 (name, lifetime, dependencies) tuples. name is 1..30 characters of a-z, 0-9 and
 underscore starting with a letter (ASCII only), distinct across the table. lifetime is exactly "singleton",

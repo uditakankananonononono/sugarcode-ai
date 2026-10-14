@@ -1,6 +1,6 @@
 """Quantum Sensing - Ultra-precise measurement.
 
-PARTIAL: classical exact-form Ramsey/Bernoulli count inference on a caller-chosen
+Bounded implementation: classical exact-form Ramsey/Bernoulli count inference on a caller-chosen
 monotone phase branch. Not a physical sensor, quantum advantage or a guarantee of
 ultra-precise measurement. Binomial uncertainty ignores technical noise.
 """
