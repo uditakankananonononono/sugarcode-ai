@@ -9,8 +9,12 @@ gamma(h) = nugget + slope * h for h > 0, so every entry is an integer. For each 
 ordinary kriging system (weights summing to 1, with a Lagrange multiplier mu) is solved
 exactly. The result per target is the weights, mu, the prediction (the weighted sum of
 the values) and the kriging variance sum(weight_i * gamma(target, point_i)) + mu, all as
-exact Fractions in strings. Because the variogram is a metric of negative type the
-system is non-singular for distinct points.
+exact Fractions in strings. The system depends only on the points and the variogram. It can
+be singular: Manhattan distance is of negative type but not strictly, so with nugget 0
+some distinct layouts (for example the four corners of a unit square) have a null vector,
+and then the call is refused with "kriging system is singular" rather than guessed. A
+positive nugget is not claimed to remove this in general; only the contrasts pinned in the
+tests are known.
 
 Scope: PARTIAL for the Kriging line. It does ordinary kriging with one fixed linear
 variogram in Manhattan distance. It fits no variogram to data, offers no spherical,
@@ -71,8 +75,9 @@ def _solve(a, b):
     n = len(a)
     m = [[Fraction(x) for x in row] + [Fraction(y)] for row, y in zip(a, b)]
     for c in range(n):
-        # the matrix is non-singular for distinct points, so some row at or below c has a pivot
-        p = next(r for r in range(c, n) if m[r][c] != 0)
+        p = next((r for r in range(c, n) if m[r][c] != 0), None)
+        if p is None:
+            raise KrigingError("kriging system is singular")
         m[c], m[p] = m[p], m[c]
         piv = m[c][c]
         m[c] = [x / piv for x in m[c]]

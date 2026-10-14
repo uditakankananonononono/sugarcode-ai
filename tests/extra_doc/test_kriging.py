@@ -142,3 +142,35 @@ def test_value_refusals_and_caps():
     run(dict(ok, nugget=0, slope=1))
     run(dict(ok, nugget=1000, slope=1000))
     run(dict(ok, values=[1000, -1000], points=[[1000, 1000], [-1000, -1000]], targets=[[-1000, 1000]]))
+
+
+SINGULAR_LAYOUTS = [
+    [[0, 0], [1, 0], [0, 1], [1, 1]],
+    [[0, 0], [2, 0], [0, 1], [2, 1]],
+    [[0, 0], [2, 0], [0, 2], [2, 2], [1, 1]],
+    [[-5, 3], [7, 3], [-5, 9], [7, 9]],
+]
+
+
+def test_zero_nugget_rectangle_layouts_are_refused():
+    for pts in SINGULAR_LAYOUTS:
+        for slope in (1, 7):
+            bad(d(pts, list(range(len(pts))), [[2, 2]], nugget=0, slope=slope), "kriging system is singular")
+            bad(d(pts, list(range(len(pts))), [[0, 0]], nugget=0, slope=slope), "kriging system is singular")
+
+
+def test_positive_nugget_contrast_and_near_miss_layouts_work():
+    for pts in SINGULAR_LAYOUTS:
+        for nugget in (1, 3):
+            out = run(d(pts, list(range(len(pts))), [[2, 2]], nugget=nugget, slope=1))
+            check_equations([tuple(p) for p in pts], list(range(len(pts))), (2, 2), nugget, 1, out["predictions"][0])
+    # three corners of the square, and a rectangle with one corner moved, are fine at nugget 0
+    for pts in ([[0, 0], [1, 0], [0, 1]], [[0, 0], [1, 0], [0, 1], [2, 2]]):
+        out = run(d(pts, list(range(len(pts))), [[2, 2]], nugget=0, slope=1))
+        check_equations([tuple(p) for p in pts], list(range(len(pts))), (2, 2), 0, 1, out["predictions"][0])
+
+
+def test_reported_failing_input_is_a_coded_refusal():
+    bad(d([[0, 0], [1, 0], [0, 1], [1, 1]], [0, 1, 2, 3], [[2, 2]], nugget=0, slope=1), "kriging system is singular")
+    out = run(d([[0, 0], [1, 0], [0, 1], [1, 1]], [0, 1, 2, 3], [[2, 2]], nugget=1, slope=1))
+    assert Fraction(out["predictions"][0]["prediction"]) == sum(Fraction(w) * v for w, v in zip(out["predictions"][0]["weights"], [0, 1, 2, 3]))
