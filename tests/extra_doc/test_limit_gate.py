@@ -86,3 +86,17 @@ def test_order():
     refuse("requests[1]: whole number 1 to 10000 required", 5, (1, 0, 0))
 
     assert G(10, (4, 7, 1))["accepted"] == (0, 2) and G(10, (4, 7, 1))["remaining"] == 5
+
+
+def test_boundary_positions():
+    r = G(1, (1,) + (2,) * 49)
+    assert r["accepted"] == (0,) and r["refused"] == tuple(range(1, 50))
+    r = G(1, (2,) * 49 + (1,))
+    assert r["accepted"] == (49,) and r["refused"] == tuple(range(49))
+    r = G(3, (2, 2, 1))
+    assert r["accepted"] == (0, 2) and r["refused"] == (1,) and r["remaining"] == 0
+    assert G(10000, (1, 10000))["accepted"] == (0,)
+    assert G(10000, (10000,) * 50)["accepted"] == (0,)
+    assert G(10000, (200,) * 50)["accepted"] == tuple(range(50))
+    assert G(10000, (200,) * 50)["remaining"] == 0
+    assert G(9999, (200,) * 50)["accepted"] == tuple(range(49))

@@ -104,3 +104,16 @@ def test_distinct_and_order():
     refuse(AV, "x", (None,) * 21)
     refuse("avoid[0]: word of 1 to 20 lowercase a-z letters required", "x", (None, None))
     refuse("avoid[1]: word of 1 to 20 lowercase a-z letters required", "x", ("a", "A", "a"))
+
+
+def test_boundary_positions():
+    assert S("bad", ("bad",))["hits"] == [(0, "bad")]
+    assert S("x bad", ("bad",))["hits"] == [(1, "bad")]
+    assert S("bad x", ("bad",))["hits"] == [(0, "bad")]
+    assert S("x " * 998 + "bad", ("bad",))["hits"] == [(998, "bad")]
+    assert S("a" * 1997 + " bad"[:3], ("bad",))["hits"] == []
+    assert S("a" * 1996 + " bad", ("bad",))["hits"] == [(1, "bad")]
+    assert S(" " * 1997 + "bad", ("bad",))["hits"] == [(0, "bad")]
+    assert S("bad" + "!" * 1997, ("bad",))["hits"] == [(0, "bad")]
+    assert S("x", ("x",) + tuple(chr(98 + i) for i in range(19)))["counts"]["x"] == 1
+    assert S("t", tuple(chr(97 + i) for i in range(20)))["counts"]["t"] == 1
