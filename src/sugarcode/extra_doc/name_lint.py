@@ -1,4 +1,4 @@
-"""Row 709 Linting (PARTIAL): three name-use checks on a supplied sequence of define/use events.
+"""Row 709 Linting : three name-use checks on a supplied sequence of define/use events.
 
 events is a list of 1..100 (action, name) tuples, action exactly "def" or "use", name 1..30 characters of a-z,
 0-9 and underscore starting with a letter (ASCII only). Issues are (event_index, kind) sorted by index then

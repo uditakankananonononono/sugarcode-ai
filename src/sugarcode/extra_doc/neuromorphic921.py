@@ -1,6 +1,6 @@
 """Neuromorphic Computing - Brain-inspired hardware.
 
-PARTIAL: deterministic software simulation of a synchronous digital leaky
+Bounded: deterministic software simulation of a synchronous digital leaky
 integrate-and-fire array with recurrent delayed spikes. No fabricated hardware,
 energy-efficiency claim, biological fidelity or autonomous learning.
 """

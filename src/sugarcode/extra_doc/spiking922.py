@@ -1,6 +1,6 @@
 """Spiking Neural Networks - Event-based processing.
 
-PARTIAL: event-driven exponential LIF neuron with exact-form between-event
+Bounded: event-driven exponential LIF neuron with exact-form between-event
 leak and refractory handling. No trained general network or physical hardware.
 """
 from math import exp,isfinite

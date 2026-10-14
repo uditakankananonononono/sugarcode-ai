@@ -1,4 +1,4 @@
-"""Row 705 Architecture Decision Records (PARTIAL): checking status and supersession links across a record list.
+"""Row 705 Architecture Decision Records : checking status and supersession links across a record list.
 
 records is a list of 1..64 (id, status, supersedes) tuples. id is a whole number 1..9999, distinct across the
 list. status is exactly "proposed", "accepted", "rejected", "deprecated" or "superseded". supersedes is None or

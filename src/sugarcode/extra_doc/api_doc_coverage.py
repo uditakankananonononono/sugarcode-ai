@@ -1,4 +1,4 @@
-"""Row 704 API Documentation (PARTIAL): comparing documented parameters with the parameters an API lists.
+"""Row 704 API Documentation : comparing documented parameters with the parameters an API lists.
 
 endpoints is a list of 1..32 (name, params) tuples; docs is a list of 0..32 (name, documented_params) tuples.
 Names and parameter names are 1..30 characters of a-z, 0-9 and underscore starting with a letter (ASCII only).

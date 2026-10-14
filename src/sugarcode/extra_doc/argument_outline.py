@@ -1,4 +1,4 @@
-"""Row 710 Persuasive Writing (PARTIAL): structure check on a supplied outline of labelled paragraphs.
+"""Row 710 Persuasive Writing : structure check on a supplied outline of labelled paragraphs.
 
 outline is a list of 1..50 labels, each exactly "claim", "evidence", "counter", "rebuttal" or "call". Issues
 are (index, kind) sorted by index then kind:

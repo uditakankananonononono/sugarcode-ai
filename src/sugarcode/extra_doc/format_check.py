@@ -1,4 +1,4 @@
-"""Row 708 Code Formatting (PARTIAL): four mechanical layout checks on supplied source lines.
+"""Row 708 Code Formatting : four mechanical layout checks on supplied source lines.
 
 check(lines, max_width, indent) takes 1..500 strings of 0..300 characters with no line breaks, max_width 20..200
 and indent 1..8 (whole numbers). Per line, in this order of kinds:
