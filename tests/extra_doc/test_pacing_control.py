@@ -66,3 +66,15 @@ def test_isolated_preflight_guards_with_otherwise_valid_inputs():
         pacing_control([('a',1,1)]*7,[1]*7,7)
     assert pacing_control([('a',1,8)],[1],1)['durations']==[1]
     assert pacing_control([('a',1,8)],[8],8)['durations']==[8]
+
+
+def test_total_and_empty_preflight_exact_precedence():
+    for total in (0,49):
+        with pytest.raises(ValueError,match='^integer cap or range exceeded$'):
+            pacing_control([('a',1,8)],[1],total)
+    assert pacing_control([('a',8,8)]*6,[8]*6,48)['durations']==[8]*6
+    with pytest.raises(ValueError,match='^beat cap 1..6 required$'):
+        pacing_control([],[],1)
+    with pytest.raises(ValueError,match='^integer cap or range exceeded$'):
+        pacing_control([('a',1,9)],[1],9)
+    assert pacing_control([('a',1,8)],[1],8)['durations']==[8]
