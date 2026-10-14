@@ -2,7 +2,8 @@
 
 Finds a minimum-effort user interaction sequence through supplied states and
 labeled transitions. Returns reachable-state and unreachable-goal diagnostics.
-Ties preserve supplied transition order. Nonnegative effort permits exact
+Ties retain the first-relaxed path in Dijkstra settle order, strict improvement
+only. No lexicographically minimal path claim. Nonnegative effort permits exact
 Dijkstra search with bounded state and transition counts.
 NOT_CLAIMED: engagement or delight validation, visual UI, psychological
 prediction, invented transitions, or autonomous user interaction.

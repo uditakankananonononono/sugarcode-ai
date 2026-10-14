@@ -49,3 +49,30 @@ def test_next_bit(value):
 def test_eighty_character_label_admission():
     label='x'*80
     assert solve([label],[],label,label)['state_path']==[label]
+
+@pytest.mark.parametrize('args,message',[
+ (({'a':1},[],'a','a'),'states and transitions must be lists or tuples'),
+ ((['a'],'x','a','a'),'states and transitions must be lists or tuples'),
+ ((['a'],[('a','x','z',1)],'a','a'),'transition endpoints must be known states'),
+ ((['a'],[('a','x','a')],'a','a'),'transitions must have source action destination effort'),
+ ((['a'],[('a','x','a',1,2)],'a','a'),'transitions must have source action destination effort'),
+ ((['a'],[],'z','a'),'start and goal must be known states'),
+ ((['a'],[],'a','z'),'start and goal must be known states'),
+])
+def test_remaining_declared_validation(args,message):
+    with pytest.raises((ValueError,TypeError)) as exc:solve(*args)
+    assert str(exc.value)==message
+
+
+def test_unsettled_source_not_relaxed_until_reachable_and_settled():
+    edges=[('b','unreachable shortcut','c',0),('a','real path','c',5)]
+    r=solve(['a','b','c'],edges,'a','c')
+    assert r['transition_indices']==[1] and r['total_effort']==5
+    assert r['reachable_states']==['a','c']
+
+
+def test_first_relaxed_tie_not_lexicographic_path_promise():
+    edges=[('a','later settle','b',2),('a','earlier settle','c',1),
+           ('c','finish first','d',2),('b','finish later','d',1)]
+    r=solve(['a','b','c','d'],edges,'a','d')
+    assert r['transition_indices']==[1,2] and r['total_effort']==3
