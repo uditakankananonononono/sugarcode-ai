@@ -15,7 +15,7 @@ If equal, the counter resets. Then dropped = max(0, load - count * capacity) for
 The result gives "history" (the count after each tick), "dropped" (per tick), "total_dropped",
 "scale_ups" and "scale_downs" (ticks on which the count rose or fell), and "peak" (largest count).
 
-Scope: PARTIAL for the Auto-Scaling line. One fixed policy on a plain list of numbers. No cloud, no
+Scope: bounded for the Auto-Scaling line. One fixed policy on a plain list of numbers. No cloud, no
 cost, no startup delay, no real service.
 
 Not claimed: that this adjusts any real capacity, that the policy is a good one, that a load list

@@ -12,7 +12,7 @@ f + 1; with none or with two answers at f + 1 there is no decision (None). The r
 answers given when there is no decision), and "masked" (a decision exists and at least one replica
 crashed or dissented).
 
-Scope: PARTIAL for the Fault Tolerance line. One vote over supplied answers. No real failure
+Scope: bounded for the Fault Tolerance line. One vote over supplied answers. No real failure
 detection, no retry, no recovery, no timing, no real system.
 
 Not claimed: that this makes any system fault tolerant, that f faults of a real kind are covered, that
