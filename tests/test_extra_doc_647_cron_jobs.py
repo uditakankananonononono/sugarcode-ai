@@ -161,6 +161,19 @@ class S(str):
 
 
 def _late(m):
+    e64 = '10' + ',5' * 27 + ' * * * *'
+    assert len(e64) == 64
+    assert m.next_runs(e64, D(2026, 1, 1), 1)['runs'] == [D(2026, 1, 1, 0, 5)]
+    _raises(ValueError, 'expression must be at most 64 characters', m.next_runs, e64 + ' ', D(2026, 1, 1), 1)
+    assert m.next_runs('0 0 */29 2 3', D(2013, 1, 31), 1) == {'runs': [], 'exhausted': True}
+    assert m.next_runs('0 0 */29 2 3', D(2013, 2, 1), 1) == {'runs': [D(2017, 2, 1)], 'exhausted': False}
+    assert m.next_runs('*/1 * * * *', D(2026, 1, 1), 2)['runs'] == [D(2026, 1, 1, 0, 1), D(2026, 1, 1, 0, 2)]
+    for expr in ('* * */31 * *', '* * * */12 *'):
+        assert m.next_runs(expr, D(2026, 1, 1), 1)['runs']
+    for expr in ('* * */32 * *', '* * */33 * *', '* * * */13 *', '* * * */14 *'):
+        _raises(ValueError, 'invalid cron field', m.next_runs, expr, D(2026, 1, 1), 1)
+    assert m.next_runs('10-12 11 * * *', D(2026, 10, 14, 10, 0), 4)['runs'] == [
+        D(2026, 10, 14, 11, 10), D(2026, 10, 14, 11, 11), D(2026, 10, 14, 11, 12), D(2026, 10, 15, 11, 10)]
     _raises(TypeError, 'expression must be a string', m.next_runs, S('* * * * *'), D(2026, 1, 1), 1)
     class DT(datetime.datetime):
         pass
@@ -173,6 +186,8 @@ def battery(m):
     _late(m)
 
 MUTANTS = [
+    ('range(1462)', 'range(1463)'), ('len(expression) > 64', 'len(expression) >= 64'),
+    ('_num(part[2:], 1, hi - lo + 1)', '_num(part[2:], 1, hi + lo + 1)'), ('_num(part[2:], 1, hi - lo + 1)', '_num(part[2:], 2, hi - lo + 1)'),
     ('type(expression) is not str', 'not isinstance(expression, str)'),
     ('type(start) is not datetime.datetime', 'not isinstance(start, datetime.datetime)'),
     ('cand > floor', 'cand >= floor'), ('(day.weekday() + 1) % 7', 'day.weekday()'),
