@@ -93,3 +93,18 @@ def test_two_arm_alpha_changes_choice_and_inputs_untouched():
     assert contextual_bandit(2,rows,[1],alpha=0)['chosen_arm']==0
     assert contextual_bandit(2,rows,[1],alpha=2)['chosen_arm']==1
     assert rows==before
+
+
+def test_exact_refusal_schema_and_scalar_boundaries():
+    with pytest.raises(ValueError,match='integer budget exceeded'):
+        contextual_bandit(2,[],[1],ridge=0)
+    assert contextual_bandit(2,[],[1],ridge=1)['bonus_squared']==[1,1]
+    for row in [None,'abc',{},(0,[1]),(0,[1],1,2)]:
+        with pytest.raises(ValueError,match='feedback row requires arm/context/reward'):
+            contextual_bandit(2,[row],[1])
+    for row in [(0,[1001],0),(0,[-1001],0),(0,[1],1001),(0,[1],-1001)]:
+        with pytest.raises(ValueError,match='integer budget exceeded'):
+            contextual_bandit(2,[row],[1])
+    for x,y in [(1000,1000),(-1000,-1000),(1000,-1000),(-1000,1000)]:
+        r=contextual_bandit(2,[(0,[x],y)],[1],ridge=1,alpha=0)
+        assert r['weights'][0]==[F(x*y,1+x*x)]
