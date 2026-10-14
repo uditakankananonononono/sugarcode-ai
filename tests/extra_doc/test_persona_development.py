@@ -72,11 +72,11 @@ def test_caps_n_and_n_plus_1():
     refuses(ValueError, NA, r1, list('wxyzq'))
     refuses(ValueError, NA, r1, [])
     assert bp([{'a' * 40: 'v' * 40}], ['a' * 40])['persona']['a' * 40]['value'] == 'v' * 40
-    refuses(ValueError, 'attribute names must be 1 to 40 characters', [{'a': 'v'}], ['a' * 41])
-    refuses(ValueError, 'attribute names must be 1 to 40 characters', [{'a': 'v'}], [''])
-    refuses(ValueError, 'attribute values must be 1 to 40 characters', [{'a': 'v' * 41}], ['a'])
-    refuses(ValueError, 'attribute values must be 1 to 40 characters', [{'a': ''}], ['a'])
-    refuses(ValueError, 'attribute values must be 1 to 40 characters', [{'a': 'v'}, {'a': ''}], ['a'])
+    refuses(ValueError, 'attribute names must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}], ['a' * 41])
+    refuses(ValueError, 'attribute names must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}], [''])
+    refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v' * 41}], ['a'])
+    refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': ''}], ['a'])
+    refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}, {'a': ''}], ['a'])
     refuses(ValueError, UA, r1, ['w', 'w'])
     refuses(ValueError, 'record is missing attribute y', [{'x': 'v'}], ['x', 'y'])
     refuses(ValueError, 'record is missing attribute y', [{'x': 'v', 'y': 'v'}, {'x': 'v'}], ['x', 'y'])
@@ -113,3 +113,11 @@ def test_check_order():
     refuses(TypeError, RD, [5], ['a'])
     refuses(ValueError, 'record is missing attribute a', [{}], ['a'])
     refuses(TypeError, 'attribute values must be str', [{'a': 1}], ['a'])
+
+
+def test_non_ascii_witnesses():
+    for ch in ('\x00', '\n', '\x7f', '\x85', '\u200b', '\ue000', '\ud800', '\u0378'):
+        refuses(ValueError, 'attribute names must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}], ['a' + ch])
+        refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v' + ch}], ['a'])
+        refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}, {'a': ch}], ['a'])
+    assert bp([{'a': 'caf\u00e9 \u4e2d \U0001f600'}], ['a'])['persona']['a']['value'] == 'caf\u00e9 \u4e2d \U0001f600'

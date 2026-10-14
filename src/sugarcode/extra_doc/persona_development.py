@@ -3,19 +3,20 @@
 Records are dicts of attribute to value that the caller already holds. For each
 chosen attribute the persona takes the most common value (first appearance wins
 ties) with its count and exact share of all records. 1 to 40 records, 1 to 4
-attributes, names and values are strings of 1 to 40 characters. Caps are
+attributes, names and values are strings of 1 to 40 characters with no control, format, private-use, surrogate or unassigned characters. Caps are
 implementation choices.
 NOT_CLAIMED: that records are accurate or representative, that a real user
 matches the persona, demand, behavior, research validity or deployment.
 """
+import unicodedata
 from fractions import Fraction
 
 
 def _s(v, what):
     if type(v) is not str:
         raise TypeError(what + ' must be str')
-    if not 1 <= len(v) <= 40:
-        raise ValueError(what + ' must be 1 to 40 characters')
+    if not 1 <= len(v) <= 40 or any(unicodedata.category(c)[0] == 'C' for c in v):
+        raise ValueError(what + ' must be 1 to 40 characters without control or unassigned characters')
     return v
 
 
