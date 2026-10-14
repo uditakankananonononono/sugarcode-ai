@@ -139,4 +139,64 @@ def test_precision_is_50_digits_and_context_not_polluted():
     r = t.stack_up([(1, "1", None, 1), (1, "1", None, 1)])  # half-widths 1 and 1, rss = sqrt(2), mid = 2
     assert r["rss_max"] == D("3.4142135623730950488016887242096980785696718753769")
     assert decimal.getcontext().prec == before == 28
-    assert t.limits("1.23456789012345678901234567890123456789", 0)["min"] == D("1.23456789012345678901234567890123456789")
+    assert t.limits("1.23456789012345678901", 0)["min"] == D("1.23456789012345678901")
+
+
+def test_decimal_places_bound_and_exactness():
+    assert t.MAX_DECIMAL_PLACES == 20
+    ok = "1." + "0" * 19 + "1"          # 20 places
+    r = t.limits(ok, 0)
+    assert r["min"] == r["max"] == D(ok) and r["nominal"] == D(ok)
+    r = t.limits(ok, "0." + "0" * 19 + "1")
+    assert r["max"] == D("1.00000000000000000002") and r["min"] == D("1")
+    for bad in ["1." + "0" * 59 + "1", "1." + "0" * 20 + "1", "0." + "0" * 20 + "1", "-1." + "0" * 20 + "5"]:
+        with pytest.raises(ValueError, match="nominal: more than 20 decimal places"):
+            t.limits(bad, 0)
+    with pytest.raises(ValueError, match="plus: more than 20 decimal places"):
+        t.limits(1, "0." + "0" * 20 + "1")
+    with pytest.raises(ValueError, match="minus: more than 20 decimal places"):
+        t.limits(1, 0, "0." + "0" * 20 + "1")
+    with pytest.raises(ValueError, match="nominal: more than 20 decimal places"):
+        t.limits(1e-21, 0)
+    assert t.limits(1e-20, 0)["nominal"] == D("1e-20")
+    assert t.limits("1." + "0" * 40, 0)["nominal"] == 1      # trailing zeros do not count
+    assert t.limits("0." + "0" * 40, 0)["nominal"] == 0
+    assert t.limits("1.5e-3", 0)["nominal"] == D("0.0015")
+    assert t.limits("1e-20", 0)["min"] == D("1e-20")
+    with pytest.raises(ValueError, match="more than 20 decimal places"):
+        t.limits("1e-21", 0)
+    assert t.limits("12e+3", 0)["nominal"] == 12000
+
+
+def test_exactness_against_fraction_oracle_at_20_places():
+    from fractions import Fraction
+    rnd = random.Random(12)
+    for _ in range(100):
+        n = "%d.%020d" % (rnd.randint(-999, 999), rnd.randint(0, 10 ** 20 - 1))
+        p = "0.%020d" % rnd.randint(0, 10 ** 20 - 1)
+        m = "0.%020d" % rnd.randint(0, 10 ** 20 - 1)
+        r = t.limits(n, p, m)
+        fn = Fraction(n)
+        assert Fraction(r["max"]) == fn + Fraction(p) and Fraction(r["min"]) == fn - Fraction(m)
+        assert Fraction(r["band"]) == Fraction(p) + Fraction(m)
+        h = t.fit(n, p, m, n, m, p)
+        assert Fraction(h["min_clearance"]) == (fn - Fraction(m)) - (fn + Fraction(m))
+        assert Fraction(h["max_clearance"]) == (fn + Fraction(p)) - (fn - Fraction(p))
+
+
+def test_trailing_zero_boundary_of_decimal_places():
+    assert t.limits("0.12345678901234567890" + "0", 0)["nominal"] == D("0.1234567890123456789")   # 21 digits, 19 real
+    assert t.limits("0.12345678901234567891" + "0", 0)["nominal"] == D("0.12345678901234567891")  # 22 chars, 20 real
+    with pytest.raises(ValueError, match="more than 20 decimal places"):
+        t.limits("0.12345678901234567891" + "00" + "1", 0)
+    with pytest.raises(ValueError, match="more than 20 decimal places"):
+        t.limits("0.123456789012345678901" + "0", 0)      # 22 places, last is zero, 21 real
+    with pytest.raises(ValueError, match="more than 20 decimal places"):
+        t.limits("0.1234567890123456789010", 0)
+    assert t.limits("0.00000000000000000010", 0)["nominal"] == D("1E-19")
+
+
+def test_two_digit_coefficient_with_trailing_zero_at_boundary():
+    assert t.limits("0.000000000000000000010", 0)["nominal"] == D("1E-20")   # 21 places written, 20 real
+    with pytest.raises(ValueError, match="more than 20 decimal places"):
+        t.limits("0.0000000000000000000010", 0)                               # 22 written, 21 real

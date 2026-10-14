@@ -1,15 +1,28 @@
 """Row 321 technical drawing (PARTIAL): tolerance arithmetic for dimensioned features.
 
-Exact Decimal limits for nominal +/- tolerance, a worst-case and a root-sum-square stack-up over a chain of signed
-dimensions, and hole/shaft fit classification. Not a drawing, not a standards check (no ISO or ASME conformance),
+Decimal limits for nominal +/- tolerance, a worst-case and a root-sum-square stack-up over a chain of signed
+dimensions, and hole/shaft fit classification. Inputs are limited to 20 decimal places so limits, worst-case sums
+and fits are exact; the RSS uses a square root rounded to 50 significant digits. Not a drawing, not a standards check (no ISO or ASME conformance),
 no manufacturing or safety claim."""
 from decimal import Decimal, localcontext
 import math
 
 MAX_CHAIN = 50
+MAX_DECIMAL_PLACES = 20
 STATUS_NOTE = ("PARTIAL: nominal-and-tolerance arithmetic with worst-case and RSS stack-up and fit classification; "
                "no drawing standard conformance and no manufacturing or safety claim")
 PREC = 50
+
+
+def _places(d):
+    sign, digits, exp = d.as_tuple()
+    digits = list(digits)
+    while len(digits) > 1 and digits[-1] == 0:
+        digits.pop()
+        exp += 1
+    if digits == [0]:
+        return 0
+    return max(0, -exp)
 
 
 def _num(v, name, lo, hi):
@@ -26,6 +39,8 @@ def _num(v, name, lo, hi):
         raise ValueError(f"{name}: finite number required")
     if abs(d) > Decimal(10) ** 9:
         raise ValueError(f"{name}: magnitude above 1e9")
+    if _places(d) > MAX_DECIMAL_PLACES:
+        raise ValueError(f"{name}: more than {MAX_DECIMAL_PLACES} decimal places")
     if not lo <= d <= hi:
         raise ValueError(f"{name}: must be within [{lo}, {hi}]")
     return d
