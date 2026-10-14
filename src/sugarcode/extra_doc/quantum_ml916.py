@@ -1,6 +1,6 @@
 """Quantum Machine Learning - Combines quantum and ML.
 
-PARTIAL: one-qubit variational classifier trained with exact parameter-shift
+PARTIAL: one-qubit variational classifier trained with parameter-shift
 loss gradients using classical circuit expectations. No hardware, quantum
 advantage or general-purpose machine learning platform.
 """
@@ -8,7 +8,13 @@ from math import cos, sin, pi, isfinite
 
 
 def _real(x):
-    if type(x) not in (int, float) or not isfinite(x):
+    if type(x) not in (int, float):
+        raise ValueError('finite built-in real required')
+    if type(x) is float and not isfinite(x):
+        raise ValueError('finite built-in real required')
+    if abs(x) > 1e6:
+        raise ValueError('real magnitude must be <=1e6')
+    if not isfinite(x):
         raise ValueError('finite built-in real required')
 
 
@@ -22,18 +28,19 @@ def _data(features, labels):
 
 
 def probability(feature, theta):
-    """P(1) for |0> -> Ry(feature) -> Ry(theta) -> Z measurement."""
+    """P(1), |feature| and |theta| <=1e6, for |0> -> Ry(feature) -> Ry(theta) -> Z measurement."""
     _real(feature); _real(theta)
     return (1-cos(feature+theta))/2
 
 
 def loss_gradient(features, labels, theta):
-    """Mean squared probability loss and exact chain-rule parameter-shift gradient."""
+    """Mean squared probability loss and double-precision chain-rule parameter-shift gradient."""
     _data(features, labels); _real(theta)
     loss = gradient = 0.0
     for x, y in zip(features, labels):
         p = probability(x, theta)
-        derivative = (probability(x, theta+pi/2)-probability(x, theta-pi/2))/2
+        # Internal parameter shifts may cross the public theta bound.
+        derivative = ((1-cos(x+theta+pi/2))/2-(1-cos(x+theta-pi/2))/2)/2
         loss += (p-y)**2
         gradient += 2*(p-y)*derivative
     return loss/len(features), gradient/len(features)

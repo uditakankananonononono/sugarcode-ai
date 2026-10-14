@@ -152,3 +152,28 @@ def test_default_learning_rate_contract():
 
 # unittest also runs the pin; pytest can run its top-level form.
 QuantumTests.test_default_learning_rate_contract = lambda self: test_default_learning_rate_contract()
+
+def test_magnitude_policy():
+    for value in (1e6,-1e6):
+        b.probability(value,0);b.probability(0,value)
+        b.loss_gradient([value],[0],0);b.fit([0],[0],theta=value,steps=0)
+    for value in (1e6+1,-1e6-1,1e100,1e308,10**10000):
+        for fn,args in [(b.probability,(value,0)),(b.probability,(0,value)),(b.loss_gradient,([value],[1],0)),(b.fit,([0],[0],value))]:
+            try:fn(*args)
+            except ValueError as error:assert str(error)=='real magnitude must be <=1e6'
+            else:raise AssertionError('oversized value accepted')
+    for value in (1e308,1e100,10**10000,complex(1e308,1e308)):
+        for amplitudes in ((value,0),(0,value)):
+            try:a.recover_bit_flip(*amplitudes,[0]*3)
+            except ValueError as error:assert str(error)=='amplitudes must have unit norm'
+            else:raise AssertionError('oversized amplitude accepted')
+QuantumTests.test_magnitude_policy=lambda self:test_magnitude_policy()
+
+def amplitude_component_boundaries(self):
+    for alpha,beta in ((1j,0),(-1j,0),(0,1j),(0,-1j),(1,0),(-1,0)):
+        out=a.recover_bit_flip(alpha,beta,[0,0,0])
+        self.assertEqual(out['fidelity'],1)
+    for value in (1.01,1.5,complex(0,1.01),complex(0,1.5)):
+        with self.assertRaises(ValueError) as caught:a.recover_bit_flip(value,0,[0,0,0])
+        self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
+QuantumTests.test_amplitude_component_boundaries=amplitude_component_boundaries

@@ -1,6 +1,6 @@
 """Quantum Error Correction - Handles decoherence.
 
-PARTIAL: exact three-qubit repetition-code correction of bit flips, including
+PARTIAL: double-precision three-qubit repetition-code correction of bit flips, including
 coherent superpositions through density-matrix recovery. No correction of phase
 errors, arbitrary decoherence, fault-tolerant gates or physical hardware.
 """
@@ -16,14 +16,18 @@ def recover_bit_flip(alpha, beta, probabilities):
     probability and fidelity to the supplied pure state. Failure is >=2 flips.
     """
     for a in (alpha, beta):
-        if type(a) not in (int, float, complex) or not isfinite(a.real) or not isfinite(a.imag):
+        if type(a) not in (int, float, complex):
+            raise ValueError('amplitudes must be finite built-in numbers')
+        if abs(a.real) > 1 or abs(a.imag) > 1:
+            raise ValueError('amplitudes must have unit norm')
+        if not isfinite(a.real) or not isfinite(a.imag):
             raise ValueError('amplitudes must be finite built-in numbers')
     if abs(abs(alpha)**2 + abs(beta)**2 - 1) > 1e-12:
         raise ValueError('amplitudes must have unit norm')
     if type(probabilities) not in (tuple, list) or len(probabilities) != 3:
         raise ValueError('three flip probabilities required')
     for p in probabilities:
-        if type(p) not in (int, float) or not isfinite(p) or not 0 <= p <= 1:
+        if type(p) not in (int, float) or not 0 <= p <= 1 or not isfinite(p):
             raise ValueError('probabilities must be finite built-in reals in [0,1]')
     syndromes = [0.0]*4
     failure = 0.0
