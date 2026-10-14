@@ -169,8 +169,8 @@ def _late(m):
     RT = 'ratings must be a list or tuple'
     RS = 'ratings must contain at most max_ratings entries'
     RP = 'each rating must be a (rater, ratee, score) triple'
-    RA = 'each rater must be a string of 1 to 12 characters'
-    RE = 'each ratee must be a string of 1 to 12 characters'
+    RA = 'each rater must be an ASCII string of 1 to 12 characters'
+    RE = 'each ratee must be an ASCII string of 1 to 12 characters'
     SC = 'score must be a nonbool integer between 1 and 5'
     SF = 'a person may not rate themself'
     DP = 'each rater may rate a person once'
@@ -184,7 +184,7 @@ def _late(m):
     for bad in ('ab', None, 5, ('a', 'b'), ('a', 'b', 1, 1), (), {'a': 1}, L(['a', 'b', 1]), T(('a', 'b', 1))):
         _raises(ValueError, RP, f, [bad])
         _raises(ValueError, RP, f, [('a', 'b', 1), bad])
-    for bad in ('', 'x' * 13, None, 5, True, S('a'), LyingS('a'), b'a', ['a']):
+    for bad in ('', 'x' * 13, None, 5, True, S('a'), LyingS('a'), b'a', ['a'], '\u00e9', 'caf\u00e9', 'a\u00e9', '\u4e2d', '\u0661'):
         _raises(ValueError, RA, f, [(bad, 'b', 1)])
         _raises(ValueError, RA, f, [('a', 'b', 1), (bad, 'b', 1)])
         _raises(ValueError, RE, f, [('a', bad, 1)])
@@ -193,6 +193,7 @@ def _late(m):
         _raises(ValueError, SC, f, [('a', 'b', bad)])
         _raises(ValueError, SC, f, [('a', 'b', 1), ('c', 'b', bad)])
     f([('a', 'b', 5)])
+    f([('A~ z', 'b 9', 5)])
     _raises(ValueError, SF, f, [('a', 'a', 1)])
     _raises(ValueError, SF, f, [('a', 'b', 1), ('c', 'c', 1)])
     _raises(ValueError, DP, f, [('a', 'b', 1), ('a', 'b', 2)])
@@ -231,19 +232,21 @@ MUTANTS = [
     ("type(r) not in (list, tuple) or len(r) != 3", "not isinstance(r, (list, tuple)) or len(r) != 3"),
     ("type(r) not in (list, tuple) or len(r) != 3", "type(r) not in (list, tuple) or len(r) > 3"),
     ("type(r) not in (list, tuple) or len(r) != 3", "type(r) not in (list, tuple) or len(r) < 3"),
-    ("type(rater) is not str or not 1 <= len(rater) <= 12", "not isinstance(rater, str) or not 1 <= len(rater) <= 12"),
-    ("type(rater) is not str or not 1 <= len(rater) <= 12", "type(rater) is not str or not 0 <= len(rater) <= 12"),
-    ("type(rater) is not str or not 1 <= len(rater) <= 12", "type(rater) is not str or not 1 <= len(rater) < 12"),
-    ("type(rater) is not str or not 1 <= len(rater) <= 12", "type(rater) is not str or not 1 <= len(rater) <= 13"),
-    ("type(ratee) is not str or not 1 <= len(ratee) <= 12", "not isinstance(ratee, str) or not 1 <= len(ratee) <= 12"),
-    ("type(ratee) is not str or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not 0 <= len(ratee) <= 12"),
-    ("type(ratee) is not str or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not 1 <= len(ratee) < 12"),
-    ("type(ratee) is not str or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not 1 <= len(ratee) <= 13"),
+    ("type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 12", "not isinstance(rater, str) or not rater.isascii() or not 1 <= len(rater) <= 12"),
+    ("type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 12", "type(rater) is not str or not rater.isascii() or not 0 <= len(rater) <= 12"),
+    ("type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 12", "type(rater) is not str or not rater.isascii() or not 1 <= len(rater) < 12"),
+    ("type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 12", "type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 13"),
+    ("type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 12", "not isinstance(ratee, str) or not ratee.isascii() or not 1 <= len(ratee) <= 12"),
+    ("type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not ratee.isascii() or not 0 <= len(ratee) <= 12"),
+    ("type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) < 12"),
+    ("type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 13"),
     ("type(score) is not int or not 1 <= score <= 5", "not isinstance(score, int) or not 1 <= score <= 5"),
     ("type(score) is not int or not 1 <= score <= 5", "isinstance(score, bool) or not isinstance(score, int) or not 1 <= score <= 5"),
     ("not 1 <= score <= 5", "not 0 <= score <= 5"),
     ("not 1 <= score <= 5", "not 1 <= score < 5"),
     ("not 1 <= score <= 5", "not 1 <= score <= 6"),
+    ("type(rater) is not str or not rater.isascii() or not 1 <= len(rater) <= 12", "type(rater) is not str or not 1 <= len(rater) <= 12"),
+    ("type(ratee) is not str or not ratee.isascii() or not 1 <= len(ratee) <= 12", "type(ratee) is not str or not 1 <= len(ratee) <= 12"),
     ("if rater == ratee:", "if False:"),
     ("if (rater, ratee) in seen:", "if False:"),
     ("if (rater, ratee) in seen:", "if rater in raters:"),
