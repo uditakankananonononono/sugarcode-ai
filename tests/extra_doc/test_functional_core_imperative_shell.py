@@ -179,3 +179,8 @@ def test_pin(exc, msg, f, c, e):
 @pytest.mark.parametrize('exc,msg,f,c,e', _collect(_order))
 def test_order(exc, msg, f, c, e):
     err(exc, msg, f, c, e)
+
+
+def test_tainted_is_sorted_not_walk_order():
+    r = cp([('b', 'core'), ('a', 'core')], [('b', 'a')], ['a'])
+    assert r == {'core_calls_shell': [], 'core_effects': ['a'], 'tainted': ['a', 'b']}
