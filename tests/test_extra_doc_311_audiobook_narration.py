@@ -46,3 +46,13 @@ def test_errors(args,error,message):
 def test_exact_next_total_sample_refusal_before_content_scan():
     with pytest.raises(ValueError) as exc:solve(['x']*5,[[None]*4096]*4+[[None]])
     assert str(exc.value)=='narration must not exceed 16384 samples'
+
+@pytest.mark.parametrize('args',[('a',[[1]]),(['a'],{0:[1]}),(['a'],'x')])
+def test_outer_container_declared_type_error(args):
+    with pytest.raises(TypeError) as exc:solve(*args)
+    assert str(exc.value)=='texts and segments must be lists or tuples'
+
+@pytest.mark.parametrize('segment',[{1,2},'ab'])
+def test_segment_container_declared_value_error(segment):
+    with pytest.raises(ValueError) as exc:solve(['a'],[segment])
+    assert str(exc.value)=='audio segments must have between 1 and 4096 samples'

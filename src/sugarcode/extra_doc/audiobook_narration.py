@@ -3,6 +3,7 @@
 Assembles supplied mono signed-16-bit spoken segments, inserts requested
 inter-segment silence, and maps each supplied text cue to its sample interval.
 Creates a narration audio timeline, not merely a textual reading plan.
+Caps: 32 segments, 4096 samples per segment, 16384 total samples, 1024 pause.
 NOT_CLAIMED: speech synthesis, voice quality, engaging performance, semantic
 text/audio verification, loudness mastering or autonomous publication.
 """
