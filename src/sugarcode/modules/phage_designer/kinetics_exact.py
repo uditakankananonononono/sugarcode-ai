@@ -16,6 +16,7 @@ with one shared rate; they are not host-range or efficacy predictions.
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 
 CAP = 1e30
 MAX_SITES = 10**9
@@ -36,14 +37,18 @@ def _num(v, name, hi=CAP):
 
 
 def escape_probability_exact(mutation_rate, target_sites, population) -> dict:
-    """P(at least one escape variant): Poisson and (when n is an integer) binomial."""
+    """P(at least one escape variant): Poisson, and binomial when the population N is an integer.
+
+    The binomial value is None unless ``population`` is an integer (or an integer-valued float);
+    L*N being an integer is not enough. ``mu*L*N`` is formed exactly (Fraction) and rounded once.
+    """
     mu = float(_num(mutation_rate, "mutation_rate", 1.0))
     if isinstance(target_sites, bool) or not isinstance(target_sites, int):
         raise ValueError("target_sites must be an integer")
     if not 1 <= target_sites <= MAX_SITES:
         raise ValueError(f"target_sites must be in [1, {MAX_SITES}]")
     pop = _num(population, "population")
-    x = mu * target_sites * float(pop)
+    x = float(Fraction(mu) * target_sites * Fraction(pop))
     poisson = -math.expm1(-x)
     binom = None
     if isinstance(pop, int) or float(pop).is_integer():
@@ -58,7 +63,8 @@ def escape_probability_exact(mutation_rate, target_sites, population) -> dict:
         "escape_probability_poisson": poisson,
         "escape_probability_binomial": binom,
         "expected_escape_variants": x,
-        "model": "1-exp(-mu*L*N) via expm1; binomial 1-(1-mu)^(L*N) via log1p when L*N is an integer",
+        "model": "1-exp(-mu*L*N) via expm1; binomial 1-(1-mu)^(L*N) via log1p "
+             "when population N is an integer (otherwise binomial is None)",
     }
 
 
@@ -70,7 +76,10 @@ def adsorption_exact(phage, bacteria, k_ads, time_min=60) -> dict:
     b = _num(bacteria, "bacteria")
     k = _num(k_ads, "k_ads")
     t = _num(time_min, "time_min")
-    frac = -math.expm1(-float(k) * float(b) * float(t)) if (b and k and t) else 0.0
-    bound = float(p0) * frac
+    # k*b*t and P0*fraction are formed exactly (Fraction) and rounded once: left-to-right float
+    # products flush e.g. 1e-30*1e-300 to 0 before the 1e30 factor can restore it.
+    x = float(Fraction(k) * Fraction(b) * Fraction(t)) if (b and k and t) else 0.0
+    frac = -math.expm1(-x)
+    bound = float(Fraction(p0) * Fraction(frac))
     return {"bound": bound, "free": float(p0) - bound, "adsorbed_fraction": frac,
             "time_min": t, "model": "first-order adsorption, bound=P0*(-expm1(-k*B*t))"}
