@@ -75,3 +75,41 @@ def test_scalar_next_bit_refused(value):
 def test_separate_shape_basis_and_feasibility_errors(args,message):
     with pytest.raises(ValueError) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('budget',[65,0,True,1.0,F(1),None,'1'])
+def test_iteration_parameter_type_and_bounds(budget):
+    with pytest.raises(ValueError) as exc:solve([[1]],[1],[1],[0],budget)
+    assert str(exc.value)=='max_iterations must be a nonbool integer between 1 and 64'
+
+
+def test_exact_cap_first_basis_pricing_tie_and_trace_snapshots():
+    r=solve([[1,0],[0,1],[1,1],[1,1]],[3,3,4,4],[2,2],[0,1],2)
+    assert r['iterations']==2 and r['trace'][0]['priced_column']==2
+    assert r['trace'][0]['active_columns']==[0,1]
+    assert r['trace'][1]['active_columns']==[0,1,2]
+    assert r['general_lp_solver_claimed'] is False
+    # All zero costs: multiple optimal bases, retain first supplied basis.
+    r=solve([[1,0],[0,1],[1,1]],[0,0,0],[1,1],[0,1])
+    assert r['solution']==[1,1,0]
+
+@pytest.mark.parametrize('args,message',[
+ (([[1]],[1],None,[0]),'inputs must be lists or tuples'),
+ (([[1]],[1],[1],None),'inputs must be lists or tuples'),
+ ((['x'],[1],[1],[0]),'column must match row count'),
+])
+def test_container_validation(args,message):
+    with pytest.raises((ValueError,TypeError)) as exc:solve(*args)
+    assert str(exc.value)==message
+
+
+def test_infeasible_nonsingular_active_candidate_skipped():
+    r=solve([[1,0],[0,1],[1,1]],[3,3,4],[1,2],[0,1],2)
+    # Basis(0,2) solves(-1,2),must skip; basis(1,2) gives(1,1).
+    assert r['solution']==[0,1,1] and r['objective']==7
+    assert r['dual']==[1,3]
+
+
+def test_first_optimal_basis_dual_retained_among_degenerate_ties():
+    r=solve([[1,0],[0,1],[1,1]],[3,3,4],[2,2],[0,1])
+    # Both (0,2) and (1,2) optimal; first has dual(3,1),second(1,3).
+    assert r['dual']==[3,1]
