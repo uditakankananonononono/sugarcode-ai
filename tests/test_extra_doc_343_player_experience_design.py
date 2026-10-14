@@ -37,3 +37,9 @@ def test_empty_budget_lower_effort_then_lex_ties_and_caps():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_category_effort_preference_admission_boundaries():
+    assert solve([(7,1000000,1)],1000000)['activity_indices']==[0]
+    r=solve([(7,1,0)],1)
+    assert r['activity_indices']==[] and r['preference_score']==0 and r['feasible_count']==2
