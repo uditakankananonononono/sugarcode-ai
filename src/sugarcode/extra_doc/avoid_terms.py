@@ -1,4 +1,4 @@
-"""Row 720 Diplomatic Language (PARTIAL): find caller-listed words in a text, whole-word and case-insensitive for ASCII.
+"""Row 720 Diplomatic Language : find caller-listed words in a text, whole-word and case-insensitive for ASCII.
 
 text is a str of 0..2000 characters. avoid is a tuple of 1..20 distinct words (after lowercasing), each 1..20
 characters of a-z (ASCII only, lowercase). Words in text are the maximal runs of ASCII letters a-z/A-Z; every

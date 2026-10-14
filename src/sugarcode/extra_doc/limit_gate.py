@@ -1,4 +1,4 @@
-"""Row 722 Boundary Setting (PARTIAL): accept requests in order while a fixed budget lasts, refuse the rest.
+"""Row 722 Boundary Setting : accept requests in order while a fixed budget lasts, refuse the rest.
 
 budget is a whole number 0..10000. requests is a tuple of 0..50 whole numbers, each 1..10000 (the cost of a
 request). Requests are taken in the given order: a request is accepted when its cost is at most what remains,

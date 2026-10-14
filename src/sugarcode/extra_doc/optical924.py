@@ -1,6 +1,6 @@
 """Optical Computing - Light-based processing.
 
-PARTIAL: double-precision coherent-mode Fourier optical processor simulation,
+Bounded: double-precision coherent-mode Fourier optical processor simulation,
 not physical optics, a fabricated photonic accelerator or nonlinear computing.
 """
 from cmath import exp

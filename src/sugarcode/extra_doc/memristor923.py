@@ -1,6 +1,6 @@
 """Memristor Computing - In-memory processing.
 
-PARTIAL: exact-rational passive crossbar matrix-vector multiplication and
+Bounded: exact-rational passive crossbar matrix-vector multiplication and
 bounded linear conductance programming model. Not fabricated memristors,
 measured device behavior, sneak-path simulation or energy-efficiency evidence.
 """

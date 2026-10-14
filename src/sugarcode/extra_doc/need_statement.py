@@ -1,4 +1,4 @@
-"""Row 721 Assertiveness (PARTIAL): check that a statement has the three caller-given parts, each non-blank.
+"""Row 721 Assertiveness : check that a statement has the three caller-given parts, each non-blank.
 
 parts is a tuple of exactly 3 str: (situation, need, request). Each is 1..200 characters, must contain at least
 one ASCII letter or digit, and must not start or end with an ASCII space, tab or newline. The result gives the
