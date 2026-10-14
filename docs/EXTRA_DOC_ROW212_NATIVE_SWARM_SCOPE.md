@@ -1,6 +1,6 @@
 # Row212 Particle Swarm Optimization, native Sugarcode
 
-Exact description: "Optimizes using swarm intelligence".
+Exact description: "Finds optima through collective behavior".
 Source: https://docs.google.com/document/d/1kCtzves_4OGVKUdFUPC0bkvY3jQGnfpeeEJWe1mQ3xY/edit
 
 Standalone exact Fraction synchronous PSO squared-target-distance generation.
