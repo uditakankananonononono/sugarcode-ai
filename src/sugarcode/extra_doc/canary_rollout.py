@@ -14,7 +14,7 @@ STATUS_NOTE = ("PARTIAL: instance-count arithmetic for a supplied rollout plan o
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -23,7 +23,7 @@ def _int(v, name, lo, hi):
 
 def plan(instances, steps):
     instances = _int(instances, "instances", 1, MAX_INSTANCES)
-    if not isinstance(steps, (list, tuple)):
+    if type(steps) not in (list, tuple):
         raise ValueError("steps: list required")
     if not 1 <= len(steps) <= MAX_STEPS:
         raise ValueError(f"steps: 1 to {MAX_STEPS} entries required")
