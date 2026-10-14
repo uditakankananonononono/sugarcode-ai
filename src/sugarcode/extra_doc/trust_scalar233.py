@@ -13,6 +13,8 @@ def optimize(initial,tilt,radius,iterations):
     x=num(initial,-10,10);b=num(tilt,-10,10);delta=num(radius,.001,10)
     if type(iterations) is not int or not 1<=iterations<=30:raise ValueError('strict trust iterations 1..30')
     def loss(v):return (v*v-1)**2+b*v
+    def bounded(*values):
+        if any(max(v.numerator.bit_length(),v.denominator.bit_length())>4096 for v in values):raise ValueError('trust rational size exceeds 4096 bits')
     trace=[];history=[str(loss(x))]
     for t in range(iterations):
         g=4*x*(x*x-1)+b;h=12*x*x-4
@@ -24,6 +26,7 @@ def optimize(initial,tilt,radius,iterations):
         if ratio<F(1,4):delta=delta/4
         elif ratio>F(3,4) and abs(step)==old:delta=min(2*delta,F(10))
         if accepted:x+=step
+        bounded(x,g,h,step,predicted,actual,ratio,old,delta,loss(x))
         trace.append({'initial_radius_fraction':str(old),'gradient_fraction':str(g),'hessian_fraction':str(h),'step_fraction':str(step),'predicted_reduction_fraction':str(predicted),
                       'actual_reduction_fraction':str(actual),'ratio_fraction':str(ratio),'accepted':accepted,'point_fraction':str(x),'next_radius_fraction':str(delta)})
         history.append(str(loss(x)))

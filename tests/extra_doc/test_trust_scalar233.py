@@ -58,3 +58,14 @@ def test_exact_ratio_thresholds_and_shrink_threshold_gap():
     s=optimize(-1,7.296,.8,1)['steps'][0];assert s['ratio_fraction']=='1/4' and s['next_radius_fraction']=='4/5'
     s=optimize(-.6,4.14,1.1,1)['steps'][0];assert s['ratio_fraction']=='23/100' and s['next_radius_fraction']=='11/40'
     s=optimize(-1.2,8.096,.4,1)['steps'][0];assert s['ratio_fraction']=='3/4' and s['next_radius_fraction']=='2/5'
+
+
+def test_bounded_rational_size_explicit_failure_before_serialization():
+    with pytest.raises(ValueError,match='^trust rational size exceeds 4096 bits$'):optimize(2,0,1,10)
+    with pytest.raises(ValueError,match='^trust rational size exceeds 4096 bits$'):optimize(2,0,1,30)
+
+
+def test_acceptance_fraction_strictly_between_tenth_and_ninth():
+    s=optimize(1,2.6,6.6,4)['steps'][3]
+    assert s['ratio_fraction']=='1066749236435/10011991682234'
+    assert F(1,10)<F(s['ratio_fraction'])<=F(1,9) and s['accepted']
