@@ -37,3 +37,9 @@ def test_manhattan_tie_and_caps():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_zero_weight_resident_contributes_nothing():
+    r=solve([(0,0),(10,0)],[0,1],[(0,0),(10,0)],1)
+    assert r['facility_indices']==[1] and r['resident_distances']==[10,0]
+    assert r['weighted_distance']==0
