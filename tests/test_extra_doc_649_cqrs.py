@@ -37,7 +37,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -45,6 +45,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -152,9 +153,20 @@ def _late(m):
     _raises(ValueError, 'amount must be a nonbool integer between 1 and 1000000', m.run_cqrs, [ok] * 49 + [('deposit', 'a', 1000001)])
 
 
+def _sym(m):
+    OUT = 'commands must be a list or tuple'
+    ROW = 'each command must be an (operation, account, amount) triple'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.run_cqrs, K([('deposit', 'a', 1)]))
+        _raises(ValueError, ROW, m.run_cqrs, [K(('deposit', 'a', 1))])
+        _raises(ValueError, ROW, m.run_cqrs, [('deposit', 'a', 1), K(('deposit', 'a', 1))])
+        _raises(ValueError, ROW, m.run_cqrs, [K(('deposit', 'a', 1)), ('deposit', 'a', 1)])
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(commands) not in (list, tuple)', 'not isinstance(commands, (list, tuple))'),
