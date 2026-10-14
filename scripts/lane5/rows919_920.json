@@ -1,0 +1,2120 @@
+{
+  "suite": "test_quantum_rows919_920.py",
+  "mutants": [
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-0",
+      "start": 377,
+      "end": 380,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-1",
+      "start": 377,
+      "end": 380,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-2",
+      "start": 391,
+      "end": 394,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-3",
+      "start": 391,
+      "end": 394,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-4",
+      "start": 398,
+      "end": 415,
+      "old": "1.959963984540054",
+      "new": "2.959963984540054"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L10-value-5",
+      "start": 398,
+      "end": 415,
+      "old": "1.959963984540054",
+      "new": "0.959963984540054"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-op-6",
+      "start": 1024,
+      "end": 1066,
+      "old": "not 1<=shots<=10**12 or not 0<=ones<=shots",
+      "new": "not 1 <= shots <= 10 ** 12 and (not 0 <= ones <= shots)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-op-7",
+      "start": 1330,
+      "end": 1396,
+      "old": "not 1e-12<=interrogation<=1e12 or not 0<contrast<=1 or not 0<z<=10",
+      "new": "not 1e-12 <= interrogation <= 1000000000000.0 and (not 0 < contrast <= 1) and (not 0 < z <= 10)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L29-op-8",
+      "start": 1475,
+      "end": 1485,
+      "old": "ones/shots",
+      "new": "ones * shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L30-op-9",
+      "start": 1496,
+      "end": 1507,
+      "old": "1+z*z/shots",
+      "new": "1 - z * z / shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-op-10",
+      "start": 1519,
+      "end": 1542,
+      "old": "(p+z*z/(2*shots))/denom",
+      "new": "(p + z * z / (2 * shots)) * denom"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-11",
+      "start": 1552,
+      "end": 1599,
+      "old": "z*sqrt(p*(1-p)/shots+z*z/(4*shots*shots))/denom",
+      "new": "z * sqrt(p * (1 - p) / shots + z * z / (4 * shots * shots)) * denom"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L20-ops-12",
+      "start": 932,
+      "end": 954,
+      "old": "type(value) is not int",
+      "new": "type(value) is int"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L25-op-13",
+      "start": 1195,
+      "end": 1248,
+      "old": "type(value) not in (int,float) or not isfinite(value)",
+      "new": "type(value) not in (int, float) and (not isfinite(value))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L30-value-14",
+      "start": 1496,
+      "end": 1497,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L30-value-15",
+      "start": 1496,
+      "end": 1497,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L30-op-16",
+      "start": 1498,
+      "end": 1507,
+      "old": "z*z/shots",
+      "new": "z * z * shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-op-17",
+      "start": 1520,
+      "end": 1535,
+      "old": "p+z*z/(2*shots)",
+      "new": "p - z * z / (2 * shots)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-18",
+      "start": 1552,
+      "end": 1593,
+      "old": "z*sqrt(p*(1-p)/shots+z*z/(4*shots*shots))",
+      "new": "z / sqrt(p * (1 - p) / shots + z * z / (4 * shots * shots))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-value-19",
+      "start": 1612,
+      "end": 1613,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-value-20",
+      "start": 1612,
+      "end": 1613,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-op-21",
+      "start": 1614,
+      "end": 1625,
+      "old": "center-half",
+      "new": "center + half"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-value-22",
+      "start": 1636,
+      "end": 1637,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-value-23",
+      "start": 1636,
+      "end": 1637,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L33-op-24",
+      "start": 1638,
+      "end": 1649,
+      "old": "center+half",
+      "new": "center - half"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L36-op-25",
+      "start": 1752,
+      "end": 1778,
+      "old": "acos(cosine)/interrogation",
+      "new": "acos(cosine) * interrogation"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-op-26",
+      "start": 1853,
+      "end": 1867,
+      "old": "(1-contrast)/2",
+      "new": "(1 - contrast) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-ops-27",
+      "start": 1979,
+      "end": 1990,
+      "old": "contrast==1",
+      "new": "contrast != 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-op-28",
+      "start": 1959,
+      "end": 1975,
+      "old": "interrogation**2",
+      "new": "interrogation * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-29",
+      "start": 2013,
+      "end": 2087,
+      "old": "contrast**2*interrogation**2*(1-cosphase*cosphase)/(4*model_p*(1-model_p))",
+      "new": "contrast ** 2 * interrogation ** 2 * (1 - cosphase * cosphase) * (4 * model_p * (1 - model_p))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L45-ops-30",
+      "start": 2295,
+      "end": 2305,
+      "old": "p!=model_p",
+      "new": "p == model_p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-ops-31",
+      "start": 1028,
+      "end": 1044,
+      "old": "1<=shots<=10**12",
+      "new": "1 < shots <= 10 ** 12"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-ops-32",
+      "start": 1028,
+      "end": 1044,
+      "old": "1<=shots<=10**12",
+      "new": "1 <= shots < 10 ** 12"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-ops-33",
+      "start": 1052,
+      "end": 1066,
+      "old": "0<=ones<=shots",
+      "new": "0 < ones <= shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-ops-34",
+      "start": 1052,
+      "end": 1066,
+      "old": "0<=ones<=shots",
+      "new": "0 <= ones < shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L25-ops-35",
+      "start": 1195,
+      "end": 1225,
+      "old": "type(value) not in (int,float)",
+      "new": "type(value) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-36",
+      "start": 1334,
+      "end": 1360,
+      "old": "1e-12<=interrogation<=1e12",
+      "new": "1e-12 < interrogation <= 1000000000000.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-37",
+      "start": 1334,
+      "end": 1360,
+      "old": "1e-12<=interrogation<=1e12",
+      "new": "1e-12 <= interrogation < 1000000000000.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-38",
+      "start": 1368,
+      "end": 1381,
+      "old": "0<contrast<=1",
+      "new": "0 <= contrast <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-39",
+      "start": 1368,
+      "end": 1381,
+      "old": "0<contrast<=1",
+      "new": "0 < contrast < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-40",
+      "start": 1389,
+      "end": 1396,
+      "old": "0<z<=10",
+      "new": "0 <= z <= 10"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-ops-41",
+      "start": 1389,
+      "end": 1396,
+      "old": "0<z<=10",
+      "new": "0 < z < 10"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L30-op-42",
+      "start": 1498,
+      "end": 1501,
+      "old": "z*z",
+      "new": "z / z"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-op-43",
+      "start": 1522,
+      "end": 1535,
+      "old": "z*z/(2*shots)",
+      "new": "z * z * (2 * shots)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-op-44",
+      "start": 1854,
+      "end": 1864,
+      "old": "1-contrast",
+      "new": "1 + contrast"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-45",
+      "start": 1866,
+      "end": 1867,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-46",
+      "start": 1866,
+      "end": 1867,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-op-47",
+      "start": 1872,
+      "end": 1886,
+      "old": "(1+contrast)/2",
+      "new": "(1 + contrast) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-48",
+      "start": 1909,
+      "end": 1910,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-49",
+      "start": 1909,
+      "end": 1910,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-50",
+      "start": 1915,
+      "end": 1916,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-51",
+      "start": 1915,
+      "end": 1916,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-op-52",
+      "start": 1917,
+      "end": 1939,
+      "old": "(1-2*model_p)/contrast",
+      "new": "(1 - 2 * model_p) * contrast"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-value-53",
+      "start": 1989,
+      "end": 1990,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-value-54",
+      "start": 1989,
+      "end": 1990,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-value-55",
+      "start": 1974,
+      "end": 1975,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L41-value-56",
+      "start": 1974,
+      "end": 1975,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-57",
+      "start": 2013,
+      "end": 2063,
+      "old": "contrast**2*interrogation**2*(1-cosphase*cosphase)",
+      "new": "contrast ** 2 * interrogation ** 2 / (1 - cosphase * cosphase)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-58",
+      "start": 2065,
+      "end": 2086,
+      "old": "4*model_p*(1-model_p)",
+      "new": "4 * model_p / (1 - model_p)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-59",
+      "start": 1028,
+      "end": 1029,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-60",
+      "start": 1028,
+      "end": 1029,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-op-61",
+      "start": 1038,
+      "end": 1044,
+      "old": "10**12",
+      "new": "10 * 12"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-62",
+      "start": 1052,
+      "end": 1053,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-63",
+      "start": 1052,
+      "end": 1053,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-64",
+      "start": 1334,
+      "end": 1339,
+      "old": "1e-12",
+      "new": "1.000000000001"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-65",
+      "start": 1334,
+      "end": 1339,
+      "old": "1e-12",
+      "new": "-0.999999999999"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-66",
+      "start": 1356,
+      "end": 1360,
+      "old": "1e12",
+      "new": "1000000000001.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-67",
+      "start": 1356,
+      "end": 1360,
+      "old": "1e12",
+      "new": "999999999999.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-68",
+      "start": 1368,
+      "end": 1369,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-69",
+      "start": 1368,
+      "end": 1369,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-70",
+      "start": 1380,
+      "end": 1381,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-71",
+      "start": 1380,
+      "end": 1381,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-72",
+      "start": 1389,
+      "end": 1390,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-73",
+      "start": 1389,
+      "end": 1390,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-74",
+      "start": 1394,
+      "end": 1396,
+      "old": "10",
+      "new": "11"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L27-value-75",
+      "start": 1394,
+      "end": 1396,
+      "old": "10",
+      "new": "9"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-op-76",
+      "start": 1522,
+      "end": 1525,
+      "old": "z*z",
+      "new": "z / z"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-op-77",
+      "start": 1527,
+      "end": 1534,
+      "old": "2*shots",
+      "new": "2 / shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-78",
+      "start": 1559,
+      "end": 1592,
+      "old": "p*(1-p)/shots+z*z/(4*shots*shots)",
+      "new": "p * (1 - p) / shots - z * z / (4 * shots * shots)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-79",
+      "start": 1700,
+      "end": 1701,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-80",
+      "start": 1700,
+      "end": 1701,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-81",
+      "start": 1706,
+      "end": 1707,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-82",
+      "start": 1706,
+      "end": 1707,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-op-83",
+      "start": 1708,
+      "end": 1734,
+      "old": "(1-2*probability)/contrast",
+      "new": "(1 - 2 * probability) * contrast"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-84",
+      "start": 1854,
+      "end": 1855,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-85",
+      "start": 1854,
+      "end": 1855,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-op-86",
+      "start": 1873,
+      "end": 1883,
+      "old": "1+contrast",
+      "new": "1 - contrast"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-87",
+      "start": 1885,
+      "end": 1886,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-88",
+      "start": 1885,
+      "end": 1886,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-op-89",
+      "start": 1918,
+      "end": 1929,
+      "old": "1-2*model_p",
+      "new": "1 + 2 * model_p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-90",
+      "start": 2013,
+      "end": 2041,
+      "old": "contrast**2*interrogation**2",
+      "new": "contrast ** 2 / interrogation ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-91",
+      "start": 2043,
+      "end": 2062,
+      "old": "1-cosphase*cosphase",
+      "new": "1 + cosphase * cosphase"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-92",
+      "start": 2065,
+      "end": 2074,
+      "old": "4*model_p",
+      "new": "4 / model_p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-93",
+      "start": 2076,
+      "end": 2085,
+      "old": "1-model_p",
+      "new": "1 + model_p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-94",
+      "start": 1038,
+      "end": 1040,
+      "old": "10",
+      "new": "11"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-95",
+      "start": 1038,
+      "end": 1040,
+      "old": "10",
+      "new": "9"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-96",
+      "start": 1042,
+      "end": 1044,
+      "old": "12",
+      "new": "13"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L22-value-97",
+      "start": 1042,
+      "end": 1044,
+      "old": "12",
+      "new": "11"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-value-98",
+      "start": 1527,
+      "end": 1528,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L31-value-99",
+      "start": 1527,
+      "end": 1528,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-100",
+      "start": 1559,
+      "end": 1572,
+      "old": "p*(1-p)/shots",
+      "new": "p * (1 - p) * shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-101",
+      "start": 1573,
+      "end": 1592,
+      "old": "z*z/(4*shots*shots)",
+      "new": "z * z * (4 * shots * shots)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-op-102",
+      "start": 1709,
+      "end": 1724,
+      "old": "1-2*probability",
+      "new": "1 + 2 * probability"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-103",
+      "start": 1873,
+      "end": 1874,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L39-value-104",
+      "start": 1873,
+      "end": 1874,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-105",
+      "start": 1918,
+      "end": 1919,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-106",
+      "start": 1918,
+      "end": 1919,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-op-107",
+      "start": 1920,
+      "end": 1929,
+      "old": "2*model_p",
+      "new": "2 / model_p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-108",
+      "start": 2013,
+      "end": 2024,
+      "old": "contrast**2",
+      "new": "contrast * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-109",
+      "start": 2025,
+      "end": 2041,
+      "old": "interrogation**2",
+      "new": "interrogation * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-110",
+      "start": 2043,
+      "end": 2044,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-111",
+      "start": 2043,
+      "end": 2044,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-op-112",
+      "start": 2045,
+      "end": 2062,
+      "old": "cosphase*cosphase",
+      "new": "cosphase / cosphase"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-113",
+      "start": 2065,
+      "end": 2066,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-114",
+      "start": 2065,
+      "end": 2066,
+      "old": "4",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-115",
+      "start": 2076,
+      "end": 2077,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-116",
+      "start": 2076,
+      "end": 2077,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-117",
+      "start": 1559,
+      "end": 1566,
+      "old": "p*(1-p)",
+      "new": "p / (1 - p)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-118",
+      "start": 1573,
+      "end": 1576,
+      "old": "z*z",
+      "new": "z / z"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-119",
+      "start": 1578,
+      "end": 1591,
+      "old": "4*shots*shots",
+      "new": "4 * shots / shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-120",
+      "start": 1709,
+      "end": 1710,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-121",
+      "start": 1709,
+      "end": 1710,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-op-122",
+      "start": 1711,
+      "end": 1724,
+      "old": "2*probability",
+      "new": "2 / probability"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-123",
+      "start": 1920,
+      "end": 1921,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L40-value-124",
+      "start": 1920,
+      "end": 1921,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-125",
+      "start": 2023,
+      "end": 2024,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-126",
+      "start": 2023,
+      "end": 2024,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-127",
+      "start": 2040,
+      "end": 2041,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L42-value-128",
+      "start": 2040,
+      "end": 2041,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-129",
+      "start": 1562,
+      "end": 1565,
+      "old": "1-p",
+      "new": "1 + p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-op-130",
+      "start": 1578,
+      "end": 1585,
+      "old": "4*shots",
+      "new": "4 / shots"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-131",
+      "start": 1711,
+      "end": 1712,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L35-value-132",
+      "start": 1711,
+      "end": 1712,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-value-133",
+      "start": 1562,
+      "end": 1563,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-value-134",
+      "start": 1562,
+      "end": 1563,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-value-135",
+      "start": 1578,
+      "end": 1579,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_sensing919",
+      "source": "src/sugarcode/extra_doc/quantum_sensing919.py",
+      "name": "quantum_sensing919-L32-value-136",
+      "start": 1578,
+      "end": 1579,
+      "old": "4",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L10-value-137",
+      "start": 386,
+      "end": 389,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L10-value-138",
+      "start": 386,
+      "end": 389,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L23-ops-139",
+      "start": 1105,
+      "end": 1119,
+      "old": "source==target",
+      "new": "source != target"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-op-140",
+      "start": 1186,
+      "end": 1279,
+      "old": "type(swap_success) not in (int,float) or not isfinite(swap_success) or not 0<=swap_success<=1",
+      "new": "type(swap_success) not in (int, float) and (not isfinite(swap_success)) and (not 0 <= swap_success <= 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-op-141",
+      "start": 1367,
+      "end": 1423,
+      "old": "type(edges) not in (list,tuple) or not 1<=len(edges)<=20",
+      "new": "type(edges) not in (list, tuple) and (not 1 <= len(edges) <= 20)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L43-ops-142",
+      "start": 2255,
+      "end": 2272,
+      "old": "len(adjacency)>10",
+      "new": "len(adjacency) >= 10"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L45-op-143",
+      "start": 2336,
+      "end": 2386,
+      "old": "source not in adjacency or target not in adjacency",
+      "new": "source not in adjacency and target not in adjacency"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L20-op-144",
+      "start": 901,
+      "end": 979,
+      "old": "type(x) is not str or not x or len(x)>24 or not x.isascii() or not x.isalnum()",
+      "new": "type(x) is not str and (not x) and (len(x) > 24) and (not x.isascii()) and (not x.isalnum())"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-ops-145",
+      "start": 1186,
+      "end": 1223,
+      "old": "type(swap_success) not in (int,float)",
+      "new": "type(swap_success) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-ops-146",
+      "start": 1367,
+      "end": 1398,
+      "old": "type(edges) not in (list,tuple)",
+      "new": "type(edges) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L31-op-147",
+      "start": 1552,
+      "end": 1591,
+      "old": "type(edge) is not tuple or len(edge)!=4",
+      "new": "type(edge) is not tuple and len(edge) != 4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L34-op-148",
+      "start": 1718,
+      "end": 1754,
+      "old": "u==v or tuple(sorted((u,v))) in seen",
+      "new": "u == v and tuple(sorted((u, v))) in seen"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-op-149",
+      "start": 2052,
+      "end": 2080,
+      "old": "not 0<=p<=1 or not .25<=f<=1",
+      "new": "not 0 <= p <= 1 and (not 0.25 <= f <= 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L43-value-150",
+      "start": 2270,
+      "end": 2272,
+      "old": "10",
+      "new": "11"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L43-value-151",
+      "start": 2270,
+      "end": 2272,
+      "old": "10",
+      "new": "9"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L45-ops-152",
+      "start": 2336,
+      "end": 2359,
+      "old": "source not in adjacency",
+      "new": "source in adjacency"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L45-ops-153",
+      "start": 2363,
+      "end": 2386,
+      "old": "target not in adjacency",
+      "new": "target in adjacency"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L51-ops-154",
+      "start": 2560,
+      "end": 2569,
+      "old": "u==target",
+      "new": "u != target"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L62-value-155",
+      "start": 3223,
+      "end": 3226,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L62-value-156",
+      "start": 3223,
+      "end": 3226,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L62-value-157",
+      "start": 3227,
+      "end": 3230,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L62-value-158",
+      "start": 3227,
+      "end": 3230,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L20-ops-159",
+      "start": 901,
+      "end": 919,
+      "old": "type(x) is not str",
+      "new": "type(x) is str"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L20-ops-160",
+      "start": 932,
+      "end": 941,
+      "old": "len(x)>24",
+      "new": "len(x) >= 24"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-ops-161",
+      "start": 1261,
+      "end": 1279,
+      "old": "0<=swap_success<=1",
+      "new": "0 < swap_success <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-ops-162",
+      "start": 1261,
+      "end": 1279,
+      "old": "0<=swap_success<=1",
+      "new": "0 <= swap_success < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-ops-163",
+      "start": 1406,
+      "end": 1423,
+      "old": "1<=len(edges)<=20",
+      "new": "1 < len(edges) <= 20"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-ops-164",
+      "start": 1406,
+      "end": 1423,
+      "old": "1<=len(edges)<=20",
+      "new": "1 <= len(edges) < 20"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L31-ops-165",
+      "start": 1552,
+      "end": 1575,
+      "old": "type(edge) is not tuple",
+      "new": "type(edge) is tuple"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L31-ops-166",
+      "start": 1579,
+      "end": 1591,
+      "old": "len(edge)!=4",
+      "new": "len(edge) == 4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L34-ops-167",
+      "start": 1718,
+      "end": 1722,
+      "old": "u==v",
+      "new": "u != v"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L34-ops-168",
+      "start": 1726,
+      "end": 1754,
+      "old": "tuple(sorted((u,v))) in seen",
+      "new": "tuple(sorted((u, v))) not in seen"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L38-op-169",
+      "start": 1901,
+      "end": 1954,
+      "old": "type(value) not in (int,float) or not isfinite(value)",
+      "new": "type(value) not in (int, float) and (not isfinite(value))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-op-170",
+      "start": 2592,
+      "end": 2610,
+      "old": "(1+3*visibility)/4",
+      "new": "(1 + 3 * visibility) * 4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-op-171",
+      "start": 2877,
+      "end": 2990,
+      "old": "best is None or result['yield']>best['yield'] or (result['yield']==best['yield'] and result['path']<best['path'])",
+      "new": "best is None and result['yield'] > best['yield'] and (result['yield'] == best['yield'] and result['path'] < best['path'])"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L60-ops-172",
+      "start": 3089,
+      "end": 3102,
+      "old": "v not in path",
+      "new": "v in path"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L20-value-173",
+      "start": 939,
+      "end": 941,
+      "old": "24",
+      "new": "25"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L20-value-174",
+      "start": 939,
+      "end": 941,
+      "old": "24",
+      "new": "23"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-value-175",
+      "start": 1261,
+      "end": 1262,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-value-176",
+      "start": 1261,
+      "end": 1262,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-value-177",
+      "start": 1278,
+      "end": 1279,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L25-value-178",
+      "start": 1278,
+      "end": 1279,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-value-179",
+      "start": 1406,
+      "end": 1407,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-value-180",
+      "start": 1406,
+      "end": 1407,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-value-181",
+      "start": 1421,
+      "end": 1423,
+      "old": "20",
+      "new": "21"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L27-value-182",
+      "start": 1421,
+      "end": 1423,
+      "old": "20",
+      "new": "19"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L31-value-183",
+      "start": 1590,
+      "end": 1591,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L31-value-184",
+      "start": 1590,
+      "end": 1591,
+      "old": "4",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L38-ops-185",
+      "start": 1901,
+      "end": 1931,
+      "old": "type(value) not in (int,float)",
+      "new": "type(value) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-ops-186",
+      "start": 2056,
+      "end": 2063,
+      "old": "0<=p<=1",
+      "new": "0 < p <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-ops-187",
+      "start": 2056,
+      "end": 2063,
+      "old": "0<=p<=1",
+      "new": "0 <= p < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-ops-188",
+      "start": 2071,
+      "end": 2080,
+      "old": ".25<=f<=1",
+      "new": "0.25 < f <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-ops-189",
+      "start": 2071,
+      "end": 2080,
+      "old": ".25<=f<=1",
+      "new": "0.25 <= f < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L50-value-190",
+      "start": 2546,
+      "end": 2547,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L50-value-191",
+      "start": 2546,
+      "end": 2547,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-op-192",
+      "start": 2593,
+      "end": 2607,
+      "old": "1+3*visibility",
+      "new": "1 - 3 * visibility"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-193",
+      "start": 2609,
+      "end": 2610,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-194",
+      "start": 2609,
+      "end": 2610,
+      "old": "4",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L54-op-195",
+      "start": 2729,
+      "end": 2745,
+      "old": "success*fidelity",
+      "new": "success / fidelity"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L54-op-196",
+      "start": 2754,
+      "end": 2765,
+      "old": "len(path)-2",
+      "new": "len(path) + 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-ops-197",
+      "start": 2877,
+      "end": 2889,
+      "old": "best is None",
+      "new": "best is not None"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-ops-198",
+      "start": 2893,
+      "end": 2922,
+      "old": "result['yield']>best['yield']",
+      "new": "result['yield'] >= best['yield']"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-op-199",
+      "start": 2927,
+      "end": 2989,
+      "old": "result['yield']==best['yield'] and result['path']<best['path']",
+      "new": "result['yield'] == best['yield'] or result['path'] < best['path']"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-200",
+      "start": 2056,
+      "end": 2057,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-201",
+      "start": 2056,
+      "end": 2057,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-202",
+      "start": 2062,
+      "end": 2063,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-203",
+      "start": 2062,
+      "end": 2063,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-204",
+      "start": 2071,
+      "end": 2074,
+      "old": ".25",
+      "new": "1.25"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-205",
+      "start": 2071,
+      "end": 2074,
+      "old": ".25",
+      "new": "-0.75"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-206",
+      "start": 2079,
+      "end": 2080,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L40-value-207",
+      "start": 2079,
+      "end": 2080,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-208",
+      "start": 2593,
+      "end": 2594,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-209",
+      "start": 2593,
+      "end": 2594,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-op-210",
+      "start": 2595,
+      "end": 2607,
+      "old": "3*visibility",
+      "new": "3 / visibility"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L54-value-211",
+      "start": 2764,
+      "end": 2765,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L54-value-212",
+      "start": 2764,
+      "end": 2765,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-ops-213",
+      "start": 2927,
+      "end": 2957,
+      "old": "result['yield']==best['yield']",
+      "new": "result['yield'] != best['yield']"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L56-ops-214",
+      "start": 2962,
+      "end": 2989,
+      "old": "result['path']<best['path']",
+      "new": "result['path'] <= best['path']"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-215",
+      "start": 3126,
+      "end": 3134,
+      "old": "path+[v]",
+      "new": "path - [v]"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-216",
+      "start": 3135,
+      "end": 3181,
+      "old": "success*p*(swap_success if len(path)>1 else 1)",
+      "new": "success * p / (swap_success if len(path) > 1 else 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-217",
+      "start": 3182,
+      "end": 3202,
+      "old": "visibility*(4*f-1)/3",
+      "new": "visibility * (4 * f - 1) * 3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-218",
+      "start": 2595,
+      "end": 2596,
+      "old": "3",
+      "new": "4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L52-value-219",
+      "start": 2595,
+      "end": 2596,
+      "old": "3",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-220",
+      "start": 3135,
+      "end": 3144,
+      "old": "success*p",
+      "new": "success / p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-221",
+      "start": 3182,
+      "end": 3200,
+      "old": "visibility*(4*f-1)",
+      "new": "visibility / (4 * f - 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-222",
+      "start": 3201,
+      "end": 3202,
+      "old": "3",
+      "new": "4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-223",
+      "start": 3201,
+      "end": 3202,
+      "old": "3",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-ops-224",
+      "start": 3162,
+      "end": 3173,
+      "old": "len(path)>1",
+      "new": "len(path) >= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-225",
+      "start": 3179,
+      "end": 3180,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-226",
+      "start": 3179,
+      "end": 3180,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-227",
+      "start": 3194,
+      "end": 3199,
+      "old": "4*f-1",
+      "new": "4 * f + 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-228",
+      "start": 3172,
+      "end": 3173,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-229",
+      "start": 3172,
+      "end": 3173,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-op-230",
+      "start": 3194,
+      "end": 3197,
+      "old": "4*f",
+      "new": "4 / f"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-231",
+      "start": 3198,
+      "end": 3199,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-232",
+      "start": 3198,
+      "end": 3199,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-233",
+      "start": 3194,
+      "end": 3195,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_network920",
+      "source": "src/sugarcode/extra_doc/quantum_network920.py",
+      "name": "quantum_network920-L61-value-234",
+      "start": 3194,
+      "end": 3195,
+      "old": "4",
+      "new": "3"
+    }
+  ]
+}
