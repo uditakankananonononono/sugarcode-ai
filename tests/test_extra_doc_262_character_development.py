@@ -47,3 +47,28 @@ def test_all_incompatible_and_shape_cap_precedes_contents():
 def test_exact_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_exact_label_dimension_rule_event_boundaries():
+    label='x'*80
+    dims={'a':[label],'b':['y']}
+    assert solve(dims,[],[])['persona']=={'a':label,'b':'y'}
+    rules=[('a',label,'b','z')]*64
+    valid_dims={'a':[label],'b':['y','z']}
+    events=[('e','a',label,label,'m')]*32
+    r=solve(valid_dims,rules,events)
+    assert r['persona']=={'a':label,'b':'y'} and len(r['arc'])==32
+    assert all(t['applied'] for t in r['arc'])
+
+@pytest.mark.parametrize('args,message',[
+ (({'a':['x']},[],[]),'dimension count must be between 2 and 6'),
+ (({'a':['x'],'b':['y']},[],[None]*33),'rule count must not exceed 64 and event count 32'),
+ (({'a':[],'b':['y']},[],[]),'each dimension must have between 1 and 4 options'),
+ (({'a':['x'],'b':['y']},[None],[]),'forbidden pairs must have four fields'),
+ (({'a':['x'],'b':['y']},[('a','x','b')],[]),'forbidden pairs must have four fields'),
+ (({'a':['x'],'b':['y']},[],[None]),'events must have five fields'),
+ (({'a':['x'],'b':['y']},[],[('e','a','x','y')]),'events must have five fields'),
+])
+def test_remaining_shape_and_lower_boundary_errors(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
