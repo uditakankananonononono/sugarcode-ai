@@ -9,7 +9,7 @@ def test_exact_ratio_zero_baseline_and_escaped_label_oracle():
     assert [b['height'] for b in r['bars']]==[F(600,7),200,0]
     assert all(b['y']+b['height']==240 for b in r['bars'])
     assert [b['x'] for b in r['bars']]==[40,120,200] and r['axis_max']==7
-    root=ET.fromstring(r['svg']);texts=[e.text for e in root.iter('{http://www.w3.org/2000/svg}text')]
+    root=ET.fromstring(r['svg']);texts=[''.join(e.itertext()) for e in root.iter('{http://www.w3.org/2000/svg}text')]
     assert texts==['3','A&B','7','<x>','0','zero']
     assert r['beauty_validated'] is False
 
@@ -36,3 +36,15 @@ def test_all_zero_max_categories_and_integer_boundary():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('label',['a\x00b','a\x01b','a\ud800b','a\ufffeb'])
+def test_xml_forbidden_characters_declared_refusal(label):
+    with pytest.raises(ValueError) as exc:solve([label],[1])
+    assert str(exc.value)=='labels must contain only XML-valid characters'
+
+
+def test_wide_label_wrapping_and_zero_axis_integer():
+    root=ET.fromstring(solve(['W'*12]*8,[1]*8)['svg'])
+    spans=list(root.iter('{http://www.w3.org/2000/svg}tspan'))
+    assert len(spans)==16 and all(e.text=='W'*6 for e in spans)
+    assert type(solve(['x'],[0])['axis_max']) is int

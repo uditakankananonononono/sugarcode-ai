@@ -2,7 +2,7 @@
 
 Maps supplied nonnegative integer data to exact rational bar heights, includes
 escaped category labels and value annotations, and returns both geometry and
-SVG. Fixed layout permits at most eight categories without overlap.
+SVG. Labels wrap into at most two six-character rows in each 80-pixel category.
 NOT_CLAIMED: perceptual beauty, arbitrary signed/log axes, interactive charts,
 statistical interpretation, universal accessibility or deployment.
 """
@@ -19,6 +19,8 @@ def bar_chart(labels,values):
         if type(label) is not str:raise TypeError('labels must be strings')
         if not 1<=len(label)<=12:raise ValueError('label length must be between 1 and 12')
         if not label.strip():raise ValueError('labels must not be blank')
+        if any(not (ord(c) in (9,10,13) or 32<=ord(c)<=55295 or 57344<=ord(c)<=65533 or 65536<=ord(c)<=1114111) for c in label):
+            raise ValueError('labels must contain only XML-valid characters')
     if any(type(v) is not int or not 0<=v<=1000000 for v in values):
         raise ValueError('values must be nonbool integers zero through 1000000')
     scale=max(values) or 1;bars=[];elements=[]
@@ -27,7 +29,7 @@ def bar_chart(labels,values):
         bars.append({'x':x,'y':y,'width':48,'height':height,'value':value,'label':label})
         elements.append(f'<rect x="{x}" y="{float(y):.6f}" width="48" height="{float(height):.6f}" fill="#2463a0"/>')
         elements.append(f'<text x="{x+24}" y="{float(y)-8:.6f}" text-anchor="middle">{value}</text>')
-        elements.append(f'<text x="{x+24}" y="265" text-anchor="middle">{escape(label)}</text>')
+        elements.append(f'<text x="{x+24}" y="265" text-anchor="middle" ><tspan x="{x+24}" dy="0">{escape(label[:6])}</tspan><tspan x="{x+24}" dy="12">{escape(label[6:])}</tspan></text>')
     width=80*len(labels)+40
     svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="290" viewBox="0 0 {width} 290"><rect width="100%" height="100%" fill="white"/><g font-family="sans-serif" font-size="10"><path d="M30 40 V240 H{width-15}" fill="none" stroke="black"/>'+''.join(elements)+'</g></svg>'
     return {'bars':bars,'axis_max':scale,'svg':svg,'beauty_validated':False}
