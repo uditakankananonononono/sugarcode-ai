@@ -106,6 +106,18 @@ def _core(m):
     # starved comes back sorted
     got = m.live([('b', 'starve'), ('a', 'starve'), ('c', 'feed')])
     assert got == {'feed': 1, 'starve': 2, 'total': 3, 'starved': ['a', 'b']}
+    # wide many-name sort pins: 12 starved cells per run, so set
+    # iteration order matches sorted order for no hash seed in
+    # practice (two disjoint sets, different characters)
+    wide = ['d', 'a', 'm', 'b', 'z', 'k', 'c', 'y', 'e', 'x', 'f', 'w']
+    got = m.live([(n, 'starve') for n in wide])
+    assert got == {'feed': 0, 'starve': 12, 'total': 12,
+                   'starved': sorted(wide)}
+    wide2 = ['h7', 'q1', 'n9', 'p3', 'r8', 'j2', 's5', 'u4', 'v6', 'g0',
+             'k2', 'l9']
+    got = m.live([(n, 'starve') for n in wide2])
+    assert got == {'feed': 0, 'starve': 12, 'total': 12,
+                   'starved': sorted(wide2)}
     # an empty record has nothing
     assert m.live([]) == {'feed': 0, 'starve': 0, 'total': 0, 'starved': []}
     # tuples accepted
