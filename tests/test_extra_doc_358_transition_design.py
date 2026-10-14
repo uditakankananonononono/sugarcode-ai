@@ -35,3 +35,18 @@ def test_empty_ties_max_shape_and_global_cycles():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_prerequisite_shape12_later_duplicate_guard():
+    with pytest.raises(ValueError) as exc:solve([0,0],[0,0],[[],[0]*12],0)
+    assert str(exc.value)=='prerequisites must be unique'
+
+@pytest.mark.parametrize('bad',[-1,2])
+def test_unselected_invalid_dependency_still_refused(bad):
+    with pytest.raises(ValueError) as exc:solve([0,2],[1,0],[[],[bad]],0)
+    assert str(exc.value)=='prerequisite indices must be nonbool valid nonself indices'
+
+
+def test_lowest_ready_execution_order_not_highest():
+    r=solve([0,0,0],[1,1,1],[[],[],[0,1]],0)
+    assert r['execution_order']==[0,1,2]
