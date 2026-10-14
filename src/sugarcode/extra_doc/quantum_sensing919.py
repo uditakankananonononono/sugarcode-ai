@@ -22,7 +22,7 @@ def ramsey_estimate(ones, shots, interrogation=1.0, contrast=1.0, z=1.9599639845
     if not 1<=shots<=10**12 or not 0<=ones<=shots:
         raise ValueError('require 1<=shots<=10^12 and 0<=ones<=shots')
     for value in (interrogation,contrast,z):
-        if type(value) not in (int,float) or not isfinite(value):
+        if type(value) not in (int,float) or abs(value)>1e20 or not isfinite(value):
             raise ValueError('finite built-in real parameters required')
     if not 1e-12<=interrogation<=1e12 or not 0<contrast<=1 or not 0<z<=10:
         raise ValueError('interrogation, contrast or z outside range')

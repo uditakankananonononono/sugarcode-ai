@@ -22,7 +22,7 @@ def best_entanglement_route(edges, source, target, swap_success=1.0):
     label(source);label(target)
     if source==target:
         raise ValueError('source and target must differ')
-    if type(swap_success) not in (int,float) or not isfinite(swap_success) or not 0<=swap_success<=1:
+    if type(swap_success) not in (int,float) or not 0<=swap_success<=1 or not isfinite(swap_success):
         raise ValueError('swap_success must be finite built-in real in [0,1]')
     if type(edges) not in (list,tuple) or not 1<=len(edges)<=20:
         raise ValueError('edges must contain 1..20 edge tuples')
@@ -35,7 +35,7 @@ def best_entanglement_route(edges, source, target, swap_success=1.0):
             raise ValueError('self or parallel edges refused')
         seen.add(tuple(sorted((u,v))))
         for value in (p,f):
-            if type(value) not in (int,float) or not isfinite(value):
+            if type(value) not in (int,float) or abs(value)>1 or not isfinite(value):
                 raise ValueError('edge probabilities must be finite built-in reals')
         if not 0<=p<=1 or not .25<=f<=1:
             raise ValueError('success/fidelity outside [0,1]/[0.25,1]')

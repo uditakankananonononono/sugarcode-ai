@@ -83,7 +83,7 @@ _cases=[]
 for args in [(True,2),(IntSubclass(1),2),(1,True),(1.,2)]:_cases.append((a.ramsey_estimate,args,'counts must be built-in ints'))
 for args in [(0,0),(0,10**12+1),(-1,1),(2,1)]:_cases.append((a.ramsey_estimate,args,'require 1<=shots<=10^12 and 0<=ones<=shots'))
 for args in [(1,2,True),(1,2,1,True),(1,2,1,1,True),(1,2,float('inf'))]:_cases.append((a.ramsey_estimate,args,'finite built-in real parameters required'))
-for args in [(1,2,0),(1,2,1e-13),(1,2,1e13),(1,2,1,0),(1,2,1,1.1),(1,2,1,1,0),(1,2,1,1,10.1)]:_cases.append((a.ramsey_estimate,args,'interrogation, contrast or z outside range'))
+for args in [(1,2,0),(1,2,1e-13),(1,2,1e12+0.5),(1,2,1,0),(1,2,1,1.1),(1,2,1,1,0),(1,2,1,1,10.1)]:_cases.append((a.ramsey_estimate,args,'interrogation, contrast or z outside range'))
 for source in ('',True,'a'*25,'é','a_'):_cases.append((b.best_entanglement_route,([('a','b',1,1)],source,'b'),'node labels must be 1..24 ASCII alphanumeric strings'))
 _cases.extend([
 (b.best_entanglement_route,([('a','b',1,1)],'a','a'),'source and target must differ'),
@@ -132,3 +132,12 @@ def route_caps_and_ties(self):
     self.assertEqual(b.best_entanglement_route(edges,'a','d')['path'],('a','b','d'))
     with self.assertRaises(ValueError):a.ramsey_estimate(1,2,interrogation=1e12+.5)
 QuantumTests.test_route_caps_and_ties=route_caps_and_ties
+
+def giant_inputs(self):
+    for value in (1e100,1e308,10**10000):
+        for args in ((1,2,value),(1,2,1,value),(1,2,1,1,value)):
+            with self.assertRaises(ValueError) as caught:a.ramsey_estimate(*args)
+            self.assertEqual(str(caught.exception),'finite built-in real parameters required')
+        for args in (([('a','b',value,1)],'a','b'),([('a','b',1,value)],'a','b'),([('a','b',1,1)],'a','b',value)):
+            with self.assertRaises(ValueError):b.best_entanglement_route(*args)
+QuantumTests.test_giant_inputs=giant_inputs
