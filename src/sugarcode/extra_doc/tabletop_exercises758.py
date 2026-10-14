@@ -1,0 +1,62 @@
+"""Row 758: Tabletop Exercises - Practices response.
+
+SCOPED planning aid over caller supplied rows. No external actions, persistence,
+capability development evidence, organization quality, or optimal policy claim.
+Explicit import only; 1..32 tuple rows. Labels are lowercase ASCII identifiers.
+"""
+import re
+
+LABEL = re.compile(r"[a-z][a-z0-9_]{0,23}\Z")
+
+
+def _label(value):
+    if type(value) is not str:
+        raise TypeError('exact string label required')
+    if len(value) > 24 or LABEL.fullmatch(value) is None:
+        raise ValueError('label must be 1..24 lowercase identifier characters')
+
+
+def _integer(value, low, high):
+    if type(value) is not int:
+        raise TypeError('exact nonbool integer required')
+    if not low <= value <= high:
+        raise ValueError('integer outside declared range')
+
+
+def _rows(rows, arity):
+    if type(rows) is not list:
+        raise TypeError('exact list required')
+    if not 1 <= len(rows) <= 32:
+        raise ValueError('row count must be 1..32')
+    for row in rows:
+        if type(row) is not tuple:
+            raise TypeError('exact tuple row required')
+        if len(row) != arity:
+            raise ValueError('wrong row arity')
+
+
+def review_response_drill(rows):
+    """Rows: (drill_id, owner_assigned_bit, escalation_path_tested_bit,
+    recovery_step_rehearsed_bit). Report missing declared response elements.
+    No real response practice, incident actions, operational readiness or
+    effectiveness demonstrated. Supplied checklist only, not certification.
+    """
+    _rows(rows, 4)
+    for drill,owner,escalation,recovery in rows:
+        _label(drill)
+        _integer(owner, 0, 1)
+        _integer(escalation, 0, 1)
+        _integer(recovery, 0, 1)
+    if len({x[0] for x in rows})!=len(rows):
+        raise ValueError('duplicate drill')
+    drills=[]
+    for drill,owner,escalation,recovery in sorted(rows):
+        missing=[]
+        if owner==0:
+            missing.append('owner')
+        if escalation==0:
+            missing.append('escalation')
+        if recovery==0:
+            missing.append('recovery')
+        drills.append((drill,missing))
+    return {'drills':drills,'drills_with_gaps':sum(bool(x[1]) for x in drills)}
