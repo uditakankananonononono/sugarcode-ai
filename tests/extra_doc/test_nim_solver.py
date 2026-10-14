@@ -112,3 +112,25 @@ def test_order_and_every_position():
         err(nim, T, 'pile must be a nonbool int', p, 2)
         p[pos] = 13
         err(nim, V, 'pile must be between 0 and 12', p, 2)
+
+
+class IntSub(int):
+    pass
+
+
+class ListSub(list):
+    pass
+
+
+class TupleSub(tuple):
+    pass
+
+
+def test_subclass_witnesses_are_rejected_with_exact_errors():
+    err(nim, T, 'piles must be a list or tuple', ListSub([1, 2]), 1)
+    err(nim, T, 'piles must be a list or tuple', TupleSub([1, 2]), 1)
+    err(nim, T, 'pile must be a nonbool int', [1, IntSub(2)], 1)
+    err(nim, T, 'pile must be a nonbool int', [IntSub(1)], 1)
+    err(nim, T, 'max_take must be a nonbool int', [1], IntSub(1))
+    # plain types still work and give the same answer as the subclass-free form
+    assert nim([1, 2], 1) == nim((1, 2), 1)
