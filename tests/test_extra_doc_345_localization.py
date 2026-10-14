@@ -153,3 +153,38 @@ def test_number_messages_and_edges():
         N(-10 ** 12 - 1)
     assert N(1e12, decimals=0) == "1,000,000,000,000" and N(-1e12, decimals=0) == "-1,000,000,000,000"
     assert N(1e12, decimals=6) == "1,000,000,000,000.000000"
+
+
+def test_unhashable_and_odd_locales_give_declared_error():
+    msg = r"locale: unknown, expected one of \['de-DE', 'en-GB', 'en-IN', 'en-US', 'fr-FR', 'ja-JP'\]"
+    for bad in (["en-US"], {}, {"en-US": 1}, ("en-US",), set(), b"en-US", 3.5):
+        with pytest.raises(ValueError, match=msg):
+            N(1, bad)
+        with pytest.raises(ValueError, match=msg):
+            DT(2024, 1, 1, bad)
+    with pytest.raises(ValueError, match=msg):
+        N(1, ["en-US"])
+    with pytest.raises(ValueError, match=msg):
+        N(1, {})
+    with pytest.raises(ValueError, match=msg):
+        DT(2024, 1, 1, ["en-US"])
+
+
+def test_infinity_and_boundary_messages():
+    for inf in (float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="value: magnitude above 1e15"):   # the abs cap runs before the finite check
+            N(inf)
+    with pytest.raises(ValueError, match="value: finite number required"):
+        N(float("nan"))
+    with pytest.raises(ValueError, match=r"value: must be within \[-1000000000000, 1000000000000\]"):
+        N(1e15)
+    with pytest.raises(ValueError, match=r"value: must be within"):
+        N(-1e15)
+    with pytest.raises(ValueError, match="value: magnitude above 1e15"):
+        N(1.0000000000000002e15)
+    with pytest.raises(ValueError, match="value: magnitude above 1e15"):
+        N(-1.0000000000000002e15)
+    with pytest.raises(ValueError, match="value: must be within"):
+        N(10 ** 15)
+    with pytest.raises(ValueError, match="value: magnitude above 1e15"):
+        N(10 ** 15 + 1)
