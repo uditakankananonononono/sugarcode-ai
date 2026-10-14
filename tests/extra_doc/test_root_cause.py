@@ -230,3 +230,28 @@ def test_ancestor_search_visits_each_node_once_on_deep_diamonds():
     t0 = time.time()
     err(ac, V, 'at most 12 ancestors are supported', e, 'f')
     assert time.time() - t0 < 3
+
+
+@pytest.mark.parametrize('fail', ['A', 'f', 'zz'])
+def test_cut_search_visits_each_node_once_behind_dead_diamonds(fail):
+    import time
+    e = [('r', fail), ('r', 'a00'), ('r', 'b00')]
+    for i in range(1, 30):
+        for x in 'ab':
+            for y in 'ab':
+                e.append(('%s%02d' % (x, i - 1), '%s%02d' % (y, i)))
+    import signal
+
+    def boom(*_):
+        raise AssertionError('cut search took more than 5 seconds')
+    old = signal.signal(signal.SIGALRM, boom)
+    signal.alarm(5)
+    try:
+        t0 = time.time()
+        r = ac(e, fail)
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old)
+    assert time.time() - t0 < 3
+    assert r == {'ancestors': ['r'], 'roots': ['r'], 'chains': [['r', fail]], 'chain_count': 1,
+                 'min_cut': ['r'], 'min_cut_size': 1}
