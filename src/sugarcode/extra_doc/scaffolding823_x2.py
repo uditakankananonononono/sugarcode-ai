@@ -28,5 +28,5 @@ def prerequisite_masks(rows):
     _rows(rows,'stages',32,3)
     for label,required,completed in rows:_label(label);_integer(required,0,255);_integer(completed,0,255)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('stage labels must be unique')
-    missing=[(label,required & ~completed) for label,required,completed in sorted(rows)]
+    missing=[(label,required & ~completed) for label,required,completed in sorted(rows,key=lambda r:r[0])]
     return {'missing':missing,'eligible':[label for label,mask in missing if mask==0],'mastery_verified':False}

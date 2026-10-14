@@ -28,4 +28,4 @@ def declared_support_decrements(rows):
     _rows(rows,'supports',32,3)
     for label,support,decrement in rows:_label(label);_integer(support,0,100);_integer(decrement,0,100)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('support labels must be unique')
-    return {'supports':[(label,max(support-decrement,0),min(support,decrement)) for label,support,decrement in sorted(rows)],'readiness_evaluated':False}
+    return {'supports':[(label,max(support-decrement,0),min(support,decrement)) for label,support,decrement in sorted(rows,key=lambda r:r[0])],'readiness_evaluated':False}
