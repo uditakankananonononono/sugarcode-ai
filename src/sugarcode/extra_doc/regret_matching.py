@@ -8,7 +8,11 @@ each round, the learner's expected payoff each round and in total, the cumulativ
 regrets, the average policy, and the largest cumulative regret (external regret).
 Caps: 1 to 5 actions, 1 to 10 rounds (exact fractions double in size each round,
 so the round cap is low on purpose), payoffs nonbool int or Fraction with
-numerator and denominator at most 32 bits, in [0, 1]. Checks run before any scan.
+numerator and denominator at most 32 bits, in [0, 1]. Order of checks: the round cap first, then row
+types and the first-row action cap (at most 10 cheap type checks), then every value
+is converted to a Fraction and checked against the 32-bit and range rules, and only
+then is any arithmetic done. An oversized int is converted to a Fraction just before
+its bit-length check (bounded cost, no arithmetic on it).
 
 NOT_CLAIMED: only the update rule and exact bookkeeping. No sublinear regret
 bound is checked or asserted; payoffs are caller inputs and are not verified;

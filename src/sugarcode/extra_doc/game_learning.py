@@ -11,7 +11,11 @@ which brackets the game value: min_j (xbar A)_j <= value <= max_i (A ybar)_i.
 gap = 0 exactly means (xbar, ybar) is a Nash equilibrium of the game.
 Caps: 1 to 4 rows and columns, 1 to 8 rounds (exact fractions grow quickly),
 entries nonbool int or Fraction with numerator and denominator at most 32 bits,
-in [0, 1]. Checks run before any scan.
+in [0, 1]. Order of checks: the round type and cap first, then
+row count and row types (at most 4 cheap type checks), the first-row column cap, then
+every value is converted to a Fraction and checked against the 32-bit and range rules,
+and only then is any arithmetic done. An oversized int is converted to a Fraction just
+before its bit-length check (bounded cost, no arithmetic on it).
 
 NOT_CLAIMED: zero-sum two-player case only, not a general-sum claim. No
 convergence rate or guarantee that gap is small after the given rounds; the
