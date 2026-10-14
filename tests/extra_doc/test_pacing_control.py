@@ -78,3 +78,9 @@ def test_total_and_empty_preflight_exact_precedence():
     with pytest.raises(ValueError,match='^integer cap or range exceeded$'):
         pacing_control([('a',1,9)],[1],9)
     assert pacing_control([('a',1,8)],[1],8)['durations']==[8]
+
+
+def test_lo_upper_cap_precedes_min_max_consistency():
+    with pytest.raises(ValueError,match='^integer cap or range exceeded$'):
+        pacing_control([('a',9,8)],[1],8)
+    assert pacing_control([('a',8,8)],[1],8)['durations']==[8]
