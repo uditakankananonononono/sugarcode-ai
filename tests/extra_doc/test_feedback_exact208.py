@@ -65,3 +65,21 @@ def test_all_caps_schema_types_and_huge_integer_refusals():
     for dt in (0,.00000099,1.01):
         a=args();a[3]=dt
         with pytest.raises(ValueError,match='^strict finite bounded feedback number$'):simulate(*a)
+
+
+@pytest.mark.parametrize('n,expected',[(3,[[0,1,2]]),(4,[[0,1,2,3]]),(5,[[0,1,2,3,4]])])
+def test_literal_full_length_single_directed_cycle_canonical_uniqueness(n,expected):
+    matrix=[[0]*n for _ in range(n)]
+    for i in range(n):matrix[(i+1)%n][i]=1
+    r=simulate([0]*n,matrix,[0]*n,1,0)
+    assert [loop['stocks'] for loop in r['feedback_loops']]==expected
+    assert r['feedback_loops']==[dict(stocks=expected[0],gain_fraction='1',kind='reinforcing')]
+    assert len({tuple(loop['stocks']) for loop in r['feedback_loops']})==len(r['feedback_loops'])
+    assert all(min(loop['stocks'])==loop['stocks'][0] and len(loop['stocks'])==len(set(loop['stocks'])) for loop in r['feedback_loops'])
+
+
+def test_internal_negative_one_cycle_edge_and_sparse_zero_nonedges():
+    matrix=[[0,0,1],[-1,0,0],[0,1,0]]
+    assert simulate([0]*3,matrix,[0]*3,1,0)['feedback_loops']==[dict(stocks=[0,1,2],gain_fraction='-1',kind='balancing')]
+    sparse=[[0,0,0],[1,0,0],[0,1,0]]
+    assert simulate([0]*3,sparse,[0]*3,1,0)['feedback_loops']==[]
