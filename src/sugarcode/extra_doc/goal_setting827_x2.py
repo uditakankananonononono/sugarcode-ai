@@ -29,7 +29,7 @@ def declared_goal_status(rows,as_of):
     for label,target,current,deadline in rows:_label(label);_integer(target,1,100);_integer(current,0,100);_integer(deadline,0,1000000)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('goal labels must be unique')
     met=[];overdue=[];pending=[]
-    for label,target,current,deadline in sorted(rows):
+    for label,target,current,deadline in sorted(rows,key=lambda r:r[0]):
         if current>=target:met.append(label)
         elif deadline<as_of:overdue.append((label,target-current))
         else:pending.append((label,target-current))

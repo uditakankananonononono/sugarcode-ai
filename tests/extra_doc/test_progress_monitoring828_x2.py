@@ -44,3 +44,13 @@ def test_independent_adjacent_pair_oracle():
     rows=[('r_'+str(i),i) for i in reversed(range(32))];assert run(rows)['drops']==[r[0] for r in rows[1:]]
     from sugarcode.extra_doc import progress_monitoring828_x2 as m
     assert 'NOT_CLAIMED: verified progress, advancement quality, monitoring integrations,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])
