@@ -1,4 +1,4 @@
-"""Row 706 Code Comments (PARTIAL): counting blank, comment-only and other lines in supplied source lines.
+"""Row 706 Code Comments : counting blank, comment-only and other lines in supplied source lines.
 
 lines is a list of 1..500 strings of up to 200 characters each, with no newline characters. A line is blank
 when str.strip() leaves nothing (so Unicode spaces such as U+00A0 count as blank), a comment line when the first

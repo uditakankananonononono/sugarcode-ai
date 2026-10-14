@@ -1,4 +1,4 @@
-"""Row 735, Explaining Complex Ideas (PARTIAL: one exact jargon rule): first-use explanation check on supplied text.
+"""Row 735, Explaining Complex Ideas (Bounded: one exact jargon rule): first-use explanation check on supplied text.
 
 check_explainer(sentences, terms) takes sentences as a list of 0 to 60 exact strings of 1 to 300 characters and terms as
 a list of 0 to 20 exact strings of 1 to 24 lowercase identifier characters: the jargon a reader may not know. A word is

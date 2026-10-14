@@ -1,4 +1,4 @@
-"""Row 683, Functional Core, Imperative Shell (PARTIAL: one exact purity rule): check that effects stay out of the core.
+"""Row 683, Functional Core, Imperative Shell (Bounded: one exact purity rule): check that effects stay out of the core.
 
 check_purity(functions, calls, effects) takes functions as a list of (name, zone), zone 'core' or 'shell', calls as a list of
 (caller, callee), and effects as a list of the function names that do an effect (read a file, write, use the clock, ...). It

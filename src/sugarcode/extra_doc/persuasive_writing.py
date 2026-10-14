@@ -1,4 +1,4 @@
-"""Row 711, Persuasive Writing (PARTIAL: one exact copy-audit rule): measurable checks on a supplied piece of copy.
+"""Row 711, Persuasive Writing (Bounded: one exact copy-audit rule): measurable checks on a supplied piece of copy.
 
 check_copy(sentences) takes sentences as a list of 0 to 40 exact strings, each 1 to 200 characters. A word is a
 whitespace-separated token; a keyword is a word lowercased and stripped of leading and trailing .,!?;:'"()

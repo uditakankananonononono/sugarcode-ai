@@ -1,4 +1,4 @@
-"""Row 707 Naming Conventions (PARTIAL): classifying supplied identifiers by their spelling style.
+"""Row 707 Naming Conventions : classifying supplied identifiers by their spelling style.
 
 names is a list of 1..100 strings of 1..64 characters. Styles are decided by this module's own rules, tried in
 this order, on ASCII letters, digits and underscore only:
