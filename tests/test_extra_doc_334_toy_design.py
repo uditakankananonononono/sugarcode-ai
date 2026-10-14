@@ -35,3 +35,8 @@ def test_solved_single_move_and_scramble_cap_admission():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_discovered_states_before_goal_not_full_reachable_count():
+    assert solve([])['discovered_states']==1
+    assert solve(['up'])['discovered_states']==3

@@ -2,7 +2,7 @@
 
 Creates a 2x2 sliding puzzle by executing supplied legal blank moves from a
 solved board, then finds a shortest solution using exhaustive BFS over at most
-24 permutations. Returns the puzzle, solution moves and reachable-state count.
+24 permutations. Returns the puzzle, solution moves and states discovered before the solution was found.
 NOT_CLAIMED: toy safety, age suitability, engagement validation, physical
 manufacturing, arbitrary puzzle size or autonomous publication.
 """
