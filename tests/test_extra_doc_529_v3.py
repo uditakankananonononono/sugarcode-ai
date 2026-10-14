@@ -100,3 +100,19 @@ def test_status_note_key_and_literal_v4(fn, rows):
     assert result['status_note'] == STATUS_NOTE
     assert result['status_note'] == ('PARTIAL: hash-chain arithmetic over supplied rows only; '
                                    'no judgment of whether the right events were logged')
+
+
+def test_nonadjacent_timestamp_decrease_v5():
+    refused(chain, [(1, 5, 'a'), (2, 10, 'b'), (3, 7, 'c')],
+            'events[2] ts: must not decrease')
+
+
+@pytest.mark.parametrize('digest', ['g'+'0'*63, '0'*63+'g', 'X'*64])
+def test_mixed_invalid_digest_and_alphabet_v5(digest):
+    refused(verify, [(1, 5, 'a', digest)],
+            'rows[0] digest: 64 lowercase hex characters required')
+
+
+def test_every_valid_hex_character_is_accepted_v5():
+    result = verify([(1, 5, 'a', '0123456789abcdef'*4)])
+    assert result['ok'] is False and result['checked'] == 1 and result['first_bad'] == 0
