@@ -187,3 +187,14 @@ def test_name_length_edges_for_facts_and_action_names():
     err(pa, V, 'action name ' + NAME, [], [], [('y' * 31, [], [], [])])
     err(pa, V, 'action name ' + NAME, [], [], [('', [], [], [])])
     assert pa(['x' * 30], ['z'], [('y' * 30, ['x' * 30], ['z'], [])])['plan'] == ['y' * 30]
+
+
+def test_adding_an_already_true_fact_keeps_it_true():
+    r = pa(['a'], ['a', 'b'], [('go', [], ['a', 'b'], [])])
+    assert r == {'found': True, 'plan': ['go'], 'length': 1}
+    # same for a fact that is already true and is also needed by the action
+    assert pa(['a'], ['a', 'b'], [('go', ['a'], ['a', 'b'], [])])['plan'] == ['go']
+    # an action that adds a fact twice over a run: the second run must not switch it off
+    acts = [('one', [], ['a'], []), ('two', ['a'], ['a', 'b'], [])]
+    assert pa([], ['a', 'b'], acts)['plan'] == ['one', 'two']
+    assert pa(['a'], ['a', 'b'], acts)['plan'] == ['two']
