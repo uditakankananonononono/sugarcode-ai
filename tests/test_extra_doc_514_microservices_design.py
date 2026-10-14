@@ -29,3 +29,8 @@ def test_size(bad):
 def test_values(bad):
     with pytest.raises(ValueError) as exc:solve([[0,bad],[0,0]],1)
     assert str(exc.value)=='coupling must be nonbool integers zero through 1000'
+
+
+def test_nonempty_second_service_with_unrestrictive_cap_and_cap12():
+    assert solve([[0]*4]*4,4)=={'services':[[0,2,3],[1]],'cross_coupling':0,'decomposition_performed':False}
+    assert solve([[0]*2]*2,12)=={'services':[[0],[1]],'cross_coupling':0,'decomposition_performed':False}
