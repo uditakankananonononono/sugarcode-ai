@@ -152,6 +152,7 @@ def _core(m):
     assert f(tuple(map(list, rows))) == expected
     assert f([(' ', 0, 0), ('A~ z', 100, 100)]) == _oracle([(' ', 0, 0), ('A~ z', 100, 100)], 10)
     assert f([('x' * 12, 0, 100)]) == _oracle([('x' * 12, 0, 100)], 10)
+    assert f([('a',0,11)])['within_limit'] is False
     rng = random.Random(1086)
     for _ in range(100):
         rows = [(chr(97+i), rng.randint(0, 100), rng.randint(0, 100)) for i in range(rng.randint(1,8))]
@@ -247,6 +248,7 @@ MUTANTS = [
     ("limit=10", "limit=0"),
 ]
 MUTANTS += [('F(100 - old, 100)', 'F(old, 100)'), ('F(100 - new, 100)', 'F(new, 100)'), ('new_risk <= F(limit, 100)', 'new_risk < F(limit, 100)'), ('old_risk - new_risk', 'new_risk - old_risk'), ('1 - old_survival', 'old_survival'), ('1 - new_survival', 'new_survival'), ('new_survival *=', 'new_survival +=')]
+MUTANTS += [('new_risk <= F(limit, 100)', 'new_risk <= F(11, 100)')]
 for _v, _lo, _hi in (('limit',0,100),('x',0,100),('y',0,100)):
     MUTANTS += _ints(_v, _lo, _hi)
 
