@@ -44,3 +44,19 @@ def test_full_empty_matches_and_case_distinct_tokens():
     assert raw_run([('a','RED red 1'),('b','redder')],'ReD 1 1')=={
         'matches':[('a',2,['1','red'])],'query_tokens':['1','red']}
     assert raw_run([('a','blue')],'RED red')=={'matches':[],'query_tokens':['red']}
+
+
+@pytest.mark.parametrize('character', [chr(i) for i in range(128)
+                                     if not chr(i).isalnum() and chr(i) != ' '])
+def test_every_forbidden_ascii_character_document_and_query_v3(character):
+    with pytest.raises(ValueError, match='^ASCII words and spaces required$'):
+        raw_run([('a', 'red'), ('b', 'red'+character+'blue')], 'red')
+    with pytest.raises(ValueError, match='^ASCII words and spaces required$'):
+        raw_run([('a', 'red')], 'red'+character+'blue')
+
+
+def test_ten_unsorted_query_tokens_and_matched_tokens_sorted_v3():
+    query = 'zz yy xx ww vv uu tt ss rr qq'
+    expected = ['qq','rr','ss','tt','uu','vv','ww','xx','yy','zz']
+    assert raw_run([('a', query)], query) == {
+        'matches':[('a',10,expected)],'query_tokens':expected}
