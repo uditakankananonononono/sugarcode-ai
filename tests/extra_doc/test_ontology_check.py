@@ -191,3 +191,17 @@ def test_diamond_ladder_is_fast():
     r = oc(pairs, [], [('i', 'l00a')])
     assert time.time() - t0 < 3
     assert len(r['ancestors']['l00a']) == 56 and len(r['instance_types']['i']) == 57
+
+
+def test_class_below_one_side_of_a_disjoint_pair_is_itself_the_other_side():
+    # b is a kind of a, and a and b are disjoint: b is both, so b is unsatisfiable (a alone is fine)
+    r = oc([('b', 'a')], [('a', 'b')], [])
+    assert r['unsatisfiable'] == ['b'] and r['consistent'] is True
+    r = oc([('a', 'b')], [('a', 'b')], [])                   # same with the names swapped
+    assert r['unsatisfiable'] == ['a']
+    r = oc([('b', 'a')], [('b', 'a')], [])                   # pair written in the other order
+    assert r['unsatisfiable'] == ['b']
+    r = oc([('b', 'a')], [('a', 'b')], [('i', 'b')])
+    assert r['violations'] == [['i', 'a', 'b']] and r['unsatisfiable'] == ['b']
+    r = oc([('b', 'a')], [('a', 'b')], [('i', 'a')])
+    assert r['violations'] == [] and r['unsatisfiable'] == ['b']
