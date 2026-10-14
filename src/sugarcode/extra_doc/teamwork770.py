@@ -1,6 +1,6 @@
 """Row 770: Teamwork - Functions in groups.
 
-SCOPED planning aid over caller supplied rows. No external actions, persistence,
+Bounded planning aid over caller supplied rows. No external actions, persistence,
 capability development evidence, organization quality, or optimal policy claim.
 Explicit import only; 1..32 tuple rows. Labels are lowercase ASCII identifiers.
 """
