@@ -39,3 +39,27 @@ def test_exploit_tie_first_arm_zero_and_full_epsilon():
 def test_exact_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_exact_default_epsilon_round_number_and_zero_arm_refusal():
+    import inspect
+    assert inspect.signature(solve).parameters['epsilon'].default==F(1,10)
+    assert [t['round'] for t in solve(1,[0,0],[0,1])['trace']]==[1,2]
+    with pytest.raises(ValueError) as exc:solve(0,[0],[0])
+    assert str(exc.value)=='arm_count must be a nonbool integer between 1 and 16'
+    with pytest.raises(ValueError) as exc:solve(1,[0],[0],2)
+    assert str(exc.value)=='epsilon must be between zero and one'
+
+@pytest.mark.parametrize('value',[2**32-1,F(2**32-1)])
+def test_scalar_admitted_then_domain_refused(value):
+    with pytest.raises(ValueError) as exc:solve(1,[0],[value])
+    assert str(exc.value)=='rewards must be between zero and one'
+
+
+def test_fraction_denominator_exact_boundary_admitted():
+    assert solve(1,[F(1,2**32-1)],[F(1,2**32-1)])['means']==[F(1,2**32-1)]
+
+@pytest.mark.parametrize('value',[2**32,F(2**32),F(1,2**32)])
+def test_next_bit_exact_refusal(value):
+    with pytest.raises(ValueError) as exc:solve(1,[0],[value])
+    assert str(exc.value)=='rational values must fit 32 bits'
