@@ -79,3 +79,30 @@ def test_fraction_to_boundary_step_both_signs_and_nonzero_limits():
         r=optimize([.001],[b],[-2],[3],[.5],[.000001],1);s=r['steps'][0];p=s['direction'][0]
         assert s['step_size']==pytest.approx(.99*(3-.5)/p if p>0 else .99*(-2-.5)/p,rel=1e-12)
         assert s['point']==pytest.approx([2.975 if p>0 else -1.975],abs=1e-12)
+
+
+def test_natural_armijo_backtracking_literal_point_and_step():
+    r=optimize([.0027401794949267946],[-85.97006090159817],[-48.05094725045404],[7.669396702197396],[2.5773616693397656],[96.07797947602411],1)
+    s=r['steps'][0]
+    assert s['step_size']==pytest.approx(.13684383086244278,rel=1e-13)
+    assert s['point']==pytest.approx([5.097919010604293],abs=1e-12)
+    assert s['barrier_objective_after']==pytest.approx(-910.7037094891912,abs=1e-10)
+
+
+def test_natural_gradient_tolerance_exact_equality_stops_without_step():
+    assert 1e-8-.000001/100+.000001/100==1e-8
+    r=optimize([1],[1e-8],[-100],[100],[0],[.000001],1)
+    assert r['steps']==[] and r['point']==[0] and r['objective']==0
+
+
+def test_synthetic_log_fault_backtracking_failure_exact_attempt_budget(monkeypatch):
+    # Synthetic numerical fault proves guard/budget only, not natural reachability.
+    import sugarcode.extra_doc.interior_barrier234 as m
+    count=[0]
+    def faulty_log(v):
+        count[0]+=1
+        return 0. if count[0]<=2 else -1000000.
+    monkeypatch.setattr(m.math,'log',faulty_log)
+    with pytest.raises(ValueError,match='^interior Armijo step not found within 40 reductions$'):
+        optimize([1],[1],[-1],[1],[0],[1],1)
+    assert count[0]==82
