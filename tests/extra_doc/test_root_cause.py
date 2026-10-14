@@ -207,3 +207,26 @@ def test_dead_branches_do_not_blow_up():
     r = ac(e, 'f')
     assert r == {'ancestors': ['r'], 'roots': ['r'], 'chains': [['r', 'f']], 'chain_count': 1,
                  'min_cut': ['r'], 'min_cut_size': 1}
+
+
+def test_cut_may_use_a_middle_node_beside_a_root_only_path():
+    # z -> m -> f is blocked by m (sorts before z); y -> f is a separate direct path and needs y itself
+    r = ac([('z', 'm'), ('m', 'f'), ('y', 'f')], 'f')
+    assert r['roots'] == ['y', 'z'] and r['min_cut'] == ['m', 'y'] and r['min_cut_size'] == 2
+    assert r == oracle([('z', 'm'), ('m', 'f'), ('y', 'f')], 'f')
+    # the cut node must really block: with m removed, z cannot reach f through another way
+    r = ac([('z', 'm'), ('m', 'n'), ('n', 'f'), ('y', 'f')], 'f')
+    assert r['min_cut'] == ['m', 'y']
+
+
+def test_ancestor_search_visits_each_node_once_on_deep_diamonds():
+    import time
+    e = []
+    for i in range(1, 48):
+        for x in 'ab':
+            for y in 'ab':
+                e.append(('l%02d%s' % (i - 1, x), 'l%02d%s' % (i, y)))
+    e += [('l47a', 'f'), ('l47b', 'f')]
+    t0 = time.time()
+    err(ac, V, 'at most 12 ancestors are supported', e, 'f')
+    assert time.time() - t0 < 3
