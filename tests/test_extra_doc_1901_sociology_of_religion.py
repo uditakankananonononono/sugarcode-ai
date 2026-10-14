@@ -84,9 +84,10 @@ def _expected(rows):
     rising = sorted(g for g in rises if rises[g] > falls[g])
     falling = sorted(g for g in rises if falls[g] > rises[g])
     steepest = None
-    for group in rises:
-        if steepest is None or rises[group] > rises[steepest]:
-            steepest = group
+    if rises:
+        top = max(rises.values())
+        supply = list(dict.fromkeys(g for g, _p, _s in rows))
+        steepest = next(g for g in supply if rises.get(g) == top)
     return {'total': len(rows), 'rises': rises, 'falls': falls,
             'rising': rising, 'falling': falling, 'steepest': steepest}
 
@@ -106,6 +107,10 @@ def _core(m):
     # comparisons follow each group's own subsequence, not adjacent rows
     r = m.track_groups([('a', 'p', 1), ('b', 'q', 9), ('a', 'r', 5)])
     assert r['rises'] == {'a': 1, 'b': 0} and r['rising'] == ['a']
+    # a steepest tie ignores alphabetical order
+    r = m.track_groups([('z', 'p', 1), ('z', 'q', 5),
+                        ('a', 'r', 1), ('a', 's', 5)])
+    assert r['steepest'] == 'z'
     # the steepest tie goes to the first supplied group
     r = m.track_groups([('a', 'p', 1), ('a', 'q', 5),
                         ('b', 'r', 1), ('b', 's', 5)])
@@ -176,6 +181,11 @@ def _late(m):
     assert mixed == m.track_groups([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.track_groups([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.track_groups([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.track_groups([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.track_groups([('a', 'b', 5),
+                           ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.track_groups([('a', 'b', 9)])['rises'] == {'a': 0}
     return True
 
@@ -236,6 +246,7 @@ MUTANTS = [
     ('if falls[g] > rises[g]', 'if falls[g] >= rises[g]'),
     ('if steepest is None or rises[group] > rises[steepest]:',
      'if steepest is None or rises[group] < rises[steepest]:'),
+    ('    for group in rises:', '    for group in sorted(rises):'),
     ("'rising': rising", "'rising': falling"),
     ("'rises': rises", "'rises': falls"),
     ("'total': len(rows)", "'total': len(rises)"),

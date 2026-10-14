@@ -77,9 +77,10 @@ def _expected(rows):
     odd_leaning = sorted(r for r in odds if odds[r] > evens[r])
     even_leaning = sorted(r for r in odds if evens[r] > odds[r])
     oddest = None
-    for rite in odds:
-        if oddest is None or odds[rite] > odds[oddest]:
-            oddest = rite
+    if odds:
+        top = max(odds.values())
+        supply = list(dict.fromkeys(r for r, _o, _s in rows))
+        oddest = next(r for r in supply if odds.get(r) == top)
     return {'total': len(rows), 'odds': odds, 'evens': evens,
             'odd_leaning': odd_leaning, 'even_leaning': even_leaning,
             'oddest': oddest}
@@ -98,6 +99,9 @@ def _core(m):
     # equal counts lean neither way
     r = m.weigh_rites([('r', 'a', 1), ('r', 'b', 2)])
     assert r['odd_leaning'] == [] and r['even_leaning'] == []
+    # an oddest tie ignores alphabetical order
+    r = m.weigh_rites([('z', 'o', 1), ('a', 'o', 3)])
+    assert r['oddest'] == 'z'
     # the oddest tie goes to the first supplied rite
     r = m.weigh_rites([('a', 'o', 1), ('b', 'o', 3)])
     assert r['odd_leaning'] == ['a', 'b'] and r['oddest'] == 'a'
@@ -163,6 +167,11 @@ def _late(m):
     assert mixed == m.weigh_rites([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.weigh_rites([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.weigh_rites([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.weigh_rites([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.weigh_rites([('a', 'b', 5),
+                          ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.weigh_rites([('a', 'b', 9)])['odds'] == {'a': 1}
     return True
 
@@ -222,6 +231,7 @@ MUTANTS = [
     ('if evens[r] > odds[r]', 'if evens[r] >= odds[r]'),
     ('if oddest is None or odds[rite] > odds[oddest]:',
      'if oddest is None or odds[rite] < odds[oddest]:'),
+    ('    for rite in odds:', '    for rite in sorted(odds):'),
     ("'odd_leaning': odd_leaning", "'odd_leaning': even_leaning"),
     ("'odds': odds", "'odds': evens"),
     ("'total': len(rows)", "'total': len(odds)"),

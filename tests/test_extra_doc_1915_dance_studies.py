@@ -75,9 +75,10 @@ def _expected(rows):
         crews[power][crew] = True
     missing = sorted(p for p in range(1, 10) if p not in levels)
     broadest = None
-    for power in levels:
-        if broadest is None or len(crews[power]) > len(crews[broadest]):
-            broadest = power
+    if levels:
+        top = max(len(v) for v in crews.values())
+        supply = list(dict.fromkeys(p for _m, _c, p in rows))
+        broadest = next(p for p in supply if len(crews.get(p, ())) == top)
     return {'total': len(rows), 'levels': levels,
             'missing': missing, 'broadest': broadest}
 
@@ -100,6 +101,10 @@ def _core(m):
     assert r['levels'] == {2: 2, 4: 1} and r['broadest'] == 2
     # repeat rows by one crew do not broaden a level
     r = m.read_levels([('a', 'x', 3), ('b', 'y', 7), ('c', 'z', 7)])
+    assert r['broadest'] == 7
+    # a broadest tie ignores numeric order
+    r = m.read_levels([('m1', 'c1', 7), ('m2', 'c2', 7),
+                       ('m3', 'c3', 3), ('m4', 'c4', 3)])
     assert r['broadest'] == 7
     # the broadest tie goes to the first used level
     r = m.read_levels([('a', 'x', 4), ('b', 'y', 4), ('c', 'y', 6)])
@@ -164,6 +169,11 @@ def _late(m):
     assert mixed == m.read_levels([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.read_levels([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.read_levels([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.read_levels([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.read_levels([('a', 'b', 5),
+                          ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.read_levels([('a', 'b', 9)])['levels'] == {9: 1}
     return True
 
@@ -222,6 +232,7 @@ MUTANTS = [
      'missing = sorted(p for p in range(1, 9) if p not in levels)'),
     ('if broadest is None or len(crews[power]) > len(crews[broadest]):',
      'if broadest is None or len(crews[power]) < len(crews[broadest]):'),
+    ('    for power in levels:', '    for power in sorted(levels):'),
     ("'levels': levels", "'levels': {}"),
     ("'missing': missing", "'missing': []"),
     ("'broadest': broadest", "'broadest': None"),

@@ -82,9 +82,10 @@ def _expected(rows):
         runner_up = None
         chasers = []
     dominant = None
-    for style in styles:
-        if dominant is None or styles[style] > styles[dominant]:
-            dominant = style
+    if styles:
+        top = max(styles.values())
+        supply = list(dict.fromkeys(s for _b, s, _h in rows))
+        dominant = next(s for s in supply if styles.get(s) == top)
     return {'total': len(rows), 'peak': peak, 'runner_up': runner_up,
             'chasers': chasers, 'styles': styles, 'dominant': dominant}
 
@@ -109,6 +110,9 @@ def _core(m):
     # the runner-up can be the lowest height
     r = m.measure_skyline([('b1', 'x', 1), ('b2', 'y', 2)])
     assert r['peak'] == 2 and r['runner_up'] == 1 and r['chasers'] == ['b1']
+    # a dominant tie ignores alphabetical order
+    r = m.measure_skyline([('b1', 'z', 1), ('b2', 'a', 2)])
+    assert r['dominant'] == 'z'
     # the dominant tie goes to the first supplied style
     assert m.measure_skyline([('b1', 'x', 1), ('b2', 'y', 2)])['dominant'] == 'x'
     # dicts keep first-touch order
@@ -172,6 +176,11 @@ def _late(m):
     assert mixed == m.measure_skyline([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.measure_skyline([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.measure_skyline([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.measure_skyline([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.measure_skyline([('a', 'b', 5),
+                              ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.measure_skyline([('a', 'b', 9)])['peak'] == 9
     return True
 
@@ -233,6 +242,7 @@ MUTANTS = [
     ("'chasers': chasers", "'chasers': []"),
     ('if dominant is None or styles[style] > styles[dominant]:',
      'if dominant is None or styles[style] < styles[dominant]:'),
+    ('    for style in styles:', '    for style in sorted(styles):'),
     ("'styles': styles", "'styles': marks"),
     ("'total': len(rows)", "'total': len(styles)"),
     ('        building, style, height = row',

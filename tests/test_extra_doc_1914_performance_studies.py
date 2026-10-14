@@ -75,9 +75,10 @@ def _expected(rows):
             breaks[troupe] += 1
     quiet = sorted(t for t in breaks if breaks[t] == 0)
     chaser = None
-    for troupe in breaks:
-        if chaser is None or breaks[troupe] > breaks[chaser]:
-            chaser = troupe
+    if breaks:
+        top = max(breaks.values())
+        supply = list(dict.fromkeys(t for _a, t, _e in rows))
+        chaser = next(t for t in supply if breaks.get(t) == top)
     return {'total': len(rows), 'breaks': breaks,
             'quiet': quiet, 'chaser': chaser}
 
@@ -95,6 +96,10 @@ def _core(m):
     assert m.break_records([('a', 't', 9), ('b', 't', 1)])['breaks'] == {'t': 0}
     # equal energy is no break either
     assert m.break_records([('a', 't', 5), ('b', 't', 5)])['quiet'] == ['t']
+    # a chaser tie ignores alphabetical order
+    r = m.break_records([('x', 'z', 1), ('x', 'z', 2),
+                         ('y', 'a', 1), ('y', 'a', 2)])
+    assert r['chaser'] == 'z'
     # the chaser tie goes to the first supplied troupe
     r = m.break_records([('a', 'x', 1), ('a', 'x', 2),
                          ('b', 'y', 1), ('b', 'y', 2)])
@@ -160,6 +165,11 @@ def _late(m):
     assert mixed == m.break_records([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.break_records([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.break_records([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.break_records([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.break_records([('a', 'b', 5),
+                            ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.break_records([('a', 'b', 9)])['breaks'] == {'b': 0}
     return True
 
@@ -218,6 +228,7 @@ MUTANTS = [
     ('if breaks[t] == 0', 'if breaks[t] == 1'),
     ('if chaser is None or breaks[troupe] > breaks[chaser]:',
      'if chaser is None or breaks[troupe] < breaks[chaser]:'),
+    ('    for troupe in breaks:', '    for troupe in sorted(breaks):'),
     ("'breaks': breaks", "'breaks': peaks"),
     ("'quiet': quiet", "'quiet': []"),
     ("'chaser': chaser", "'chaser': None"),
