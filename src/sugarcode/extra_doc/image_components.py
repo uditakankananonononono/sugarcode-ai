@@ -13,18 +13,18 @@ STATUS_NOTE = ("PARTIAL: connected foreground cells on a supplied binary grid on
 
 
 def components(image, connectivity=4):
-    if isinstance(connectivity, bool) or not isinstance(connectivity, int):
+    if type(connectivity) is not int:
         raise ValueError("connectivity: integer required")
     if connectivity not in (4, 8):
         raise ValueError("connectivity: must be 4 or 8")
-    if not isinstance(image, (list, tuple)):
+    if type(image) not in (list, tuple):
         raise ValueError("image: list of rows required")
     if not 1 <= len(image) <= MAX_SIDE:
         raise ValueError(f"image: 1 to {MAX_SIDE} rows required")
     width = None
     grid = []
     for r, row in enumerate(image):
-        if not isinstance(row, (list, tuple)):
+        if type(row) not in (list, tuple):
             raise ValueError(f"image[{r}]: list required")
         if width is None:
             if not 1 <= len(row) <= MAX_SIDE:
@@ -34,7 +34,7 @@ def components(image, connectivity=4):
             raise ValueError(f"image[{r}]: {width} cells required")
         cells = []
         for c, v in enumerate(row):
-            if isinstance(v, bool) or not isinstance(v, int):
+            if type(v) is not int:
                 raise ValueError(f"image[{r}][{c}]: integer required")
             if v not in (0, 1):
                 raise ValueError(f"image[{r}][{c}]: must be 0 or 1")
