@@ -1,4 +1,4 @@
-"""Row 410, Keyword Research (PARTIAL: one exact list rule): check a supplied keyword list for repeats and coverage.
+"""Row 410, Keyword Research (Bounded: one exact list rule): check a supplied keyword list for repeats and coverage.
 
 check_keywords(terms) takes terms as a list of 0 to 50 exact strings of 1 to 40 characters. A term's folded form is its
 words lowercased and joined by single spaces. The rules, applied to each term i (0-based), are:

@@ -1,4 +1,4 @@
-"""Row 414, Content Marketing (PARTIAL: one exact mapping rule): check a supplied asset list for funnel coverage.
+"""Row 414, Content Marketing (Bounded: one exact mapping rule): check a supplied asset list for funnel coverage.
 
 check_assets(assets) takes assets as a list of 0 to 30 tuples (title, stage, fmt): title an exact string of 1 to 100
 characters, stage one of 'awareness', 'consideration', 'decision' (exact strings), fmt one of 'blog', 'video', 'guide',

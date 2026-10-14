@@ -1,4 +1,4 @@
-"""Row 412, Technical SEO (PARTIAL: one exact path rule): check supplied URL paths against a fixed structure style.
+"""Row 412, Technical SEO (Bounded: one exact path rule): check supplied URL paths against a fixed structure style.
 
 check_urls(urls) takes urls as a list of 0 to 40 exact strings of 1 to 120 characters. A path's segments are its
 '/'-separated parts, empty parts dropped; its folded form is the segments lowercased and rejoined with '/'. The rules,

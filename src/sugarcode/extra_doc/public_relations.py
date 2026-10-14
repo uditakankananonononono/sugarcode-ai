@@ -1,4 +1,4 @@
-"""Row 416, Public Relations (PARTIAL: one exact triage rule): check a supplied mention list against fixed reach bars.
+"""Row 416, Public Relations (Bounded: one exact triage rule): check a supplied mention list against fixed reach bars.
 
 check_mentions(mentions) takes mentions as a list of 0 to 40 tuples (source, sentiment, reach): source 1 to 24
 lowercase identifier characters, sentiment one of 'positive', 'neutral', 'negative' (exact strings), reach an exact

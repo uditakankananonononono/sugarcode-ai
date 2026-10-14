@@ -1,4 +1,4 @@
-"""Row 413, Local SEO (PARTIAL: one exact consistency rule): check supplied location pages for slug and phone consistency.
+"""Row 413, Local SEO (Bounded: one exact consistency rule): check supplied location pages for slug and phone consistency.
 
 check_locations(pages) takes pages as a list of 0 to 30 tuples (slug, city, phone): slug 1 to 24 lowercase identifier
 characters, city an exact string of 1 to 40 characters, phone an exact string of exactly 10 digits. A city's folded

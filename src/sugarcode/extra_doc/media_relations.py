@@ -1,4 +1,4 @@
-"""Row 417, Media Relations (PARTIAL: one exact tracker rule): check a supplied outreach log for order and blanketing.
+"""Row 417, Media Relations (Bounded: one exact tracker rule): check a supplied outreach log for order and blanketing.
 
 check_outreach(entries) takes entries as a list of 0 to 40 tuples (journalist, outlet, status): journalist and outlet
 1 to 24 lowercase identifier characters, status one of 'pitched', 'replied', 'published', 'declined' (exact strings),

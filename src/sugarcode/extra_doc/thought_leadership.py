@@ -1,4 +1,4 @@
-"""Row 415, Thought Leadership (PARTIAL: one exact evidence rule): check supplied pieces for unsupported claims.
+"""Row 415, Thought Leadership (Bounded: one exact evidence rule): check supplied pieces for unsupported claims.
 
 check_pieces(pieces) takes pieces as a list of 0 to 20 tuples (title, claims): title an exact string of 1 to 100
 characters, claims a list of 0 to 5 exact strings of 1 to 120 characters (the piece's claims of expertise). A claim's

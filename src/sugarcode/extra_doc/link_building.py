@@ -1,4 +1,4 @@
-"""Row 411, Link Building (PARTIAL: one exact link-table rule): check a supplied backlink list.
+"""Row 411, Link Building (Bounded: one exact link-table rule): check a supplied backlink list.
 
 check_links(links) takes links as a list of 0 to 30 tuples (source, target, anchor): source and target 1 to 24
 lowercase identifier characters (site slugs), anchor an exact string of 1 to 80 characters. The rules, applied to each
