@@ -12,8 +12,12 @@ best fixed expert (lowest cumulative loss, ties to the lowest index).
 It uses the linear (1 - eta l) update instead of exp(-eta l) because the
 exponential is not rational.
 Caps: 1 to 5 experts, 1 to 16 rounds, losses and eta nonbool int or Fraction with
-numerator and denominator at most 32 bits, losses in [0, 1]. Checks run before
-any scan.
+numerator and denominator at most 32 bits, losses in [0, 1]. Order of checks:
+the round cap first, then row types and the first-row expert cap (at most 16 cheap
+type checks), then every value is converted to a Fraction and checked against the
+32-bit and range rules, and only then is any arithmetic done. An oversized int is
+converted to a Fraction just before its bit-length check (bounded cost, no
+arithmetic on it).
 
 NOT_CLAIMED: no regret bound is asserted by this module (the textbook bound is
 not checked here); regret values are exact for the supplied losses only. Losses
