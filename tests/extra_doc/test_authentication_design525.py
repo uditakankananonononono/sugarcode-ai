@@ -99,3 +99,34 @@ def test_complete_authentication_truth_table():
     for primary,second,required in itertools.product((0,1),repeat=3):
         accepted = (primary,second,required) in {(1,0,0),(1,1,0),(1,1,1)}
         assert run([('subject',primary,second,required)])=={'decisions':[('subject',accepted)]}
+
+
+class L525(list): pass
+class T525(tuple): pass
+class S525(str): pass
+class I525(int): pass
+
+
+@pytest.mark.parametrize('container', [L525, T525])
+def test_subclass_outer_and_row_v3(container):
+    with pytest.raises(TypeError, match='^exact list required$'):
+        run(container(ROWS))
+    with pytest.raises(TypeError, match='^exact tuple row required$'):
+        run([ROWS[0], container(ROWS[1])])
+
+
+def test_label_subclass_nonfirst_v3():
+    with pytest.raises(TypeError, match='^exact string label required$'):
+        run([ROWS[0], (S525('bob'), 1, 0, 0)])
+
+
+@pytest.mark.parametrize('slot', [1, 2, 3])
+def test_bit_subclass_nonfirst_v3(slot):
+    row = list(ROWS[1]); row[slot] = I525(row[slot])
+    with pytest.raises(TypeError, match='^exact nonbool integer required$'):
+        run([ROWS[0], tuple(row)])
+
+
+def test_duplicate_subject_full_message_v3():
+    with pytest.raises(ValueError, match='^duplicate subject$'):
+        run([ROWS[0], ROWS[0]])

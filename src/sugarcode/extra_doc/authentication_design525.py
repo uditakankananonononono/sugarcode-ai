@@ -52,10 +52,34 @@ def evaluate_authentication(rows):
                           for subject,primary,second,required in sorted(rows)]}
 
 
+_SMALL_ORDER_PUBLIC_KEYS = frozenset(bytes.fromhex(value) for value in (
+    '0100000000000000000000000000000000000000000000000000000000000000',
+    'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a',
+    '0000000000000000000000000000000000000000000000000000000000000080',
+    '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05',
+    'ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f',
+    '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85',
+    '0000000000000000000000000000000000000000000000000000000000000000',
+    'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa',
+))
+
+
+def _small_order_public_key(encoded):
+    # Normalize field aliases too; sign is irrelevant for the two x=0 points.
+    bits = int.from_bytes(encoded, 'little')
+    y = (bits & (2**255 - 1)) % (2**255 - 19)
+    sign = bits >> 255
+    if y in (1, 2**255 - 20):
+        sign = 0
+    normalized = (y | (sign << 255)).to_bytes(32, 'little')
+    return normalized in _SMALL_ORDER_PUBLIC_KEYS
+
+
 def verify_challenge_signature(row):
     """Tuple: (Ed25519 public_key bytes32, challenge bytes16..256, signature bytes64).
 
-    Cryptographically verify possession evidence for this exact challenge/key.
+    Verify an Ed25519 signature for this exact challenge/key, rejecting small-order
+    public keys. Signature validity alone does not establish identity or enrollment.
     The caller must bind the public key through trusted enrollment, issue a fresh
     unpredictable challenge and consume it once. This stateless helper does NOT
     verify a person's identity, challenge freshness, audience or replay status.
@@ -72,6 +96,8 @@ def verify_challenge_signature(row):
     public_key, challenge, signature = row
     if len(public_key) != 32 or not 16 <= len(challenge) <= 256 or len(signature) != 64:
         raise ValueError('proof byte lengths outside declared range')
+    if _small_order_public_key(public_key):
+        raise ValueError('small-order public key refused')
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
     from cryptography.exceptions import InvalidSignature
     try:

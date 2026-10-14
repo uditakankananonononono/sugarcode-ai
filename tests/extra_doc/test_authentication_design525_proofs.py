@@ -39,3 +39,37 @@ def test_slot_type(slot,bad):
 def test_byte_lengths(slot,n):
     row=[bytes(32),bytes(16),bytes(64)];row[slot]=bytes(n)
     with pytest.raises(ValueError,match='^proof byte lengths outside declared range$'):run(tuple(row))
+
+
+class L525(list): pass
+class T525(tuple): pass
+class B525(bytes): pass
+
+
+@pytest.mark.parametrize('container', [L525, T525])
+def test_proof_container_subclass_v3(container):
+    _, public = keypair()
+    with pytest.raises(TypeError, match='^exact tuple proof required$'):
+        run(container((public, bytes(16), bytes(64))))
+
+
+@pytest.mark.parametrize('slot', range(3))
+def test_proof_bytes_subclass_v3(slot):
+    _, public = keypair()
+    proof = [public, bytes(16), bytes(64)]; proof[slot] = B525(proof[slot])
+    with pytest.raises(TypeError, match='^exact proof bytes required$'):
+        run(tuple(proof))
+
+
+@pytest.mark.parametrize('n', [16, 32, 256])
+def test_identity_universal_forgery_refused_v3(n):
+    public = (1).to_bytes(32, 'little')
+    with pytest.raises(ValueError, match='^small-order public key refused$'):
+        run((public, b'a' * n, public + bytes(32)))
+
+
+@pytest.mark.parametrize('encoded', ['0100000000000000000000000000000000000000000000000000000000000000', 'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a', '0000000000000000000000000000000000000000000000000000000000000080', '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05', 'ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f', '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85', '0000000000000000000000000000000000000000000000000000000000000000', 'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa'])
+def test_all_eight_torsion_public_keys_refused_v3(encoded):
+    public = bytes.fromhex(encoded)
+    with pytest.raises(ValueError, match='^small-order public key refused$'):
+        run((public, bytes(16), public + bytes(32)))
