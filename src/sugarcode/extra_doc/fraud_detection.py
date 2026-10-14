@@ -19,7 +19,7 @@ STATUS_NOTE = ("PARTIAL: two fixed rules over supplied transactions; a flag is a
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -30,13 +30,13 @@ def screen(transactions, amount_limit, max_count, window):
     amount_limit = _int(amount_limit, "amount_limit", 1, MAX_AMOUNT)
     max_count = _int(max_count, "max_count", 1, MAX_COUNT)
     window = _int(window, "window", 1, MAX_WINDOW)
-    if not isinstance(transactions, (list, tuple)):
+    if type(transactions) not in (list, tuple):
         raise ValueError("transactions: list required")
     if not 1 <= len(transactions) <= MAX_TX:
         raise ValueError(f"transactions: 1 to {MAX_TX} entries required")
     tx = []
     for i, t in enumerate(transactions):
-        if not isinstance(t, (list, tuple)):
+        if type(t) not in (list, tuple):
             raise ValueError(f"transactions[{i}]: (ts, amount) required")
         if len(t) != 2:
             raise ValueError(f"transactions[{i}]: 2 entries required")
