@@ -44,3 +44,13 @@ def test_independent_truth_table():
     rows=[('s_'+str(i).zfill(2),1,0) for i in reversed(range(32))];assert run(rows)['truths']==[(r[0],False,False) for r in sorted(rows)]
     from sugarcode.extra_doc import deductive_reasoning854_x2 as m
     assert 'NOT_CLAIMED: real proof validity, sound premises, semantic propositions,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

@@ -28,4 +28,4 @@ def declared_material_implications(rows):
     _rows(rows,'statements',32,3)
     for label,premise,conclusion in rows:_label(label);_integer(premise,0,1);_integer(conclusion,0,1)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('statement labels must be unique')
-    return {'truths':[(label,not bool(premise) or bool(conclusion),bool(conclusion) or not bool(premise)) for label,premise,conclusion in sorted(rows)],'proofs_verified':False}
+    return {'truths':[(label,not bool(premise) or bool(conclusion),bool(conclusion) or not bool(premise)) for label,premise,conclusion in sorted(rows,key=lambda r:r[0])],'proofs_verified':False}

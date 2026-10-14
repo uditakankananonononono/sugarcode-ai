@@ -48,3 +48,13 @@ def test_independent_scaled_shares_oracle():
     from sugarcode.extra_doc import probabilistic_reasoning848_x2 as m
     assert 'NOT_CLAIMED: valid beliefs, Bayesian evidence, calibrated uncertainty,' in m.__doc__
     assert run([('a',1),('b',1)])['shares']==[('a',F(1,2)),('b',F(1,2))]
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

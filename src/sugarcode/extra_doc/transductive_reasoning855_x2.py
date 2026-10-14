@@ -29,5 +29,5 @@ def nearest_declared_exemplars(rows,query):
     for label,coordinate,code in rows:_label(label);_integer(coordinate,-1000,1000);_integer(code,0,15)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('exemplar labels must be unique')
     distance=min(abs(coordinate-query) for _,coordinate,_ in rows)
-    nearest=[(label,code) for label,coordinate,code in sorted(rows) if abs(coordinate-query)==distance]
+    nearest=[(label,code) for label,coordinate,code in sorted(rows,key=lambda r:r[0]) if abs(coordinate-query)==distance]
     return {'distance':distance,'exemplars':[l for l,_ in nearest],'class_codes':sorted({c for _,c in nearest}),'classification_verified':False}

@@ -29,4 +29,4 @@ def declared_scale_conversions(rows):
     for label,quantity,source,target in rows:_label(label);_integer(quantity,-1000,1000);_integer(source,1,1000);_integer(target,1,1000)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('quantity labels must be unique')
     from fractions import Fraction
-    return {'converted':[(label,Fraction(quantity*source,target)) for label,quantity,source,target in sorted(rows)],'units_verified':False}
+    return {'converted':[(label,Fraction(quantity*source,target)) for label,quantity,source,target in sorted(rows,key=lambda r:r[0])],'units_verified':False}

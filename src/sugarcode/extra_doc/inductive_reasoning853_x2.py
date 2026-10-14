@@ -31,5 +31,5 @@ def declared_pooled_rates(rows):
         if successes>attempts:raise ValueError('successes must not exceed attempts')
     if len({r[0] for r in rows})!=len(rows):raise ValueError('sample labels must be unique')
     from fractions import Fraction
-    return {'rates':[(label,Fraction(s,a)) for label,s,a in sorted(rows)],
+    return {'rates':[(label,Fraction(s,a)) for label,s,a in sorted(rows,key=lambda r:r[0])],
             'pooled':Fraction(sum(s for _,s,_ in rows),sum(a for _,_,a in rows)),'generalization_verified':False}

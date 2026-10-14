@@ -25,5 +25,5 @@ def declared_default_bits(rows):
         _label(label)
         if type(default) is not bool or type(contradicted) is not bool:raise TypeError('default flags must be exact bool')
     if len({r[0] for r in rows})!=len(rows):raise ValueError('default labels must be unique')
-    return {'accepted':[l for l,d,c in sorted(rows) if d and not c],
-            'blocked':[l for l,d,c in sorted(rows) if d and c],'inactive':[l for l,d,c in sorted(rows) if not d],'assumptions_verified':False}
+    return {'accepted':[l for l,d,c in sorted(rows,key=lambda r:r[0]) if d and not c],
+            'blocked':[l for l,d,c in sorted(rows,key=lambda r:r[0]) if d and c],'inactive':[l for l,d,c in sorted(rows,key=lambda r:r[0]) if not d],'assumptions_verified':False}

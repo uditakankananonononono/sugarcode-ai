@@ -43,3 +43,13 @@ def test_independent_sorted_pair_oracle():
     rows=[('m_'+str(i).zfill(2),10000,10000) for i in reversed(range(32))];assert run(rows)['memberships']==[(r[0],10000,10000,0,10000) for r in sorted(rows)]
     from sugarcode.extra_doc import fuzzy_logic849_x2 as m
     assert 'NOT_CLAIMED: valid fuzzy sets, vague meaning interpretation, decisions,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

@@ -31,4 +31,4 @@ def declared_weight_shares(rows):
     total=sum(w for _,w in rows)
     if total==0:raise ValueError('at least one weight must be positive')
     from fractions import Fraction
-    return {'shares':[(label,Fraction(weight,total)) for label,weight in sorted(rows)],'beliefs_verified':False}
+    return {'shares':[(label,Fraction(weight,total)) for label,weight in sorted(rows,key=lambda r:r[0])],'beliefs_verified':False}

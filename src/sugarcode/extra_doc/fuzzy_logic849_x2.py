@@ -28,4 +28,4 @@ def declared_membership_algebra(rows):
     _rows(rows,'memberships',32,3)
     for label,a,b in rows:_label(label);_integer(a,0,10000);_integer(b,0,10000)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('membership labels must be unique')
-    return {'memberships':[(label,min(a,b),max(a,b),10000-a,max(a+b-10000,0)) for label,a,b in sorted(rows)],'memberships_verified':False}
+    return {'memberships':[(label,min(a,b),max(a,b),10000-a,max(a+b-10000,0)) for label,a,b in sorted(rows,key=lambda r:r[0])],'memberships_verified':False}

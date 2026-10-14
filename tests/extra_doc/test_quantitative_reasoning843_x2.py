@@ -42,3 +42,13 @@ def test_independent_fraction_scale_oracle():
     rows=[('q_'+str(i).zfill(2),1000,1000,1) for i in reversed(range(32))];assert run(rows)['converted']==[(r[0],1000000) for r in sorted(rows)]
     from sugarcode.extra_doc import quantitative_reasoning843_x2 as m
     assert 'NOT_CLAIMED: valid units, dimensional consistency, measurement truth,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

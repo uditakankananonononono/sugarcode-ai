@@ -28,5 +28,5 @@ def declared_direction_products(rows):
     _rows(rows,'directions',32,3)
     for label,a,b in rows:_label(label);_integer(a,-1,1);_integer(b,-1,1)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('direction labels must be unique')
-    products=[(label,a*b) for label,a,b in sorted(rows)]
+    products=[(label,a*b) for label,a,b in sorted(rows,key=lambda r:r[0])]
     return {'products':products,'positive':[l for l,p in products if p>0],'negative':[l for l,p in products if p<0],'zero':[l for l,p in products if p==0],'interpretation_verified':False}

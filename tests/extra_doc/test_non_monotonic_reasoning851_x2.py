@@ -48,3 +48,13 @@ def test_identity_key_independent_fields():
     with pytest.raises(ValueError,match='^event labels must be unique$'):run([('a',0,True),('a',1,False)])
     assert run([('a',1,True),('b',1,True)])['facts']==[1]
     assert run([('a',1,True),('b',8,True)])['facts']==[1,8]
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

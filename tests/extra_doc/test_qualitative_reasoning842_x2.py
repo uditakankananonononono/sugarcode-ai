@@ -45,3 +45,13 @@ def test_independent_sign_table():
         assert r[key]==sorted(x[0] for x in rows) and r['products']==[(x[0],p) for x in sorted(rows)]
     from sugarcode.extra_doc import qualitative_reasoning842_x2 as m
     assert 'NOT_CLAIMED: qualitative world models, semantic directions, causal truth,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])
