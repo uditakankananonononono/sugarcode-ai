@@ -1,4 +1,4 @@
-"""Row 682, Ports and Adapters (PARTIAL: one exact wiring rule): check that ports have adapters on one side and the core uses them.
+"""Row 682, Ports and Adapters (Bounded: one exact wiring rule): check that ports have adapters on one side and the core uses them.
 
 check_wiring(ports, adapters, core_ports) takes ports as a list of port names, adapters as a list of (adapter, port, side)
 where side is 'driving' (the outside calls the core through the port) or 'driven' (the core calls the outside through the
