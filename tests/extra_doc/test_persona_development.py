@@ -121,3 +121,9 @@ def test_non_ascii_witnesses():
         refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v' + ch}], ['a'])
         refuses(ValueError, 'attribute values must be 1 to 40 characters without control or unassigned characters', [{'a': 'v'}, {'a': ch}], ['a'])
     assert bp([{'a': 'caf\u00e9 \u4e2d \U0001f600'}], ['a'])['persona']['a']['value'] == 'caf\u00e9 \u4e2d \U0001f600'
+
+
+def test_mixed_list_tuple_inputs_both_orders():
+    rs = [{'a': 'x'}, {'a': 'y'}]
+    assert bp(rs, ['a']) == bp(tuple(rs), ('a',)) == bp(rs, ('a',)) == bp(tuple(rs), ['a'])
+    assert bp(rs[::-1], ['a'])['persona']['a']['value'] == 'y' and bp(rs, ['a'])['persona']['a']['value'] == 'x'

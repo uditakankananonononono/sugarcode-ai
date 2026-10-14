@@ -91,3 +91,10 @@ def test_non_ascii_witnesses():
             refuses(ValueError, TXT, [row])
             refuses(ValueError, TXT, [('a', 'b', 'c'), row])
     assert aj([('caf\u00e9', '\u4e2d', '\U0001f600')])['statements']
+
+
+def test_mixed_list_tuple_rows_both_orders():
+    a, b = ('s', 'm', 'o'), ['s', 'n', 'p']
+    assert aj([a, b]) == aj([list(a), list(b)]) == aj([tuple(a), tuple(b)])
+    assert [m['motivation'] for m in aj([b, a])['motivations']] == ['n', 'm']
+    assert [m['motivation'] for m in aj([a, b])['motivations']] == ['m', 'n']

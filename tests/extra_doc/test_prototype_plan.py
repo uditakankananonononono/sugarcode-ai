@@ -121,3 +121,9 @@ def test_check_order():
     refuses(ValueError, DEPI, [('a', 1, [True, 9])])
     refuses(ValueError, DEPU, [('a', 1, [0]), ('a', 1, [1])])
     refuses(ValueError, UNI, [('a', 1, []), ('a', 1, [0])])
+
+
+def test_mixed_list_tuple_rows_both_orders():
+    a, b = ('a', 1, []), ['b', 2, (0,)]
+    assert pp([a, b]) == pp([list(a), list(b)]) == pp([tuple(a), tuple(b)])
+    assert pp([['b', 2, ()], ('a', 1, [0])])['finish'] == [2, 3]

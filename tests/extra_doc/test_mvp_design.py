@@ -134,3 +134,9 @@ def test_check_order():
     refuses(ValueError, LAB, [('\n', True, 1)], 'x')
     refuses(ValueError, VAL, [('a', True, 1), ('a', 1, 1)], 'x')
     refuses(ValueError, BUD, [('a', 1, 1), ('a', 1, 1)], 'x')
+
+
+def test_mixed_list_tuple_rows_both_orders():
+    a, b = ('a', 1, 1), ['b', 2, 2]
+    assert st([a, b], 5) == st([list(a), list(b)], 5) == st([tuple(a), tuple(b)], 5)
+    assert st([b, a], 5)['labels'] == ['b', 'a'] and st([a, b], 5)['labels'] == ['a', 'b']

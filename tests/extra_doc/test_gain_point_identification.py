@@ -100,3 +100,10 @@ def test_non_ascii_witnesses():
         refuses(ValueError, LAB, [(ch, 1, 0)])
         refuses(ValueError, LAB, [('a', 1, 0), ('b' + ch + 'c', 1, 0)])
     assert rg([('caf\u00e9 \u4e2d \U0001f600', 1, 0)])['ranked'][0]['label'] == 'caf\u00e9 \u4e2d \U0001f600'
+
+
+def test_mixed_list_tuple_rows_both_orders():
+    a, b = ('a', 5, 0), ['b', 5, 0]
+    assert rg([a, b]) == rg([tuple(a), tuple(b)]) == rg([list(a), list(b)])
+    assert [x['label'] for x in rg([b, a])['ranked']] == ['b', 'a']
+    assert [x['label'] for x in rg([a, b])['ranked']] == ['a', 'b']

@@ -95,3 +95,10 @@ def test_non_ascii_witnesses():
         refuses(ValueError, ENT, mk(problem=['a', ch]))
         refuses(ValueError, ENT, mk(unfair_advantage=['b' + ch + 'c']))
     assert cc(mk(problem=['caf\u00e9 \u4e2d \U0001f600']))['counts'][0] == 1
+
+
+def test_mixed_list_tuple_rows_both_orders():
+    a = mk(problem=('x',), solution=['y'])
+    b = mk(problem=['x'], solution=('y',))
+    assert cc(a) == cc(b) == cc(tuple(tuple(r) for r in a))
+    assert cc([('x',)] + [['y']] * 8)['filled_count'] == cc([['y']] * 8 + [('x',)])['filled_count'] == 9
