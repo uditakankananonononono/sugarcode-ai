@@ -124,3 +124,8 @@ def test_nonunit_feature_mean_and_multiple_evaluation_mse():
     assert result=={'slope_fraction':'2','intercept_fraction':'1',
                     'predictions':[('a','5'),('b','9'),('c','1'),('d','7')],
                     'evaluation_mse_fraction':'5','training_count':2,'evaluation_count':2}
+
+
+def test_single_training_with_evaluation_refuses_split_before_variance():
+    with pytest.raises(ValueError,match='^at least two training and one evaluation samples required$'):
+        run([('train',2,5,1),('eval',3,7,0)])
