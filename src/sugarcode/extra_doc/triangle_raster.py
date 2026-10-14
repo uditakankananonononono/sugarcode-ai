@@ -1,4 +1,4 @@
-"""Row 578, Rendering Engine (PARTIAL: one exact step of a renderer): which pixels a triangle covers.
+"""Row 578, Rendering Engine (bounded scope: one exact step of a renderer): which pixels a triangle covers.
 
 rasterize(width, height, a, b, c) takes a grid of width x height pixels, where pixel (x, y) has its sample point at
 its centre (x + 1/2, y + 1/2), and a triangle with vertices a, b, c (each an (x, y) pair). It returns

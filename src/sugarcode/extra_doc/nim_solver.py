@@ -1,4 +1,4 @@
-"""Row 576, Game Engine (PARTIAL: one fixed rule set, solved exactly): who wins a game of Nim with a take limit, and how.
+"""Row 576, Game Engine (bounded scope: one fixed rule set, solved exactly): who wins a game of Nim with a take limit, and how.
 
 solve_nim(piles, max_take) plays out the game of Nim in which two players alternate; on a turn the player picks one pile
 and removes between 1 and max_take items from it (not more than the pile holds); the player who cannot move loses.

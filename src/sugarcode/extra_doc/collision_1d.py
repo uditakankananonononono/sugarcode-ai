@@ -1,4 +1,4 @@
-"""Row 577, Physics Engine (PARTIAL: one exact two-body model): head-on collision of two point masses on a line.
+"""Row 577, Physics Engine (bounded scope: one exact two-body model): head-on collision of two point masses on a line.
 
 collide_1d(m1, x1, v1, m2, x2, v2, restitution) puts body 1 at x1 and body 2 at x2 (x1 < x2) moving at constant
 velocities v1 and v2. If body 1 is closing on body 2 (v1 > v2) they meet once, and the speeds change at that meeting

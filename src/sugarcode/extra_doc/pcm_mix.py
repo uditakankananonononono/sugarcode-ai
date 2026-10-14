@@ -1,4 +1,4 @@
-"""Row 579, Audio Engine (PARTIAL: one exact step of an audio engine): mix 16-bit sample tracks with gains.
+"""Row 579, Audio Engine (bounded scope: one exact step of an audio engine): mix 16-bit sample tracks with gains.
 
 mix_pcm(tracks, gains) mixes up to 4 tracks of equal length. For each position i the exact mix is the sum over tracks
 of gains[t] * tracks[t][i] (a Fraction); the output sample is that value rounded half up (floor(value + 1/2)) and then
