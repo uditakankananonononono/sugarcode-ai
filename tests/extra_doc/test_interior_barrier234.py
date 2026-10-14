@@ -125,3 +125,8 @@ def test_negative_endpoint_upper_and_initial_and_small_directions():
 def test_mixed_coordinate_margin_refusal():
     with pytest.raises(ValueError,match='^interior slack margin must be at least 1e-12$'):
         optimize([1,1],[0,0],[0,0],[1,1],[.5,math.nextafter(0,1)],[1],1)
+
+
+def test_initial_margin_error_precedes_invalid_barrier_menu():
+    with pytest.raises(ValueError,match='^interior slack margin must be at least 1e-12$'):
+        optimize([1,1],[0,0],[0,0],[1,1],[.5,1e-13],[],1)

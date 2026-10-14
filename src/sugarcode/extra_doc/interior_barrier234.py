@@ -1,5 +1,6 @@
 """FLOAT separable box log-barrier interior-point Newton path.
-NOT_CLAIMED: exact optimum; arbitrary inequalities; full convergence; authentic
+Domain requires each initial and pre-derivative slack to be at least 1e-12.
+NOT_CLAIMED: smaller-margin inputs; exact optimum; arbitrary inequalities; full convergence; authentic
 model; runtime integration or external execution.
 """
 import math
