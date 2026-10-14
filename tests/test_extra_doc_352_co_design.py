@@ -34,3 +34,19 @@ def test_signed_boundaries_zero_surplus_caps_and_infeasible():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('args,message',[
+ (([[0],None],[0]),'utility rows must match stakeholders'),
+ (([[0,True]],[0,0]),'utilities must be nonbool integers between -1000 and 1000'),
+ (([[0,0]],[0,True]),'minimums must be nonbool integers between -1000 and 1000'),
+ (([[0,-1001]],[0,0]),'utilities must be nonbool integers between -1000 and 1000'),
+ (([[0,0]],[0,-1001]),'minimums must be nonbool integers between -1000 and 1000'),
+ (([[0,0]],[0,1001]),'minimums must be nonbool integers between -1000 and 1000'),
+])
+def test_mixed_rows_and_scalars(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
+
+
+def test_upper_minimum_boundary_admitted():
+    assert solve([[1000]],[1000])['candidate_index']==0
