@@ -3,7 +3,13 @@
 Checks a candidate against the source: protected strings kept verbatim, required phrases present, forbidden terms
 absent, length ratio and a character cap, and a lexical overlap (Jaccard of word sets with protected words removed)
 used as a crude 'near literal' signal. The overlap is a lexical proxy, not a translation or creativity measure.
-No judgment of whether the copy is persuasive, idiomatic or culturally right."""
+No judgment of whether the copy is persuasive, idiomatic or culturally right.
+
+Quirks, by design:
+- protected strings are matched as case-sensitive substrings, while required and forbidden are case-insensitive;
+- if every word of both texts is protected, both word sets are empty, the overlap is 0 and the verdict is
+  "recreated" even for identical text (check("Buy now", "Buy now", ["Buy now"]));
+- words are \\w+ tokens, so "don't" is the two words "don" and "t"."""
 from fractions import Fraction
 import re
 

@@ -120,3 +120,29 @@ def test_limits_and_messages():
                     (dict(source="a", candidate="a", max_chars=5001), r"max_chars: must be within \[1, 5000\]")]:
         with pytest.raises(ValueError, match=msg):
             C(**kw)
+
+
+def test_ok_false_for_each_single_cause():
+    base = C("src", "Great Deal", required=["great deal"], forbidden=["cheap"])
+    assert base["ok"] is True
+    r = C("src", "Great Deal", required=["missing phrase"])
+    assert r["missing_required"] == ["missing phrase"] and r["missing_protected"] == [] and r["forbidden_found"] == []
+    assert r["too_long"] is False and r["ok"] is False
+    r = C("src", "Great Deal", forbidden=["deal"])
+    assert r["forbidden_found"] == ["deal"] and r["missing_protected"] == [] and r["missing_required"] == []
+    assert r["too_long"] is False and r["ok"] is False
+    r = C("src", "Great Deal", protected=["Nope"])
+    assert r["missing_protected"] == ["Nope"] and r["missing_required"] == [] and r["forbidden_found"] == [] and r["ok"] is False
+    r = C("src", "Great Deal", max_chars=3)
+    assert r["too_long"] is True and r["missing_protected"] == [] and r["missing_required"] == [] and r["ok"] is False
+
+
+def test_documented_quirks():
+    r = C("Buy now", "Buy now", ["Buy now"])
+    assert r["overlap"] == 0 and r["verdict"] == "recreated" and r["missing_protected"] == [] and r["ok"] is True
+    assert C("Buy now", "Buy now")["overlap"] == 1
+    assert C("don't stop", "don t stop")["overlap"] == 1
+    assert C("don't stop", "dont stop")["overlap"] == Fr(1, 4)
+    r = C("src", "nike", protected=["Nike"], required=["NIKE"])          # protected is case-sensitive, required is not
+    assert r["missing_protected"] == ["Nike"] and r["missing_required"] == []
+    assert "Quirks" in t.__doc__ and "don" in t.__doc__ and 'check("Buy now", "Buy now", ["Buy now"])' in t.__doc__
