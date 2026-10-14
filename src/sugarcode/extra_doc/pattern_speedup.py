@@ -10,7 +10,7 @@ The result gives "pattern_trials" and "other_trials" (counts); "pattern_mean" an
 kind has no trials); "speedup", other_mean minus pattern_mean as an exact Fraction string (null
 when either mean is null); and "faster_on_pattern": true when speedup is above 0.
 
-Scope: PARTIAL for the Implicit Learning line. Averages over response times the caller wrote.
+Scope: bounded for the Implicit Learning line. Averages over response times the caller wrote.
 It measures nobody's awareness and does not run a task.
 
 Not claimed: that the learner was unaware of the pattern, that a speedup shows learning, that

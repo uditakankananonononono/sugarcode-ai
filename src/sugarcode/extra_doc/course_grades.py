@@ -10,7 +10,7 @@ The result gives "total_credits"; "earned_credits", the credits of courses with 
 "failed", the sorted names with 0 points; and "heaviest", the name with the most credits (ties
 go to the alphabetically first).
 
-Scope: PARTIAL for the Formal Learning line. Credit-weighted arithmetic on grades the caller
+Scope: bounded for the Formal Learning line. Credit-weighted arithmetic on grades the caller
 wrote. It does not assess anyone or say what a course taught.
 
 Not claimed: that the grades are real, that the average measures learning, that 0 points means

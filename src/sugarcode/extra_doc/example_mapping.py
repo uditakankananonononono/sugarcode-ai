@@ -1,4 +1,4 @@
-"""Row 685, Example Mapping (PARTIAL: one exact card-completeness rule): check an example map is ready to hand over.
+"""Row 685, Example Mapping (Bounded: one exact card-completeness rule): check an example map is ready to hand over.
 
 check_example_map(rules, questions) takes rules as a list of (rule, examples), examples a tuple of example names, and questions
 as a list of (question, resolved) with resolved an exact bool. It returns:

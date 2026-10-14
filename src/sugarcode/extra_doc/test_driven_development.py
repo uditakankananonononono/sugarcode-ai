@@ -1,4 +1,4 @@
-"""Row 687, Test-Driven Development (PARTIAL: one exact cycle rule): check a red, green, refactor log against the TDD cycle.
+"""Row 687, Test-Driven Development (Bounded: one exact cycle rule): check a red, green, refactor log against the TDD cycle.
 
 check_cycle(log) takes log as a list of (phase, passed, failed): phase is 'red', 'green' or 'refactor' and passed and failed
 are the test counts after that step, exact ints from 0 to 1000. Rules, per entry i:

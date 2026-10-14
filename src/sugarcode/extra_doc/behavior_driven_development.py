@@ -1,4 +1,4 @@
-"""Row 686, Behavior-Driven Development (PARTIAL: one exact scenario-shape rule): check the step order of a Given/When/Then scenario.
+"""Row 686, Behavior-Driven Development (Bounded: one exact scenario-shape rule): check the step order of a Given/When/Then scenario.
 
 check_scenario(steps) takes steps as a list of (keyword, text): keyword is 'Given', 'When', 'Then', 'And' or 'But', and text a
 string of 1 to 80 printable ASCII characters with no leading or trailing space. 'And' and 'But' take the effective keyword of

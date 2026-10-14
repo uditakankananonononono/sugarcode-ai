@@ -1,4 +1,4 @@
-"""Row 684, Event Storming (PARTIAL: one exact timeline-grammar rule): check the order of stickies on an event storming timeline.
+"""Row 684, Event Storming (Bounded: one exact timeline-grammar rule): check the order of stickies on an event storming timeline.
 
 check_timeline(stickies) takes stickies as a list of (kind, name) in timeline order; kind is 'actor', 'command', 'policy' or
 'event'. The grammar, checked at every position i (0-based), is:

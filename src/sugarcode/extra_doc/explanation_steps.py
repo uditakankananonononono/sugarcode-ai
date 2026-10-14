@@ -11,7 +11,7 @@ The result gives "total_examples"; "without_example", the sorted names with 0 ex
 as an exact Fraction string; and "complete": true when no step is without an example and no
 step is unchecked.
 
-Scope: PARTIAL for the Explicit Instruction line. Counting over a list the caller wrote. It does
+Scope: bounded for the Explicit Instruction line. Counting over a list the caller wrote. It does
 not teach or judge an explanation.
 
 Not claimed: that the explanation was clear, that examples or checks caused understanding, that

@@ -9,7 +9,7 @@ order home, work, commute, social, online); "total"; "shares", context -> minute
 exact Fraction string (same order); "top", the context with the most minutes (ties go to the
 earlier one in that order); and "missing", the contexts with no moment (same order).
 
-Scope: PARTIAL for the Informal Learning line. Counting minutes in a list the caller wrote. It
+Scope: bounded for the Informal Learning line. Counting minutes in a list the caller wrote. It
 does not observe anyone's day or judge what was learned.
 
 Not claimed: that the moments happened, that minutes mean learning, that these five contexts
