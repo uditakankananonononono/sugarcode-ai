@@ -3,7 +3,11 @@
 core.py fba()/pfba() return ONE optimum (`res.x` from linprog) although FBA optima are
 degenerate (its own pfba docstring says so); no function reports which fluxes are fixed,
 free or blocked at the optimum. FVA: for each reaction, min and max of v subject to
-S v = 0, lb <= v <= ub, objective >= fraction * optimum (two LPs per reaction)."""
+S v = 0, lb <= v <= ub, objective >= fraction * optimum (two LPs per reaction).
+
+Tolerance wording: `fixed` is hi - lo <= tol. With tol=0 it is True only when the min LP and the max
+LP return bit-for-bit identical values; solver float noise (~1e-15) can make a truly fixed reaction
+report fixed=False at tol=0. Use the default tol=1e-6 for practical fixed detection."""
 from __future__ import annotations
 import math
 import numpy as np
