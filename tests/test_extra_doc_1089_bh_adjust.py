@@ -152,6 +152,7 @@ def _core(m):
     assert f(tuple(map(list, rows))) == expected
     assert f([(' ', 0, 0), ('A~ z', 100, 100)]) == _oracle([(' ', 0, 0), ('A~ z', 100, 100)], 5)
     assert f([('x' * 12, 0, 100)]) == _oracle([('x' * 12, 0, 100)], 5)
+    assert f([('b',25,0),('a',25,0)])['adjusted'] == [('a','1/4'),('b','1/4')]
     rng = random.Random(1089)
     for _ in range(700):
         rows = [(chr(97+i), rng.randint(0, 100), rng.randint(0, 100)) for i in range(rng.randint(1,8))]
@@ -247,6 +248,7 @@ MUTANTS = [
     ("level=5", "level=1"),
 ]
 MUTANTS += [('F(x, 100+y)', 'F(x, 100)'), ('min(running, len(ranked) * ranked[i][1] / (i+1))', 'min(F(1), len(ranked) * ranked[i][1] / (i+1))'), ('/ (i+1)', '/ (i+2)'), ('len(ranked) * ranked[i][1]', 'ranked[i][1]'), ('p <= F(level, 100)', 'p < F(level, 100)'), ('(r[1], r[0])', '(-r[1], r[0])'), ('range(len(ranked)-1, -1, -1)', 'range(len(ranked)-1, 0, -1)')]
+MUTANTS += [('key=lambda r: (r[1], r[0])', 'key=lambda r: (r[1], r[1])')]
 for _v, _lo, _hi in (('level',1,100),('x',0,100),('y',0,100)):
     MUTANTS += _ints(_v, _lo, _hi)
 
