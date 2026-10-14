@@ -245,3 +245,16 @@ def test_rule4_window_is_exactly_eight_points():
     assert ccs([1] * 8 + [-1], 0, 1)['rule4'] == [7]
     assert ccs([-1] * 8 + [1], 0, 1)['rule4'] == [7]
     assert ccs([1] * 8 + [-1] + [1] * 8, 0, 1)['rule4'] == [7, 16]
+
+
+def test_in_control_is_false_for_each_rule_alone():
+    r = ccs([1] * 8, 0, 2)                  # only rule 4 fires
+    assert (r['rule1'], r['rule2'], r['rule3'], r['rule4']) == ([], [], [], [7]) and r['in_control'] is False
+    r = ccs([4], 0, 1)                      # only rule 1 (4 sigma, a single point)
+    assert (r['rule1'], r['rule2'], r['rule3'], r['rule4']) == ([0], [], [], []) and r['in_control'] is False
+    r = ccs([F(5, 2), 0, F(5, 2)], 0, 1)    # only rule 2: two of three beyond 2 sigma
+    assert (r['rule1'], r['rule2'], r['rule3'], r['rule4']) == ([], [2], [], []) and r['in_control'] is False
+    r = ccs([0, 2, 0, 2, 2, 2], 0, 2)       # 1 sigma units: z = 0,1,0,1,1,1 are not beyond 1 -> nothing fires
+    assert r['in_control'] is True and (r['rule1'], r['rule2'], r['rule3'], r['rule4']) == ([], [], [], [])
+    r = ccs([0, 2, 0, 2, 2, 2], 0, 1)       # only rule 3 fires at index 5 (z of 2 is beyond 1 sigma but not 2 sigma twice in 3)
+    assert r['rule3'] == [5] and r['in_control'] is False
