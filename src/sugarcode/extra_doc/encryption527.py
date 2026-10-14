@@ -47,3 +47,24 @@ def decrypt(row):
     """
     key, nonce, data, aad = _request(row, True)
     return AESGCM(key).decrypt(nonce, data, aad)
+
+
+def encrypt_random_nonce(row):
+    """Tuple: (key bytes32, plaintext bytes0..65536, AAD bytes0..4096).
+
+    Generate a 96-bit nonce from the OS CSPRNG and return (nonce, ciphertext).
+    Reduces accidental deterministic reuse, not a uniqueness guarantee: the
+    caller must enforce per-key volume limits, coordinate writers and rotate
+    keys under its own policy. No nonce ledger or key management is provided.
+    """
+    if type(row) is not tuple:
+        raise TypeError('exact tuple encryption input required')
+    if len(row) != 3:
+        raise ValueError('encryption input arity must be three')
+    key, data, aad = row
+    _bytes(key, 32, 32)
+    _bytes(data, 0, 65536)
+    _bytes(aad, 0, 4096)
+    import os
+    nonce = os.urandom(12)
+    return nonce, encrypt((key, nonce, data, aad))
