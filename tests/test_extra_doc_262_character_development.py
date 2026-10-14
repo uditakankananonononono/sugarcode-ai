@@ -72,3 +72,8 @@ def test_exact_label_dimension_rule_event_boundaries():
 def test_remaining_shape_and_lower_boundary_errors(args,message):
     with pytest.raises(ValueError) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_empty_label_length_error_precedes_blank_error():
+    with pytest.raises(ValueError) as exc:solve({'a':[''],'b':['y']},[],[])
+    assert str(exc.value)=='label length must be between 1 and 80'
