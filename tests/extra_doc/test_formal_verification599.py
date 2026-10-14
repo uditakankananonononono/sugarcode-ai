@@ -66,3 +66,9 @@ def test_duplicate_and_state_caps():
     edges=[('s_'+str(i),'s_'+str(i+1)) for i in range(31)]
     assert len(run('s_0',edges,[])['reachable'])==32
     with pytest.raises(ValueError,match='^state count must be at most32$'):run('s_0',edges+[('s_31','s_32')],[])
+
+
+def test_bad_state_order_does_not_replace_lexicographic_witness_tie():
+    edges=[('a','c'),('a','b'),('b','d'),('c','e')]
+    for bad in (['e','d'],['d','e']):
+        assert run('a',edges,bad)['counterexample']==['a','b','d']
