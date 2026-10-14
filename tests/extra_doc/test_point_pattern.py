@@ -169,3 +169,13 @@ def test_all_points_in_one_cell_and_minimum_window():
     q = run(d([[0, 0], [0, 1], [0, 1]], w=1, h=2, nx=1, ny=2))["quadrat"]
     # mean 3/2, deviations -1/2 and 1/2: ss = 1/2, var = 1/2, chi = 1/3
     assert q["variance"] == "1/2" and q["chi_square"] == "1/3" and q["degrees_of_freedom"] == 1
+
+
+def test_variance_to_mean_with_non_unit_mean():
+    q = run(d([[0, 0], [1, 1], [2, 2]]))["quadrat"]
+    assert q["counts"] == [3, 0, 0, 0] and q["mean"] == "3/4"
+    assert q["variance"] == "9/4" and q["variance_to_mean"] == "3" and q["chi_square"] == "9"
+    # counts 2,1,0,0: ss = 25/16 + 1/16 + 9/16 + 9/16 = 11/4 ; var 11/12 ; vmr 11/9 ; chi 11/3
+    q = run(d([[0, 0], [1, 1], [7, 1]]))["quadrat"]
+    assert q["counts"] == [2, 1, 0, 0] and q["mean"] == "3/4"
+    assert q["variance"] == "11/12" and q["variance_to_mean"] == "11/9" and q["chi_square"] == "11/3"
