@@ -1,0 +1,1220 @@
+{
+  "suite": "test_quantum_rows921_922.py",
+  "mutants": [
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-0",
+      "start": 352,
+      "end": 355,
+      "old": "0.9",
+      "new": "1.9"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-1",
+      "start": 352,
+      "end": 355,
+      "old": "0.9",
+      "new": "-0.09999999999999998"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-2",
+      "start": 367,
+      "end": 370,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-3",
+      "start": 367,
+      "end": 370,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-4",
+      "start": 378,
+      "end": 381,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L10-value-5",
+      "start": 378,
+      "end": 381,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-op-6",
+      "start": 1018,
+      "end": 1079,
+      "old": "not 0<=leak<=1 or not 0<threshold<=100 or not reset<threshold",
+      "new": "not 0 <= leak <= 1 and (not 0 < threshold <= 100) and (not reset < threshold)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-op-7",
+      "start": 1149,
+      "end": 1209,
+      "old": "type(weights) not in (list,tuple) or not 1<=len(weights)<=64",
+      "new": "type(weights) not in (list, tuple) and (not 1 <= len(weights) <= 64)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-op-8",
+      "start": 1513,
+      "end": 1577,
+      "old": "type(currents) not in (list,tuple) or not 1<=len(currents)<=1000",
+      "new": "type(currents) not in (list, tuple) and (not 1 <= len(currents) <= 1000)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-op-9",
+      "start": 1836,
+      "end": 1847,
+      "old": "[0.0]*cells",
+      "new": "[0.0] / cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-op-10",
+      "start": 1857,
+      "end": 1866,
+      "old": "[0]*cells",
+      "new": "[0] / cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L19-op-11",
+      "start": 828,
+      "end": 887,
+      "old": "type(x) not in (int,float) or abs(x)>100 or not isfinite(x)",
+      "new": "type(x) not in (int, float) and abs(x) > 100 and (not isfinite(x))"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-ops-12",
+      "start": 1149,
+      "end": 1182,
+      "old": "type(weights) not in (list,tuple)",
+      "new": "type(weights) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L28-op-13",
+      "start": 1346,
+      "end": 1394,
+      "old": "type(row) not in (list,tuple) or len(row)!=cells",
+      "new": "type(row) not in (list, tuple) and len(row) != cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-ops-14",
+      "start": 1513,
+      "end": 1547,
+      "old": "type(currents) not in (list,tuple)",
+      "new": "type(currents) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L34-op-15",
+      "start": 1679,
+      "end": 1727,
+      "old": "type(row) not in (list,tuple) or len(row)!=cells",
+      "new": "type(row) not in (list, tuple) and len(row) != cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L19-ops-16",
+      "start": 828,
+      "end": 854,
+      "old": "type(x) not in (int,float)",
+      "new": "type(x) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L19-ops-17",
+      "start": 858,
+      "end": 868,
+      "old": "abs(x)>100",
+      "new": "abs(x) >= 100"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-ops-18",
+      "start": 1022,
+      "end": 1032,
+      "old": "0<=leak<=1",
+      "new": "0 < leak <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-ops-19",
+      "start": 1022,
+      "end": 1032,
+      "old": "0<=leak<=1",
+      "new": "0 <= leak < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-ops-20",
+      "start": 1040,
+      "end": 1056,
+      "old": "0<threshold<=100",
+      "new": "0 <= threshold <= 100"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-ops-21",
+      "start": 1040,
+      "end": 1056,
+      "old": "0<threshold<=100",
+      "new": "0 < threshold < 100"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-ops-22",
+      "start": 1064,
+      "end": 1079,
+      "old": "reset<threshold",
+      "new": "reset <= threshold"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-ops-23",
+      "start": 1190,
+      "end": 1209,
+      "old": "1<=len(weights)<=64",
+      "new": "1 < len(weights) <= 64"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-ops-24",
+      "start": 1190,
+      "end": 1209,
+      "old": "1<=len(weights)<=64",
+      "new": "1 <= len(weights) < 64"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L28-ops-25",
+      "start": 1346,
+      "end": 1375,
+      "old": "type(row) not in (list,tuple)",
+      "new": "type(row) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L28-ops-26",
+      "start": 1379,
+      "end": 1394,
+      "old": "len(row)!=cells",
+      "new": "len(row) == cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-ops-27",
+      "start": 1555,
+      "end": 1577,
+      "old": "1<=len(currents)<=1000",
+      "new": "1 < len(currents) <= 1000"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-ops-28",
+      "start": 1555,
+      "end": 1577,
+      "old": "1<=len(currents)<=1000",
+      "new": "1 <= len(currents) < 1000"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L34-ops-29",
+      "start": 1679,
+      "end": 1708,
+      "old": "type(row) not in (list,tuple)",
+      "new": "type(row) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L34-ops-30",
+      "start": 1712,
+      "end": 1727,
+      "old": "len(row)!=cells",
+      "new": "len(row) == cells"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-value-31",
+      "start": 1837,
+      "end": 1840,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-value-32",
+      "start": 1837,
+      "end": 1840,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-value-33",
+      "start": 1858,
+      "end": 1859,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L37-value-34",
+      "start": 1858,
+      "end": 1859,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L39-op-35",
+      "start": 1940,
+      "end": 2013,
+      "old": "leak*v[i]+current[i]+sum(weights[i][j]*previous[j] for j in range(cells))",
+      "new": "leak * v[i] + current[i] - sum((weights[i][j] * previous[j] for j in range(cells)))"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L19-value-36",
+      "start": 865,
+      "end": 868,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L19-value-37",
+      "start": 865,
+      "end": 868,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-38",
+      "start": 1022,
+      "end": 1023,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-39",
+      "start": 1022,
+      "end": 1023,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-40",
+      "start": 1031,
+      "end": 1032,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-41",
+      "start": 1031,
+      "end": 1032,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-42",
+      "start": 1040,
+      "end": 1041,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-43",
+      "start": 1040,
+      "end": 1041,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-44",
+      "start": 1053,
+      "end": 1056,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L22-value-45",
+      "start": 1053,
+      "end": 1056,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-value-46",
+      "start": 1190,
+      "end": 1191,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-value-47",
+      "start": 1190,
+      "end": 1191,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-value-48",
+      "start": 1207,
+      "end": 1209,
+      "old": "64",
+      "new": "65"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L24-value-49",
+      "start": 1207,
+      "end": 1209,
+      "old": "64",
+      "new": "63"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-value-50",
+      "start": 1555,
+      "end": 1556,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-value-51",
+      "start": 1555,
+      "end": 1556,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-value-52",
+      "start": 1573,
+      "end": 1577,
+      "old": "1000",
+      "new": "1001"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L31-value-53",
+      "start": 1573,
+      "end": 1577,
+      "old": "1000",
+      "new": "999"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L39-op-54",
+      "start": 1940,
+      "end": 1960,
+      "old": "leak*v[i]+current[i]",
+      "new": "leak * v[i] - current[i]"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L40-ops-55",
+      "start": 2056,
+      "end": 2068,
+      "old": "x>=threshold",
+      "new": "x > threshold"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L39-op-56",
+      "start": 1940,
+      "end": 1949,
+      "old": "leak*v[i]",
+      "new": "leak / v[i]"
+    },
+    {
+      "module": "sugarcode.extra_doc.neuromorphic921",
+      "source": "src/sugarcode/extra_doc/neuromorphic921.py",
+      "name": "neuromorphic921-L39-op-57",
+      "start": 1965,
+      "end": 1990,
+      "old": "weights[i][j]*previous[j]",
+      "new": "weights[i][j] / previous[j]"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-58",
+      "start": 272,
+      "end": 276,
+      "old": "10.0",
+      "new": "11.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-59",
+      "start": 272,
+      "end": 276,
+      "old": "10.0",
+      "new": "9.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-60",
+      "start": 287,
+      "end": 290,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-61",
+      "start": 287,
+      "end": 290,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-62",
+      "start": 297,
+      "end": 300,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-63",
+      "start": 297,
+      "end": 300,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-64",
+      "start": 312,
+      "end": 315,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L9-value-65",
+      "start": 312,
+      "end": 315,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L23-ops-66",
+      "start": 1157,
+      "end": 1173,
+      "old": "reset>=threshold",
+      "new": "reset > threshold"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L24-op-67",
+      "start": 1231,
+      "end": 1283,
+      "old": "type(events) not in (list,tuple) or len(events)>1000",
+      "new": "type(events) not in (list, tuple) and len(events) > 1000"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-68",
+      "start": 1794,
+      "end": 1797,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-69",
+      "start": 1794,
+      "end": 1797,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-70",
+      "start": 1803,
+      "end": 1806,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-71",
+      "start": 1803,
+      "end": 1806,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L20-op-72",
+      "start": 912,
+      "end": 977,
+      "old": "type(x) not in (int,float) or not low<=x<=high or not isfinite(x)",
+      "new": "type(x) not in (int, float) and (not low <= x <= high) and (not isfinite(x))"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-73",
+      "start": 1069,
+      "end": 1073,
+      "old": "1e-6",
+      "new": "1.000001"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-74",
+      "start": 1069,
+      "end": 1073,
+      "old": "1e-6",
+      "new": "-0.999999"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-75",
+      "start": 1074,
+      "end": 1077,
+      "old": "1e6",
+      "new": "1000001.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-76",
+      "start": 1074,
+      "end": 1077,
+      "old": "1e6",
+      "new": "999999.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-77",
+      "start": 1094,
+      "end": 1100,
+      "old": "1e-300",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-78",
+      "start": 1094,
+      "end": 1100,
+      "old": "1e-300",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-79",
+      "start": 1101,
+      "end": 1104,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-80",
+      "start": 1101,
+      "end": 1104,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-81",
+      "start": 1122,
+      "end": 1125,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-82",
+      "start": 1122,
+      "end": 1125,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-83",
+      "start": 1143,
+      "end": 1144,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-84",
+      "start": 1143,
+      "end": 1144,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-85",
+      "start": 1145,
+      "end": 1148,
+      "old": "1e6",
+      "new": "1000001.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-86",
+      "start": 1145,
+      "end": 1148,
+      "old": "1e6",
+      "new": "999999.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L24-ops-87",
+      "start": 1231,
+      "end": 1263,
+      "old": "type(events) not in (list,tuple)",
+      "new": "type(events) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L24-ops-88",
+      "start": 1267,
+      "end": 1283,
+      "old": "len(events)>1000",
+      "new": "len(events) >= 1000"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L28-op-89",
+      "start": 1416,
+      "end": 1457,
+      "old": "type(event) is not tuple or len(event)!=2",
+      "new": "type(event) is not tuple and len(event) != 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-op-90",
+      "start": 1590,
+      "end": 1618,
+      "old": "grouped and t<grouped[-1][0]",
+      "new": "grouped or t < grouped[-1][0]"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-op-91",
+      "start": 1684,
+      "end": 1713,
+      "old": "grouped and t==grouped[-1][0]",
+      "new": "grouped or t == grouped[-1][0]"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-92",
+      "start": 1822,
+      "end": 1825,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L34-value-93",
+      "start": 1822,
+      "end": 1825,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L38-ops-94",
+      "start": 1931,
+      "end": 1947,
+      "old": "t>=blocked_until",
+      "new": "t > blocked_until"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L20-ops-95",
+      "start": 912,
+      "end": 938,
+      "old": "type(x) not in (int,float)",
+      "new": "type(x) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-96",
+      "start": 1118,
+      "end": 1121,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L22-value-97",
+      "start": 1118,
+      "end": 1121,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L24-value-98",
+      "start": 1279,
+      "end": 1283,
+      "old": "1000",
+      "new": "1001"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L24-value-99",
+      "start": 1279,
+      "end": 1283,
+      "old": "1000",
+      "new": "999"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L28-ops-100",
+      "start": 1416,
+      "end": 1440,
+      "old": "type(event) is not tuple",
+      "new": "type(event) is tuple"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L28-ops-101",
+      "start": 1444,
+      "end": 1457,
+      "old": "len(event)!=2",
+      "new": "len(event) == 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-102",
+      "start": 1555,
+      "end": 1556,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-103",
+      "start": 1555,
+      "end": 1556,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-104",
+      "start": 1557,
+      "end": 1560,
+      "old": "1e6",
+      "new": "1000001.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-105",
+      "start": 1557,
+      "end": 1560,
+      "old": "1e6",
+      "new": "999999.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-106",
+      "start": 1574,
+      "end": 1577,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-107",
+      "start": 1574,
+      "end": 1577,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-ops-108",
+      "start": 1602,
+      "end": 1618,
+      "old": "t<grouped[-1][0]",
+      "new": "t <= grouped[-1][0]"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-ops-109",
+      "start": 1696,
+      "end": 1713,
+      "old": "t==grouped[-1][0]",
+      "new": "t != grouped[-1][0]"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L36-op-110",
+      "start": 1890,
+      "end": 1903,
+      "old": "-(t-last)/tau",
+      "new": "-(t - last) * tau"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L40-ops-111",
+      "start": 1987,
+      "end": 2005,
+      "old": "voltage>=threshold",
+      "new": "voltage > threshold"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L20-ops-112",
+      "start": 946,
+      "end": 958,
+      "old": "low<=x<=high",
+      "new": "low < x <= high"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L20-ops-113",
+      "start": 946,
+      "end": 958,
+      "old": "low<=x<=high",
+      "new": "low <= x < high"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L28-value-114",
+      "start": 1456,
+      "end": 1457,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L28-value-115",
+      "start": 1456,
+      "end": 1457,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-116",
+      "start": 1570,
+      "end": 1573,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L30-value-117",
+      "start": 1570,
+      "end": 1573,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-op-118",
+      "start": 1729,
+      "end": 1745,
+      "old": "grouped[-1][1]+w",
+      "new": "grouped[-1][1] - w"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L41-op-119",
+      "start": 2068,
+      "end": 2080,
+      "old": "t+refractory",
+      "new": "t - refractory"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-value-120",
+      "start": 1616,
+      "end": 1617,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-value-121",
+      "start": 1616,
+      "end": 1617,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-122",
+      "start": 1711,
+      "end": 1712,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-123",
+      "start": 1711,
+      "end": 1712,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-124",
+      "start": 1723,
+      "end": 1724,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-125",
+      "start": 1723,
+      "end": 1724,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L36-op-126",
+      "start": 1892,
+      "end": 1898,
+      "old": "t-last",
+      "new": "t + last"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-127",
+      "start": 1741,
+      "end": 1742,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-128",
+      "start": 1741,
+      "end": 1742,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-value-129",
+      "start": 1613,
+      "end": 1614,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L31-value-130",
+      "start": 1613,
+      "end": 1614,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-131",
+      "start": 1708,
+      "end": 1709,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-132",
+      "start": 1708,
+      "end": 1709,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-133",
+      "start": 1738,
+      "end": 1739,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.spiking922",
+      "source": "src/sugarcode/extra_doc/spiking922.py",
+      "name": "spiking922-L32-value-134",
+      "start": 1738,
+      "end": 1739,
+      "old": "1",
+      "new": "0"
+    }
+  ]
+}
