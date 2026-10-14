@@ -2,6 +2,7 @@
 
 Computes exact normalized inverse-squared-distance speaker gains at supplied
 listener sample locations, avoiding zero distance with a positive floor.
+distance_floor applies to squared distance, not ordinary Euclidean distance.
 Each listener's gains sum to one; this creates a spatial gain configuration.
 NOT_CLAIMED: acoustic immersion validation, HRTF, room reflections, delay,
 physical calibration, playback, artistic quality or deployment.

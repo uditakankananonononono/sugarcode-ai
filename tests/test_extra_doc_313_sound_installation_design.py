@@ -38,3 +38,10 @@ def test_errors(args,error,message):
 @pytest.mark.parametrize('value',[2**32,F(2**32),F(1,2**32)])
 def test_next_bit(value):
     with pytest.raises(ValueError,match='^values must fit 32 bits$'):solve([[value,0,0]],[[0]*3])
+
+
+def test_listener_set_and_position_range_declared_errors():
+    with pytest.raises(TypeError) as exc:solve([[0,0,0]],{(0,0,0)})
+    assert str(exc.value)=='speakers and listeners must be lists or tuples'
+    with pytest.raises(ValueError) as exc:solve([range(3)],[[0,0,0]])
+    assert str(exc.value)=='positions must have three coordinates'
