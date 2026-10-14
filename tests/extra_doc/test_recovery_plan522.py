@@ -91,3 +91,13 @@ def test_container_and_prerequisite_subclasses_exact_messages():
         plan([(1, 1), (1, 1)], [[], ListSubclass522([0])])
     with pytest.raises(ValueError, match='^valid nonself prerequisite indices$'):
         plan([(1, 1), (1, 1)], [[], [IntSubclass522(0)]])
+
+
+def test_duplicate_prerequisite_exact_message_nonfirst():
+    with pytest.raises(ValueError, match='^unique prerequisites$'):
+        plan([(1, 1)] * 2, [[], [0, 0]])
+
+
+def test_cycle_exact_message():
+    with pytest.raises(ValueError, match='^prerequisites must be acyclic$'):
+        plan([(1, 1)] * 2, [[1], [0]])
