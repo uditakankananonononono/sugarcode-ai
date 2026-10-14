@@ -56,3 +56,12 @@ def test_rational_outside_bounds(slot,bad,message):
 def test_zero_fraction_endpoints_nonzero_tam_valid_path():
     assert solve([(2,10,0,1)])['totals']=={'tam':20,'sam':0,'som':0}
     assert solve([(2,10,1,0)])['totals']=={'tam':20,'sam':20,'som':0}
+
+@pytest.mark.parametrize('container',[list,tuple])
+@pytest.mark.parametrize('malformed',[None,(1,1,1),[1,1,1],(1,1,1,1,1)])
+@pytest.mark.parametrize('first',[False,True])
+def test_mixed_schema_rows_rejected_before_unpack(container,malformed,first):
+    valid=(1,1,1,1)
+    rows=container([malformed,valid] if first else [valid,malformed])
+    with pytest.raises(ValueError) as exc:solve(rows)
+    assert str(exc.value)=='segments must contain count annual_spend serviceable obtainable'
