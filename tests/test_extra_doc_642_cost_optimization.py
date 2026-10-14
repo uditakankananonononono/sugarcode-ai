@@ -39,7 +39,7 @@ def _survives(battery, old, new):
     code = compile(mutated, 'mutant', 'exec')  # a syntax error is not a kill
     def _timeout(*_):
         raise TimeoutError('mutant did not terminate')
-    signal.signal(signal.SIGALRM, _timeout)
+    previous = signal.signal(signal.SIGALRM, _timeout)
     signal.alarm(5)
     try:
         battery(_load_code(code))
@@ -47,6 +47,7 @@ def _survives(battery, old, new):
         return False
     finally:
         signal.alarm(0)
+        signal.signal(signal.SIGALRM, previous)
     return True
 
 
@@ -157,9 +158,20 @@ def _late(m):
     _raises(ValueError, 'cost must be a nonbool integer between 1 and 100000', m.cut_costs, [('x%d' % i, 1, 1) for i in range(11)] + [('z', 100001, 1)], 0)
 
 
+def _sym(m):
+    OUT = 'items must be a list or tuple'
+    ROW = 'each item must be a (name, cost, impact) triple'
+    for K in (L, T):
+        _raises(TypeError, OUT, m.cut_costs, K([('a', 1, 1)]), 0)
+        _raises(ValueError, ROW, m.cut_costs, [K(('a', 1, 1))], 0)
+        _raises(ValueError, ROW, m.cut_costs, [('a', 1, 1), K(('a', 1, 1))], 0)
+        _raises(ValueError, ROW, m.cut_costs, [K(('a', 1, 1)), ('a', 1, 1)], 0)
+
+
 def battery(m):
     _core(m)
     _late(m)
+    _sym(m)
 
 MUTANTS = [
     ('type(items) not in (list, tuple)', 'not isinstance(items, (list, tuple))'),
