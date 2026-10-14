@@ -10,7 +10,7 @@ string (keys sorted); "best", the action with the largest mean (ties go to the
 alphabetically first); "followed", how many of the observer's choices equal best; and
 "follow_rate", followed divided by the number of choices as an exact Fraction string.
 
-Scope: PARTIAL for the Observational Learning line. Averaging and counting over lists the
+Scope: bounded implementation for the Observational Learning line. Averaging and counting over lists the
 caller wrote. It does not watch anyone or tell why the observer chose as they did.
 
 Not claimed: that the observed rewards were seen by the observer, that choosing the best

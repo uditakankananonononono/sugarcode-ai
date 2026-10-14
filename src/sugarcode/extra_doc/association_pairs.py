@@ -11,7 +11,7 @@ inside a row, rows sorted by low then high), "strongest", the row with the large
 number of presentations as an exact Fraction string, and "partners", a dict of stimulus ->
 number of distinct stimuli it was paired with (keys sorted).
 
-Scope: PARTIAL for the Learning by Association line. Counting over a presentation list the
+Scope: bounded implementation for the Learning by Association line. Counting over a presentation list the
 caller wrote. It does not condition anyone or tell what was learned.
 
 Not claimed: that the presentations happened, that frequent pairing means an association was

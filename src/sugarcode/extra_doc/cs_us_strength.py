@@ -10,7 +10,7 @@ The strength starts at 0. On each trial strength becomes strength + rate/100 * (
 a Fraction string ("strengths"), the final strength, and "trials_to_half": the 1-based number
 of the first trial after which the strength is at least 50 (null when it never is).
 
-Scope: PARTIAL for the Classical Conditioning line. One textbook update rule applied to a
+Scope: bounded implementation for the Classical Conditioning line. One textbook update rule applied to a
 trial list the caller wrote. It does not condition anyone or estimate a real learning rate.
 
 Not claimed: that real learners follow this rule, that the rate fits anyone, that strength

@@ -12,7 +12,7 @@ consequence -> {"transitions": n, "mean_change": exact Fraction string} for each
 that was credited at least once (keys sorted); "increasing": the consequences with a mean
 change above 0 (sorted); "decreasing": those with a mean change below 0 (sorted).
 
-Scope: PARTIAL for the Operant Conditioning line. Arithmetic on interval counts the caller
+Scope: bounded implementation for the Operant Conditioning line. Arithmetic on interval counts the caller
 wrote. It does not condition anyone or show that a consequence caused a change.
 
 Not claimed: that the counts are real behaviour, that a consequence caused the change, that

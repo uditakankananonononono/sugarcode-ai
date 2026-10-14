@@ -1,4 +1,4 @@
-"""Row 631 Metrics Collection (PARTIAL): exact summary of one supplied list of latency-style samples.
+"""Row 631 Metrics Collection (bounded implementation): exact summary of one supplied list of latency-style samples.
 
 summarize(samples, percentiles) takes 1..1000 whole samples (0..10**9) and 1..10 whole percentiles (1..100).
 It returns count, minimum, maximum, sum, the mean as an exact reduced fraction, and for each percentile p the

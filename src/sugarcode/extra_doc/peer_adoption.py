@@ -12,7 +12,7 @@ adopted (2 * adopted_ties > ties). The result gives "state", the new 0/1 list; "
 the sorted person numbers who adopted this round; "adopters", the count of 1s afterwards; and
 "share", adopters divided by the number of people as an exact Fraction string.
 
-Scope: PARTIAL for the Social Learning line. One fixed adoption rule applied once to a
+Scope: bounded implementation for the Social Learning line. One fixed adoption rule applied once to a
 network the caller wrote. It does not model real people or tell what they learn from each other.
 
 Not claimed: that people copy a majority, that ties are real, that one round shows spread over

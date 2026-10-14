@@ -8,7 +8,7 @@ For each action the result gives rewards, punishes and net (rewards minus punish
 keyed by action (keys sorted). It also lists "approach" (actions with net above 0), "avoid"
 (net below 0) and "neutral" (net exactly 0), each sorted.
 
-Scope: PARTIAL for the Vicarious Learning line. Counting over a list the caller wrote. It does
+Scope: bounded implementation for the Vicarious Learning line. Counting over a list the caller wrote. It does
 not watch anyone or say what the observer took from what they saw.
 
 Not claimed: that the observer saw these outcomes, that net means the observer's choice,

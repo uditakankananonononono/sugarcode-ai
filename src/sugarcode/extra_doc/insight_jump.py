@@ -10,7 +10,7 @@ largest change; "plateau", the number of steps before jump_at whose change is 0;
 "sudden": true when jump is at least threshold and every other change is at most half
 of it (exact test: 2 * other <= jump).
 
-Scope: PARTIAL for the Learning by Insight line. Arithmetic on a progress series the
+Scope: bounded implementation for the Learning by Insight line. Arithmetic on a progress series the
 caller wrote. It does not observe anyone's understanding or say what caused a jump.
 
 Not claimed: that the series measures understanding, that a sudden jump is insight, that

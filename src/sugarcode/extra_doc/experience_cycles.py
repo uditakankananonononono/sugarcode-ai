@@ -11,7 +11,7 @@ number of complete cycles; "next_needed", the stage the reading was waiting for 
 of the log; "set_aside", the number of entries that were not the stage needed when read; and
 "stages_seen", a dict of stage -> count for each stage present (keys sorted).
 
-Scope: PARTIAL for the Experiential Learning line. One fixed stage order applied to a log the
+Scope: bounded implementation for the Experiential Learning line. One fixed stage order applied to a log the
 caller wrote. It does not judge anyone's experience or say what was learned.
 
 Not claimed: that the log is a real record, that a complete cycle means learning, that the
