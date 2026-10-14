@@ -27,10 +27,10 @@ def package_spy(monkeypatch):
             bound.apply_defaults()
             return dict(bound.arguments)
         spy.__signature__ = sig
-        monkeypatch.setattr(core, name, spy)
         wrapper = importlib.import_module(module)
         package = importlib.import_module(module.rsplit('.', 1)[0])
         touched.append((wrapper, dict(vars(wrapper)), package, dict(vars(package))))
+        monkeypatch.setattr(core, name, spy)
         importlib.reload(wrapper)
         importlib.reload(package)
         assert getattr(package, name) is getattr(wrapper, name)
