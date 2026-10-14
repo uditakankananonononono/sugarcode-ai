@@ -103,3 +103,13 @@ def test_perturbation_and_independent_matrix_oracle():
     for slot, value in enumerate(('newgroup', 'newchannel', 'newfact', 'newowner', 365)):
         changed = list(rows[0]); changed[slot] = value
         assert run([tuple(changed)])['matrix'] != run([rows[0]])['matrix']
+
+
+@pytest.mark.parametrize('slot', range(4))
+def test_day_ties_resolve_by_every_declared_label_slot(slot):
+    lower = ['a','x','f','o',1]
+    upper = lower.copy()
+    upper[slot] = {'a':'b','x':'y','f':'g','o':'p'}[lower[slot]]
+    expected = [tuple(lower),tuple(upper)]
+    for supplied in (expected, list(reversed(expected))):
+        assert run(supplied)['matrix'] == expected
