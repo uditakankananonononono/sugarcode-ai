@@ -38,3 +38,12 @@ def test_nonadjacent_newer_batch_beats_older_stream():
 def test_nonadjacent_equal_version_stream_wins_even_if_first():
     assert run([('a',1000000,-1000000,1),('b',0,1000000,0),('a',1000000,1000000,0)])=={
         'view':[('a',1000000,-1000000,1),('b',0,1000000,0)],'input_count':3}
+
+
+def test_many_reverse_key_view_is_sorted_v3():
+    keys = ['key_'+str(i).zfill(2) for i in range(24)]
+    rows = [(key, 1, index, 0) for index, key in enumerate(reversed(keys))]
+    result = run(rows)
+    assert [record[0] for record in result['view']] == keys
+    assert result['view'] == sorted(rows)
+    assert result['input_count'] == 24
