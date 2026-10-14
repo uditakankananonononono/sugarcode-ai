@@ -10,7 +10,8 @@ def evolve(state, field, time):
     """Return exp(-i H time)|state>, Bloch vector, norm and energy.
 
     Built-in finite numbers only, normalized two-amplitude list/tuple; three real
-    field components. Unit-norm tolerance 1e-12. Reject overflowing field/time
+    field components. Infinite amplitudes hit the conservative overflow guard
+    with the state-must-have-unit-norm diagnostic. Unit-norm tolerance 1e-12. Reject overflowing field/time
     scales rather than return NaNs; field/time bound is 1e6. No open-system or noise dynamics.
     """
     if type(state) not in (list, tuple) or len(state) != 2:
