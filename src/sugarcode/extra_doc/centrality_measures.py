@@ -13,9 +13,9 @@ order). For every node the result gives, as exact Fractions in strings or intege
     divided by (n - 1)(n - 2) / 2.
 
 Scope: PARTIAL for the Centrality Measures line. It covers degree, closeness, harmonic and
-betweenness on unweighted undirected graphs. It computes no eigenvector, Katz or PageRank
-score (those are not exact rationals), uses no edge weights or directions, and ranks
-nothing as important in the real world.
+betweenness on unweighted undirected graphs. Eigenvector, Katz and PageRank scores are not
+implemented. It uses no edge weights or directions, and ranks nothing as important in the
+real world.
 
 Not claimed: that a high score means a node matters, that the graph is real, that the
 graph is complete, or anything about the real world. Every claim flag in the result is
