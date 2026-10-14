@@ -140,3 +140,12 @@ def test_minimum_canvas_accepted():
     r = A(1, 1, [E("a", 0, 0, 1, 1)])
     assert r["out_of_bounds"] == [] and r["centroid"] == [0.5, 0.5] and r["balanced"] is True
     assert A(10000, 10000, [E("a", 0, 0, 1, 1)])["elements"][0]["margin"] == 0
+
+
+def test_on_thirds_checks_each_axis_not_the_sum():
+    # canvas 90x90, box centre (33,33): nearest thirds point (30,30); each axis error 3/90 = 1/30 <= 1/20, the sum 1/15 > 1/20
+    r = A(90, 90, [E("t", 23, 23, 20, 20)])["elements"][0]
+    assert r["on_thirds"] is True and r["thirds_offset"] == pytest.approx(1 / 15)
+    # one axis over the limit (centre y 35: 5/90 > 1/20) fails even though the other axis is exact
+    assert A(90, 90, [E("t", 20, 25, 20, 20)])["elements"][0]["on_thirds"] is False
+    assert A(90, 90, [E("t", 25, 20, 20, 20)])["elements"][0]["on_thirds"] is False
