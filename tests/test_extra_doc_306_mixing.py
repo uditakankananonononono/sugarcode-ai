@@ -50,3 +50,13 @@ def test_positive_pcm_endpoint_and_overload_strict_equality():
     r=solve([[32767]],[1])
     assert r['samples']==[32767] and r['overload_indices']==[]
     assert solve([[1]],[1],1,False)['overload_indices']==[]
+
+@pytest.mark.parametrize('gains',[{1,2},{0:1}])
+def test_gain_container_nonsequence_refused(gains):
+    with pytest.raises(TypeError) as exc:solve([[0]],gains)
+    assert str(exc.value)=='tracks and gains must be lists or tuples'
+
+@pytest.mark.parametrize('track',[range(3),b'ab'])
+def test_track_nonsequence_container_refused(track):
+    with pytest.raises(ValueError) as exc:solve([track],[1])
+    assert str(exc.value)=='tracks must have between 1 and 4096 samples'
