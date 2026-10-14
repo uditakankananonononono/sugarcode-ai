@@ -108,3 +108,7 @@ def test_repository_replacement_missing_zero_and_key_namespace():
     assert run([('z','k',1,7),('a','k',2,8),('b','k',0,0),('c','j',0,-2),('d','k',0,5),('e','k',1,9),('f','j',2,10),('g','j',2,11)])=={'operations':[('z',None),('a',False),('b',0),('c',-2),('d',5),('e',5),('f',True),('g',False)],'records':[('k',5)]}
     assert run([('a','k',1,0)])['records']==[]
     assert run([('a','k',1,0)])['operations']==[('a',None)]
+
+
+def test_records_sorted_by_key_not_insertion_or_value_order():
+    assert run([('o1','b',0,1),('o2','a',0,2)])['records']==[('a',2),('b',1)]
