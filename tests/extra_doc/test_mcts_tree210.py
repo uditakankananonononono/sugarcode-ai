@@ -118,3 +118,19 @@ def test_different_draws_each_rollout_depth_and_round():
     r=search(nodes,'root',2,0,draws)
     assert r['trace'][0]['rollout_path']==['a','c','h'] and r['trace'][0]['reward_fraction']=='1'
     assert r['trace'][1]['rollout_path']==['b','f'] and r['trace'][1]['reward_fraction']=='3'
+
+
+def test_uct_deeper_parent_child_menu_literal_witness():
+    nodes=[dict(id='r',children=['a'],reward=None),dict(id='a',children=['b','c'],reward=None),dict(id='b',children=[],reward=1),dict(id='c',children=[],reward=2)]
+    r=search(nodes,'r',5,1,[.5]*40)
+    assert [t['selected_path'] for t in r['trace']]==[['r','a'],['r','a','b'],['r','a','c'],['r','a','c'],['r','a','c']]
+    assert r['visits']==dict(r=5,a=5,b=1,c=3) and r['reward_sum_fraction']==dict(r='9',a='9',b='1',c='6') and r['selected_root_child']=='a'
+
+
+def test_asymmetric_depth_three_uct_literal_trace_backprop():
+    nodes=[dict(id='r',children=['a'],reward=None),dict(id='a',children=['b','c'],reward=None),dict(id='b',children=['d','e'],reward=None),dict(id='c',children=[],reward=2),dict(id='d',children=[],reward=-1),dict(id='e',children=[],reward=4)]
+    r=search(nodes,'r',8,1,[.75]*64)
+    assert [t['selected_path'] for t in r['trace']]==[['r','a'],['r','a','b'],['r','a','c'],['r','a','b','d']]+[['r','a','c']]*4
+    assert [t['reward_fraction'] for t in r['trace']]==['2','4','2','-1','2','2','2','2']
+    assert r['visits']==dict(r=8,a=8,b=2,c=5,d=1,e=0) and r['reward_sum_fraction']==dict(r='15',a='15',b='3',c='10',d='-1',e='0')
+    assert r['selected_root_child']=='a'
