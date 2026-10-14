@@ -201,3 +201,63 @@ def test_module_docstring_and_scope():
 def test_battery_on_source():
     module = _load_code(SRC)
     assert battery(module) is True
+
+
+class S(str):
+    pass
+
+
+def _exact(fn, exc_type, expected):
+    with pytest.raises(exc_type) as info:
+        fn()
+    assert str(info.value) == expected
+
+
+def test_str_subclass_rejected_v2():
+    m = _load_code(SRC)
+    _exact(lambda: m.broadcast([(S('a'), 'b')]), TypeError,
+           'row 1: sender must be str, got S')
+    _exact(lambda: m.broadcast([('a', S('b'))]), TypeError,
+           'row 1: receiver must be str, got S')
+
+
+def test_error_messages_exact_v2():
+    m = _load_code(SRC)
+    _exact(lambda: m.broadcast('nope'), TypeError,
+           'rows must be list or tuple, got str')
+    _exact(lambda: m.broadcast(123), TypeError,
+           'rows must be list or tuple, got int')
+    _exact(lambda: m.broadcast({'a': 1}), TypeError,
+           'rows must be list or tuple, got dict')
+    _exact(lambda: m.broadcast([('a', 'b')] * 101), ValueError,
+           'rows must contain at most 100 entries')
+    _exact(lambda: m.broadcast([('a', 'b'), 'bad']), TypeError,
+           'row 2: expected (sender, receiver) tuple, got str')
+    _exact(lambda: m.broadcast([('a', 'b'), ('a',)]), ValueError,
+           'row 2: expected 2 fields, got 1')
+    _exact(lambda: m.broadcast([(1, 'b')]), TypeError,
+           'row 1: sender must be str, got int')
+    _exact(lambda: m.broadcast([(True, 'b')]), TypeError,
+           'row 1: sender must be str, got bool')
+    _exact(lambda: m.broadcast([('a', 1)]), TypeError,
+           'row 1: receiver must be str, got int')
+    _exact(lambda: m.broadcast([('', 'b')]), ValueError,
+           'row 1: sender must be 1-8 chars')
+    _exact(lambda: m.broadcast([('a', '')]), ValueError,
+           'row 1: receiver must be 1-8 chars')
+    _exact(lambda: m.broadcast([('abcdefghi', 'b')]), ValueError,
+           'row 1: sender must be 1-8 chars')
+    _exact(lambda: m.broadcast([('a', 'b'), ('a', 'b'), (1, 'b')]),
+           TypeError, 'row 3: sender must be str, got int')
+
+
+def test_scope_wording_exact_v2():
+    module = _load_code(SRC)
+    assert module.SCOPE == ('PARTIAL: relay reachability only; '
+                            'no formation control modeled')
+    assert module.NOT_CLAIMED == (
+        'does not model radio range or signal loss',
+        'does not coordinate movement or formations',
+        'does not implement consensus on payloads',
+        'does not relay messages after all supplied hops',
+    )

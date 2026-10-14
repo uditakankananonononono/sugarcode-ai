@@ -198,3 +198,63 @@ def test_module_docstring_and_scope():
 def test_battery_on_source():
     module = _load_code(SRC)
     assert battery(module) is True
+
+
+class S(str):
+    pass
+
+
+def _exact(fn, exc_type, expected):
+    with pytest.raises(exc_type) as info:
+        fn()
+    assert str(info.value) == expected
+
+
+def test_str_subclass_rejected_v2():
+    m = _load_code(SRC)
+    _exact(lambda: m.dock([(S('a'), 'b')]), TypeError,
+           'row 1: module must be str, got S')
+    _exact(lambda: m.dock([('a', S('b'))]), TypeError,
+           'row 1: partner must be str, got S')
+
+
+def test_error_messages_exact_v2():
+    m = _load_code(SRC)
+    _exact(lambda: m.dock('nope'), TypeError,
+           'rows must be list or tuple, got str')
+    _exact(lambda: m.dock(123), TypeError,
+           'rows must be list or tuple, got int')
+    _exact(lambda: m.dock({'a': 1}), TypeError,
+           'rows must be list or tuple, got dict')
+    _exact(lambda: m.dock([('a', 'b')] * 101), ValueError,
+           'rows must contain at most 100 entries')
+    _exact(lambda: m.dock([('a', 'b'), 'bad']), TypeError,
+           'row 2: expected (module, partner) tuple, got str')
+    _exact(lambda: m.dock([('a', 'b'), ('a',)]), ValueError,
+           'row 2: expected 2 fields, got 1')
+    _exact(lambda: m.dock([(1, 'b')]), TypeError,
+           'row 1: module must be str, got int')
+    _exact(lambda: m.dock([(True, 'b')]), TypeError,
+           'row 1: module must be str, got bool')
+    _exact(lambda: m.dock([('a', 1)]), TypeError,
+           'row 1: partner must be str, got int')
+    _exact(lambda: m.dock([('', 'b')]), ValueError,
+           'row 1: module must be 1-8 chars')
+    _exact(lambda: m.dock([('a', '')]), ValueError,
+           'row 1: partner must be 1-8 chars')
+    _exact(lambda: m.dock([('abcdefghi', 'b')]), ValueError,
+           'row 1: module must be 1-8 chars')
+    _exact(lambda: m.dock([('a', 'b'), ('a', 'b'), (1, 'b')]),
+           TypeError, 'row 3: module must be str, got int')
+
+
+def test_scope_wording_exact_v2():
+    module = _load_code(SRC)
+    assert module.SCOPE == ('PARTIAL: connectivity only; '
+                            'no geometry or kinematics modeled')
+    assert module.NOT_CLAIMED == (
+        'does not model docking mechanics or alignment',
+        'does not plan reconfiguration sequences',
+        'does not simulate structure locomotion',
+        'does not undock modules once docked',
+    )
