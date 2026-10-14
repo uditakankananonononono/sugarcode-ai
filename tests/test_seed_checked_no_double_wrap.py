@@ -20,7 +20,7 @@ EXPECTED_CHECKED = {
 }
 # modules whose numeric_b seed_checked.py was removed because seed_gate.py already wraps every function it covered
 REMOVED = ["molecule_eval", "profile_hmm", "qsar_bench", "str_scope", "syn_bio_studio", "syn_stab_ai", "virtual_cell"]
-# functions seed_gate.py wraps (lane 5 coverage list), per module
+# Functions seed_gate.py wraps, per module
 GATE_FUNCS = {
     "virtual_cell": {"simulate_expression", "simulate_cell"},
     "synthetic_life": {"stochastic_control", "ale_trajectory"},
