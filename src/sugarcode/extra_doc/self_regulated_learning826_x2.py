@@ -29,5 +29,5 @@ def declared_study_variances(rows):
     for label,planned,actual in rows:_label(label);_integer(planned,1,1440);_integer(actual,0,1440)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('study labels must be unique')
     from fractions import Fraction
-    return {'variances':[(label,actual-planned) for label,planned,actual in sorted(rows)],
+    return {'variances':[(label,actual-planned) for label,planned,actual in sorted(rows,key=lambda r:r[0])],
             'actual_to_plan':Fraction(sum(a for _,_,a in rows),sum(p for _,p,_ in rows)),'learning_evaluated':False}

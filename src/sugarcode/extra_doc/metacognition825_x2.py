@@ -29,5 +29,5 @@ def declared_prediction_errors(rows):
     for label,confidence,observed in rows:_label(label);_integer(confidence,0,10000);_integer(observed,0,1)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('prediction labels must be unique')
     from fractions import Fraction
-    errors=[(label,Fraction(confidence,10000)-observed) for label,confidence,observed in sorted(rows)]
+    errors=[(label,Fraction(confidence,10000)-observed) for label,confidence,observed in sorted(rows,key=lambda r:r[0])]
     return {'errors':errors,'brier':sum(error*error for _,error in errors)/len(errors),'metacognition_evaluated':False}
