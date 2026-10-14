@@ -49,3 +49,42 @@ def test_breadth_first_prefers_early_short_path_over_later_long_path():
            ('B','answer','asked','end'),('B','delay','detour','waiting'),
            ('A','again','waiting','ready'),('B','finally','ready','end')]
     assert [t['utterance'] for t in solve(['A','B'],rules,['start'],'end')['turns']]==['ask','answer']
+
+
+def test_initial_noop_turn_must_enable_second_speaker():
+    r=solve(['A','B'],[('A','hello','start','start'),('B','done','start','end')],['start'],'end')
+    assert [t['speaker'] for t in r['turns']]==['A','B']
+
+
+def test_initial_fact_count_32_admitted():
+    assert solve(['A','B'],RULES,['resolved']+[str(i) for i in range(31)],'resolved')['turn_count']==0
+
+@pytest.mark.parametrize('args,message',[
+ ((['A','B'],RULES,[],''),'label length must be between 1 and 160'),
+ ((['A','B'],RULES,[],'x'*161),'label length must be between 1 and 160'),
+ ((['A','B'],RULES,[],' '),'labels must not be blank'),
+ ((['A','B'],[],[],'x'),'rule count must be between 1 and 32'),
+ ((['A','B'],RULES,[],'x',9),'max_turns must be a nonbool integer between 0 and 8'),
+])
+def test_remaining_boundary_errors(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
+
+@pytest.mark.parametrize('expansions',[4096,4097])
+def test_expanded_state_guard_exact_threshold_isolated(monkeypatch,expansions):
+    # Isolate expansion accounting with a bounded queue fixture. No claim that
+    # these repeated synthetic states occur in a real BFS or bound memory.
+    import sugarcode.extra_doc.dialogue_writing as module
+    class Queue:
+        def __init__(self,entries):self.remaining=expansions
+        def __bool__(self):return self.remaining>0
+        def popleft(self):
+            self.remaining-=1
+            return frozenset({'start'}),0,[]
+        def append(self,item):raise AssertionError('rule precondition is absent')
+    monkeypatch.setattr(module,'deque',Queue)
+    expected=('no alternating dialogue reaches target within turn cap' if expansions==4096
+              else 'dialogue search exceeds 4096 expanded states')
+    with pytest.raises(ValueError) as exc:
+        solve(['A','B'],[('A','say','absent','end')],['start'],'end')
+    assert str(exc.value)==expected
