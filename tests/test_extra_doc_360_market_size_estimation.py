@@ -39,3 +39,20 @@ def test_errors(args,error,message):
 @pytest.mark.parametrize('value',[2**32,F(2**32),F(1,2**32)])
 def test_next_bit(value):
     with pytest.raises(ValueError,match='^values must fit 32 bits$'):solve([(1,value,0,0)])
+
+@pytest.mark.parametrize('slot,bad,message',[
+ (1,F(-1,2),'annual spend must be nonnegative'),
+ (2,F(-1,2),'fractions must be between zero and one'),
+ (3,F(-1,2),'fractions must be between zero and one'),
+ (2,F(3,2),'fractions must be between zero and one'),
+ (3,F(3,2),'fractions must be between zero and one'),
+])
+def test_rational_outside_bounds(slot,bad,message):
+    segment=[2,10,F(1,2),F(1,2)];segment[slot]=bad
+    with pytest.raises(ValueError) as exc:solve([segment])
+    assert str(exc.value)==message
+
+
+def test_zero_fraction_endpoints_nonzero_tam_valid_path():
+    assert solve([(2,10,0,1)])['totals']=={'tam':20,'sam':0,'som':0}
+    assert solve([(2,10,1,0)])['totals']=={'tam':20,'sam':20,'som':0}
