@@ -104,3 +104,14 @@ def test_outer_container_and_requested_subclasses_exact_messages():
         recover(ListSubclass523([(0, None, 0, True)]), 0)
     with pytest.raises(ValueError, match='^requested integer0..1000000000$'):
         recover([(0, None, 0, True)], IntSubclass523(0))
+
+
+def test_triple_row_exact_message_nonfirst():
+    with pytest.raises(ValueError, match='^backup timestamp parent bytes available quadruple$'):
+        recover([(0, None, 0, True), (1, 0, 0)], 1)
+
+
+@pytest.mark.parametrize('timestamp', [0, 1])
+def test_parent_timestamp_exact_message_nonfirst(timestamp):
+    with pytest.raises(ValueError, match='^parent timestamp must be strictly earlier$'):
+        recover([(1, None, 0, True), (timestamp, 0, 0, True)], 1)
