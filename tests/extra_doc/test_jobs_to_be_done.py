@@ -25,7 +25,7 @@ def refuses(error, msg, a):
 TY = 'jobs must be a list or tuple'
 CNT = 'job count must be between 1 and 24'
 TRI = 'jobs must be situation motivation outcome triples'
-TXT = 'job text must be strings of length 1 through 80'
+TXT = 'job text must be strings of length 1 through 80 without control or unassigned characters'
 
 
 def test_literals_and_oracle():
@@ -81,3 +81,13 @@ def test_check_order():
     refuses(ValueError, CNT, [])
     refuses(ValueError, TRI, [5])
     refuses(ValueError, TXT, [(1, 2, 3)])
+
+
+def test_non_ascii_witnesses():
+    for ch in ('\x00', '\n', '\x7f', '\x85', '\u200b', '\ue000', '\ud800', '\u0378'):
+        for pos in range(3):
+            row = ['a', 'b', 'c']
+            row[pos] = 'x' + ch
+            refuses(ValueError, TXT, [row])
+            refuses(ValueError, TXT, [('a', 'b', 'c'), row])
+    assert aj([('caf\u00e9', '\u4e2d', '\U0001f600')])['statements']

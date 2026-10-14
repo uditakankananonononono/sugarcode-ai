@@ -1,13 +1,17 @@
 """Row 371 Jobs-to-be-Done Analysis - Understands customer motivation: supplied job statements.
 
-Each job is (situation, motivation, outcome), strings of 1 to 80 characters the
+Each job is (situation, motivation, outcome), strings of 1 to 80 characters with no control, format, private-use, surrogate or unassigned characters the
 caller supplies. Returns the statements "When <situation>, I want to <motivation>,
 so I can <outcome>" in input order and motivation counts ranked by count
 descending, first appearance on ties. 1 to 24 jobs. Caps are implementation choices.
 NOT_CLAIMED: that motivations were discovered or verified, customer interviews,
 accuracy of the supplied text, demand, causal claims or product fit.
 """
+import unicodedata
 
+
+def _bad(s):
+    return any(unicodedata.category(c)[0] == 'C' for c in s)
 
 def analyze_jobs(jobs):
     if type(jobs) not in (list, tuple):
@@ -16,8 +20,8 @@ def analyze_jobs(jobs):
         raise ValueError('job count must be between 1 and 24')
     if any(type(j) not in (list, tuple) or len(j) != 3 for j in jobs):
         raise ValueError('jobs must be situation motivation outcome triples')
-    if any(type(s) is not str or not 1 <= len(s) <= 80 for j in jobs for s in j):
-        raise ValueError('job text must be strings of length 1 through 80')
+    if any(type(s) is not str or not 1 <= len(s) <= 80 or _bad(s) for j in jobs for s in j):
+        raise ValueError('job text must be strings of length 1 through 80 without control or unassigned characters')
     tally = {}
     for j in jobs:
         tally[j[1]] = tally.get(j[1], 0) + 1
