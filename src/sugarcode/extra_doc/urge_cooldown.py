@@ -8,7 +8,7 @@ An event follows the rule when action - urge >= cooldown. The result gives, per 
 the wait and whether it followed the rule; the number that followed it; the share that
 followed it as an exact Fraction string; the shortest wait; and the longest wait.
 
-Scope: PARTIAL for the Impulse Control line. Arithmetic on gaps the caller logged. It does
+Scope: bounded implementation for the Impulse Control line. Arithmetic on gaps the caller logged. It does
 not detect urges, enforce anything, or judge behaviour.
 
 Not claimed: that the times are accurate, that waiting helps, that a followed rule shows

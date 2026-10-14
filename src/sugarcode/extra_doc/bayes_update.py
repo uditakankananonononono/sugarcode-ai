@@ -13,7 +13,7 @@ impossible under every hypothesis and the call is refused. The result gives the 
 (Fraction strings) after each observation, the final posterior, and the hypothesis with
 the highest final posterior (ties to the alphabetically first).
 
-Scope: PARTIAL for the Model Updating line. Exact Bayes' rule over a small discrete model
+Scope: bounded implementation for the Model Updating line. Exact Bayes' rule over a small discrete model
 the caller wrote, with independent observations. It learns no model and checks none.
 
 Not claimed: that the priors or likelihoods are right, that observations are independent

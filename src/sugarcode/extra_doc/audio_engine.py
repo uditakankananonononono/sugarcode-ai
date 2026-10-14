@@ -12,7 +12,7 @@ the mixed samples, the number of clipped samples (those that changed by clipping
 peak absolute value after clipping, the energy (sum of squares after clipping) and the
 mean power (energy / length) as an exact Fraction string.
 
-Scope: PARTIAL for the Audio Engine line. Exact integer mixing of already-sampled data.
+Scope: bounded implementation for the Audio Engine line. Exact integer mixing of already-sampled data.
 It is not an audio engine in the general sense: no resampling, no filters, no effects,
 no file formats, no playback, no real-time processing.
 

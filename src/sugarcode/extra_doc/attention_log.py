@@ -8,7 +8,7 @@ Fraction string, the number of drifts (a P followed directly by D), the number o
 (a D followed directly by P), the longest run of P, and the mean length of the P runs as an
 exact Fraction string (null when there is no P).
 
-Scope: PARTIAL for the Mindfulness line. Counting on a string the caller wrote. It does
+Scope: bounded implementation for the Mindfulness line. Counting on a string the caller wrote. It does
 not measure awareness, teach, or advise.
 
 Not claimed: that the check-ins are accurate, that the tallies reflect mindfulness, that

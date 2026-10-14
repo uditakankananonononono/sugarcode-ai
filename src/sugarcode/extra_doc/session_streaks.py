@@ -9,7 +9,7 @@ sessions, the number of streaks, the longest streak length, the current streak (
 ending at the last logged day), the longest gap (the most days with no session between two
 logged days; 0 if none), and the span in days from first to last logged day inclusive.
 
-Scope: PARTIAL for the Meditation line. Counting on day numbers the caller wrote. It does
+Scope: bounded implementation for the Meditation line. Counting on day numbers the caller wrote. It does
 not teach meditation, time sessions, or judge practice.
 
 Not claimed: that the days are accurate, that a streak reflects benefit, that it predicts

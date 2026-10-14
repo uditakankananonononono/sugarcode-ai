@@ -7,7 +7,7 @@ The result gives the count, resisted and gave-in counts, the resist rate as an e
 Fraction string, the longest run of resisted events, the longest run of gave-in events,
 and the run of resisted events at the end of the log (0 if the last event was a give-in).
 
-Scope: PARTIAL for the Self-Control line. Counting on a list the caller wrote. It does not
+Scope: bounded implementation for the Self-Control line. Counting on a list the caller wrote. It does not
 measure self-control, diagnose anything, or advise.
 
 Not claimed: that the log is accurate, that the rate reflects the person's self-control,

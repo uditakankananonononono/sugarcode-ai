@@ -14,7 +14,7 @@ average wait and utilisation (total busy time / (servers * makespan)) as Fractio
 strings; the maximum wait; and the maximum number of customers waiting (arrived but not
 started) at any instant, counted just after an arrival.
 
-Scope: PARTIAL for the Simulation Engine line. Exact simulation of one specified
+Scope: bounded implementation for the Simulation Engine line. Exact simulation of one specified
 queueing scenario given as data. It is not a general simulation framework: no random
 arrivals, no other service disciplines, no priorities, no routing networks.
 

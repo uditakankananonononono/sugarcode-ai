@@ -10,7 +10,7 @@ total before as an exact Fraction string (null when the total before is 0); the 
 regions that improved, stayed equal and worsened; and the region with the largest change
 (ties go to the earlier region in input order).
 
-Scope: PARTIAL for the Relaxation line. Arithmetic on ratings the caller wrote. It does not
+Scope: bounded implementation for the Relaxation line. Arithmetic on ratings the caller wrote. It does not
 measure tension, teach relaxation, or advise.
 
 Not claimed: that the ratings are accurate, that a relaxation method caused the change,

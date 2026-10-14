@@ -12,7 +12,7 @@ spread: bedtimes are measured as minutes after 12:00 noon ((bedtime - 720) mod 1
 late-evening and after-midnight bedtimes sit on one line, and the spread is the largest
 minus the smallest of those values.
 
-Scope: PARTIAL for the Sleep Hygiene line. Clock arithmetic on times the caller wrote. It
+Scope: bounded implementation for the Sleep Hygiene line. Clock arithmetic on times the caller wrote. It
 does not track sleep, judge sleep quality, or give health advice. The noon cut for
 bedtime spread is a stated convention and fails for bedtimes spread across noon.
 

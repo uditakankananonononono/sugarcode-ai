@@ -12,7 +12,7 @@ the game; every later move is ignored and counted as ignored. The result reports
 row and column, coins collected, coins left, moves applied (moved or blocked, before the
 game ended), blocked, ignored, and whether the goal was reached.
 
-Scope: PARTIAL for the Game Engine line. Exact replay of one tiny rule set. It is not a
+Scope: bounded implementation for the Game Engine line. Exact replay of one tiny rule set. It is not a
 game framework: no graphics, no real-time loop, no AI opponents, no physics.
 
 Not claimed: that the game is fun or playable by people, that the script is a good

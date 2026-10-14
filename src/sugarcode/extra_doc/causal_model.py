@@ -9,7 +9,7 @@ causes and every concept it can reach (its downstream set); the roots (no causes
 leaves (no effects); whether the graph has a cycle; and, when there is none, the
 topological order that always takes the alphabetically first available concept.
 
-Scope: PARTIAL for the Mental Model Construction line. Graph bookkeeping on a model the
+Scope: bounded implementation for the Mental Model Construction line. Graph bookkeeping on a model the
 caller wrote. It builds no model from observations and checks nothing against the world.
 
 Not claimed: that the links are true, that the model is complete, that the order is the

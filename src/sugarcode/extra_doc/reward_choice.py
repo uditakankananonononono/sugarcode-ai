@@ -10,7 +10,7 @@ choice is "later" when that value is above sooner, "sooner" when below, "tie" wh
 The result also gives the value as an exact Fraction string and the break-even rate per
 period, (later - sooner) / (sooner * delay), as an exact Fraction string.
 
-Scope: PARTIAL for the Delayed Gratification line. Exact arithmetic for one stated
+Scope: bounded implementation for the Delayed Gratification line. Exact arithmetic for one stated
 discounting rule. It does not measure anyone's patience or say which choice is wiser.
 
 Not claimed: that the rate is the person's real rate, that the rule is how people decide,

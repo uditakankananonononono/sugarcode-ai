@@ -9,7 +9,7 @@ For each strategy (listed in alphabetical order) the result gives the number of 
 the exact mean of (after - before) as a Fraction string, and how many entries went down,
 stayed equal and went up. It also gives the same mean over all entries.
 
-Scope: PARTIAL for the Emotional Regulation line. Averages of ratings the caller wrote. It
+Scope: bounded implementation for the Emotional Regulation line. Averages of ratings the caller wrote. It
 does not measure emotions, compare strategies fairly, or advise.
 
 Not claimed: that the ratings are accurate, that a strategy caused any change, that the

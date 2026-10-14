@@ -9,7 +9,7 @@ worked as an exact Fraction string. "top" is the strategy with the highest share
 those with at least 2 attempts; ties go to the strategy with more attempts, then to the
 alphabetically first. "top" is null when no strategy has 2 attempts.
 
-Scope: PARTIAL for the Coping Strategies line. Counting on attempts the caller logged. It
+Scope: bounded implementation for the Coping Strategies line. Counting on attempts the caller logged. It
 does not recommend strategies or assess coping.
 
 Not claimed: that the log is accurate, that a strategy caused help, that "top" is the best

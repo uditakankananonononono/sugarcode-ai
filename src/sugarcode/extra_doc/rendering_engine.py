@@ -12,7 +12,7 @@ shapes overwrite earlier ones. The result gives the canvas as a list of row stri
 (row 0 first) and, per shape, the number of pixels it covers (before overwriting) and
 the final count of pixels showing each colour used (a colour shared by shapes is counted once).
 
-Scope: PARTIAL for the Rendering Engine line. Exact flat-colour triangle rasterisation
+Scope: bounded implementation for the Rendering Engine line. Exact flat-colour triangle rasterisation
 with one sampling rule. It is not a rendering engine in the general sense: no 3D, no
 shading, no textures, no anti-aliasing, no clipping beyond the canvas.
 

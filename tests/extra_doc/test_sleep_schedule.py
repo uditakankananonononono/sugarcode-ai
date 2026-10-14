@@ -152,7 +152,7 @@ class SubInt(int):
 
 
 class Quirky(int):
-    """int subclass whose arithmetic lies: the auditor's witness for the +720 mutant."""
+    """int subclass whose arithmetic lies: a witness for the +720 mutant."""
     def __sub__(self, other):
         return 0
 

@@ -12,7 +12,7 @@ and the bounce counter rises. The result reports final height and velocity (Frac
 strings), the bounce count, the step number of the first bounce (or null), and the
 maximum height seen (the start included).
 
-Scope: PARTIAL for the Physics Engine line. Exact stepping of one ball in one dimension
+Scope: bounded implementation for the Physics Engine line. Exact stepping of one ball in one dimension
 with one discrete rule. It is not a physics engine in the general sense: no 2D or 3D, no
 collisions between bodies, no friction, no continuous collision detection, no adaptive
 step. The discrete rule is not claimed to match true physics.

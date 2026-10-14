@@ -15,7 +15,7 @@ The result gives the number of base models, the number of info models, the revis
 as strings over the atoms in alphabetical order (sorted), the distance used (0 when the
 base has no models), and the literals true in every revised model.
 
-Scope: PARTIAL for the Belief Revision line. One concrete revision operator, brute force
+Scope: bounded implementation for the Belief Revision line. One concrete revision operator, brute force
 over at most 32 assignments. It is not a theory of belief change and picks no operator for
 anyone else.
 

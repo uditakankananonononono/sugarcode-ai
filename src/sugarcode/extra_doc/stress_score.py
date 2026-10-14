@@ -10,7 +10,7 @@ score / maximum as an exact Fraction string. Band: "low" when the share is below
 low_below percent, "high" when it is at or above high_from percent, otherwise "medium"
 (boundaries are exact, no rounding).
 
-Scope: PARTIAL for the Stress Management line. Weighted arithmetic on ratings the caller
+Scope: bounded implementation for the Stress Management line. Weighted arithmetic on ratings the caller
 wrote and cut points the caller chose. It is not a stress test, screening tool or advice.
 
 Not claimed: that the ratings are accurate, that the band means anything clinically, that
