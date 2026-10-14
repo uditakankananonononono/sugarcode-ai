@@ -73,3 +73,27 @@ def test_all_eight_torsion_public_keys_refused_v3(encoded):
     public = bytes.fromhex(encoded)
     with pytest.raises(ValueError, match='^small-order public key refused$'):
         run((public, bytes(16), public + bytes(32)))
+
+
+@pytest.mark.parametrize('y,sign', [
+    (1, 1),
+    (2**255 - 20, 0),
+    (2**255 - 20, 1),
+    (2**255 - 19, 0),
+    (2**255 - 18, 0),
+    (2**255 - 18, 1),
+], ids=['identity-sign1', 'order2-sign0', 'order2-sign1',
+        'alias-zero-sign0', 'alias-identity-sign0', 'alias-identity-sign1'])
+def test_small_order_alias_sign_encodings_refused_v4(y, sign):
+    public = (y | (sign << 255)).to_bytes(32, 'little')
+    identity = (1).to_bytes(32, 'little')
+    with pytest.raises(ValueError, match='^small-order public key refused$'):
+        run((public, bytes(16), identity + bytes(32)))
+
+
+@pytest.mark.parametrize('encoded', ['0100000000000000000000000000000000000000000000000000000000000000', 'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a', '0000000000000000000000000000000000000000000000000000000000000080', '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05', 'ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f', '26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85', '0000000000000000000000000000000000000000000000000000000000000000', 'c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa'])
+def test_canonical_torsion_identity_signature_refused_v4(encoded):
+    public = bytes.fromhex(encoded)
+    identity = (1).to_bytes(32, 'little')
+    with pytest.raises(ValueError, match='^small-order public key refused$'):
+        run((public, bytes(16), identity + bytes(32)))
