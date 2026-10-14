@@ -1,6 +1,6 @@
 """Quantum Cryptography - Unbreakable encryption.
 
-PARTIAL: deterministic BB84 transcript sifting/error audit, not encryption or a
+Bounded implementation: deterministic BB84 transcript sifting/error audit, not encryption or a
 secure key generator. No quantum channel, authenticated transport, privacy
 amplification, finite-key proof or claim of unbreakable encryption.
 """

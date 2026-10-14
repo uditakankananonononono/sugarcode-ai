@@ -1,4 +1,4 @@
-"""Row 665 Factory Pattern (PARTIAL): numbered product identifiers produced by a creation plan.
+"""Row 665 Factory Pattern (bounded implementation): numbered product identifiers produced by a creation plan.
 
 plan is a list of 1..16 (kind, count) tuples. kind is 1..30 characters of a-z, 0-9 and underscore starting with
 a letter (ASCII only), distinct across the plan; count is a whole number 0..1000; the counts add up to at most

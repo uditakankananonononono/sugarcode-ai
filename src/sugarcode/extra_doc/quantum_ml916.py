@@ -1,6 +1,6 @@
 """Quantum Machine Learning - Combines quantum and ML.
 
-PARTIAL: one-qubit variational classifier trained with parameter-shift
+Bounded implementation: one-qubit variational classifier trained with parameter-shift
 loss gradients using classical circuit expectations. No hardware, quantum
 advantage or general-purpose machine learning platform.
 """

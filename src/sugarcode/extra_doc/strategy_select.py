@@ -1,4 +1,4 @@
-"""Row 664 Strategy Pattern (PARTIAL): choosing one named strategy per input size from a threshold table.
+"""Row 664 Strategy Pattern (bounded implementation): choosing one named strategy per input size from a threshold table.
 
 table is a list of 1..16 (name, max_size) tuples with strictly increasing max_size (whole numbers 0..10**9);
 names are 1..30 characters of a-z, 0-9 and underscore starting with a letter (ASCII only) and distinct. sizes is

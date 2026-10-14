@@ -1,6 +1,6 @@
 """Quantum Error Correction - Handles decoherence.
 
-PARTIAL: double-precision three-qubit repetition-code correction of bit flips, including
+Bounded implementation: double-precision three-qubit repetition-code correction of bit flips, including
 coherent superpositions through density-matrix recovery. No correction of phase
 errors, arbitrary decoherence, fault-tolerant gates or physical hardware.
 """

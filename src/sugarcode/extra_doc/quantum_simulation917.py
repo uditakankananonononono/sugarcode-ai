@@ -1,6 +1,6 @@
 """Quantum Simulation - Models quantum systems.
 
-PARTIAL: double-precision exact-form propagator for the single-qubit Hamiltonian
+Bounded implementation: double-precision exact-form propagator for the single-qubit Hamiltonian
 H=hx*X+hy*Y+hz*Z (hbar=1). Not a many-body simulator or quantum hardware.
 """
 from math import cos, sin, sqrt, isfinite
