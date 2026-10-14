@@ -141,3 +141,40 @@ def giant_inputs(self):
         for args in (([('a','b',value,1)],'a','b'),([('a','b',1,value)],'a','b'),([('a','b',1,1)],'a','b',value)):
             with self.assertRaises(ValueError):b.best_entanglement_route(*args)
 QuantumTests.test_giant_inputs=giant_inputs
+
+def endpoint_roundoff_clamps(self):
+    contrast=0.05076034842872479
+    for p in (0,1):
+        out=a.ramsey_estimate(p,1,contrast=contrast)
+        self.assertEqual(out['fisher_information_per_shot'],0)
+        self.assertAlmostEqual(out['frequency'],0 if p==0 else math.pi)
+        self.assertTrue(out['clipped'])
+    # Independently evaluate Wilson construction at count endpoints, including
+    # tiny positive roundoff of center-half and high-end endpoint rounding.
+    for n in (1,3,10,31,1000,10**12):
+        for k in (0,n):
+            for z in (.1,1.959963984540054,10):
+                out=a.ramsey_estimate(k,n,z=z)
+                p=k/n;denom=1+z*z/n
+                center=(p+z*z/(2*n))/denom
+                half=z*math.sqrt(p*(1-p)/n+z*z/(4*n*n))/denom
+                wanted=(max(0.,center-half),min(1.,center+half))
+                self.assertEqual(out['wilson_probability_interval'],wanted)
+                self.assertGreaterEqual(wanted[0],0);self.assertLessEqual(wanted[1],1)
+    with self.assertRaises(ValueError) as caught:a.ramsey_estimate(1,2,1e20)
+    self.assertEqual(str(caught.exception),'interrogation, contrast or z outside range')
+    for p,f in ((1.5,1),(1,1.5)):
+        with self.assertRaises(ValueError) as caught:b.best_entanglement_route([('a','b',p,f)],'a','b')
+        self.assertEqual(str(caught.exception),'edge probabilities must be finite built-in reals')
+QuantumTests.test_endpoint_roundoff_clamps=endpoint_roundoff_clamps
+
+def upper_roundoff_witness_and_guard_neighbors(self):
+    # Seeded search found this upper-endpoint cosine >1 before min(1,...).
+    contrast=.23933977348644617
+    raw=(1-2*((1-contrast)/2))/contrast
+    self.assertGreater(raw,1)
+    self.assertEqual(a.ramsey_estimate(0,1,contrast=contrast)['fisher_information_per_shot'],0)
+    for value,message in ((math.nextafter(1e20,0),'interrogation, contrast or z outside range'),(1e20,'interrogation, contrast or z outside range'),(math.nextafter(1e20,math.inf),'finite built-in real parameters required')):
+        with self.assertRaises(ValueError) as caught:a.ramsey_estimate(1,2,value)
+        self.assertEqual(str(caught.exception),message)
+QuantumTests.test_upper_roundoff_witness_and_guard_neighbors=upper_roundoff_witness_and_guard_neighbors
