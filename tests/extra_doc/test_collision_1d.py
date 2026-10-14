@@ -141,3 +141,23 @@ def test_exact_range_limits_on_each_side_for_positions_and_velocities():
     col(1, 0, L, 1, 5, -L, 1)                      # both extremes at once
     err(col, V, 'x1 must be below x2', 1, L, 1, 1, L, 0, 1)      # x1 = 1e6 passes its range, then fails the order
     err(col, V, 'x1 must be below x2', 1, -L, 1, 1, -L, 0, 1)    # x2 = -1e6 passes its range, then fails the order
+
+
+class IntSub(int):
+    pass
+
+
+class FracSub(F):
+    pass
+
+
+def test_subclass_witnesses_rejected_at_all_seven_arguments_and_plain_types_accepted():
+    base = [1, 0, 2, 1, 4, 0, 1]
+    for pos, name in enumerate(NAMES):
+        for sub in (IntSub(base[pos]), FracSub(base[pos])):
+            a = list(base)
+            a[pos] = sub
+            err(col, T, name + ' must be a nonbool int or Fraction', *a)
+    plain = col(*base)
+    assert plain['time'] == F(2)
+    assert col(*[F(v) for v in base]) == plain
