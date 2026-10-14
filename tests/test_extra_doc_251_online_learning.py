@@ -76,3 +76,19 @@ def test_exact_boundary_all_numeric_fields(field):
 def test_fraction_component_overflow_refused(value):
     with pytest.raises(ValueError) as exc:solve([[value]],[0],[1],[0])
     assert str(exc.value)=='rational values must fit 32 bits'
+
+
+def test_upper_projection_clamps_before_next_prediction():
+    r=solve([[-10],[1]],[0],[2],[1],1)
+    assert r['trace'][0]['next_point']==[2]
+    assert r['trace'][1]['prediction']==[2] and r['final_point']==[1]
+    assert r['learner_loss']==-8 and r['comparator_loss']==-18 and r['regret']==10
+
+@pytest.mark.parametrize('args,error,message',[
+ (([[0]],[0],None,[0]),TypeError,'inputs must be lists or tuples'),
+ (([[]],[],[],[]),ValueError,'dimension count must be between 1 and 8'),
+ ((['0'],[0],[1],[0]),ValueError,'gradient dimensions must agree'),
+])
+def test_remaining_shape_validation(args,error,message):
+    with pytest.raises(error) as exc:solve(*args)
+    assert str(exc.value)==message
