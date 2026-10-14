@@ -19,7 +19,7 @@ STATUS_NOTE = ("PARTIAL: linear-trend smoothing of the supplied past only; no se
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -30,7 +30,7 @@ def forecast(history, alpha_bps, beta_bps, horizon):
     alpha_bps = _int(alpha_bps, "alpha_bps", 1, MAX_BPS)
     beta_bps = _int(beta_bps, "beta_bps", 1, MAX_BPS)
     horizon = _int(horizon, "horizon", 1, MAX_HORIZON)
-    if not isinstance(history, (list, tuple)):
+    if type(history) not in (list, tuple):
         raise ValueError("history: list required")
     if not 3 <= len(history) <= MAX_HISTORY:
         raise ValueError(f"history: 3 to {MAX_HISTORY} entries required")
