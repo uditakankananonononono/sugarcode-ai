@@ -8,6 +8,7 @@ in-progress counts, the done share (Fraction), the first step not done (number a
 all are done), and the out-of-order steps: a step that is started or done while an earlier step is
 not started, so the sequence the model describes was skipped (listed by step number). The
 statuses are the caller's. Caps are implementation choices, not spec values.
+Step names checked against https://www.kotterinc.com/methodology/8-steps/ on 2026-10-14.
 NOT_CLAIMED: that a status is accurate, that doing the steps in order leads to successful change,
 that skipping a step is wrong for this organisation, effects on people or results, employment or
 consultation obligations, approval-gate clearance, deployment.
