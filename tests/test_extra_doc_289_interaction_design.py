@@ -76,3 +76,8 @@ def test_first_relaxed_tie_not_lexicographic_path_promise():
            ('c','finish first','d',2),('b','finish later','d',1)]
     r=solve(['a','b','c','d'],edges,'a','d')
     assert r['transition_indices']==[1,2] and r['total_effort']==3
+
+
+def test_unknown_transition_source_refused():
+    with pytest.raises(ValueError) as exc:solve(['a'],[('z','x','a',1)],'a','a')
+    assert str(exc.value)=='transition endpoints must be known states'
