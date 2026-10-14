@@ -4,7 +4,9 @@ A necklace is a list of bead diameters in millimetres, in order along the string
 - check_necklace(beads, clasp_mm, target_mm, tolerance_mm) returns the strung length
   (sum of diameters plus clasp), the gap to the target (length - target), within_tolerance
   (|gap| <= tolerance), symmetric (the sequence reads the same both ways) and graduated
-  (sizes never decrease up to the middle and never increase after it).
+  (sizes never decrease up to the middle bead and never increase after it; for an even
+  bead count the peak must be the LEFT of the two middle beads, so [1, 3, 2, 1] is graduated and
+  [1, 2, 3, 1] is not).
 - graduated_symmetric(beads) arranges the same beads, as a multiset, into the one graduated
   symmetric order if one exists: each size is split in halves, the halves run smallest to largest,
   an odd bead out sits in the middle, the halves are mirrored. It exists exactly when at most

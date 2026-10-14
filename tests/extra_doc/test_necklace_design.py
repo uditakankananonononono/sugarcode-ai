@@ -6,7 +6,7 @@ from sugarcode.extra_doc.necklace_design import check_necklace as chk, graduated
 
 def oracle_chk(b, clasp, target, tol):
     n = len(b)
-    # graduated per the module's definition: peak at the middle (either middle bead for even n)
+    # graduated per the module's definition: the peak is the middle bead (the LEFT middle bead for even n)
     peaks = [(n - 1) // 2] if n % 2 else [n // 2 - 1]
     grad = any(all(b[i] <= b[i + 1] for i in range(p)) and all(b[i] >= b[i + 1] for i in range(p, n - 1)) for p in peaks)
     L = sum(b) + clasp
@@ -55,6 +55,7 @@ def test_hand_cases():
     assert chk([1, 2, 3], 0, 6, 0)['graduated'] is False and chk([1, 2, 3], 0, 6, 0)['symmetric'] is False
     assert chk([1, 2, 2, 1], 0, 6, 0)['graduated'] is True
     assert chk([1, 2, 3, 1], 0, 6, 0)['graduated'] is False
+    assert chk([1, 3, 2, 1], 0, 6, 0)['graduated'] is True
     assert chk([7], 0, 7, 0) == {'length_mm': 7, 'gap_mm': 0, 'within_tolerance': True, 'symmetric': True, 'graduated': True, 'bead_count': 1}
     assert gs([3, 5, 5, 3, 8]) == {'possible': True, 'arrangement': [3, 5, 8, 5, 3], 'odd_sizes': [8]}
     assert gs([3, 5, 5]) == {'possible': False, 'arrangement': None, 'odd_sizes': [3]}
