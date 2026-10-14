@@ -321,3 +321,72 @@ def test_identity_objective_certificate_and_tangent_cases_with_nonzero_coordinat
     assert out["optimizer"] == {"x": ["8/5", "0"], "y": ["4/5", "0"], "z": ["2/5", "0"]}
     out = run(d([-3, 2, 4], 2, {"A": [2, 2, -1], "b": 6}))  # same X: -3*8/5 + 2*2*4/5 + 4*2/5 = 0
     assert out["optimal_value"] == ["0", "0"]
+
+
+def squarefree_part(n):
+    """independent of the module: strip squares by dividing out s*s for s descending from isqrt(n)."""
+    n = int(n)
+    for s in range(isqrt(n), 1, -1):
+        while n % (s * s) == 0:
+            n //= s * s
+    return n
+
+
+def test_radicand_is_the_squarefree_part_in_every_case():
+    rng = random.Random(2451)
+    seen = {"m1": 0, "mbig": 0, "con": 0}
+    for _ in range(600):
+        C = [rng.randint(-20, 20) for _ in range(3)]
+        t = rng.randint(1, 50)
+        con = None
+        if rng.random() < 0.5:
+            con = {"A": [rng.randint(-6, 6) for _ in range(3)], "b": rng.randint(-60, 60)}
+        try:
+            out = run(d(C, t, con))
+        except SdpError:
+            continue
+        u = F(t, 2)
+        p, q = F(C[0] - C[2]), F(2 * C[1])
+        if con is None or (con["A"][0] == con["A"][2] and con["A"][1] == 0):
+            rad = p * p + q * q
+        else:
+            A = con["A"]
+            r, s = F(A[0] - A[2]), F(2 * A[1])
+            g = con["b"] - F(A[0] + A[2]) * u
+            rad = u * u * (r * r + s * s) - g * g
+        want = 1 if rad == 0 else squarefree_part(rad.numerator * rad.denominator)
+        assert out["radicand"] == want, (C, t, con)
+        seen["m1"] += want == 1
+        seen["mbig"] += want > 1
+        seen["con"] += con is not None
+        # irrational parts only appear with a radicand above 1, and the key pair is [rational, sqrt coefficient]
+        if want == 1:
+            for k in ("x", "y", "z"):
+                assert out["optimizer"][k][1] == "0"
+            assert out["optimal_value"][1] == "0"
+    assert min(seen.values()) >= 15
+    # the flat-C case the audit named: C = [1,0,1], trace 2, no constraint: rational, radicand exactly 1
+    out = run(d([1, 0, 1], 2))
+    assert out["radicand"] == 1 and out["optimal_value"] == ["2", "0"]
+    assert out["optimizer"] == {"x": ["1", "0"], "y": ["0", "0"], "z": ["1", "0"]}
+    o = run(d([2, 1, 5], 2))  # p = -3, q = 2, p^2 + q^2 = 13 (already squarefree)
+    assert o["radicand"] == 13 and o["optimal_value"] == ["7", "-1"]
+    o = run(d([4, 2, 0], 1))  # p = 4, q = 4, p^2 + q^2 = 32 = 16 * 2: radicand 2, not 32 or 1
+    assert o["radicand"] == 2 and o["optimal_value"] == ["2", "-2"]
+    assert run(d([3, 0, -3], 1))["radicand"] == 1  # p^2 + q^2 = 36, a perfect square
+
+
+def test_surd_sign_exhaustive_over_small_fractions():
+    fr = sorted({F(n, dd) for n in range(-12, 13) for dd in (1, 2, 3)})
+    for mm in (1, 2, 3, 5, 6, 7, 10, 11, 13, 15):
+        root = F(isqrt(mm * SC * SC), SC)
+        for a in fr:
+            for b in fr:
+                got = m._S(a, b, mm).sign()
+                if mm == 1:
+                    want = ((a + b) > 0) - ((a + b) < 0)
+                else:
+                    val = a + b * root
+                    want = 0 if (a == 0 and b == 0) else (val > 0) - (val < 0)
+                    assert (a == 0 and b == 0) or abs(val) > F(1, 10 ** 30)
+                assert got == want, (a, b, mm)
