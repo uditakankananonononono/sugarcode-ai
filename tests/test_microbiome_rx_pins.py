@@ -277,3 +277,28 @@ def test_analyze_microbiome_constants():
                              "test antibiotic and diet perturbations"]
     assert r["diagnostics"]["optimized_fiber"] == r["optimization"]["diet"]["fiber"]
     assert r["diagnostics"]["optimization_evaluations"] == r["optimization"]["evaluations"]
+
+
+def test_default_arguments_pinned():
+    import inspect
+    assert inspect.signature(core.simulate_community).parameters["days"].default == 14
+    assert inspect.signature(core.simulate_metabolic_community).parameters["days"].default == 14
+    assert inspect.signature(core.simulate_metabolic_community).parameters["sample_hours"].default == 6
+    assert inspect.signature(core.optimize_intervention).parameters["days"].default == 7
+    assert inspect.signature(core.analyze_microbiome).parameters["days"].default == 7
+    assert inspect.signature(core.design_intervention).parameters["condition"].default == "dysbiosis"
+
+
+def test_legacy_rounding_places_and_missing_diet_default():
+    r = simulate_community(C6, days=1.3)
+    assert r["trajectory"]["t_d"] == [0.0, 1.04]                      # linspace(0, 1.3, 6)[::4], rounded to 2 places
+    for s in C6:
+        for v in r["trajectory"][s]:
+            assert v == round(v, 3)
+    for v in r["final_relative"].values():
+        assert v == round(v, 3)
+    # a diet that omits a consumed metabolite uses the 0.5 default for it (sugar users): compare to RK4 reference
+    d = simulate_community(C6, days=2, diet={"fiber": 2.0})
+    fin = ref_legacy(C6, 2, diet={"fiber": 2.0})
+    for s in C6:
+        assert d["trajectory"][s][-1] == pytest.approx(fin[s], abs=2e-3)
