@@ -38,3 +38,21 @@ def test_zero_effort_equal_limit_and_max_caps():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('args,message',[
+ (([[0,True]],[[1,1]],[0,0]),'efforts must be nonbool integers zero through 1000000'),
+ (([[0,0]],[[1,True]],[0,0]),'availability must be nonbool binary integers'),
+ (([[0,0]],[[1,1]],[0,True]),'maximum efforts must be nonbool integers zero through 1000000'),
+ (([[2,0]],[[1,1]],[1,1]),'no candidate satisfies every supplied profile'),
+ (([[0,-1]],[[1,1]],[1,1]),'efforts must be nonbool integers zero through 1000000'),
+ (([[0,0]],[[1,2]],[1,1]),'availability must be nonbool binary integers'),
+ (([[0,0]],[[1,1]],[1,-1]),'maximum efforts must be nonbool integers zero through 1000000'),
+])
+def test_mixed_profile_validation_and_all_profile_feasibility(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
+
+
+def test_mixed_pass_fail_filters_infeasible_before_minimax():
+    r=solve([[2,0],[1,1]],[[1,1],[1,1]],[1,1])
+    assert r['candidate_index']==1 and r['feasible_indices']==[1]
