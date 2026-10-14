@@ -62,3 +62,8 @@ def test_duration_acceleration_scales_quadratically_not_linearly():
     r=solve(0,1,2,5)
     assert r['frames'][1]['acceleration']==F(45,32)
     assert r['frames'][1]['velocity']==F(135,256)
+
+@pytest.mark.parametrize('samples',[3.0,'3',None])
+def test_sample_type_declared_error(samples):
+    with pytest.raises(ValueError) as exc:solve(0,1,1,samples)
+    assert str(exc.value)=='samples must be a nonbool integer between 2 and 257'
