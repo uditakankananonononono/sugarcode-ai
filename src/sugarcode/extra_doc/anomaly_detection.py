@@ -23,16 +23,16 @@ def _quantile(sorted_vals, num, den):
 
 
 def detect(values, k_tenths=15):
-    if isinstance(k_tenths, bool) or not isinstance(k_tenths, int):
+    if type(k_tenths) is not int:
         raise ValueError("k_tenths: integer required")
     if not 1 <= k_tenths <= MAX_K_TENTHS:
         raise ValueError(f"k_tenths: must be within 1 to {MAX_K_TENTHS}")
-    if not isinstance(values, (list, tuple)):
+    if type(values) not in (list, tuple):
         raise ValueError("values: list required")
     if not 4 <= len(values) <= MAX_VALUES:
         raise ValueError(f"values: 4 to {MAX_VALUES} entries required")
     for i, v in enumerate(values):
-        if isinstance(v, bool) or not isinstance(v, int):
+        if type(v) is not int:
             raise ValueError(f"values[{i}]: integer required")
         if not -MAX_ABS <= v <= MAX_ABS:
             raise ValueError(f"values[{i}]: must be within -{MAX_ABS} to {MAX_ABS}")
