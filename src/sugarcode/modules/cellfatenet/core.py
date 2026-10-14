@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 
 # Small curated lineage GRN: node -> {regulator: sign}
 LINEAGE_GRN = {
@@ -287,6 +288,7 @@ def _diagnostics(sim,control,validation,attractors,source,target):
 
 def design_fate_transition(source_state,target_state,*,hours=48,seed=8):
     """Hand-set GRN simulation with numerical control search and noise sensitivity."""
+    seed = check_seed(seed)
     attractors=identify_attractors(starts=16,seed=seed); control=optimal_reprogramming(source_state,target_state,hours=hours)
     controls={x["factor"]:x["control"] for x in control["interventions"]}; sim=simulate_fate(source_state,hours=hours,controls=controls)
     validation=stochastic_validate(source_state,target_state,control["interventions"],replicates=32,seed=seed)

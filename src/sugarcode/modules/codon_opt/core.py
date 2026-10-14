@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import math
 import numpy as np
 from ...bio import codon as codonlib
@@ -277,6 +278,7 @@ def _design_diagnostics(dna,tasep,load,fold,evo,attention,table,copies):
 
 def design_expression_construct(protein:str,host:str="ecoli_k12",*,gc_min:float=.40,gc_max:float=.60,copies:int=100,avoid_motifs:list[str]|None=None,tasep_steps:int=2000,seed:int=7)->dict:
     """Design an actionable synthesis-ready coding sequence for a named host."""
+    seed = check_seed(seed)
     p=_validate_design(protein,host,gc_min,gc_max,copies); base=optimize(p,host,gc_min,gc_max,avoid_motifs); dna=base["optimized_dna"]; table=codonlib.HOST_TABLES[host]
     flow=tasep_simulate(dna,table,steps=tasep_steps); load=metabolic_load(dna,copies=copies); fold=folding_accessibility(dna); evo=evolutionary_robustness(dna,seed=seed); att=sequence_attention(dna); diag=_design_diagnostics(dna,flow,load,fold,evo,att,table,copies)
     flags=[]

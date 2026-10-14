@@ -6,6 +6,7 @@ mechanistic or named heuristic surrogates, never claims of measured editing.
 All sequence inputs are DNA 5' to 3'; probabilities are fractions in [0, 1].
 """
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import json, math
 from dataclasses import dataclass
 from typing import Dict, List
@@ -244,6 +245,7 @@ class MuseAgent:
  """Categorical policy-gradient guide designer with reproducible feedback."""
  BASES=BASES
  def __init__(self,seed=0,guide_length=20):
+  seed = check_seed(seed)
   if guide_length!=20: raise ValueError("current on-target model requires 20 nt guides")
   self.rng=np.random.default_rng(seed); self.logits=np.zeros((guide_length,4)); self.baseline=.5; self.rounds=0; self.history=[]; self.posterior={}; self.seed=seed
  def sample_guides(self,n=32):

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import random
 from ..alpha_fold_ui.core import chou_fasman, _confidence
 from ...bio.sequence import molecular_weight, hydrophobicity_profile
@@ -74,6 +75,7 @@ def design_protein(description: str, length: int | None = None, seed: int = 0,
     with active-site placement -> Chou-Fasman fold verification -> stability
     ranking. Returns the best candidate plus alternates.
     """
+    seed = check_seed(seed)
     if length is not None and length < 1:
         raise ValueError("length must be >= 1 (0 was silently ignored as falsy)")
     if candidates < 1:

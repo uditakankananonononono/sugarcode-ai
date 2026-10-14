@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import math
 import random
 import re
@@ -171,6 +172,7 @@ def pareto_front(candidates: list[dict]) -> list[dict]:
 
 def generate(n: int = 12, target_logp: float = 2.5, seed: int = 42) -> dict:
     """Assemble candidate molecules from fragments, score ADMET, keep Pareto front."""
+    seed = check_seed(seed)
     rng = random.Random(seed)
     rings = [f for f in FRAGMENTS if FRAGMENTS[f][5] == 0 and FRAGMENTS[f][1] >= 5]
     groups = [f for f in FRAGMENTS if f not in rings]
@@ -319,6 +321,7 @@ def active_learning_update(prior_mean,prior_std,observations,observation_std=.1)
     p=1/prior_std**2; q=len(observations)/observation_std**2; mean=(p*prior_mean+sum(observations)/observation_std**2)/(p+q); return {"mean":mean,"std":math.sqrt(1/(p+q)),"observations":len(observations)}
 
 def generate_conditioned(n=20,target=None,pocket=None,seed=0):
+    seed = check_seed(seed)
     target=target or {"logP":2,"min_solubility":.2,"max_toxicity":.4}; generated=generate(n,target.get('logP',2),seed); candidates=[]
     for c in generated['pareto_front']:
         dock=docking_score(c['fragments'],pocket or {}); admet=admet_profile(c['fragments']); condition_penalty=abs(admet['logP']-target.get('logP',2)) + max(0,target.get('min_solubility',0)-max(0,1+admet['logS']/4))+max(0,admet['hepatotoxicity']-target.get('max_toxicity',1)); reinforcement=-dock['binding_energy_kcal_mol']-condition_penalty; candidates.append({**c,"admet":admet,"docking":dock,"condition_penalty":condition_penalty,"reinforcement_score":reinforcement})

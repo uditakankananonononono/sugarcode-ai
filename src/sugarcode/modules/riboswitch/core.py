@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import numpy as _np
 _trapz = getattr(_np, "trapezoid", None) or _np.trapz  # numpy 1.x/2.x compat: trapz removed in numpy 2.0
 import random
@@ -26,6 +27,7 @@ def design_riboswitch(ligand: str, mode: str = "on", spacer: str = "AAGGAG",
     mode 'off': ligand binding stabilizes RBS-sequestering stem.
     Returns predicted dynamic range from stem energetics.
     """
+    seed = check_seed(seed)
     if ligand not in APTAMERS:
         raise KeyError(f"no aptamer for {ligand}; have {sorted(APTAMERS)}")
     if mode not in ("on", "off"):

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import random
 
 # Receptor-contact annotations are serotype-dependent and follow the default AAV9.
@@ -26,6 +27,7 @@ def engineer_capsid(capsid: str = "AAV9", target_receptor: str = "generic",
     Mutations scored: receptor-contact gain (if receptor region), NAb epitope
     disruption, conservation penalty (structural integrity).
     """
+    seed = check_seed(seed)
     rng = random.Random(seed)
     variants = []
     for i in range(n_variants):

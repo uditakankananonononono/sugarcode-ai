@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sugarcode.seed_check import check_seed
 import random
 from ...bio.sequence import clean_dna, gc_content
 
@@ -51,6 +52,7 @@ def design_promoter(target_strength: float = 0.7, tfbs: list[str] | None = None,
     Starts from consensus and mutates away until within tolerance; optional
     TF binding sites are embedded upstream for compatibility.
     """
+    seed = check_seed(seed)
     rng = random.Random(seed)
     core = CONS_35 + "".join(rng.choice("ACGT") for _ in range(17)) + CONS_10
     flank5 = UP_ELEMENT + "".join(rng.choice("ACGT") for _ in range(6))
@@ -94,6 +96,7 @@ def generate_library(n: int = 12, tfbs: list[str] | None = None,
                      strength_min: float = 0.2, strength_max: float = 0.95,
                      seed: int = 7) -> dict:
     """A promoter library spanning a predictable strength range."""
+    seed = check_seed(seed)
     rng = random.Random(seed)
     members = []
     for i in range(n):
