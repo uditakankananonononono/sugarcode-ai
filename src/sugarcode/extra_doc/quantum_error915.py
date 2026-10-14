@@ -11,7 +11,8 @@ def recover_bit_flip(alpha, beta, probabilities):
     """Encode alpha|0>+beta|1>, apply independent flips, measure syndromes/recover.
 
     Accept finite built-in int/float/complex amplitudes with unit squared norm
-    within 1e-12. Three built-in real probabilities lie in [0,1]. Return the
+    within 1e-12. Infinite amplitudes are refused by the conservative overflow
+    guard with the amplitudes-must-have-unit-norm diagnostic. Three built-in real probabilities lie in [0,1]. Return the
     decoded logical density matrix, four syndrome probabilities, logical flip
     probability and fidelity to the supplied pure state. Failure is >=2 flips.
     """

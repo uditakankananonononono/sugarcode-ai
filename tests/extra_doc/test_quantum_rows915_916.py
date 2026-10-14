@@ -194,3 +194,9 @@ def imaginary_tolerance(self):
     with self.assertRaises(ValueError) as caught:a.recover_bit_flip(1j*(1+2e-12),0,[0]*3)
     self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
 QuantumTests.test_imaginary_tolerance=imaginary_tolerance
+
+def infinite_amplitude_policy(self):
+    for value in (complex(float('inf'),0),complex(0,float('inf'))):
+        with self.assertRaises(ValueError) as caught:a.recover_bit_flip(value,0,[0]*3)
+        self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
+QuantumTests.test_infinite_amplitude_policy=infinite_amplitude_policy
