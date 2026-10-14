@@ -40,3 +40,16 @@ def test_ready_tie_later_index_ancestor_max_shape_and_global_cycle():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_prerequisite_shape32_admitted_to_duplicate_guard():
+    with pytest.raises(ValueError) as exc:solve(['a','b'],[[],[0]*32],[1,1],0)
+    assert str(exc.value)=='prerequisites must be unique'
+
+
+def test_negative_target_and_unreachable_invalid_prerequisite_indices():
+    with pytest.raises(ValueError) as exc:solve(['a'],[[]],[1],-1)
+    assert str(exc.value)=='target must be a nonbool objective index'
+    for bad in [-1,2]:
+        with pytest.raises(ValueError) as exc:solve(['a','b'],[[],[bad]],[1,1],0)
+        assert str(exc.value)=='prerequisites must be nonbool valid nonself indices'
