@@ -1,0 +1,49 @@
+"""Row 1156, Chronic Disease Management.
+
+followup_debt_fixture adds supplied abstract last index x and interval y.
+Returns deadlines sorted by label, overdue (label,positive_age) for deadline
+strictly before now, due_now labels at equality and future after now.
+Indices are supplied integers, not calendar dates or clinical follow-up rules.
+Inputs: rows is an exact list or tuple of 1 to 8 entries. Each entry is an
+exact list or tuple (label, x, y). label is an exact printable ASCII str
+of 1 to 12 characters, unique across rows. x and y are exact ints from
+0 to 10; bool and all subclasses are refused.
+now defaults to 6, an exact int from 0 to 20.
+Validation order: rows type, rows size, now, then each row in input
+order (shape, label, x, y), then duplicate labels.
+NOT_CLAIMED: chronic disease management, care scheduling, clinical advice, diagnosis, production readiness.
+"""
+
+SCOPE = 'PARTIAL: ages supplied abstract checklist timestamps, no disease management'
+NOT_CLAIMED = ('chronic disease management', 'care scheduling', 'clinical advice', 'diagnosis', 'production readiness')
+
+
+def _label(x):
+    return type(x) is str and x.isascii() and x.isprintable() and 1 <= len(x) <= 12
+
+
+def followup_debt_fixture(rows, now=6):
+    if type(rows) not in (list, tuple):
+        raise TypeError('rows must be a list or tuple')
+    if not 1 <= len(rows) <= 8:
+        raise ValueError('rows must contain 1 to 8 entries')
+    if type(now) is not int or not 0 <= now <= 20:
+        raise ValueError('now must be a nonbool integer between 0 and 20')
+    clean = []
+    for row in rows:
+        if type(row) not in (list, tuple) or len(row) != 3:
+            raise ValueError('each row must be a (label, x, y) triple')
+        label, x, y = row
+        if not _label(label):
+            raise ValueError('label must be a printable ASCII string of 1 to 12 characters')
+        if type(x) is not int or not 0 <= x <= 10:
+            raise ValueError('x must be a nonbool integer between 0 and 10')
+        if type(y) is not int or not 0 <= y <= 10:
+            raise ValueError('y must be a nonbool integer between 0 and 10')
+        clean.append((label, x, y))
+    if len({r[0] for r in clean}) != len(clean):
+        raise ValueError('labels must be distinct')
+    deadlines = [(n, last + interval) for n,last,interval in sorted(clean,key=lambda r:r[0])]
+    overdue = [(n, now - due) for n,due in deadlines if due < now]
+    return {'deadlines':deadlines,'overdue':overdue,'due_now':[n for n,due in deadlines if due==now],
+            'future':[n for n,due in deadlines if due>now]}
