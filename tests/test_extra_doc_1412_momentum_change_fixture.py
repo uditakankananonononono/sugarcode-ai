@@ -248,3 +248,18 @@ for _v, _lo, _hi in (('threshold',0,100),('x',0,10),('y',0,10)):
 @pytest.mark.parametrize('old,new', MUTANTS)
 def test_mutant_is_killed(old, new):
     assert not _survives(battery, old, new)
+
+
+def _near_threshold(m):
+    for start,end,threshold in ((6,10,67),(3,5,67),(7,10,43)):
+        result=m.momentum_change_fixture([('a',start,end)],threshold)
+        assert result['rising']==[]
+        assert result==_oracle([('a',start,end)],threshold)
+
+
+def test_near_threshold_denominator_101_witnesses():
+    _near_threshold(mod)
+
+
+def test_threshold_denominator_101_mutant_is_killed():
+    assert not _survives(_near_threshold,'F(threshold,100)','F(threshold,101)')
