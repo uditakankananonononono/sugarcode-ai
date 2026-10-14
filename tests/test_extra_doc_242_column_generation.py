@@ -40,3 +40,38 @@ def test_degenerate_zero_demand_and_fractional_pattern():
 def test_exact_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+
+def test_singular_active_candidate_skipped_before_duplicate_optimum():
+    r=solve([[1,0],[0,1],[1,0]],[3,2,1],[1,1],[0,1])
+    assert r['solution']==[0,1,1] and r['objective']==3 and r['iterations']==2
+    assert r['trace'][1]['active_columns']==[0,1,2]
+
+
+def test_iteration_counts_immediate_and_two_row():
+    assert solve([[1]],[2],[3],[0],64)['iterations']==1
+    assert solve([[1,0],[0,1],[1,1]],[3,3,4],[2,2],[0,1])['iterations']==2
+    assert solve([[1,0,0],[0,1,0],[0,0,1]],[1,2,3],[1,1,1],[0,1,2])['objective']==6
+
+@pytest.mark.parametrize('value',[2**32-1,F(2**32-1),F(1,2**32-1)])
+def test_scalar_boundary_admitted(value):assert solve([[1]],[value],[1],[0])['objective']==value
+
+@pytest.mark.parametrize('value',[2**32,F(2**32),F(1,2**32)])
+def test_scalar_next_bit_refused(value):
+    with pytest.raises(ValueError,match='^rational values must fit 32 bits$'):solve([[1]],[value],[1],[0])
+
+@pytest.mark.parametrize('args,message',[
+ (([[1,0,0,0]]*4,[1]*4,[1]*4,[0,1,2,3]),'row count must be between 1 and 3'),
+ (([[1]],[],[1],[0]),'cost and basis shapes do not match'),
+ (([[1]],[1],[1],[]),'cost and basis shapes do not match'),
+ (([[1,2]],[1],[1],[0]),'column must match row count'),
+ (([[1]],[1],[1],[-1]),'initial basis must contain distinct nonbool column indices'),
+ (([[1]],[1],[1],[1]),'initial basis must contain distinct nonbool column indices'),
+ (([[1]],[1],[1],[0.0]),'initial basis must contain distinct nonbool column indices'),
+ (([[1,0],[0,1]],[1,1],[1,1],[0,0]),'initial basis must contain distinct nonbool column indices'),
+ (([[-1]],[1],[1],[0]),'columns must be nonnegative and nonzero'),
+ (([[1,0],[1,1]],[1,1],[0,1],[0,1]),'initial basis must be nonsingular and feasible'),
+])
+def test_separate_shape_basis_and_feasibility_errors(args,message):
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)==message
