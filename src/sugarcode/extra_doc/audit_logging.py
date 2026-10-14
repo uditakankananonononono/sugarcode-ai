@@ -9,7 +9,10 @@ the timestamp order and every recomputed digest. Only a digest mismatch is repor
 first row whose digest does not recompute, None when all do); a row with a malformed shape, seq, ts, action or
 digest raises ValueError for the whole call, even if an earlier row was tampered with. An action may not contain a
 lone surrogate character (U+D800 to U+DFFF), which cannot be hashed as UTF-8.
-This detects edits to stored rows; it does not say whether the events were worth logging."""
+A digest mismatch detects an inconsistent supplied chain. A writer able to replace
+all rows and recompute hashes can produce a chain that verifies: this helper has
+no trusted external head/checkpoint, authentication, persistence or append-only
+enforcement. It does not say whether the events were worth logging."""
 import hashlib
 
 GENESIS = "0" * 64
@@ -21,7 +24,7 @@ STATUS_NOTE = ("PARTIAL: hash-chain arithmetic over supplied rows only; no judgm
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -34,14 +37,14 @@ def _digest(prev, seq, ts, action):
 
 def _shape(events, with_digests):
     label = "rows" if with_digests else "events"
-    if not isinstance(events, (list, tuple)):
+    if type(events) not in (list, tuple):
         raise ValueError(f"{label}: list required")
     if not 1 <= len(events) <= MAX_ENTRIES:
         raise ValueError(f"{label}: 1 to {MAX_ENTRIES} entries required")
     want = 4 if with_digests else 3
     out = []
     for i, e in enumerate(events):
-        if not isinstance(e, (list, tuple)):
+        if type(e) not in (list, tuple):
             raise ValueError(f"{label}[{i}]: (seq, ts, action{', digest' if with_digests else ''}) required")
         if len(e) != want:
             raise ValueError(f"{label}[{i}]: {want} entries required")
@@ -52,14 +55,14 @@ def _shape(events, with_digests):
         ts = _int(ts, f"{label}[{i}] ts", 0, MAX_TS)
         if out and ts < out[-1][1]:
             raise ValueError(f"{label}[{i}] ts: must not decrease")
-        if not isinstance(action, str) or not action or len(action) > MAX_ACTION:
+        if type(action) is not str or not action or len(action) > MAX_ACTION:
             raise ValueError(f"{label}[{i}] action: non-empty string up to {MAX_ACTION} characters required")
         if any("\ud800" <= ch <= "\udfff" for ch in action):
             raise ValueError(f"{label}[{i}] action: lone surrogate characters are not allowed")
         row = [seq, ts, action]
         if with_digests:
             d = e[3]
-            if not isinstance(d, str) or len(d) != 64 or any(c not in "0123456789abcdef" for c in d):
+            if type(d) is not str or len(d) != 64 or any(c not in "0123456789abcdef" for c in d):
                 raise ValueError(f"{label}[{i}] digest: 64 lowercase hex characters required")
             row.append(d)
         out.append(row)
