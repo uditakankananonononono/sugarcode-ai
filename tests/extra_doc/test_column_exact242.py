@@ -49,3 +49,14 @@ def test_precise_shapes_bounds_hugeints_and_hull_refusals():
         with pytest.raises(ValueError,match='^target in nondegenerate column coordinate hull$'):solve(columns,t,1)
     for k in (True,None,1.,0,81,10**400):
         with pytest.raises(ValueError,match='^strict column iterations 1..80$'):solve([[0,0],[1,1]],0,k)
+
+
+@pytest.mark.parametrize('columns,target,basis,weights',[
+    ([[-3,-1],[-4,2],[-4,-1]],-4,[0,2],['0','1']),
+    ([[2,2],[-3,-1],[-3,4]],2,[0],['1']),
+    ([[4,3],[3,4],[-1,-2],[4,3],[-2,-3],[3,0]],-2,[4],['1']),
+    ([[2,1],[4,-2],[0,-2],[-1,3],[-3,4],[0,4],[1,0]],0,[1,2],['0','1']),
+])
+def test_exact_degenerate_basis_weight_tie_witnesses(columns,target,basis,weights):
+    r=solve(columns,target,80)
+    assert r['basis_indices']==basis and r['weights_fraction']==weights
