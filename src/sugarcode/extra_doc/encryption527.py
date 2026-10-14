@@ -1,6 +1,6 @@
 """Row 527 Encryption Implementation - Protects data.
 
-SCOPED AES-256-GCM using the existing cryptography dependency, not custom crypto.
+Bounded AES-256-GCM using the existing cryptography dependency, not custom crypto.
 Caller supplies a 32-byte key and 12-byte nonce. Each key/nonce pair MUST be unique
 for every encryption, even across processes and calls. This stateless helper
 cannot enforce that rule. No key storage, nonce generation or key lifecycle.
