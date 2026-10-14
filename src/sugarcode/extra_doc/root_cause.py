@@ -93,7 +93,8 @@ def analyse_causes(edges, failure):
             chains.append(path)
             return
         for y in succ[x]:
-            walk(y, path + [y])
+            if y == f or y in anc:
+                walk(y, path + [y])
     for r in roots:
         walk(r, [r])
     if len(chains) > MAX_CHAINS:

@@ -193,3 +193,17 @@ def test_chain_cap_exactly_1000_accepted_1001_refused():
     assert r['chain_count'] == oracle(EDGES_1000, 'f')['chain_count']
     err(ac, V, 'too many causal chains', EDGES_1001, 'f')
     assert len(oracle(EDGES_1001, 'f')['chains']) == 1001
+
+
+def test_dead_branches_do_not_blow_up():
+    # 40 diamond layers behind the failure: r reaches f directly; a/b nodes cannot reach f at all.
+    # A traversal that explores dead branches takes 2**40 steps; this must return quickly.
+    e = [('r', 'f'), ('r', 'a00'), ('r', 'b00')]
+    for i in range(1, 40):
+        for x in ('a%02d' % (i - 1), 'b%02d' % (i - 1)):
+            e.append((x, 'a%02d' % i))
+            e.append((x, 'b%02d' % i))
+    assert len(e) == 159
+    r = ac(e, 'f')
+    assert r == {'ancestors': ['r'], 'roots': ['r'], 'chains': [['r', 'f']], 'chain_count': 1,
+                 'min_cut': ['r'], 'min_cut_size': 1}
