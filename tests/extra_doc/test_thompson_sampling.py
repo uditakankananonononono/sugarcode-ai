@@ -101,3 +101,14 @@ def test_rational_size_exact_boundaries():
 def test_nonzero_lower_and_upper_initial_brackets():
     assert thompson_sampling([(0,0)],[F(1,3)],bits=1)['draw_brackets']==[(0,F(1,2))]
     assert thompson_sampling([(0,0)],[F(2,3)],bits=1)['draw_brackets']==[(F(1,2),1)]
+
+
+def test_asymmetric_prior_indices_and_feedback():
+    r=thompson_sampling([(0,0)],[F(1,3)],prior=(2,3),bits=4)
+    assert r['posterior']==[(2,3)]
+    lo,hi=r['draw_brackets'][0]
+    assert cdf_oracle(2,3,lo)<=F(1,3)<=cdf_oracle(2,3,hi)
+    r=thompson_sampling([(1,4),(3,2)],[F(1,4),F(3,4)],prior=(2,3),bits=4)
+    assert r['posterior']==[(3,7),(5,5)]
+    for pair,q,(lo,hi) in zip([(3,7),(5,5)],[F(1,4),F(3,4)],r['draw_brackets']):
+        assert cdf_oracle(*pair,lo)<=q<=cdf_oracle(*pair,hi)
