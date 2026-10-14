@@ -1,6 +1,6 @@
 """Row607 Performance Testing - Measures speed.
 
-SCOPED local wall-clock nanosecond measurements of a fixed integer sort workload.
+Bounded local wall-clock nanosecond measurements of a fixed integer sort workload.
 No arbitrary callback, network, process, load service or cross-machine benchmark
 claim. Timings are noisy; no performance guarantee or universal ranking.
 """

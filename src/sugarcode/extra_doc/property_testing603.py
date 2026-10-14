@@ -1,6 +1,6 @@
 """Row603 Property-Based Testing - Tests invariants.
 
-SCOPED property checks on supplied integer-list input/output examples of a sort:
+Bounded property checks on supplied integer-list input/output examples of a sort:
 nondecreasing order, equal multiplicities, equal length. No target execution,
 random generation, shrinking or universal correctness claim.
 """

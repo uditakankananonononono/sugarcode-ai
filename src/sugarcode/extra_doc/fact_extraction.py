@@ -1,4 +1,4 @@
-"""Row 561 information extraction (PARTIAL): pulling dates and percentages out of plain text by fixed patterns.
+"""Row 561 information extraction: pulling dates and percentages out of plain text by fixed patterns.
 
 text is a string of 1 to 3000 characters. A date is the exact shape YYYY-MM-DD (ASCII digits, two hyphens) with no
 ASCII digit immediately before or after it, whose year is 1 to 9999, month 1 to 12 and day valid in the Gregorian

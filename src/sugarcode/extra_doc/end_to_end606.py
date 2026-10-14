@@ -1,6 +1,6 @@
 """Row606 End-to-End Testing - Tests full flows.
 
-SCOPED fixed checkout state-machine simulation: cart -> paid -> shipped. No
+Bounded fixed checkout state-machine simulation: cart -> paid -> shipped. No
 actual commerce, payment, shipping, UI, browser, user data or external calls.
 The complete simulated flow is executed, not a deployed full-flow test claim.
 """

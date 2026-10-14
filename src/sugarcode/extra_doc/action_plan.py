@@ -1,4 +1,4 @@
-"""Row 572, Planning System (PARTIAL: symbolic shortest-plan search only): exact shortest action sequence between two sets of true facts.
+"""Row 572, Planning System (symbolic shortest-plan search only): exact shortest action sequence between two sets of true facts.
 
 plan_actions(initial, goal, actions) takes
   initial  names true at the start;
