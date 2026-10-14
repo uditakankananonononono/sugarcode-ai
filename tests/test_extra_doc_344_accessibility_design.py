@@ -44,3 +44,29 @@ def test_errors(args,error,message):
 @pytest.mark.parametrize('text',['a\x00b','a\x01b','a\ufffeb','a\ud800b'])
 def test_invalid_xml_chars(text):
     with pytest.raises(ValueError,match='^text must contain only XML-valid characters$'):solve(text,[('h','p',None)])
+
+@pytest.mark.parametrize('field',range(4))
+@pytest.mark.parametrize('code',[9,10,13,32,55295,57344,65533,65536,1114111])
+def test_xml_char_endpoints_accepted_in_every_field(field,code):
+    text='a'+chr(code)+'b';args=['title',[('heading','paragraph','description')]]
+    if field==0:args[0]=text
+    else:
+        section=list(args[1][0]);section[field-1]=text;args[1]=[tuple(section)]
+    r=solve(*args)
+    assert r['section_count']==1 and r['html'].encode('utf-8')
+
+@pytest.mark.parametrize('field',range(4))
+@pytest.mark.parametrize('code',[0,8,11,12,14,31,55296,57343,65534,65535])
+def test_xml_gap_endpoints_refused_in_every_field(field,code):
+    text='a'+chr(code)+'b';args=['title',[('heading','paragraph','description')]]
+    if field==0:args[0]=text
+    else:
+        section=list(args[1][0]);section[field-1]=text;args[1]=[tuple(section)]
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)=='text must contain only XML-valid characters'
+
+
+def test_heading_eighty_admitted_eighty_one_refused():
+    assert solve('x',[('h'*80,'p',None)])['section_count']==1
+    with pytest.raises(ValueError) as exc:solve('x',[('h'*81,'p',None)])
+    assert str(exc.value)=='text length exceeds supported range'
