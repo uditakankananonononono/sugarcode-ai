@@ -1,4 +1,4 @@
-"""Row 610 continuous integration (PARTIAL): ordering build jobs into parallel stages by their dependencies.
+"""Row 610 continuous integration: ordering build jobs into parallel stages by their dependencies.
 
 jobs is a list of 1 to 100 (name, needs) pairs: name a unique non-empty string up to 30 characters and needs a
 list or tuple of up to 20 distinct names of jobs in the same list. plan(jobs) puts every job into the earliest
