@@ -90,3 +90,13 @@ def test_recomputed_rewrite_is_not_authenticated():
     assert verify(rewritten)['ok'] is True
     altered = [original[0], (2,5,'different',original[1][3])]
     assert verify(altered)['first_bad'] == 1
+
+
+@pytest.mark.parametrize('fn,rows', [(chain, EV), (verify, ROWS)])
+def test_status_note_key_and_literal_v4(fn, rows):
+    from sugarcode.extra_doc.audit_logging import STATUS_NOTE
+    result = fn(rows)
+    assert 'status_note' in result
+    assert result['status_note'] == STATUS_NOTE
+    assert result['status_note'] == ('PARTIAL: hash-chain arithmetic over supplied rows only; '
+                                   'no judgment of whether the right events were logged')
