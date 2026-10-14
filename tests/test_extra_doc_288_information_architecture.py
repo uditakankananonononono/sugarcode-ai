@@ -62,3 +62,13 @@ def test_dict_weights_and_nonsequence_options_declared_errors():
 def test_first_feasible_initialization_and_product_tie_contract():
     assert solve([1],[[-1]])['parents']==[-1]
     assert solve([0,0],[[1,-1],[-1,0]])['parents']==[1,-1]
+
+
+def test_later_strictly_better_tree_replaces_first_feasible():
+    r=solve([1,1],[[1,-1],[-1,0]])
+    assert r['parents']==[-1,-1] and r['weighted_depth']==2
+
+
+def test_parent_options_string_declared_type_error():
+    with pytest.raises(TypeError) as exc:solve([1],'x')
+    assert str(exc.value)=='inputs must be lists or tuples'
