@@ -1,0 +1,51 @@
+"""Row 1496, Scripted Instruction.
+
+script_repeat_fixture formats supplied cue x and response y counts into
+fixed text for repeats iterations per label, in label then iteration order.
+Returns lines (label,one-based_iteration,text), cue_total and response_total.
+No actual scripted teaching, lesson content, content validation, learner
+assessment, learning effectiveness or educational recommendation is supplied.
+Inputs: rows is an exact list or tuple of 1 to 8 entries. Each entry is an
+exact list or tuple (label, x, y). label is an exact printable ASCII str
+of 1 to 12 characters, unique across rows. x and y are exact ints from
+0 to 10; bool and all subclasses are refused.
+repeats defaults to 2, an exact int from 1 to 5.
+Validation order: rows type, rows size, repeats, then each row in input
+order (shape, label, x, y), then duplicate labels.
+NOT_CLAIMED: scripted teaching, content validation, learning effectiveness, production readiness.
+"""
+
+SCOPE = 'PARTIAL: formats supplied cue/response repetition counts, no scripted teaching'
+NOT_CLAIMED = ('scripted teaching', 'content validation', 'learning effectiveness', 'production readiness')
+
+
+def _label(x):
+    return type(x) is str and x.isascii() and x.isprintable() and 1 <= len(x) <= 12
+
+
+def script_repeat_fixture(rows, repeats=2):
+    if type(rows) not in (list, tuple):
+        raise TypeError('rows must be a list or tuple')
+    if not 1 <= len(rows) <= 8:
+        raise ValueError('rows must contain 1 to 8 entries')
+    if type(repeats) is not int or not 1 <= repeats <= 5:
+        raise ValueError('repeats must be a nonbool integer between 1 and 5')
+    clean = []
+    for row in rows:
+        if type(row) not in (list, tuple) or len(row) != 3:
+            raise ValueError('each row must be a (label, x, y) triple')
+        label, x, y = row
+        if not _label(label):
+            raise ValueError('label must be a printable ASCII string of 1 to 12 characters')
+        if type(x) is not int or not 0 <= x <= 10:
+            raise ValueError('x must be a nonbool integer between 0 and 10')
+        if type(y) is not int or not 0 <= y <= 10:
+            raise ValueError('y must be a nonbool integer between 0 and 10')
+        clean.append((label, x, y))
+    if len({r[0] for r in clean}) != len(clean):
+        raise ValueError('labels must be distinct')
+    lines=[]
+    for n,cues,responses in sorted(clean,key=lambda r:r[0]):
+        for i in range(repeats): lines.append((n,i+1,f'{n}: {cues} cues; {responses} responses'))
+    return {'lines':lines,'cue_total':repeats*sum(x for n,x,y in clean),
+            'response_total':repeats*sum(y for n,x,y in clean)}
