@@ -147,11 +147,20 @@ def test_random_against_independent_measurement():
         assert min(c - pk2, t - rms2) == A(0, abs=1e-9)
 
 
-def test_underflowing_rms_is_minus_infinity_and_ceiling_limits():
-    r = M([1e-200])  # x*x underflows to 0.0, so RMS is 0 although the peak is not
-    assert r["rms_db"] == -math.inf and r["crest_db"] == math.inf
-    assert r["peak_db"] == A(-4000.0, abs=1e-6)
-    assert r["limited_by"] == "ceiling" and r["gain_db"] == A(3999.0, abs=1e-6)
+def test_tiny_samples_rms_not_underflowed():
+    r = M([1e-200])  # true RMS equals the peak: -4000 dBFS
+    assert r["rms_db"] == A(-4000.0, abs=1e-6) and r["peak_db"] == A(-4000.0, abs=1e-6)
+    assert r["crest_db"] == A(0.0, abs=1e-6)
+    assert r["gain_db"] == A(3984.0, abs=1e-6) and r["limited_by"] == "target"
+    r = M([1e-200, -1e-200, 1e-200, -1e-200], target_rms_db=-200, ceiling_db=-200)
+    assert r["rms_db"] == A(-4000.0, abs=1e-6) and r["gain_db"] == A(3800.0, abs=1e-6)
+    r = M([5e-324])  # smallest subnormal
+    assert r["rms_db"] == r["peak_db"] and r["rms_db"] == A(20 * math.log10(5e-324), abs=1e-6)
+    r = M([1e-160])
+    assert r["rms_db"] == A(-3200.0, abs=1e-9) and r["peak_db"] == A(-3200.0, abs=1e-9)
+    r = M([3e-200, 4e-200])  # rms = 5e-200 / sqrt(2) = 3.5355e-200
+    assert r["rms_db"] == A(20 * math.log10(math.sqrt(12.5) * 1e-200), abs=1e-6)
+    assert r["peak_db"] == A(20 * math.log10(4e-200), abs=1e-6)
 
 
 def test_ceiling_met_despite_float_error():

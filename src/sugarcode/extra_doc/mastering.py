@@ -12,7 +12,7 @@ STATUS_NOTE = ("PARTIAL: sample-peak and plain RMS measurement with a gain calcu
 
 
 def _db(v):
-    return -math.inf if v == 0 else 20 * math.log10(v)
+    return 20 * math.log10(v)
 
 
 def _num(v, name, lo, hi):
@@ -39,13 +39,13 @@ def master(samples, target_rms_db=-16.0, ceiling_db=-1.0):
     xs = [_num(s, "sample", -1e6, 1e6) for s in samples]
     n = len(xs)
     peak = max(abs(x) for x in xs)
-    rms = math.sqrt(sum(x * x for x in xs) / n)
     dc = sum(xs) / n
     clipped = sum(1 for x in xs if abs(x) >= 1.0)
     if peak == 0:
         return {"samples": n, "peak_db": -math.inf, "rms_db": -math.inf, "dc_offset": 0.0, "clipped": 0,
                 "crest_db": None, "gain_db": 0.0, "limited_by": "silence", "meets_ceiling": True,
                 "status": STATUS_NOTE}
+    rms = peak * math.sqrt(math.fsum((x / peak) ** 2 for x in xs) / n)
     want = t - _db(rms)
     room = c - _db(peak)
     gain = min(want, room)
