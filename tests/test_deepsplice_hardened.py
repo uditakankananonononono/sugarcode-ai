@@ -1,5 +1,5 @@
 import math, random
-from decimal import Decimal, getcontext
+from decimal import Decimal, localcontext
 import pytest
 from sugarcode.modules.deepsplice import core
 from sugarcode.modules.deepsplice.hardened import (
@@ -86,12 +86,13 @@ def test_green_bp_delta_oracle():
 
 
 def test_green_ei_decimal_oracle():
-    getcontext().prec = 40
-    ref, alt, sup = Decimal("0.9"), Decimal("0.5"), Decimal("0.5")
-    logit_ref = Decimal("-0.5") + 5 * ref + 2 * sup
-    logit = logit_ref + (alt - ref) * max(Decimal(5), logit_ref / Decimal("0.15"))
-    psi = 1 / (1 + (-logit).exp())
-    assert ei(0.9, 0.5, REG, 200)["psi"] == pytest.approx(float(psi), rel=1e-9)
+    with localcontext() as context:
+        context.prec = 40
+        ref, alt, sup = Decimal("0.9"), Decimal("0.5"), Decimal("0.5")
+        logit_ref = Decimal("-0.5") + 5 * ref + 2 * sup
+        logit = logit_ref + (alt - ref) * max(Decimal(5), logit_ref / Decimal("0.15"))
+        psi = 1 / (1 + (-logit).exp())
+        assert ei(0.9, 0.5, REG, 200)["psi"] == pytest.approx(float(psi), rel=1e-9)
 
 
 def test_green_iso_sums_to_one_and_hand_oracle():

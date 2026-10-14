@@ -4,14 +4,18 @@ Oracle: decimal.Decimal at 80 digits (independent exp / power), not the
 module's expm1/log1p code path.
 """
 import math
-from decimal import Decimal, getcontext
+from decimal import Decimal, localcontext
 
 import pytest
 
 from sugarcode.modules.phage_designer import core
 from sugarcode.modules.phage_designer import kinetics_exact as kx
 
-getcontext().prec = 80
+@pytest.fixture(autouse=True)
+def decimal_oracle_context():
+    with localcontext() as context:
+        context.prec = 80
+        yield
 
 
 def d_one_minus_exp_neg(x):

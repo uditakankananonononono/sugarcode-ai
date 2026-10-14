@@ -1,13 +1,17 @@
 """Independent oracles for kinetics_exact. Expected values come from 50-digit Decimal / exact Fraction arithmetic
 written here (no module helper reused) plus hand-derived literals. Textbook idealised kinetics only."""
 import math
-from decimal import Decimal, getcontext
+from decimal import Decimal, localcontext
 from fractions import Fraction
 
 import pytest
 from sugarcode.modules.phage_designer import kinetics_exact as kx
 
-getcontext().prec = 60
+@pytest.fixture(autouse=True)
+def decimal_oracle_context():
+    with localcontext() as context:
+        context.prec = 60
+        yield
 
 
 def one_minus_exp_neg(x):

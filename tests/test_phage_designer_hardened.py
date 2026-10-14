@@ -1,11 +1,15 @@
 import math
-from decimal import Decimal as D, getcontext
+from decimal import Decimal as D, localcontext
 from fractions import Fraction
 import pytest
 from sugarcode.modules.phage_designer import core, hardened as h
 
 NAN, INF = float("nan"), float("inf")
-getcontext().prec = 60
+@pytest.fixture(autouse=True)
+def decimal_oracle_context():
+    with localcontext() as context:
+        context.prec = 60
+        yield
 
 
 def test_core_defects_documented():  # raw core behaviour on b363c3b

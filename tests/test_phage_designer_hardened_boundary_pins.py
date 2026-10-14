@@ -4,14 +4,18 @@ Oracles: Fraction/Decimal exact arithmetic (independent of the module's code pat
 Caps in the wrapper boundary tests are the module's own constants, not spec values.
 """
 import math
-from decimal import Decimal as D, getcontext
+from decimal import Decimal as D, localcontext
 from fractions import Fraction
 
 import pytest
 
 from sugarcode.modules.phage_designer import core, hardened as h, kinetics_exact as kx
 
-getcontext().prec = 80
+@pytest.fixture(autouse=True)
+def decimal_oracle_context():
+    with localcontext() as context:
+        context.prec = 80
+        yield
 NAN, INF = float("nan"), float("inf")
 
 
