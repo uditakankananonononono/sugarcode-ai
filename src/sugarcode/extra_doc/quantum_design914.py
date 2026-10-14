@@ -1,6 +1,6 @@
 """Quantum Algorithm Design - Creates quantum solutions.
 
-PARTIAL: constructive Bernstein-Vazirani circuit synthesis and exact simulation
+PARTIAL: constructive Bernstein-Vazirani circuit synthesis and double-precision simulation
 for a supplied binary hidden string. Not an automatic general algorithm inventor
 and not quantum hardware execution. Qubit zero is the least significant bit;
 the last qubit is the phase-kickback ancilla.

@@ -1,6 +1,6 @@
 """Quantum Computing Application - Solves problems exponentially faster.
 
-PARTIAL: exact classical simulation of Grover amplitude amplification, not a
+PARTIAL: double-precision classical simulation of Grover amplitude amplification, not a
 physical quantum processor or evidence of exponential speedup. Grover gives a
 quadratic oracle-query advantage in the ideal black-box model, not exponential.
 Amplitudes use little-endian basis indices and double precision. At most 12
