@@ -1,4 +1,4 @@
-"""Row 671, Domain-Driven Design (PARTIAL: one exact layering rule): check module dependencies against the DDD layers.
+"""Row 671, Domain-Driven Design (bounded scope: one exact layering rule): check module dependencies against the DDD layers.
 
 check_layers(modules, dependencies) takes the modules of a design, each with the layer it sits in, and the dependencies
 between them. modules is a list of (name, layer), layer one of 'domain', 'application', 'infrastructure', 'interface'.

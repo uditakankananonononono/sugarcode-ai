@@ -1,4 +1,4 @@
-"""Row 670, Unit of Work (PARTIAL: one exact commit rule): batch registered changes and apply them all or none.
+"""Row 670, Unit of Work (bounded scope: one exact commit rule): batch registered changes and apply them all or none.
 
 commit_unit_of_work(state, changes) takes the current records and a list of registered changes and returns what a single
 commit would do. state is a dict of key -> int. Each change is a tuple (action, key, value) where action is 'new' (the key
