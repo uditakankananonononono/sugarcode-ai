@@ -189,3 +189,38 @@ def test_magnitude_cap_exact_and_sample_range_both_sides():
         m.apply_gain([1000000001.0], 0)
     with pytest.raises(ValueError, match="gain_db: must be within"):
         m.apply_gain([1], 200.5)
+
+
+def _exact_db(vals):
+    from decimal import Decimal, Context
+    ctx = Context(prec=60, Emin=-100000, Emax=100000)
+    sq = sum((Decimal(v) ** 2 for v in vals), Decimal(0))
+    return float(ctx.divide(sq, Decimal(len(vals))).log10(ctx) * 10)
+
+
+def test_subnormal_rms_never_materialised():
+    r = M([5e-324, 0, 0, 0, 0])
+    assert r["peak_db"] == A(20 * math.log10(5e-324), abs=1e-6)
+    assert r["rms_db"] == A(r["peak_db"] - 10 * math.log10(5), abs=1e-9)
+    assert r["crest_db"] == A(10 * math.log10(5), abs=1e-9)
+    r = M([5e-324, 5e-324])
+    assert r["rms_db"] == A(r["peak_db"], abs=1e-9)
+    r = M([5e-324, -5e-324, 5e-324, -5e-324, 0, 0, 0, 0])
+    assert r["crest_db"] == A(10 * math.log10(2), abs=1e-9)
+    r = M([5e-324, 1e-323])
+    assert r["rms_db"] == A(_exact_db([5e-324, 1e-323]), abs=1e-9)
+    assert r["crest_db"] == A(r["peak_db"] - _exact_db([5e-324, 1e-323]), abs=1e-9)
+    r = M([1e-320, 3e-322, 0, 7e-323])
+    assert r["rms_db"] == A(_exact_db([1e-320, 3e-322, 0, 7e-323]), abs=1e-9)
+
+
+def test_rms_db_matches_exact_decimal_oracle_on_wide_range():
+    import random
+    rnd = random.Random(21)
+    for _ in range(60):
+        scale = 10.0 ** rnd.choice([-320, -200, -160, -100, -10, -1, 0])
+        xs = [rnd.uniform(-1, 1) * scale * rnd.choice([0, 1, 1, 0.5]) for _ in range(rnd.randint(1, 9))]
+        if not any(xs):
+            continue
+        r = M(xs)
+        assert r["rms_db"] == A(_exact_db(xs), abs=1e-7)

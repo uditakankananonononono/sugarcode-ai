@@ -45,14 +45,15 @@ def master(samples, target_rms_db=-16.0, ceiling_db=-1.0):
         return {"samples": n, "peak_db": -math.inf, "rms_db": -math.inf, "dc_offset": 0.0, "clipped": 0,
                 "crest_db": None, "gain_db": 0.0, "limited_by": "silence", "meets_ceiling": True,
                 "status": STATUS_NOTE}
-    rms = peak * math.sqrt(math.fsum((x / peak) ** 2 for x in xs) / n)
-    want = t - _db(rms)
-    room = c - _db(peak)
+    peak_db = _db(peak)
+    rms_db = peak_db + 10 * math.log10(math.fsum((x / peak) ** 2 for x in xs) / n)
+    want = t - rms_db
+    room = c - peak_db
     gain = min(want, room)
-    return {"samples": n, "peak_db": _db(peak), "rms_db": _db(rms), "dc_offset": dc + 0.0, "clipped": clipped,
-            "crest_db": _db(peak) - _db(rms), "gain_db": gain,
+    return {"samples": n, "peak_db": peak_db, "rms_db": rms_db, "dc_offset": dc + 0.0, "clipped": clipped,
+            "crest_db": peak_db - rms_db, "gain_db": gain,
             "limited_by": "ceiling" if room < want else "target",
-            "meets_ceiling": _db(peak) + gain <= c + 1e-9, "status": STATUS_NOTE}
+            "meets_ceiling": peak_db + gain <= c + 1e-9, "status": STATUS_NOTE}
 
 
 def apply_gain(samples, gain_db):
