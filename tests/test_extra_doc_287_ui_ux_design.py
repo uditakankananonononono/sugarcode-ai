@@ -77,3 +77,8 @@ def test_long_matrix_row_and_long_forbidden_tuple_errors():
     assert str(exc.value)=='cost matrix must be square and match actions'
     with pytest.raises(ValueError) as exc:solve([1],[[0]],[(0,0,0)])
     assert str(exc.value)=='forbidden pairs must contain action and slot indices'
+
+@pytest.mark.parametrize('index',[True,1.0,'0'])
+def test_index_types_with_two_actions(index):
+    with pytest.raises(ValueError) as exc:solve([1,1],[[0,1],[1,0]],[(index,0)])
+    assert str(exc.value)=='forbidden indices must be nonbool integers inside action range'
