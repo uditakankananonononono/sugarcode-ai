@@ -99,3 +99,15 @@ def test_type_refusals_and_order():
         H("bad", 1, 1, True)
     with pytest.raises(ValueError, match=r"^history\[0\]: integer required$"):
         H([True, 10**30, 0], 1, 1, 1)
+
+
+def test_unequal_alpha_and_beta_roles():
+    # hand-derived: L0=0,T0=0; step 1 no change; step 2 pred 0, y 100: L = 1/2*100 = 50, T = beta*(50-0) = 1/4*50 = 25/2
+    r = H([0, 0, 100], 5000, 2500, 1)
+    assert (r["level"], r["trend"], r["forecast"], r["mae"]) == (F(50), F(25, 2), [F(125, 2)], F(50))
+    # [10,12,16], alpha 1/2, beta 1/4: L 10,T 2 -> L 12,T 2 -> pred 14, L 15, T = 1/4*3 + 3/4*2 = 9/4
+    r = H([10, 12, 16], 5000, 2500, 2)
+    assert (r["level"], r["trend"], r["forecast"]) == (F(15), F(9, 4), [F(69, 4), F(39, 2)])
+    # swapped weights: alpha 1/4, beta 1/2 -> L = 1/4*16 + 3/4*14 = 29/2, T = 1/2*(5/2) + 1/2*2 = 9/4
+    r = H([10, 12, 16], 2500, 5000, 1)
+    assert (r["level"], r["trend"], r["forecast"]) == (F(29, 2), F(9, 4), [F(67, 4)])
