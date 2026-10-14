@@ -19,7 +19,7 @@ STATUS_NOTE = ("PARTIAL: coverage bookkeeping over supplied ids only; no judgmen
 
 
 def _entries(rows, label, n_max, with_refs):
-    if not isinstance(rows, (list, tuple)):
+    if type(rows) not in (list, tuple):
         raise ValueError(f"{label}: list required")
     hi = 1 if label == "requirements" else 0
     if not hi <= len(rows) <= n_max:
@@ -28,27 +28,27 @@ def _entries(rows, label, n_max, with_refs):
     shape = "(cid, title, rids)" if with_refs else "(rid, title)"
     out, seen = [], set()
     for i, r in enumerate(rows):
-        if not isinstance(r, (list, tuple)):
+        if type(r) not in (list, tuple):
             raise ValueError(f"{label}[{i}]: {shape} required")
         if len(r) != want:
             raise ValueError(f"{label}[{i}]: {want} entries required")
         rid, title = r[0], r[1]
-        if not isinstance(rid, str) or not rid or len(rid) > MAX_ID:
+        if type(rid) is not str or not rid or len(rid) > MAX_ID:
             raise ValueError(f"{label}[{i}] id: non-empty string up to {MAX_ID} characters required")
         if rid in seen:
             raise ValueError(f"{label}[{i}]: duplicate id {rid}")
         seen.add(rid)
-        if not isinstance(title, str) or not title.strip() or len(title) > MAX_TITLE:
+        if type(title) is not str or not title.strip() or len(title) > MAX_TITLE:
             raise ValueError(f"{label}[{i}] title: non-empty string up to {MAX_TITLE} characters required")
         refs = None
         if with_refs:
             refs = r[2]
-            if not isinstance(refs, (list, tuple)):
+            if type(refs) not in (list, tuple):
                 raise ValueError(f"{label}[{i}] rids: list required")
             if len(refs) > MAX_REFS:
                 raise ValueError(f"{label}[{i}] rids: at most {MAX_REFS} entries allowed")
             for j, x in enumerate(refs):
-                if not isinstance(x, str) or not x or len(x) > MAX_ID:
+                if type(x) is not str or not x or len(x) > MAX_ID:
                     raise ValueError(f"{label}[{i}] rids[{j}]: non-empty string up to {MAX_ID} characters required")
             if len(set(refs)) != len(refs):
                 raise ValueError(f"{label}[{i}] rids: duplicates not allowed")
