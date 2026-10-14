@@ -64,3 +64,20 @@ def test_real_clock_measurement_shape_without_speed_claim():
     result=run(list(reversed(range(16))),2)
     assert result['sorted_values']==list(range(16))
     assert len(result['durations_ns'])==2 and all(type(n) is int and n>=0 for n in result['durations_ns'])
+
+
+def test_every_repetition_executes_sort_inside_timed_interval(monkeypatch):
+    import builtins
+    import sugarcode.extra_doc.performance_testing607 as module
+    events=[]
+    def clock():
+        events.append('clock')
+        return 0
+    def sort(values):
+        events.append('sort')
+        return builtins.sorted(values)
+    monkeypatch.setattr(module.time,'perf_counter_ns',clock)
+    monkeypatch.setattr(module,'sorted',sort,raising=False)
+    assert run([3,1,2],4)['sorted_values']==[1,2,3]
+    assert events==['clock','sort','clock']*4
+    assert events.count('sort')==4
