@@ -117,3 +117,15 @@ def tolerance_contract(self):
     with self.assertRaises(ValueError) as caught:a.evolve([1+2e-12,0],[0,0,0],0)
     self.assertEqual(str(caught.exception),'state must have unit norm')
 QuantumTests.test_tolerance_contract=tolerance_contract
+
+def imaginary_tolerance_and_nonfinite(self):
+    a.evolve([1j*(1+2**-52),0],[0]*3,0)
+    with self.assertRaises(ValueError) as caught:a.evolve([1j*(1+2e-12),0],[0]*3,0)
+    self.assertEqual(str(caught.exception),'state must have unit norm')
+    for value in (complex(float('nan'),0),complex(0,float('nan'))):
+        with self.assertRaises(ValueError) as caught:a.evolve([value,1],[0]*3,0)
+        self.assertEqual(str(caught.exception),'finite built-in amplitudes required')
+    for value in (complex(float('inf'),0),complex(0,float('inf'))):
+        with self.assertRaises(ValueError) as caught:a.evolve([value,1],[0]*3,0)
+        self.assertEqual(str(caught.exception),'state must have unit norm')
+QuantumTests.test_imaginary_tolerance_and_nonfinite=imaginary_tolerance_and_nonfinite
