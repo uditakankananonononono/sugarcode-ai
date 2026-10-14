@@ -76,13 +76,13 @@ def _expected(rows):
             energy[drive] = 0
         energy[drive] += intensity
     most_frequent = None
-    for drive in appearances:
-        if most_frequent is None or appearances[drive] > appearances[most_frequent]:
-            most_frequent = drive
     rarest = None
-    for drive in appearances:
-        if rarest is None or appearances[drive] < appearances[rarest]:
-            rarest = drive
+    if appearances:
+        top = max(appearances.values())
+        bottom = min(appearances.values())
+        supply = list(dict.fromkeys(d for _t, d, _i in rows))
+        most_frequent = next(d for d in supply if appearances.get(d) == top)
+        rarest = next(d for d in supply if appearances.get(d) == bottom)
     fleeting = sorted(drive for drive in appearances if appearances[drive] == 1)
     return {'total': len(rows), 'appearances': appearances, 'energy': energy,
             'most_frequent': most_frequent, 'rarest': rarest,
@@ -107,6 +107,9 @@ def _core(m):
     # most frequent is about appearances, not intensity
     r = m.analyze_drives([('t', 'a', 1), ('t', 'a', 1), ('t', 'b', 9)])
     assert r['most_frequent'] == 'a' and r['energy'] == {'a': 2, 'b': 9}
+    # frequency ties ignore alphabetical order
+    r = m.analyze_drives([('t', 'z', 1), ('u', 'a', 1)])
+    assert r['most_frequent'] == 'z' and r['rarest'] == 'z'
     # the rarest tie goes to the first supplied, fleeting sorted
     r = m.analyze_drives([('t', 'c', 4), ('t', 'b', 2), ('t', 'b', 3),
                           ('t', 'a', 1)])
@@ -168,6 +171,11 @@ def _late(m):
     assert mixed == m.analyze_drives([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.analyze_drives([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.analyze_drives([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.analyze_drives([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.analyze_drives([('a', 'b', 5),
+                             ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.analyze_drives([('a', 'b', 9)])['energy'] == {'b': 9}
     # pre-seed pin: fresh accumulators only
     assert m.analyze_drives([('a', 'p', 2), ('b', 'p', 8), ('a', 'q', 5)]) == {
@@ -228,6 +236,9 @@ MUTANTS = [
     ('        energy[drive] += intensity', '        energy[drive] += 1'),
     ('if most_frequent is None or appearances[drive] > appearances[most_frequent]:',
      'if most_frequent is None or appearances[drive] < appearances[most_frequent]:'),
+    ('    for drive in appearances:', '    for drive in sorted(appearances):'),
+    ('for drive in appearances:\n        if rarest is None',
+     'for drive in sorted(appearances):\n        if rarest is None'),
     ('if rarest is None or appearances[drive] < appearances[rarest]:',
      'if rarest is None or appearances[drive] > appearances[rarest]:'),
     ('if appearances[drive] == 1', 'if appearances[drive] == 2'),

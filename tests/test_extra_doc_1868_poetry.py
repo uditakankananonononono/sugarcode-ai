@@ -82,9 +82,10 @@ def _expected(rows):
     unrhymed = sorted(p for p in lines
                       if lines[p] >= 2 and couplets[p] == 0)
     richest = None
-    for poem in couplets:
-        if richest is None or couplets[poem] > couplets[richest]:
-            richest = poem
+    if couplets:
+        top = max(couplets.values())
+        supply = list(dict.fromkeys(p for p, _l, _r in rows))
+        richest = next(p for p in supply if couplets.get(p) == top)
     return {'total': len(rows), 'lines': lines, 'couplets': couplets,
             'unrhymed': unrhymed, 'richest': richest}
 
@@ -123,6 +124,10 @@ def _core(m):
     r = m.scan_couplets([('a', 'x', 1), ('a', 'y', 1),
                          ('b', 'w', 2), ('b', 'z', 2)])
     assert r['richest'] == 'a'
+    # a richest tie ignores alphabetical order
+    r = m.scan_couplets([('z', 'x', 1), ('z', 'y', 1),
+                         ('a', 'w', 2), ('a', 'v', 2)])
+    assert r['richest'] == 'z'
     # a strictly richer poem replaces the richest
     r = m.scan_couplets([('a', 'x', 1), ('a', 'y', 1),
                          ('b', 'w', 2), ('b', 'z', 2), ('b', 'v', 2)])
@@ -188,6 +193,11 @@ def _late(m):
     assert mixed == m.scan_couplets([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.scan_couplets([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.scan_couplets([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.scan_couplets([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.scan_couplets([('a', 'b', 5),
+                            ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.scan_couplets([('a', 'b', 9)])['couplets'] == {'a': 0}
     # pre-seed pin: fresh accumulators only
     assert m.scan_couplets([('a', 'x', 1), ('b', 'y', 2), ('a', 'z', 1)]) == {
@@ -253,6 +263,7 @@ MUTANTS = [
      'if lines[p] >= 1 and couplets[p] == 0'),
     ('if richest is None or couplets[poem] > couplets[richest]:',
      'if richest is None or couplets[poem] < couplets[richest]:'),
+    ('    for poem in couplets:', '    for poem in sorted(couplets):'),
     ("'unrhymed': unrhymed", "'unrhymed': []"),
     ("'total': len(rows)", "'total': len(lines)"),
     ('        poem, line, rhyme = row',

@@ -85,9 +85,10 @@ def _expected(rows):
             longest = streak
         previous = voice
     dominant = None
-    for voice in scenes:
-        if dominant is None or scenes[voice] > scenes[dominant]:
-            dominant = voice
+    if scenes:
+        top = max(scenes.values())
+        supply = list(dict.fromkeys(v for _s, v, _i in rows))
+        dominant = next(v for v in supply if scenes.get(v) == top)
     return {'total': len(rows), 'scenes': scenes, 'switches': switches,
             'longest': longest, 'dominant': dominant}
 
@@ -116,6 +117,9 @@ def _core(m):
     r = m.track_voices([('a', 'x', 1), ('b', 'y', 1),
                         ('c', 'y', 1), ('d', 'y', 1)])
     assert r['longest'] == 3 and r['switches'] == 1
+    # a dominant tie ignores alphabetical order
+    r = m.track_voices([('s1', 'z', 1), ('s2', 'a', 1)])
+    assert r['dominant'] == 'z'
     # the dominant tie goes to the first supplied
     r = m.track_voices([('a', 'x', 1), ('b', 'y', 1)])
     assert r['dominant'] == 'x'
@@ -182,6 +186,11 @@ def _late(m):
     assert mixed == m.track_voices([['a', 'x', 2], ('b', 'y', 1), ['a', 'y', 3]])
     # boundary acceptance pins
     assert m.track_voices([('a', 'b', 1)] * 60)['total'] == 60
+    # exact-cap acceptance: 16-char labels in each position and late
+    assert m.track_voices([('x' * 16, 'b', 5)])['total'] == 1
+    assert m.track_voices([('a', 'y' * 16, 5)])['total'] == 1
+    assert m.track_voices([('a', 'b', 5),
+                           ('x' * 16, 'y' * 16, 5)])['total'] == 2
     assert m.track_voices([('a', 'b', 9), ('c', 'b', 9)])['switches'] == 0
     # pre-seed pin: fresh accumulators only
     assert m.track_voices([('a', 'x', 1), ('b', 'x', 2), ('c', 'y', 3)]) == {
@@ -249,6 +258,9 @@ MUTANTS = [
     ("'total': len(rows)", "'total': len(scenes)"),
     ('        scene, voice, intensity = row',
      '        voice, scene, intensity = row'),
+    ('if dominant is None or scenes[voice] > scenes[dominant]:',
+     'if dominant is None or scenes[voice] < scenes[dominant]:'),
+    ('    for voice in scenes:', '    for voice in sorted(scenes):'),
     ('for i, row in enumerate(rows, 1):', 'for i, row in enumerate(rows):'),
 ]
 
