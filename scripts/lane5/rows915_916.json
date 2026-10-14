@@ -1,0 +1,1715 @@
+{
+  "suite": "test_quantum_rows915_916.py",
+  "mutants": [
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-ops-0",
+      "start": 979,
+      "end": 1024,
+      "old": "abs(abs(alpha)**2 + abs(beta)**2 - 1) > 1e-12",
+      "new": "abs(abs(alpha) ** 2 + abs(beta) ** 2 - 1) >= 1e-12"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L23-op-1",
+      "start": 1092,
+      "end": 1159,
+      "old": "type(probabilities) not in (tuple, list) or len(probabilities) != 3",
+      "new": "type(probabilities) not in (tuple, list) and len(probabilities) != 3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L28-op-2",
+      "start": 1430,
+      "end": 1437,
+      "old": "[0.0]*4",
+      "new": "[0.0] / 4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L29-value-3",
+      "start": 1452,
+      "end": 1455,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L29-value-4",
+      "start": 1452,
+      "end": 1455,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-op-5",
+      "start": 2106,
+      "end": 2147,
+      "old": "abs(a.conjugate()*b + b.conjugate()*a)**2",
+      "new": "abs(a.conjugate() * b + b.conjugate() * a) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L45-op-6",
+      "start": 2163,
+      "end": 2190,
+      "old": "1-failure + failure*overlap",
+      "new": "1 - failure - failure * overlap"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L19-op-7",
+      "start": 811,
+      "end": 895,
+      "old": "type(a) not in (int, float, complex) or not isfinite(a.real) or not isfinite(a.imag)",
+      "new": "type(a) not in (int, float, complex) and (not isfinite(a.real)) and (not isfinite(a.imag))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-8",
+      "start": 1019,
+      "end": 1024,
+      "old": "1e-12",
+      "new": "1.000000000001"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-9",
+      "start": 1019,
+      "end": 1024,
+      "old": "1e-12",
+      "new": "-0.999999999999"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L23-ops-10",
+      "start": 1092,
+      "end": 1132,
+      "old": "type(probabilities) not in (tuple, list)",
+      "new": "type(probabilities) in (tuple, list)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L23-ops-11",
+      "start": 1136,
+      "end": 1159,
+      "old": "len(probabilities) != 3",
+      "new": "len(probabilities) == 3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-op-12",
+      "start": 1262,
+      "end": 1327,
+      "old": "type(p) not in (int, float) or not isfinite(p) or not 0 <= p <= 1",
+      "new": "type(p) not in (int, float) and (not isfinite(p)) and (not 0 <= p <= 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L28-value-13",
+      "start": 1436,
+      "end": 1437,
+      "old": "4",
+      "new": "5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L28-value-14",
+      "start": 1436,
+      "end": 1437,
+      "old": "4",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L30-value-15",
+      "start": 1478,
+      "end": 1479,
+      "old": "8",
+      "new": "9"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L30-value-16",
+      "start": 1478,
+      "end": 1479,
+      "old": "8",
+      "new": "7"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L32-value-17",
+      "start": 1550,
+      "end": 1553,
+      "old": "1.0",
+      "new": "2.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L32-value-18",
+      "start": 1550,
+      "end": 1553,
+      "old": "1.0",
+      "new": "0.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-op-19",
+      "start": 1661,
+      "end": 1704,
+      "old": "(bits[0] ^ bits[1]) + 2*(bits[1] ^ bits[2])",
+      "new": "(bits[0] ^ bits[1]) - 2 * (bits[1] ^ bits[2])"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L37-ops-20",
+      "start": 1754,
+      "end": 1768,
+      "old": "sum(bits) >= 2",
+      "new": "sum(bits) > 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-value-21",
+      "start": 2146,
+      "end": 2147,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-value-22",
+      "start": 2146,
+      "end": 2147,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L45-op-23",
+      "start": 2163,
+      "end": 2172,
+      "old": "1-failure",
+      "new": "1 + failure"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L45-op-24",
+      "start": 2175,
+      "end": 2190,
+      "old": "failure*overlap",
+      "new": "failure / overlap"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L19-ops-25",
+      "start": 811,
+      "end": 847,
+      "old": "type(a) not in (int, float, complex)",
+      "new": "type(a) in (int, float, complex)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-op-26",
+      "start": 983,
+      "end": 1015,
+      "old": "abs(alpha)**2 + abs(beta)**2 - 1",
+      "new": "abs(alpha) ** 2 + abs(beta) ** 2 + 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L23-value-27",
+      "start": 1158,
+      "end": 1159,
+      "old": "3",
+      "new": "4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L23-value-28",
+      "start": 1158,
+      "end": 1159,
+      "old": "3",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-ops-29",
+      "start": 1262,
+      "end": 1289,
+      "old": "type(p) not in (int, float)",
+      "new": "type(p) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L28-value-30",
+      "start": 1431,
+      "end": 1434,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L28-value-31",
+      "start": 1431,
+      "end": 1434,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L31-op-32",
+      "start": 1498,
+      "end": 1513,
+      "old": "(mask >> i) & 1",
+      "new": "mask >> i | 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-op-33",
+      "start": 1662,
+      "end": 1679,
+      "old": "bits[0] ^ bits[1]",
+      "new": "bits[0] | bits[1]"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-op-34",
+      "start": 1683,
+      "end": 1704,
+      "old": "2*(bits[1] ^ bits[2])",
+      "new": "2 / (bits[1] ^ bits[2])"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L37-value-35",
+      "start": 1767,
+      "end": 1768,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L37-value-36",
+      "start": 1767,
+      "end": 1768,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-37",
+      "start": 1854,
+      "end": 1895,
+      "old": "(1-failure)*abs(a)**2 + failure*abs(b)**2",
+      "new": "(1 - failure) * abs(a) ** 2 - failure * abs(b) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-38",
+      "start": 1910,
+      "end": 1963,
+      "old": "(1-failure)*a*b.conjugate() + failure*b*a.conjugate()",
+      "new": "(1 - failure) * a * b.conjugate() - failure * b * a.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-39",
+      "start": 1979,
+      "end": 2032,
+      "old": "(1-failure)*b*a.conjugate() + failure*a*b.conjugate()",
+      "new": "(1 - failure) * b * a.conjugate() - failure * a * b.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-40",
+      "start": 2047,
+      "end": 2088,
+      "old": "(1-failure)*abs(b)**2 + failure*abs(a)**2",
+      "new": "(1 - failure) * abs(b) ** 2 - failure * abs(a) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-op-41",
+      "start": 2110,
+      "end": 2143,
+      "old": "a.conjugate()*b + b.conjugate()*a",
+      "new": "a.conjugate() * b - b.conjugate() * a"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L45-value-42",
+      "start": 2163,
+      "end": 2164,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L45-value-43",
+      "start": 2163,
+      "end": 2164,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-op-44",
+      "start": 983,
+      "end": 1011,
+      "old": "abs(alpha)**2 + abs(beta)**2",
+      "new": "abs(alpha) ** 2 - abs(beta) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-45",
+      "start": 1014,
+      "end": 1015,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-46",
+      "start": 1014,
+      "end": 1015,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-ops-47",
+      "start": 1316,
+      "end": 1327,
+      "old": "0 <= p <= 1",
+      "new": "0 < p <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-ops-48",
+      "start": 1316,
+      "end": 1327,
+      "old": "0 <= p <= 1",
+      "new": "0 <= p < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L31-value-49",
+      "start": 1512,
+      "end": 1513,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L31-value-50",
+      "start": 1512,
+      "end": 1513,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L34-op-51",
+      "start": 1638,
+      "end": 1641,
+      "old": "1-p",
+      "new": "1 + p"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-52",
+      "start": 1683,
+      "end": 1684,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-53",
+      "start": 1683,
+      "end": 1684,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-op-54",
+      "start": 1686,
+      "end": 1703,
+      "old": "bits[1] ^ bits[2]",
+      "new": "bits[1] | bits[2]"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-55",
+      "start": 1854,
+      "end": 1875,
+      "old": "(1-failure)*abs(a)**2",
+      "new": "(1 - failure) / abs(a) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-56",
+      "start": 1878,
+      "end": 1895,
+      "old": "failure*abs(b)**2",
+      "new": "failure / abs(b) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-57",
+      "start": 1910,
+      "end": 1937,
+      "old": "(1-failure)*a*b.conjugate()",
+      "new": "(1 - failure) * a / b.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-58",
+      "start": 1940,
+      "end": 1963,
+      "old": "failure*b*a.conjugate()",
+      "new": "failure * b / a.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-59",
+      "start": 1979,
+      "end": 2006,
+      "old": "(1-failure)*b*a.conjugate()",
+      "new": "(1 - failure) * b / a.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-60",
+      "start": 2009,
+      "end": 2032,
+      "old": "failure*a*b.conjugate()",
+      "new": "failure * a / b.conjugate()"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-61",
+      "start": 2047,
+      "end": 2068,
+      "old": "(1-failure)*abs(b)**2",
+      "new": "(1 - failure) / abs(b) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-62",
+      "start": 2071,
+      "end": 2088,
+      "old": "failure*abs(a)**2",
+      "new": "failure / abs(a) ** 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-op-63",
+      "start": 2110,
+      "end": 2125,
+      "old": "a.conjugate()*b",
+      "new": "a.conjugate() / b"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L44-op-64",
+      "start": 2128,
+      "end": 2143,
+      "old": "b.conjugate()*a",
+      "new": "b.conjugate() / a"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-op-65",
+      "start": 983,
+      "end": 996,
+      "old": "abs(alpha)**2",
+      "new": "abs(alpha) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-op-66",
+      "start": 999,
+      "end": 1011,
+      "old": "abs(beta)**2",
+      "new": "abs(beta) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-value-67",
+      "start": 1316,
+      "end": 1317,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-value-68",
+      "start": 1316,
+      "end": 1317,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-value-69",
+      "start": 1326,
+      "end": 1327,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L26-value-70",
+      "start": 1326,
+      "end": 1327,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L31-value-71",
+      "start": 1529,
+      "end": 1530,
+      "old": "3",
+      "new": "4"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L31-value-72",
+      "start": 1529,
+      "end": 1530,
+      "old": "3",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L34-value-73",
+      "start": 1638,
+      "end": 1639,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L34-value-74",
+      "start": 1638,
+      "end": 1639,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-75",
+      "start": 1667,
+      "end": 1668,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-76",
+      "start": 1667,
+      "end": 1668,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-77",
+      "start": 1677,
+      "end": 1678,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-78",
+      "start": 1677,
+      "end": 1678,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-79",
+      "start": 1855,
+      "end": 1864,
+      "old": "1-failure",
+      "new": "1 + failure"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-80",
+      "start": 1866,
+      "end": 1875,
+      "old": "abs(a)**2",
+      "new": "abs(a) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-op-81",
+      "start": 1886,
+      "end": 1895,
+      "old": "abs(b)**2",
+      "new": "abs(b) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-82",
+      "start": 1910,
+      "end": 1923,
+      "old": "(1-failure)*a",
+      "new": "(1 - failure) / a"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-83",
+      "start": 1940,
+      "end": 1949,
+      "old": "failure*b",
+      "new": "failure / b"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-84",
+      "start": 1979,
+      "end": 1992,
+      "old": "(1-failure)*b",
+      "new": "(1 - failure) / b"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-85",
+      "start": 2009,
+      "end": 2018,
+      "old": "failure*a",
+      "new": "failure / a"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-86",
+      "start": 2048,
+      "end": 2057,
+      "old": "1-failure",
+      "new": "1 + failure"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-87",
+      "start": 2059,
+      "end": 2068,
+      "old": "abs(b)**2",
+      "new": "abs(b) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-op-88",
+      "start": 2079,
+      "end": 2088,
+      "old": "abs(a)**2",
+      "new": "abs(a) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-89",
+      "start": 995,
+      "end": 996,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-90",
+      "start": 995,
+      "end": 996,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-91",
+      "start": 1010,
+      "end": 1011,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L21-value-92",
+      "start": 1010,
+      "end": 1011,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-93",
+      "start": 1691,
+      "end": 1692,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-94",
+      "start": 1691,
+      "end": 1692,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-95",
+      "start": 1701,
+      "end": 1702,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L35-value-96",
+      "start": 1701,
+      "end": 1702,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-97",
+      "start": 1855,
+      "end": 1856,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-98",
+      "start": 1855,
+      "end": 1856,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-99",
+      "start": 1874,
+      "end": 1875,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-100",
+      "start": 1874,
+      "end": 1875,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-101",
+      "start": 1894,
+      "end": 1895,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L40-value-102",
+      "start": 1894,
+      "end": 1895,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-op-103",
+      "start": 1911,
+      "end": 1920,
+      "old": "1-failure",
+      "new": "1 + failure"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-op-104",
+      "start": 1980,
+      "end": 1989,
+      "old": "1-failure",
+      "new": "1 + failure"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-105",
+      "start": 2048,
+      "end": 2049,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-106",
+      "start": 2048,
+      "end": 2049,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-107",
+      "start": 2067,
+      "end": 2068,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-108",
+      "start": 2067,
+      "end": 2068,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-109",
+      "start": 2087,
+      "end": 2088,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L43-value-110",
+      "start": 2087,
+      "end": 2088,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-value-111",
+      "start": 1911,
+      "end": 1912,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L41-value-112",
+      "start": 1911,
+      "end": 1912,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-value-113",
+      "start": 1980,
+      "end": 1981,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_error915",
+      "source": "src/sugarcode/extra_doc/quantum_error915.py",
+      "name": "quantum_error915-L42-value-114",
+      "start": 1980,
+      "end": 1981,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L11-op-115",
+      "start": 330,
+      "end": 376,
+      "old": "type(x) not in (int, float) or not isfinite(x)",
+      "new": "type(x) not in (int, float) and (not isfinite(x))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-op-116",
+      "start": 474,
+      "end": 613,
+      "old": "type(features) not in (list, tuple) or type(labels) not in (list, tuple) or not 1 <= len(features) <= 10000 or len(features) != len(labels)",
+      "new": "type(features) not in (list, tuple) and type(labels) not in (list, tuple) and (not 1 <= len(features) <= 10000) and (len(features) != len(labels))"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-op-117",
+      "start": 1030,
+      "end": 1054,
+      "old": "(1-cos(feature+theta))/2",
+      "new": "(1 - cos(feature + theta)) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L33-value-118",
+      "start": 1252,
+      "end": 1255,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L33-value-119",
+      "start": 1252,
+      "end": 1255,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-120",
+      "start": 1560,
+      "end": 1563,
+      "old": "0.0",
+      "new": "1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-121",
+      "start": 1560,
+      "end": 1563,
+      "old": "0.0",
+      "new": "-1.0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-122",
+      "start": 1579,
+      "end": 1582,
+      "old": "0.1",
+      "new": "1.1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-123",
+      "start": 1579,
+      "end": 1582,
+      "old": "0.1",
+      "new": "-0.9"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-124",
+      "start": 1590,
+      "end": 1593,
+      "old": "100",
+      "new": "101"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L42-value-125",
+      "start": 1590,
+      "end": 1593,
+      "old": "100",
+      "new": "99"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-op-126",
+      "start": 1922,
+      "end": 1971,
+      "old": "type(steps) is not int or not 0 <= steps <= 10000",
+      "new": "type(steps) is not int and (not 0 <= steps <= 10000)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L11-ops-127",
+      "start": 330,
+      "end": 357,
+      "old": "type(x) not in (int, float)",
+      "new": "type(x) in (int, float)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-ops-128",
+      "start": 474,
+      "end": 509,
+      "old": "type(features) not in (list, tuple)",
+      "new": "type(features) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-ops-129",
+      "start": 513,
+      "end": 546,
+      "old": "type(labels) not in (list, tuple)",
+      "new": "type(labels) in (list, tuple)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-ops-130",
+      "start": 585,
+      "end": 613,
+      "old": "len(features) != len(labels)",
+      "new": "len(features) == len(labels)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-op-131",
+      "start": 772,
+      "end": 809,
+      "old": "type(y) is not int or y not in (0, 1)",
+      "new": "type(y) is not int and y not in (0, 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-op-132",
+      "start": 1031,
+      "end": 1051,
+      "old": "1-cos(feature+theta)",
+      "new": "1 + cos(feature + theta)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-value-133",
+      "start": 1053,
+      "end": 1054,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-value-134",
+      "start": 1053,
+      "end": 1054,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-135",
+      "start": 1350,
+      "end": 1407,
+      "old": "(probability(x, theta+pi/2)-probability(x, theta-pi/2))/2",
+      "new": "(probability(x, theta + pi / 2) - probability(x, theta - pi / 2)) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L37-op-136",
+      "start": 1424,
+      "end": 1432,
+      "old": "(p-y)**2",
+      "new": "(p - y) * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L38-op-137",
+      "start": 1453,
+      "end": 1471,
+      "old": "2*(p-y)*derivative",
+      "new": "2 * (p - y) / derivative"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L39-op-138",
+      "start": 1483,
+      "end": 1501,
+      "old": "loss/len(features)",
+      "new": "loss * len(features)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L39-op-139",
+      "start": 1503,
+      "end": 1525,
+      "old": "gradient/len(features)",
+      "new": "gradient * len(features)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-ops-140",
+      "start": 1831,
+      "end": 1853,
+      "old": "0 < learning_rate <= 1",
+      "new": "0 <= learning_rate <= 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-ops-141",
+      "start": 1831,
+      "end": 1853,
+      "old": "0 < learning_rate <= 1",
+      "new": "0 < learning_rate < 1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-ops-142",
+      "start": 1922,
+      "end": 1944,
+      "old": "type(steps) is not int",
+      "new": "type(steps) is int"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L56-op-143",
+      "start": 2195,
+      "end": 2217,
+      "old": "learning_rate*gradient",
+      "new": "learning_rate / gradient"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-ops-144",
+      "start": 554,
+      "end": 581,
+      "old": "1 <= len(features) <= 10000",
+      "new": "1 < len(features) <= 10000"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-ops-145",
+      "start": 554,
+      "end": 581,
+      "old": "1 <= len(features) <= 10000",
+      "new": "1 <= len(features) < 10000"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-ops-146",
+      "start": 772,
+      "end": 790,
+      "old": "type(y) is not int",
+      "new": "type(y) is int"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-ops-147",
+      "start": 794,
+      "end": 809,
+      "old": "y not in (0, 1)",
+      "new": "y in (0, 1)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-value-148",
+      "start": 1031,
+      "end": 1032,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-value-149",
+      "start": 1031,
+      "end": 1032,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-150",
+      "start": 1351,
+      "end": 1404,
+      "old": "probability(x, theta+pi/2)-probability(x, theta-pi/2)",
+      "new": "probability(x, theta + pi / 2) + probability(x, theta - pi / 2)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-151",
+      "start": 1406,
+      "end": 1407,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-152",
+      "start": 1406,
+      "end": 1407,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L37-op-153",
+      "start": 1425,
+      "end": 1428,
+      "old": "p-y",
+      "new": "p + y"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L37-value-154",
+      "start": 1431,
+      "end": 1432,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L37-value-155",
+      "start": 1431,
+      "end": 1432,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L38-op-156",
+      "start": 1453,
+      "end": 1460,
+      "old": "2*(p-y)",
+      "new": "2 / (p - y)"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-value-157",
+      "start": 1831,
+      "end": 1832,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-value-158",
+      "start": 1831,
+      "end": 1832,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-value-159",
+      "start": 1852,
+      "end": 1853,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L48-value-160",
+      "start": 1852,
+      "end": 1853,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-ops-161",
+      "start": 1952,
+      "end": 1971,
+      "old": "0 <= steps <= 10000",
+      "new": "0 < steps <= 10000"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-ops-162",
+      "start": 1952,
+      "end": 1971,
+      "old": "0 <= steps <= 10000",
+      "new": "0 <= steps < 10000"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-value-163",
+      "start": 554,
+      "end": 555,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-value-164",
+      "start": 554,
+      "end": 555,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-value-165",
+      "start": 576,
+      "end": 581,
+      "old": "10000",
+      "new": "10001"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L16-value-166",
+      "start": 576,
+      "end": 581,
+      "old": "10000",
+      "new": "9999"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L27-op-167",
+      "start": 1037,
+      "end": 1050,
+      "old": "feature+theta",
+      "new": "feature - theta"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L38-value-168",
+      "start": 1453,
+      "end": 1454,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L38-value-169",
+      "start": 1453,
+      "end": 1454,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L38-op-170",
+      "start": 1456,
+      "end": 1459,
+      "old": "p-y",
+      "new": "p + y"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-value-171",
+      "start": 1952,
+      "end": 1953,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-value-172",
+      "start": 1952,
+      "end": 1953,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-value-173",
+      "start": 1966,
+      "end": 1971,
+      "old": "10000",
+      "new": "10001"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L50-value-174",
+      "start": 1966,
+      "end": 1971,
+      "old": "10000",
+      "new": "9999"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-value-175",
+      "start": 804,
+      "end": 805,
+      "old": "0",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-value-176",
+      "start": 804,
+      "end": 805,
+      "old": "0",
+      "new": "-1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-value-177",
+      "start": 807,
+      "end": 808,
+      "old": "1",
+      "new": "2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L20-value-178",
+      "start": 807,
+      "end": 808,
+      "old": "1",
+      "new": "0"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-179",
+      "start": 1366,
+      "end": 1376,
+      "old": "theta+pi/2",
+      "new": "theta - pi / 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-180",
+      "start": 1393,
+      "end": 1403,
+      "old": "theta-pi/2",
+      "new": "theta + pi / 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L61-ops-181",
+      "start": 2494,
+      "end": 2502,
+      "old": "p >= 0.5",
+      "new": "p > 0.5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-182",
+      "start": 1372,
+      "end": 1376,
+      "old": "pi/2",
+      "new": "pi * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-op-183",
+      "start": 1399,
+      "end": 1403,
+      "old": "pi/2",
+      "new": "pi * 2"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L61-value-184",
+      "start": 2499,
+      "end": 2502,
+      "old": "0.5",
+      "new": "1.5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L61-value-185",
+      "start": 2499,
+      "end": 2502,
+      "old": "0.5",
+      "new": "-0.5"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-186",
+      "start": 1375,
+      "end": 1376,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-187",
+      "start": 1375,
+      "end": 1376,
+      "old": "2",
+      "new": "1"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-188",
+      "start": 1402,
+      "end": 1403,
+      "old": "2",
+      "new": "3"
+    },
+    {
+      "module": "sugarcode.extra_doc.quantum_ml916",
+      "source": "src/sugarcode/extra_doc/quantum_ml916.py",
+      "name": "quantum_ml916-L36-value-189",
+      "start": 1402,
+      "end": 1403,
+      "old": "2",
+      "new": "1"
+    }
+  ]
+}
