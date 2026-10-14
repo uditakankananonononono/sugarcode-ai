@@ -15,7 +15,8 @@ def test_actual_scipy_refuses_malformed_seed_without_a_result():
 
 
 @pytest.mark.parametrize('code,stderr', [
-    (0, ''), (1, 'ValueError: unrelated failure'),
+    (0, ''), (1, ''), (1, 'ValueError: unrelated failure'),
+    (1, 'in check_random_state\nRuntimeError: x cannot be used to seed a numpy.random.RandomState instance'),
     (1, 'ValueError: cannot be used to seed a numpy.random.RandomState instance'),
     (1, 'in check_random_state\nValueError: unrelated failure'),
     (1, 'ImportError: missing module'), (2, 'TypeError: invalid seed'),
