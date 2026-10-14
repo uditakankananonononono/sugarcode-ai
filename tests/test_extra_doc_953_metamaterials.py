@@ -1,6 +1,7 @@
 """Mutation and oracle tests for extra_doc.metamaterials."""
 
 import signal
+import sys
 import types
 
 import pytest
@@ -278,3 +279,31 @@ def test_scope_wording_exact_v2():
         'does not optimize the geometry',
         'does not handle more than two structural dimensions',
     )
+
+
+def test_gcd_swap_dies_bounded_v3():
+    """The 'a, b = b, a' gcd mutant loops forever; a line-event budget
+    makes it die cleanly instead of hanging."""
+    old = 'a, b = b, a % b'
+    new = 'a, b = b, a'
+    assert SRC.count(old) == 1
+    mutant = SRC.replace(old, new, 1)
+    module = types.ModuleType('mutant')
+    exec(compile(mutant, 'mutant', 'exec'), module.__dict__)
+    budget = [200000]
+
+    def _tracer(frame, event, arg):
+        budget[0] -= 1
+        if budget[0] <= 0:
+            raise _Timeout()
+        return _tracer
+
+    sys.settrace(_tracer)
+    try:
+        battery(module)
+    except BaseException:
+        pass
+    else:
+        pytest.fail('gcd swap mutant survived')
+    finally:
+        sys.settrace(None)

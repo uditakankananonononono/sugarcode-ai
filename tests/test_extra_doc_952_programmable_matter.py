@@ -274,3 +274,22 @@ def test_scope_wording_exact_v2():
         'does not reshape the sheet',
         'does not weight cells by area',
     )
+
+
+def test_stress_line_witnesses_v3():
+    """Behavior witnesses for the exact cross-multiplied stress line."""
+    m = _load_code(SRC)
+    # auditor-21 witness: the //-mutant returns ['a', 'b'] here
+    r = m.morph([('b', 3), ('a', 7), ('b', 0)])
+    assert r == {'total': 3, 'cells': 2, 'mean': 3, 'stress': ['a']}
+    # a sits exactly at the tolerance: |1*3 - 9*1| = 6 == 2*3*1, strict >
+    # keeps it calm; the //-mutant calls b stressed (6 > 3)
+    r = m.morph([('b', 4), ('b', 4), ('a', 1)])
+    assert r == {'total': 3, 'cells': 2, 'mean': 3, 'stress': []}
+    # two clearly deviating cells are stressed under either threshold
+    # shape; the cell exactly on the mean stays calm
+    r = m.morph([('a', 10), ('b', 0), ('c', 5)])
+    assert r['stress'] == ['a', 'b']
+    # one record per cell: * and // agree, deviation must still be exact
+    r = m.morph([('a', 10), ('b', 0)])
+    assert r['stress'] == ['a', 'b']
