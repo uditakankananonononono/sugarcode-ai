@@ -77,3 +77,12 @@ def test_plain_containers_default_and_boundaries(outer, row_type):
                 r = audit([('x'*60, created, rotation, False)], created, warn)['keys'][0]
                 assert r['due_day'] == created + rotation and r['age_days'] == 0
                 assert r['days_left'] == rotation
+
+
+def test_status_note_key_and_literal_v3():
+    from sugarcode.extra_doc.key_management import STATUS_NOTE
+    result = audit([('a', 0, 1, False)], 0)
+    assert 'status_note' in result
+    assert result['status_note'] == STATUS_NOTE
+    assert result['status_note'] == ('PARTIAL: date arithmetic over a supplied inventory only; '
+                                   'no key material handled and no judgment of security or of the rotation periods')
