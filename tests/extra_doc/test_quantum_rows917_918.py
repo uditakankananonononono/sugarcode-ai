@@ -111,3 +111,9 @@ def magnitude_policy(self):
         self.assertEqual(str(caught.exception),'state must have unit norm')
     a.evolve([1,0],[1e6,0,0],1e6)
 QuantumTests.test_magnitude_policy=magnitude_policy
+
+def tolerance_contract(self):
+    a.evolve([1+2**-52,0],[0,0,0],0)
+    with self.assertRaises(ValueError) as caught:a.evolve([1+2e-12,0],[0,0,0],0)
+    self.assertEqual(str(caught.exception),'state must have unit norm')
+QuantumTests.test_tolerance_contract=tolerance_contract

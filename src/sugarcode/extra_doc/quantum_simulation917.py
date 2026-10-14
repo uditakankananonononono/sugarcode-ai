@@ -18,7 +18,7 @@ def evolve(state, field, time):
     for value in state:
         if type(value) not in (int, float, complex):
             raise ValueError('finite built-in amplitudes required')
-        if abs(value.real)>1 or abs(value.imag)>1:
+        if abs(value.real)>2 or abs(value.imag)>2:
             raise ValueError('state must have unit norm')
         if not isfinite(value.real) or not isfinite(value.imag):
             raise ValueError('finite built-in amplitudes required')

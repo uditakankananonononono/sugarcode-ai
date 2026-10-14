@@ -70,8 +70,8 @@
       "name": "quantum_simulation917-L21-op-7",
       "start": 892,
       "end": 930,
-      "old": "abs(value.real)>1 or abs(value.imag)>1",
-      "new": "abs(value.real) > 1 and abs(value.imag) > 1"
+      "old": "abs(value.real)>2 or abs(value.imag)>2",
+      "new": "abs(value.real) > 2 and abs(value.imag) > 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -214,8 +214,8 @@
       "name": "quantum_simulation917-L21-ops-23",
       "start": 892,
       "end": 909,
-      "old": "abs(value.real)>1",
-      "new": "abs(value.real) >= 1"
+      "old": "abs(value.real)>2",
+      "new": "abs(value.real) >= 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -223,8 +223,8 @@
       "name": "quantum_simulation917-L21-ops-24",
       "start": 913,
       "end": 930,
-      "old": "abs(value.imag)>1",
-      "new": "abs(value.imag) >= 1"
+      "old": "abs(value.imag)>2",
+      "new": "abs(value.imag) >= 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -367,8 +367,8 @@
       "name": "quantum_simulation917-L21-value-40",
       "start": 908,
       "end": 909,
-      "old": "1",
-      "new": "2"
+      "old": "2",
+      "new": "3"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -376,8 +376,8 @@
       "name": "quantum_simulation917-L21-value-41",
       "start": 908,
       "end": 909,
-      "old": "1",
-      "new": "0"
+      "old": "2",
+      "new": "1"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -385,8 +385,8 @@
       "name": "quantum_simulation917-L21-value-42",
       "start": 929,
       "end": 930,
-      "old": "1",
-      "new": "2"
+      "old": "2",
+      "new": "3"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
@@ -394,8 +394,8 @@
       "name": "quantum_simulation917-L21-value-43",
       "start": 929,
       "end": 930,
-      "old": "1",
-      "new": "0"
+      "old": "2",
+      "new": "1"
     },
     {
       "module": "sugarcode.extra_doc.quantum_simulation917",
