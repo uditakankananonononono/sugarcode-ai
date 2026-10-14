@@ -18,7 +18,7 @@ STATUSES = ("revoked", "overdue", "due_soon", "ok")
 
 
 def _int(v, name, lo, hi):
-    if isinstance(v, bool) or not isinstance(v, int):
+    if type(v) is not int:
         raise ValueError(f"{name}: integer required")
     if not lo <= v <= hi:
         raise ValueError(f"{name}: must be within {lo} to {hi}")
@@ -28,18 +28,18 @@ def _int(v, name, lo, hi):
 def audit(keys, today, warn_days=14):
     t = _int(today, "today", 0, MAX_DAY)
     warn = _int(warn_days, "warn_days", 0, MAX_WARN)
-    if not isinstance(keys, (list, tuple)):
+    if type(keys) not in (list, tuple):
         raise ValueError("keys: list required")
     if not 1 <= len(keys) <= MAX_KEYS:
         raise ValueError(f"keys: 1 to {MAX_KEYS} entries required")
     rows, seen = [], set()
     for i, k in enumerate(keys):
-        if not isinstance(k, (list, tuple)):
+        if type(k) not in (list, tuple):
             raise ValueError(f"keys[{i}]: (name, created_day, rotation_days, revoked) required")
         if len(k) != 4:
             raise ValueError(f"keys[{i}]: 4 entries required")
         name, created, rot, revoked = k
-        if not isinstance(name, str) or not name.strip() or len(name) > MAX_NAME:
+        if type(name) is not str or not name.strip() or len(name) > MAX_NAME:
             raise ValueError(f"keys[{i}] name: non-empty string up to {MAX_NAME} characters required")
         if name in seen:
             raise ValueError(f"keys[{i}]: duplicate key {name}")
@@ -48,7 +48,7 @@ def audit(keys, today, warn_days=14):
         if c > t:
             raise ValueError(f"keys[{i}] created_day: must not be after today")
         r = _int(rot, f"keys[{i}] rotation_days", 1, MAX_ROTATION)
-        if not isinstance(revoked, bool):
+        if type(revoked) is not bool:
             raise ValueError(f"keys[{i}] revoked: bool required")
         due = c + r
         left = due - t
