@@ -57,3 +57,27 @@ def test_mixed_row_containers_and_label_charset():
     for bad in ('a-b','a.b','a b','a/b','a@b'):
         second=list(ROWS[1]);second[0]=bad
         with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])
+
+
+def test_validation_precedence_label_before_integer():
+    row=list(ROWS[1]);row[0]='a-b';row[1]=True
+    with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],row])
+    row[0]=None;row[1]=1000001
+    with pytest.raises(TypeError,match='^exact string label required$'):run([ROWS[0],row])
+
+def test_all_row_shapes_before_content():
+    row=list(ROWS[0]);row[0]='a-b'
+    with pytest.raises(ValueError,match='^intervals: wrong row arity$'):run([row,ROWS[1][:-1]])
+
+def test_adjacent_endpoints_and_equal_interval():
+    assert run([('a',0,1),('b',1,2)])['overlaps']==[]
+    assert run([('a',0,1),('b',0,1)])['overlaps']==[('a','b',1)]
+    with pytest.raises(ValueError,match='^start must precede end$'):run([('a',1,1)])
+
+
+def test_integer_field_order_with_multiple_bad_values():
+    for first in range(1,len(ROWS[1])-1):
+        row=list(ROWS[1]);row[first]=True;row[first+1]=1000001
+        with pytest.raises(TypeError,match='^exact nonbool integer required$'):run([ROWS[0],row])
+        row=list(ROWS[1]);row[first]=1000001;row[first+1]=True
+        with pytest.raises(ValueError,match='^integer outside declared range$'):run([ROWS[0],row])

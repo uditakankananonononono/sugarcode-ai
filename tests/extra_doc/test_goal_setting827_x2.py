@@ -58,3 +58,29 @@ def test_mixed_row_containers_and_label_charset():
     for bad in ('a-b','a.b','a b','a/b','a@b'):
         second=list(ROWS[1]);second[0]=bad
         with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])
+
+
+def test_validation_precedence_label_before_integer():
+    row=list(ROWS[1]);row[0]='a-b';row[1]=True
+    with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],row])
+    row[0]=None;row[1]=1000001
+    with pytest.raises(TypeError,match='^exact string label required$'):run([ROWS[0],row])
+
+def test_all_row_shapes_before_content():
+    row=list(ROWS[0]);row[0]='a-b'
+    with pytest.raises(ValueError,match='^goals: wrong row arity$'):run([row,ROWS[1][:-1]])
+
+def test_clock_boundary_and_validation_order():
+    assert raw_run([('a',2,1,7)],7)=={'met':[],'overdue':[],'pending':[('a',1)],'progress_verified':False}
+    assert raw_run([('a',1,1,7)],7)['met']==['a']
+    with pytest.raises(TypeError,match='^goals: exact list or tuple required$'):raw_run(None,True)
+    with pytest.raises(ValueError,match='^goals: wrong row arity$'):raw_run([('a',)],True)
+    with pytest.raises(TypeError,match='^exact nonbool integer required$'):raw_run([('a-b',1,0,0)],True)
+
+
+def test_integer_field_order_with_multiple_bad_values():
+    for first in range(1,len(ROWS[1])-1):
+        row=list(ROWS[1]);row[first]=True;row[first+1]=1000001
+        with pytest.raises(TypeError,match='^exact nonbool integer required$'):run([ROWS[0],row])
+        row=list(ROWS[1]);row[first]=1000001;row[first+1]=True
+        with pytest.raises(ValueError,match='^integer outside declared range$'):run([ROWS[0],row])
