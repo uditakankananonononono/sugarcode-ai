@@ -2,6 +2,7 @@
 
 For each supplied competitor/criterion pair, compare score against a supplied
 baseline. Weighted delta totals measure relative position, not factual quality.
+Weighted delta is not normalized by weight sum; ranking ties use lower index.
 Caps 16 competitors, 16 criteria; scores/weights 0..1000 integers.
 NOT_CLAIMED: external competitor research, truthful scores, strategic advice,
 market performance prediction or actual competitive advantage.

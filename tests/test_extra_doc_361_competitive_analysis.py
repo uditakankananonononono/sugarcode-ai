@@ -35,3 +35,10 @@ def test_exact_scalar_rejection(bad,slot):
     args[slot]=[[bad]] if slot==0 else [bad]
     with pytest.raises(ValueError) as exc:solve(*args)
     assert str(exc.value)=='scores and weights must be nonbool integers zero through 1000'
+
+@pytest.mark.parametrize('scores,weights',[
+ ([[1]],[1,1]),([[1,2,3]],[1,1]),([[1,2]],[1]),([[1,2]],[1,1,1]),
+])
+def test_short_long_criterion_shapes(scores,weights):
+    with pytest.raises(ValueError) as exc:solve(scores,[1,1],weights)
+    assert str(exc.value)=='criterion shapes must agree'
