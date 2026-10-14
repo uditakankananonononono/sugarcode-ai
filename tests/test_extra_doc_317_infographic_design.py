@@ -37,3 +37,26 @@ def test_zero_data_caps_and_exact_noninteger_bar():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('text',['a\x00b','a\x01b','a\ufffeb','a\ud800b'])
+@pytest.mark.parametrize('field',[0,1])
+def test_xml_forbidden_characters(text,field):
+    args=[text,[('x',0)]] if field==0 else ['x',[(text,0)]]
+    with pytest.raises(ValueError) as exc:solve(*args)
+    assert str(exc.value)=='text must contain only XML-valid characters'
+
+
+def test_hand_literal_card_and_svg_geometry_contract():
+    r=solve('title',[('a',1),('b',2)])
+    assert r['cards']==[
+        {'x':20,'y':70,'width':360,'height':76,'bar_width':120,'label':'a','value':1},
+        {'x':20,'y':160,'width':360,'height':76,'bar_width':240,'label':'b','value':2}]
+    root=ET.fromstring(r['svg'])
+    assert root.attrib=={'width':'400','height':'260'}
+    rects=list(root.iter('{http://www.w3.org/2000/svg}rect'))
+    assert [(r.attrib.get('x'),r.attrib.get('y'),r.attrib['width'],r.attrib['height']) for r in rects[1:]]==[
+        ('20','70','360','76'),('32','112','120.000000','12'),
+        ('20','160','360','76'),('32','202','240.000000','12')]
+    texts=list(root.iter('{http://www.w3.org/2000/svg}text'))
+    assert [(t.attrib['x'],t.attrib['y'],t.attrib['font-size']) for t in texts]==[
+        ('20','38','8'),('32','94','10'),('368','94','10'),('32','184','10'),('368','184','10')]
