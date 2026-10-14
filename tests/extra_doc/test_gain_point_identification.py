@@ -29,7 +29,7 @@ def refuses(error, msg, a):
 TY = 'outcomes must be a list or tuple'
 CNT = 'outcome count must be between 1 and 32'
 TRI = 'outcomes must be label importance delivery triples'
-LAB = 'labels must be strings of length 1 through 40'
+LAB = 'labels must be strings of length 1 through 40 without control or unassigned characters'
 RAT = 'ratings must be nonbool integers zero through 100'
 UNI = 'labels must be unique'
 
@@ -92,3 +92,11 @@ def test_check_order():
     refuses(ValueError, TRI, [5])
     refuses(ValueError, LAB, [(1, True, 0)])
     refuses(ValueError, RAT, [('a', True, 0), ('a', 1, 1)])
+
+
+def test_non_ascii_witnesses():
+    for ch in ('\x00', '\n', '\x7f', '\x85', '\u200b', '\ue000', '\ud800', '\u0378'):
+        refuses(ValueError, LAB, [('a' + ch, 1, 0)])
+        refuses(ValueError, LAB, [(ch, 1, 0)])
+        refuses(ValueError, LAB, [('a', 1, 0), ('b' + ch + 'c', 1, 0)])
+    assert rg([('caf\u00e9 \u4e2d \U0001f600', 1, 0)])['ranked'][0]['label'] == 'caf\u00e9 \u4e2d \U0001f600'

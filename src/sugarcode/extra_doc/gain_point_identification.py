@@ -4,11 +4,15 @@ Outcomes are (label, importance, delivery) with ratings the caller supplies, int
 0..100. Opportunity = importance*(100-delivery). Returns outcomes with positive
 opportunity ranked by opportunity descending then input index, plus the labels
 with zero opportunity. 1 to 32 outcomes, labels unique strings of 1 to 40
-characters. Caps are implementation choices.
+characters with no control, format, private-use, surrogate or unassigned characters. Caps are implementation choices.
 NOT_CLAIMED: that outcomes were discovered or verified, customer research,
 accuracy of ratings, demand, willingness to pay or product fit.
 """
+import unicodedata
 
+
+def _bad(s):
+    return any(unicodedata.category(c)[0] == 'C' for c in s)
 
 def rank_gains(outcomes):
     if type(outcomes) not in (list, tuple):
@@ -17,8 +21,8 @@ def rank_gains(outcomes):
         raise ValueError('outcome count must be between 1 and 32')
     if any(type(o) not in (list, tuple) or len(o) != 3 for o in outcomes):
         raise ValueError('outcomes must be label importance delivery triples')
-    if any(type(o[0]) is not str or not 1 <= len(o[0]) <= 40 for o in outcomes):
-        raise ValueError('labels must be strings of length 1 through 40')
+    if any(type(o[0]) is not str or not 1 <= len(o[0]) <= 40 or _bad(o[0]) for o in outcomes):
+        raise ValueError('labels must be strings of length 1 through 40 without control or unassigned characters')
     if any(type(v) is not int or not 0 <= v <= 100 for o in outcomes for v in o[1:]):
         raise ValueError('ratings must be nonbool integers zero through 100')
     if len({o[0] for o in outcomes}) != len(outcomes):
