@@ -15,7 +15,7 @@ a topic are sorted. Each topic reports the documents containing any of its terms
 document is assigned the topic with the most of its distinct terms (ties to the lowest
 topic index), or None when it has none.
 
-Scope: PARTIAL for the Topic Modeling line. Exact deterministic theme discovery from
+Scope: bounded implementation for the Topic Modeling line. Exact deterministic theme discovery from
 term co-occurrence in the caller's documents. It is not LDA or any probabilistic topic
 model: no latent variables, no mixtures, no inference.
 

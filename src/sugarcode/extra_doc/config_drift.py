@@ -1,4 +1,4 @@
-"""Row 613, Configuration Management (PARTIAL: one exact step): layered settings and drift from them.
+"""Row 613, Configuration Management (bounded scope: one exact step): layered settings and drift from them.
 
 config_drift(layers, actual) merges settings layers, lowest priority first, and compares the result with a supplied
 actual configuration. A setting key is 1 to 4 lowercase identifier segments joined by dots (each segment 1 to 16

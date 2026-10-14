@@ -1,4 +1,4 @@
-"""Row 612, Infrastructure as Code (PARTIAL: one exact step of a plan): what to create, update and delete, and in what order.
+"""Row 612, Infrastructure as Code (bounded scope: one exact step of a plan): what to create, update and delete, and in what order.
 
 plan_changes(current, desired) compares two resource lists. A resource is a tuple (name, spec, deps): name a lowercase
 identifier, spec a nonbool int (the declared setting, compared by equality), deps a tuple of the names it depends on

@@ -18,7 +18,7 @@ index lists ordered by their lowest index, with the merge history (both sides an
 exact similarity), the per-document cluster assignment and each cluster's medoid (the
 member with the largest summed similarity to the members, ties to the lowest index).
 
-Scope: PARTIAL for the Document Clustering line. Exact bag-of-words hierarchical
+Scope: bounded implementation for the Document Clustering line. Exact bag-of-words hierarchical
 clustering over the caller's own documents. It is not k-means or any learned
 clustering: no embeddings, no weighting, no choice of the number of clusters.
 

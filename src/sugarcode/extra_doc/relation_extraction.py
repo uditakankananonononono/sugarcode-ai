@@ -19,7 +19,7 @@ relation phrase (separated by spaces and tabs), the triple (first mention, relat
 name, second mention) is returned with exact offsets. Nothing else is inferred: no
 transitive, symmetric or inverse relations, and no pairs that are not consecutive.
 
-Scope: PARTIAL for the Relation Extraction line. Exact adjacency-pattern extraction
+Scope: bounded implementation for the Relation Extraction line. Exact adjacency-pattern extraction
 over caller-listed entities and relation phrases. It is not statistical relation
 extraction: no coreference, no negation, no unlisted phrasing.
 

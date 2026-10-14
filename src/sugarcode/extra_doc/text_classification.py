@@ -15,7 +15,7 @@ Scores are exact Fractions; the posterior of each label is its score divided by 
 of the scores, so the posteriors sum to exactly 1. The predicted label has the largest
 posterior; exact ties go to the alphabetically first label and are flagged.
 
-Scope: PARTIAL for the Text Classification line. Exact Naive Bayes with add-one
+Scope: bounded implementation for the Text Classification line. Exact Naive Bayes with add-one
 smoothing and bag-of-words features over the caller's own examples. It is not a
 general classifier: no feature weighting, no n-grams, no learned embeddings.
 

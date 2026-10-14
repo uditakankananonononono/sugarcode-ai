@@ -1,4 +1,4 @@
-"""Row 614, Container Orchestration (PARTIAL: one exact step): first-fit-decreasing placement of containers on nodes.
+"""Row 614, Container Orchestration (bounded scope: one exact step): first-fit-decreasing placement of containers on nodes.
 
 place_containers(nodes, containers) places each container on a node by a fixed rule. A node is (name, cpu, mem) and a
 container is (name, cpu, mem): a lowercase identifier name and nonbool int sizes from 1 to 1000000 (cpu in millicores,

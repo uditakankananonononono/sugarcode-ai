@@ -15,7 +15,7 @@ positive and negative totals, the label (positive when the score is above 0, neg
 when below 0, otherwise neutral), the token count, the exact score per token as a
 Fraction string, and every matched token with its offsets.
 
-Scope: PARTIAL for the Sentiment Analysis line. Exact polarity arithmetic over a
+Scope: bounded implementation for the Sentiment Analysis line. Exact polarity arithmetic over a
 caller-supplied lexicon with one-token negation. It is not a trained sentiment model:
 no sarcasm, no intensifiers, no multi-word phrases, no emoji, no context beyond the one
 preceding token.

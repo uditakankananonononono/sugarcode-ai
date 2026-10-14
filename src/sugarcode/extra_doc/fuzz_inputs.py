@@ -1,4 +1,4 @@
-"""Row 602, Fuzzing (PARTIAL: one exact step of a fuzzer): a repeatable stream of pseudo-random test inputs.
+"""Row 602, Fuzzing (bounded scope: one exact step of a fuzzer): a repeatable stream of pseudo-random test inputs.
 
 fuzz_inputs(seed, count, low, high) runs a fixed 32-bit linear congruential generator from the state `seed`:
     state = (1664525 * state + 1013904223) mod 2**32        (the first output uses the state after one step)
