@@ -1,4 +1,4 @@
-"""Row 455 logistics optimization (PARTIAL): the cheapest round trip from a depot through every stop.
+"""Row 455 logistics optimization: the cheapest round trip from a depot through every stop.
 
 dist is a square matrix of whole travel costs, dist[i][j] being the cost of going from stop i to stop j (it may
 be asymmetric; the diagonal is ignored), with stop 0 the depot. The module finds, exactly, the cheapest tour
