@@ -1,3 +1,4 @@
+from seed_core_refusal_contract import is_seed_refusal
 import importlib
 import re
 import subprocess
@@ -42,7 +43,8 @@ def test_unchecked_core_gives_no_valid_result_on_nested_list_seed(fn, argstr, ar
     assert subprocess.run([sys.executable, "-c", "from sugarcode.modules.biosimvr import core"], capture_output=True, timeout=120).returncode == 0
     r = run("core", fn, argstr)
     # environment-robust: older numpy segfaults (-11), newer numpy/scipy raises TypeError or RecursionError (seed repr); either is a failure on the seed
-    assert r.returncode == -11 or (r.returncode == 1 and any(l.split(":")[0] in ("TypeError", "RecursionError") for l in r.stderr.splitlines()) and "seed must be an integer" not in r.stderr)
+    assert is_seed_refusal(r), r.stderr
+    assert not r.stdout
 
 
 @pytest.mark.parametrize("fn,argstr,args,kw", CASES)

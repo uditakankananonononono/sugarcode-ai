@@ -1,3 +1,4 @@
+from seed_core_refusal_contract import is_seed_refusal
 import importlib
 import inspect
 import re
@@ -48,7 +49,8 @@ def test_unchecked_core_fails_on_nested_list_seed(fn, argstr, args, kw):
     assert subprocess.run([sys.executable, "-c", "from sugarcode.modules.synlife_evo import core"], capture_output=True, timeout=120).returncode == 0
     r = run("core", fn, argstr)
     # random.Random(list) raises TypeError (unhashable list on 3.10, unsupported seed type on 3.11+); a segfault or RecursionError would also be a failure
-    assert r.returncode == -11 or (r.returncode == 1 and any(l.split(":")[0] in ("TypeError", "RecursionError") for l in r.stderr.splitlines()) and "seed must be an integer" not in r.stderr)
+    assert is_seed_refusal(r), r.stderr
+    assert not r.stdout
 
 
 @pytest.mark.parametrize("fn,argstr,args,kw", CASES)
