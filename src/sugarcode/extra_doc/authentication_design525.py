@@ -50,3 +50,32 @@ def evaluate_authentication(rows):
         raise ValueError('duplicate subject')
     return {'decisions': [(subject, primary==1 and (required==0 or second==1))
                           for subject,primary,second,required in sorted(rows)]}
+
+
+def verify_challenge_signature(row):
+    """Tuple: (Ed25519 public_key bytes32, challenge bytes16..256, signature bytes64).
+
+    Cryptographically verify possession evidence for this exact challenge/key.
+    The caller must bind the public key through trusted enrollment, issue a fresh
+    unpredictable challenge and consume it once. This stateless helper does NOT
+    verify a person's identity, challenge freshness, audience or replay status.
+    No credentials, enrollment, account lookup or sessions are stored.
+    Requires the existing cryptography vault/dev optional dependency.
+    """
+    if type(row) is not tuple:
+        raise TypeError('exact tuple proof required')
+    if len(row) != 3:
+        raise ValueError('proof arity must be three')
+    for value in row:
+        if type(value) is not bytes:
+            raise TypeError('exact proof bytes required')
+    public_key, challenge, signature = row
+    if len(public_key) != 32 or not 16 <= len(challenge) <= 256 or len(signature) != 64:
+        raise ValueError('proof byte lengths outside declared range')
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+    from cryptography.exceptions import InvalidSignature
+    try:
+        Ed25519PublicKey.from_public_bytes(public_key).verify(signature, challenge)
+    except InvalidSignature:
+        return False
+    return True
