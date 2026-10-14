@@ -1,7 +1,7 @@
 """Row 242: Column Generation - Handles many variables.
 
 Exact restricted-master/pricing method for min c'x,Ax=b,x>=0 with supplied
-nonnegative nonzero columns,a feasible initial basis,m<=3,columns<=64.
+nonnegative nonzero columns supplied up front,a feasible initial basis,m<=3,columns<=64.
 Returns primal/dual/reduced-cost certificate after all-column pricing.
 NOT_CLAIMED: implicit infinite pricing oracles,phase I,general LP dimensions,
 unbounded-column models,or biological validation.
