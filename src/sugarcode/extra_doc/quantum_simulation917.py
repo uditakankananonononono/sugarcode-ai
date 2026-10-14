@@ -11,20 +11,24 @@ def evolve(state, field, time):
 
     Built-in finite numbers only, normalized two-amplitude list/tuple; three real
     field components. Unit-norm tolerance 1e-12. Reject overflowing field/time
-    scales rather than return NaNs. No open-system or noise dynamics.
+    scales rather than return NaNs; field/time bound is 1e6. No open-system or noise dynamics.
     """
     if type(state) not in (list, tuple) or len(state) != 2:
         raise ValueError('state must have two amplitudes')
     for value in state:
-        if type(value) not in (int, float, complex) or not isfinite(value.real) or not isfinite(value.imag):
+        if type(value) not in (int, float, complex):
+            raise ValueError('finite built-in amplitudes required')
+        if abs(value.real)>1 or abs(value.imag)>1:
+            raise ValueError('state must have unit norm')
+        if not isfinite(value.real) or not isfinite(value.imag):
             raise ValueError('finite built-in amplitudes required')
     if abs(sum(abs(x)**2 for x in state)-1)>1e-12:
         raise ValueError('state must have unit norm')
     if type(field) not in (list, tuple) or len(field)!=3:
         raise ValueError('field must have three components')
     for x in (*field,time):
-        if type(x) not in (int,float) or not isfinite(x) or abs(x)>1e100:
-            raise ValueError('finite built-in real with magnitude <=1e100 required')
+        if type(x) not in (int,float) or abs(x)>1e6 or not isfinite(x):
+            raise ValueError('finite built-in real with magnitude <=1e6 required')
     hx,hy,hz=field
     radius=sqrt(hx*hx+hy*hy+hz*hz)
     if radius==0:

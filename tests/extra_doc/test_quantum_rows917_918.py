@@ -40,7 +40,7 @@ class QuantumTests(unittest.TestCase):
         z=[0]*10000
         self.assertEqual(len(b.audit_bb84(z,z,z,z,[9999])['alice_candidate']),9999)
         with self.assertRaisesRegex(ValueError,'^binary sequences must be lists/tuples of length 1..10000$'):b.audit_bb84(z+[0],z,z,z,[0])
-        self.assertEqual(a.evolve([1,0],[0,0,0],1e100)['state'],(1+0j,0j))
+        self.assertEqual(a.evolve([1,0],[0,0,0],1e6)['state'],(1+0j,0j))
     def test_schema(self):
         for value in (True,IntSubclass(0),1.,-1,2):
             with self.assertRaisesRegex(ValueError,'^binary entries must be built-in int 0 or 1$'):b.audit_bb84([value],[0],[0],[0],[0])
@@ -93,10 +93,21 @@ for i,(fn,args,msg) in enumerate([
  (a.evolve,([1,0],{0:0,1:0,2:0},0),'field must have three components'),
  (a.evolve,([True,0],[0,0,0],0),'finite built-in amplitudes required'),
  (a.evolve,([0,0],[0,0,0],0),'state must have unit norm'),
- (a.evolve,([1,0],[0,0,0],True),'finite built-in real with magnitude <=1e100 required'),
+ (a.evolve,([1,0],[0,0,0],True),'finite built-in real with magnitude <=1e6 required'),
  (b.audit_bb84,([],[],[],[],[0]),'binary sequences must be lists/tuples of length 1..10000'),
  (b.audit_bb84,([0],[0],[0,0],[0],[0]),'binary sequences must have equal lengths'),
  (b.audit_bb84,([0],[0],[0],[0],[]),'nonempty disclosed list/tuple required'),
  (b.audit_bb84,([0],[0],[0],[1],[0]),'disclosed indices must be built-in ints in sifted positions'),
  (b.audit_bb84,([0],[0],[0],[0],[0,0]),'disclosed indices must be unique'),
 ]):setattr(QuantumTests,'test_exact_refusal_%02d'%i,refuse(fn,args,msg))
+
+
+def magnitude_policy(self):
+    for value in (1e6+1,1e100,1e308,10**10000):
+        for field,t in (([value,0,0],0),([0,0,0],value)):
+            with self.assertRaises(ValueError) as caught:a.evolve([1,0],field,t)
+            self.assertEqual(str(caught.exception),'finite built-in real with magnitude <=1e6 required')
+        with self.assertRaises(ValueError) as caught:a.evolve([value,0],[0,0,0],0)
+        self.assertEqual(str(caught.exception),'state must have unit norm')
+    a.evolve([1,0],[1e6,0,0],1e6)
+QuantumTests.test_magnitude_policy=magnitude_policy
