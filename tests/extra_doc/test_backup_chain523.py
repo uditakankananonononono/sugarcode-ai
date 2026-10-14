@@ -61,3 +61,46 @@ def test_availability_type(bad):
 @pytest.mark.parametrize('bs,t',[(None,0),([(0,None,0,True)]*65,0),([()],0),([(0,)],0),([(0,None,0)],0),([(0,None,0,True,0)],0),([[0,None,0,True]],0),([(-1,None,0,True)],0),([(10**9+1,None,0,True)],0),([(0,-1,0,True)],0),([(0,1,0,True)],0),([(0,None,-1,True)],0),([(0,None,10**12+1,True)],0),([], -1),([],10**9+1),([(0,0,0,True)],0),([(0,1,0,True),(0,0,0,True)],0),([(0,1,0,True),(1,None,0,True)],0)])
 def test_refusals(bs,t):
     with pytest.raises(ValueError):recover(bs,t)
+
+
+class ListSubclass523(list):
+    pass
+
+
+class TupleSubclass523(tuple):
+    pass
+
+
+class IntSubclass523(int):
+    pass
+
+
+@pytest.mark.parametrize('bad', [[1, 0, 0, True], TupleSubclass523((1, 0, 0, True))])
+def test_row_container_exact_message_nonfirst(bad):
+    with pytest.raises(ValueError, match='^backup timestamp parent bytes available quadruple$'):
+        recover([(0, None, 0, True), bad], 1)
+
+
+def test_negative_parent_exact_message_nonfirst():
+    with pytest.raises(ValueError, match='^parent None or valid integer index$'):
+        recover([(0, None, 0, True), (1, -1, 0, True)], 1)
+
+
+@pytest.mark.parametrize('slot,message', [
+    (0, '^timestamp integer0..1000000000$'),
+    (1, '^parent None or valid integer index$'),
+    (2, '^bytes integer0..1000000000000$'),
+    (3, '^available must be bool$'),
+])
+def test_scalar_subclass_exact_messages_nonfirst(slot, message):
+    row = [1, 0, 0, True]
+    row[slot] = IntSubclass523(row[slot])
+    with pytest.raises(ValueError, match=message):
+        recover([(0, None, 0, True), tuple(row)], 1)
+
+
+def test_outer_container_and_requested_subclasses_exact_messages():
+    with pytest.raises(ValueError, match='^0..64 backups before scan$'):
+        recover(ListSubclass523([(0, None, 0, True)]), 0)
+    with pytest.raises(ValueError, match='^requested integer0..1000000000$'):
+        recover([(0, None, 0, True)], IntSubclass523(0))
