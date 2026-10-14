@@ -72,3 +72,19 @@ def test_radical_order_square_oracle():
         assert _compare(F(m),F(a*a),F(n),F(b*b))==((m+a>n+b)-(m+a<n+b))
     assert _compare(F(2),F(2),F(0),F(12))==-1
     assert _compare(F(3),F(2),F(0),F(12))==1
+
+
+def test_exact_numerator_size_preflight_messages():
+    for value in (F(10**100),F(-10**100)):
+        with pytest.raises(ValueError,match='^rational range exceeded$'):
+            upper_confidence_bound(1,[],log_value=value)
+    for value in (F(10**100+1),F(-10**100-1),F(10**101)):
+        with pytest.raises(ValueError,match='^rational size budget exceeded$'):
+            upper_confidence_bound(1,[],log_value=value)
+    # Valid-range fractions with near-cap numerators must not hit a shrunk budget.
+    q=F(10**99+1,2*10**99+1)
+    r=upper_confidence_bound(1,[(0,q)],log_value=q)
+    assert r['means']==[q] and r['bonus_squared']==[2*q]
+    assert upper_confidence_bound(1,[(0,F(1,10**100))],log_value=F(1,10**100))['chosen_arm']==0
+    with pytest.raises(ValueError,match='^rational size budget exceeded$'):
+        upper_confidence_bound(1,[],log_value=F(1,10**100+1))
