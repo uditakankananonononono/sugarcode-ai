@@ -69,3 +69,11 @@ def test_acceptance_fraction_strictly_between_tenth_and_ninth():
     s=optimize(1,2.6,6.6,4)['steps'][3]
     assert s['ratio_fraction']=='1066749236435/10011991682234'
     assert F(1,10)<F(s['ratio_fraction'])<=F(1,9) and s['accepted']
+
+
+def test_rational_size_guard_exact_bit_boundary_helper_not_natural_path():
+    from sugarcode.extra_doc.trust_scalar233 import _bounded
+    # Unit check of exact guard; does not claim natural optimization reaches size.
+    for v in (F(1<<4095),F(1,1<<4095)):_bounded(v)
+    for v in (F(1<<4096),F(1,1<<4096)):
+        with pytest.raises(ValueError,match='^trust rational size exceeds 4096 bits$'):_bounded(v)
