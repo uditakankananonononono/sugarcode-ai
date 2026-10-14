@@ -50,3 +50,36 @@ def evaluate_access(rows):
         raise ValueError('duplicate request')
     return {'decisions': [(subject,resource,action,grant==1 and deny==0)
                           for subject,resource,action,grant,deny in sorted(rows)]}
+
+
+def evaluate_role_policy(policy, requests):
+    """Policy rows: (role, resource, action, effect), effect 'allow' or 'deny'.
+    Request rows: (subject, role, resource, action).
+
+    Exact-match role policy, deny overrides allow and absent rules deny. Roles are
+    caller assertions. No identity/role store, inheritance, wildcards, deployed
+    enforcement or actual authorization grant. Pure returned decisions only.
+    """
+    _rows(policy, 4)
+    _rows(requests, 4)
+    for role, resource, action, effect in policy:
+        for value in (role, resource, action):
+            _label(value)
+        if type(effect) is not str:
+            raise TypeError('exact string effect required')
+        if effect not in ('allow', 'deny'):
+            raise ValueError('effect must be allow or deny')
+    for row in requests:
+        for value in row:
+            _label(value)
+    if len(set(policy)) != len(policy):
+        raise ValueError('duplicate policy rule')
+    if len(set(requests)) != len(requests):
+        raise ValueError('duplicate policy request')
+    decisions = []
+    for subject, role, resource, action in sorted(requests):
+        effects = {effect for r, obj, act, effect in policy
+                   if (r, obj, act) == (role, resource, action)}
+        decisions.append((subject, role, resource, action,
+                          'allow' in effects and 'deny' not in effects))
+    return {'decisions': decisions}
