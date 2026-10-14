@@ -36,3 +36,33 @@ def test_edge_contact_tie_and_max_shape():
 def test_errors(args,error,message):
     with pytest.raises(error) as exc:solve(*args)
     assert str(exc.value)==message
+
+@pytest.mark.parametrize('rectangles',[
+ [(0,0,2,2,0),(2,0,2,2,0)],[(2,0,2,2,0),(0,0,2,2,0)],
+ [(0,0,2,2,0),(0,2,2,2,0)],[(0,2,2,2,0),(0,0,2,2,0)]])
+def test_all_orientations_shared_edge_accepted(rectangles):
+    assert solve(4,4,[[r] for r in rectangles])['feasible_count']==1
+
+
+def test_one_cell_overlap_refused_and_exact_far_room_boundary():
+    with pytest.raises(ValueError,match='^no nonoverlapping interior plan exists$'):
+        solve(4,4,[[(0,0,2,2,0)],[(1,0,2,2,0)]])
+    assert solve(4,4,[[(3,3,1,1,0)]])['rectangles']==[[3,3,1,1]]
+    for rectangle in [(4,3,1,1,0),(3,4,1,1,0),(3,3,2,1,0),(3,3,1,2,0)]:
+        with pytest.raises(ValueError) as exc:solve(4,4,[[rectangle]])
+        assert str(exc.value)=='placement geometry must be inside room bounds'
+
+@pytest.mark.parametrize('placements',[{},'x',{1}])
+def test_outer_nonsequence_placement_type(placements):
+    with pytest.raises(TypeError) as exc:solve(4,4,placements)
+    assert str(exc.value)=='placements must be a list or tuple'
+
+@pytest.mark.parametrize('options',[{},'x',{1},range(1)])
+def test_option_nonsequence_type(options):
+    with pytest.raises(ValueError) as exc:solve(4,4,[options])
+    assert str(exc.value)=='each item must have between 1 and 4 placements'
+
+@pytest.mark.parametrize('rectangle',[{},'abcde',range(5)])
+def test_rectangle_nonsequence_type(rectangle):
+    with pytest.raises(ValueError) as exc:solve(4,4,[[rectangle]])
+    assert str(exc.value)=='placements must contain x y width height cost'
