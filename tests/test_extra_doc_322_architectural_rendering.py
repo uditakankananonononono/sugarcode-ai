@@ -182,3 +182,35 @@ def test_range_edges_on_both_sides():
 
 def test_size_upper_edge_accepted():
     assert a.box_wireframe((0, 0, 1), (100000, 100000, 99999))["bounds"] is not None
+
+
+def test_minimum_depth_refusal_and_boundary():
+    assert a.MIN_DEPTH == 1e-6
+    for z in (5e-324, 1e-300, 1e-9, 9.9e-7):
+        with pytest.raises(ValueError, match="point is closer than 1e-06 to the camera plane"):
+            P([(1, 1, z)])
+    assert P([(1, 1, 1e-6)], focal_px=1) == [(1000000.0, 1000000.0)]
+    assert P([(1, 1, 1.1e-6)], focal_px=1)[0][0] == A(1 / 1.1e-6, rel=1e-12)
+    with pytest.raises(ValueError, match="point is behind the camera"):
+        P([(1, 1, 0.0)])
+    with pytest.raises(ValueError, match="point is behind the camera"):
+        P([(1, 1, -5e-324)])
+    # every accepted output is finite, including the extreme corner
+    u, v = P([(100000, -100000, 1e-6)], focal_px=100000)[0]
+    assert math.isfinite(u) and math.isfinite(v)
+
+
+def test_origin_lower_bound_valid():
+    r = a.box_wireframe((-100000, 0, 1), (0.001, 0.001, 0.001))
+    assert len(r["edges"]) == 12
+    r = a.box_wireframe((0, -100000, 1), (0.001, 0.001, 0.001))
+    assert len(r["edges"]) == 12
+
+
+def test_origin_upper_bound_valid_just_below_cap():
+    r = a.box_wireframe((99999.5, 0, 1), (0.001, 0.001, 0.001))
+    assert len(r["edges"]) == 12
+    r = a.box_wireframe((0, 99999.5, 1), (0.001, 0.001, 0.001))
+    assert len(r["edges"]) == 12
+    r = a.box_wireframe((0, 0, 99999.5), (0.001, 0.001, 0.001))
+    assert len(r["edges"]) == 12

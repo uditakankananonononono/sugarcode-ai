@@ -6,6 +6,7 @@ cast by a wall for a given sun altitude. No lighting, materials or visual qualit
 import math
 
 MAX_POINTS = 1000
+MIN_DEPTH = 1e-6
 STATUS_NOTE = ("PARTIAL: pinhole projection and shadow-length geometry only; no lighting, materials, "
                "or claim of visual quality")
 _EDGES = [(0, 1), (1, 3), (3, 2), (2, 0), (4, 5), (5, 7), (7, 6), (6, 4), (0, 4), (1, 5), (2, 6), (3, 7)]
@@ -42,6 +43,8 @@ def project(points, cam_pos=(0, 0, 0), yaw_deg=0, focal_px=1000):
         side = dx * math.cos(yaw) - dz * math.sin(yaw)
         if depth <= 0:
             raise ValueError("point is behind the camera")
+        if depth < MIN_DEPTH:
+            raise ValueError("point is closer than 1e-06 to the camera plane")
         out.append((f * side / depth + 0.0, f * dy / depth + 0.0))
     return out
 
