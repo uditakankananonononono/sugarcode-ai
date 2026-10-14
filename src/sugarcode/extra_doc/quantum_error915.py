@@ -18,7 +18,7 @@ def recover_bit_flip(alpha, beta, probabilities):
     for a in (alpha, beta):
         if type(a) not in (int, float, complex):
             raise ValueError('amplitudes must be finite built-in numbers')
-        if abs(a.real) > 1 or abs(a.imag) > 1:
+        if abs(a.real) > 2 or abs(a.imag) > 2:
             raise ValueError('amplitudes must have unit norm')
         if not isfinite(a.real) or not isfinite(a.imag):
             raise ValueError('amplitudes must be finite built-in numbers')

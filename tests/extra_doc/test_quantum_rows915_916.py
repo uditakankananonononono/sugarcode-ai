@@ -177,3 +177,9 @@ def amplitude_component_boundaries(self):
         with self.assertRaises(ValueError) as caught:a.recover_bit_flip(value,0,[0,0,0])
         self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
 QuantumTests.test_amplitude_component_boundaries=amplitude_component_boundaries
+
+def tolerance_contract(self):
+    a.recover_bit_flip(1+2**-52,0,[0]*3)
+    with self.assertRaises(ValueError) as caught:a.recover_bit_flip(1+2e-12,0,[0]*3)
+    self.assertEqual(str(caught.exception),'amplitudes must have unit norm')
+QuantumTests.test_tolerance_contract=tolerance_contract

@@ -79,8 +79,8 @@
       "name": "quantum_error915-L21-op-8",
       "start": 946,
       "end": 980,
-      "old": "abs(a.real) > 1 or abs(a.imag) > 1",
-      "new": "abs(a.real) > 1 and abs(a.imag) > 1"
+      "old": "abs(a.real) > 2 or abs(a.imag) > 2",
+      "new": "abs(a.real) > 2 and abs(a.imag) > 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -250,8 +250,8 @@
       "name": "quantum_error915-L21-ops-27",
       "start": 946,
       "end": 961,
-      "old": "abs(a.real) > 1",
-      "new": "abs(a.real) >= 1"
+      "old": "abs(a.real) > 2",
+      "new": "abs(a.real) >= 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -259,8 +259,8 @@
       "name": "quantum_error915-L21-ops-28",
       "start": 965,
       "end": 980,
-      "old": "abs(a.imag) > 1",
-      "new": "abs(a.imag) >= 1"
+      "old": "abs(a.imag) > 2",
+      "new": "abs(a.imag) >= 2"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -430,8 +430,8 @@
       "name": "quantum_error915-L21-value-47",
       "start": 960,
       "end": 961,
-      "old": "1",
-      "new": "2"
+      "old": "2",
+      "new": "3"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -439,8 +439,8 @@
       "name": "quantum_error915-L21-value-48",
       "start": 960,
       "end": 961,
-      "old": "1",
-      "new": "0"
+      "old": "2",
+      "new": "1"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -448,8 +448,8 @@
       "name": "quantum_error915-L21-value-49",
       "start": 979,
       "end": 980,
-      "old": "1",
-      "new": "2"
+      "old": "2",
+      "new": "3"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
@@ -457,8 +457,8 @@
       "name": "quantum_error915-L21-value-50",
       "start": 979,
       "end": 980,
-      "old": "1",
-      "new": "0"
+      "old": "2",
+      "new": "1"
     },
     {
       "module": "sugarcode.extra_doc.quantum_error915",
