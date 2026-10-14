@@ -30,4 +30,4 @@ def lattice_point_distances(rows):
         _label(label)
         for coordinate in (x1,y1,x2,y2):_integer(coordinate,-1000,1000)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('point labels must be unique')
-    return {'distances':[(label,abs(x2-x1)+abs(y2-y1),(x2-x1)**2+(y2-y1)**2) for label,x1,y1,x2,y2 in sorted(rows)],'locations_verified':False}
+    return {'distances':[(label,abs(x2-x1)+abs(y2-y1),(x2-x1)**2+(y2-y1)**2) for label,x1,y1,x2,y2 in sorted(rows,key=lambda r:r[0])],'locations_verified':False}

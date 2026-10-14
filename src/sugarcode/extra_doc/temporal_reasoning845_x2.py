@@ -30,7 +30,7 @@ def declared_interval_overlaps(rows):
         _label(label);_integer(start,0,1000000);_integer(end,0,1000000)
         if start>=end:raise ValueError('start must precede end')
     if len({r[0] for r in rows})!=len(rows):raise ValueError('interval labels must be unique')
-    ordered=sorted(rows);overlaps=[]
+    ordered=sorted(rows,key=lambda r:r[0]);overlaps=[]
     for i,(a,sa,ea) in enumerate(ordered):
         for b,sb,eb in ordered[i+1:]:
             duration=min(ea,eb)-max(sa,sb)

@@ -43,3 +43,13 @@ def test_independent_polynomial_oracle():
     rows=[('s_'+str(i).zfill(2),-100,100,100,100) for i in reversed(range(32))];assert run(rows)['alternatives']==[(r[0],-9900,10100,20000) for r in sorted(rows)]
     from sugarcode.extra_doc import counterfactual_reasoning847_x2 as m
     assert 'NOT_CLAIMED: real counterfactuals, causal structure, model truth, feasible' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

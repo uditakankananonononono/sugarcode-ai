@@ -47,3 +47,13 @@ def test_independent_integer_set_intersection():
     assert run(rows)['overlaps']==[(a,b,1000000) for i,a in enumerate(labels) for b in labels[i+1:]]
     from sugarcode.extra_doc import temporal_reasoning845_x2 as m
     assert 'NOT_CLAIMED: actual event timing, calendar availability, causal time order,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])

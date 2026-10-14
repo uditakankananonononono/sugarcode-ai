@@ -31,4 +31,4 @@ def observed_group_differences(rows):
         if ts>tn or cs>cn:raise ValueError('successes must not exceed group totals')
     if len({r[0] for r in rows})!=len(rows):raise ValueError('group labels must be unique')
     from fractions import Fraction
-    return {'differences':[(label,Fraction(ts,tn)-Fraction(cs,cn)) for label,ts,tn,cs,cn in sorted(rows)],'causality_identified':False}
+    return {'differences':[(label,Fraction(ts,tn)-Fraction(cs,cn)) for label,ts,tn,cs,cn in sorted(rows,key=lambda r:r[0])],'causality_identified':False}

@@ -30,4 +30,4 @@ def declared_linear_alternatives(rows):
         _label(label)
         for value in (base,alternative,slope,intercept):_integer(value,-100,100)
     if len({r[0] for r in rows})!=len(rows):raise ValueError('scenario labels must be unique')
-    return {'alternatives':[(label,slope*base+intercept,slope*alternative+intercept,slope*(alternative-base)) for label,base,alternative,slope,intercept in sorted(rows)],'counterfactuals_verified':False}
+    return {'alternatives':[(label,slope*base+intercept,slope*alternative+intercept,slope*(alternative-base)) for label,base,alternative,slope,intercept in sorted(rows,key=lambda r:r[0])],'counterfactuals_verified':False}

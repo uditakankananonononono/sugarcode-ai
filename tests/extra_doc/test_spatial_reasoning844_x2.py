@@ -43,3 +43,13 @@ def test_independent_coordinate_oracle():
     rows=[('p_'+str(i).zfill(2),-1000,-1000,1000,1000) for i in reversed(range(32))];assert run(rows)['distances']==[(r[0],4000,8000000) for r in sorted(rows)]
     from sugarcode.extra_doc import spatial_reasoning844_x2 as m
     assert 'NOT_CLAIMED: spatial intelligence, actual distances, map interpretation,' in m.__doc__
+
+
+def test_mixed_row_containers_and_label_charset():
+    mixed=[tuple(ROWS[0]),list(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    mixed=[list(ROWS[0]),tuple(ROWS[1])]
+    assert run(mixed)==run([tuple(r) for r in mixed])
+    for bad in ('a-b','a.b','a b','a/b','a@b'):
+        second=list(ROWS[1]);second[0]=bad
+        with pytest.raises(ValueError,match='^label must be 1..24 ASCII word characters$'):run([ROWS[0],second])
