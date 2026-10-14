@@ -101,3 +101,12 @@ def test_required_facts_not_just_added_effects_and_sort_by_id_before_payload():
     assert construct(*a)['status']=='no_causal_five_beat_arc'
     a=args();a[0][3]['text']='Zulu climax.';e=copy.deepcopy(a[0][3]);e['id']='z';e['text']='Alpha climax.';a[0].append(e)
     r=construct(*a);assert r['arc'][3]['id']=='d' and r['arc'][3]['text']=='Zulu climax.'
+
+
+def test_selected_arc_tension_exact_literals_and_strict_integer_types():
+    r=construct(*args())
+    assert [e['tension'] for e in r['arc']]==[1,3,5,9,2]
+    assert all(type(e['tension']) is int for e in r['arc'])
+    a=args();alternative=copy.deepcopy(a[0][3]);alternative['id']='D';alternative['tension']=10;a[0].append(alternative)
+    r=construct(*a)
+    assert [e['tension'] for e in r['arc']]==[1,3,5,10,2] and all(type(e['tension']) is int for e in r['arc'])
