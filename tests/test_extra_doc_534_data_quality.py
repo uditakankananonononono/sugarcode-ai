@@ -22,3 +22,10 @@ def test_column(bad):
 def test_values(bad):
     with pytest.raises(ValueError) as exc:solve([[0,bad]],0)
     assert str(exc.value)=='cells must be None or nonbool 32-bit magnitude integers'
+
+
+def test_missing_keys_do_not_collide_and_key_selection_is_respected():
+    assert solve([[None,1],[None,2]],0)=={'missing_cells':[[0,0],[1,0]],'duplicate_rows':[],
+      'duplicate_keys':[],'completeness':F(1,2),'accuracy_validated':False}
+    assert solve([[None,1],[None,2]],1)['duplicate_keys']==[]
+    assert solve([[3,1],[4,1]],1)['duplicate_keys']==[[0,1]]
