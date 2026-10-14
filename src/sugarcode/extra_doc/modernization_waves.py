@@ -1,7 +1,7 @@
 """Row 694, Legacy Code Modernization: dependency-ordered modernization waves.
 
-modernization_waves takes modules, a list or tuple of 1 to 12 (name, deps)
-pairs, and max_modules, a nonbool int from 1 to 20 (default 6). A name is a
+modernization_waves takes modules, a list or tuple of 1 to max_modules
+(name, deps) pairs, and max_modules, a nonbool int from 1 to 20 (default 6). A name is a
 string of 1 to 12 characters, distinct across modules. deps is a list or
 tuple of names (at most 4, each a listed module other than itself, no
 repeats). A module joins the first wave after every dependency has been
