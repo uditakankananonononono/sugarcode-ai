@@ -36,3 +36,10 @@ def test_cashflows(bad):
 def test_discount(bad):
     with pytest.raises(ValueError) as exc:solve(0,0,0,[0],bad)
     assert str(exc.value)=='discount must be nonbool integer zero through 10000 basis points'
+
+
+def test_fractional_npv_sign():
+    assert solve(0,0,0,[1],10000)['acquisition_npv']==F(1,2)
+    assert solve(0,0,0,[1],10000)['positive_npv'] is True
+    assert solve(0,0,0,[-1],10000)['acquisition_npv']==F(-1,2)
+    assert solve(0,0,0,[-1],10000)['positive_npv'] is False
