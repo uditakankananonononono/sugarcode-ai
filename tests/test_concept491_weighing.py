@@ -129,3 +129,12 @@ def test_exact_certificate_ties_mixed_errors_and_purity():
     refuse(m.adaptive_depth_certificate,(2,hs,(None,),True),'shape:weighing')
     for fn,args in ((m.best_weighings,(2,hs,menu)),(m.minimum_nonadaptive_tests,(2,hs,menu)),(m.adaptive_depth_certificate,(2,hs,menu,3))):
         before=copy.deepcopy(args);first=fn(*args);assert args==before and fn(*args)==first
+
+
+def test_minimax_precedes_sum_squared_for_six_coin_menu():
+    candidates=((0,-1),(0,1),(1,-1),(1,1),(2,-1),(2,1),(3,-1),(4,-1))
+    menu=((-1,-1,1,-1,1,1),(-1,0,0,0,1,0))
+    sizes=tuple(tuple(sum(physical(w,h)==o for h in candidates) for o in (-1,0,1)) for w in menu)
+    assert sizes==((4,0,4),(2,5,1))
+    assert tuple((max(s),sum(v*v for v in s)) for s in sizes)==((4,32),(5,30))
+    assert m.best_weighings(6,candidates,menu)==(0,)
