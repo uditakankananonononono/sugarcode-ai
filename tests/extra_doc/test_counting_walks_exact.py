@@ -381,3 +381,86 @@ def test_new_validation():
     chk(g, (1, 5, 9, 2, 99), ValueError, 'p_num must be between 1 and 1')
     chk(g, (9, 5, 1, 2, 99), ValueError, 'start must be between 0 and 5')
     chk(g, (0, 21, 1, 2, True), ValueError, 'target must be between 1 and 20')
+
+
+
+class _HostileInt(int):
+    def __lt__(self, other):
+        return False
+
+    def __gt__(self, other):
+        return False
+
+    def __le__(self, other):
+        return True
+
+    def __ge__(self, other):
+        return True
+
+
+class _HostileStr(str):
+    def __eq__(self, other):
+        return True
+
+    def __hash__(self):
+        return 0
+
+
+_INT_CALLS = [
+    ('ballot_count', lambda v: (v, 0), 30), ('ballot_count', lambda v: (0, v), 30),
+    ('lattice_paths_under_slope', lambda v: (v, 0, 1, 1), 30),
+    ('lattice_paths_under_slope', lambda v: (0, v, 1, 1), 30),
+    ('lattice_paths_under_slope', lambda v: (0, 0, v, 1), 5),
+    ('lattice_paths_under_slope', lambda v: (0, 0, 1, v), 5),
+    ('dice_sum_distribution', lambda v: (v, 1), 10), ('dice_sum_distribution', lambda v: (1, v), 12),
+    ('walk_max_distribution', lambda v: (v,), 24), ('walk_return_count_distribution', lambda v: (v,), 24),
+    ('walk_hit_level_count', lambda v: (v, 1), 24), ('walk_hit_level_count', lambda v: (0, v), 24),
+    ('gamblers_ruin_probability', lambda v: (0, v, 1, 2), 60),
+    ('gamblers_ruin_probability', lambda v: (1, 5, 1, v), 100),
+    ('gamblers_ruin_expected_duration', lambda v: (0, v, 1, 2), 60),
+    ('bounded_walk_distribution', lambda v: (v, 0, 0, 'absorbing', 1, 2), 12),
+    ('bounded_walk_distribution', lambda v: (2, 0, v, 'absorbing', 1, 2), 60),
+    ('ruin_stopping_time_distribution', lambda v: (0, v, 1, 2, 0), 20),
+    ('ruin_stopping_time_distribution', lambda v: (0, 3, 1, 2, v), 60),
+]
+
+
+@pytest.mark.parametrize('name,mk,cap', _INT_CALLS)
+def test_subclass_and_bool_refused_at_every_cap_boundary(name, mk, cap):
+    f = getattr(m, name)
+    for v in (cap, cap + 1):
+        for bad in (_HostileInt(v), _HostileInt(0), _HostileInt(-1)):
+            with pytest.raises(TypeError) as e:
+                f(*mk(bad))
+            assert 'must be a nonbool int' in str(e.value)
+    with pytest.raises(ValueError):
+        f(*mk(cap + 1))
+    f(*mk(cap))
+
+
+def test_hostile_mode_string_refused():
+    with pytest.raises(TypeError) as e:
+        m.bounded_walk_distribution(3, 0, 0, _HostileStr('absorbing'), 1, 2)
+    assert str(e.value) == 'mode must be an exact str'
+    with pytest.raises(TypeError):
+        m.bounded_walk_distribution(3, 0, 0, _HostileStr('nonsense'), 1, 2)
+
+
+def test_documented_check_order_pinned():
+    g = m.gamblers_ruin_probability
+    with pytest.raises(ValueError) as e:
+        g('x', 99, 1, 2)
+    assert str(e.value) == 'target must be between 1 and 60'
+    with pytest.raises(TypeError) as e:
+        g('x', 5, 1, 2)
+    assert str(e.value) == 'start must be a nonbool int'
+    with pytest.raises(ValueError) as e:
+        g(1, 5, 'x', 999)
+    assert str(e.value) == 'p_den must be between 1 and 100'
+    with pytest.raises(TypeError) as e:
+        g(1, 5, 'x', 5)
+    assert str(e.value) == 'p_num must be a nonbool int'
+    with pytest.raises(ValueError) as e:
+        g(1, 5, 1, 1)
+    assert str(e.value) == 'p_num must be between 1 and 0'
+    assert 'target` is checked before `start' in m.__doc__ and "p_den` is checked before" in m.__doc__

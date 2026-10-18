@@ -7,9 +7,13 @@ with step probability p_num/p_den (0 < p < 1, p_den up to 100); dice sums for up
 Adjacent to, but not overlapping, a separate sequences module (Stirling, Bell, Catalan and similar named
 sequences); this module has no named-sequence functions.
 
-Order of checks: arguments left to right as written in each signature. Ints: nonbool int type
-first (TypeError), then range (ValueError). Mode: exact str type, then membership. Caps are checked
-before any computation or allocation that depends on them.
+Order of checks: arguments left to right as written in each signature, except where a range depends on a later
+argument: in gamblers_ruin_probability, gamblers_ruin_expected_duration and ruin_stopping_time_distribution
+`target` is checked before `start`, and in every function with a step probability `p_den` is checked before
+`p_num` (p_num's range is 1 to p_den - 1, so p_den = 1 gives the pinned message 'p_num must be between 1 and 0').
+Ints: nonbool int type first (TypeError), then range (ValueError); each argument is fully checked (type, then
+range) before the next argument is looked at. Mode: exact str type, then membership. Caps are checked
+before any computation or allocation that depends on them. Subclasses of int, bool and str are refused by type.
 
 Definitions: a simple walk has n steps of +1 or -1 from 0, all 2**n sequences. ballot_count(a, b) counts sequences of a up-steps and b down-steps whose running sum never drops
 below 0. lattice_paths_under_slope(m, n, p, q) counts monotone right/up paths from (0,0) to (m,n)
