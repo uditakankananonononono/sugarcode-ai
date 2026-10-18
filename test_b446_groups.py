@@ -84,4 +84,19 @@ class GroupTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'^table must be a group$'):m.subgroup_generated(((0,0),(0,0)),None)
         self.assertFalse(m.CLAIMS)
 
+    def test_inverse_elements_one_sided(self):
+        # Identity 1; right inverses exist that are not two-sided.
+        cases={((0,0,0),(0,1,2),(1,2,0)):(None,1,None),
+               ((0,1),(1,0)):(0,1),
+               ((0,0),(0,1)):(None,1),
+               ((0,1,2),(1,0,0),(2,0,0)):(0,1,1)}  # non-associative: smallest two-sided inverse wins
+        for table,expected in cases.items():
+            self.assertEqual(m.inverse_elements(table),expected)
+        # Independent oracle: inverse requires both x*y==e and y*x==e.
+        for table in cases:
+            n=len(table);e=m.identity_element(table)
+            expected=tuple(next((y for y in range(n) if table[x][y]==e and table[y][x]==e),None) for x in range(n))
+            self.assertEqual(m.inverse_elements(table),expected)
+            self.assertFalse(m.is_group(table) and None in expected)
+
 if __name__=='__main__':unittest.main()
