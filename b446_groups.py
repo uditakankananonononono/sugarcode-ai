@@ -11,17 +11,17 @@ MAX_ORDER=6
 
 def _label(x,n):
     if isinstance(x,bool):raise TypeError("label must be an integer")
-    if not isinstance(x,int):raise TypeError("label must be an integer")
+    if type(x) is not int:raise TypeError("label must be an integer")
     if x<0 or x>=n:raise ValueError("label out of range")
     return x
 
 
 def _table(table):
-    if not isinstance(table,(list,tuple)):raise TypeError("table must be a list or tuple")
+    if type(table) not in (list,tuple):raise TypeError("table must be a list or tuple")
     n=len(table)
     if not 1<=n<=MAX_ORDER:raise ValueError("order out of range")
     for row in table:
-        if not isinstance(row,(list,tuple)):raise TypeError("row must be a list or tuple")
+        if type(row) not in (list,tuple):raise TypeError("row must be a list or tuple")
         if len(row)!=n:raise ValueError("table must be square")
     return tuple(tuple(_label(x,n) for x in row) for row in table)
 
@@ -106,7 +106,7 @@ def element_orders(table):
 
 def subgroup_generated(table,generators):
     a,e,inv=_group(table)
-    if not isinstance(generators,(list,tuple)):raise TypeError("generators must be a list or tuple")
+    if type(generators) not in (list,tuple):raise TypeError("generators must be a list or tuple")
     if len(generators)>MAX_ORDER:raise ValueError("generator count out of range")
     seen=set()
     for x in generators:

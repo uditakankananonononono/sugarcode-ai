@@ -17,7 +17,7 @@ MAX_COLORS = 6
 def _integer(x,name,low,high):
     if isinstance(x,bool):
         raise TypeError(name+" must be an integer")
-    if not isinstance(x,int):
+    if type(x) is not int:
         raise TypeError(name+" must be an integer")
     if x<low or x>high:
         raise ValueError(name+" out of range")
@@ -26,14 +26,14 @@ def _integer(x,name,low,high):
 
 def _graph(n,edges):
     _integer(n,'vertex count',0,MAX_VERTICES)
-    if not isinstance(edges,(list,tuple)):
+    if type(edges) not in (list,tuple):
         raise TypeError("edges must be a list or tuple")
     if len(edges)>MAX_EDGES:
         raise ValueError("edge count out of range")
     out=[]
     seen=set()
     for edge in edges:
-        if not isinstance(edge,(list,tuple)):
+        if type(edge) not in (list,tuple):
             raise TypeError("edge must be a list or tuple")
         if len(edge)!=2:
             raise ValueError("edge must have two endpoints")

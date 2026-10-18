@@ -14,13 +14,13 @@ MAX_VALUE=100
 
 def _int(x,name,low,high):
     if isinstance(x,bool):raise TypeError(name+" must be an integer")
-    if not isinstance(x,int):raise TypeError(name+" must be an integer")
+    if type(x) is not int:raise TypeError(name+" must be an integer")
     if x<low or x>high:raise ValueError(name+" out of range")
     return x
 
 
 def _weights(weights,target):
-    if not isinstance(weights,(list,tuple)):raise TypeError("weights must be a list or tuple")
+    if type(weights) not in (list,tuple):raise TypeError("weights must be a list or tuple")
     if len(weights)>MAX_ITEMS:raise ValueError("item count out of range")
     _int(target,'target',0,MAX_TARGET)
     return tuple(_int(x,'weight',1,MAX_TARGET) for x in weights)
@@ -38,7 +38,7 @@ def _hist(weights,target,counts):
 
 def _bounded(weights,target,counts):
     ws=_weights(weights,target)
-    if not isinstance(counts,(list,tuple)):raise TypeError("counts must be a list or tuple")
+    if type(counts) not in (list,tuple):raise TypeError("counts must be a list or tuple")
     if len(counts)!=len(ws):raise ValueError("counts size mismatch")
     cs=tuple(_int(x,'count',0,MAX_COUNT) for x in counts)
     return ws,cs
@@ -93,7 +93,7 @@ def exact_cardinality_count(weights,target,cardinality):
 
 def _knapsack(weights,target,values):
     ws=_weights(weights,target)
-    if not isinstance(values,(list,tuple)):raise TypeError("values must be a list or tuple")
+    if type(values) not in (list,tuple):raise TypeError("values must be a list or tuple")
     if len(values)!=len(ws):raise ValueError("values size mismatch")
     vs=tuple(_int(x,'value',-MAX_VALUE,MAX_VALUE) for x in values)
     states={0:(0,1)}

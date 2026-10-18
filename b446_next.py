@@ -12,7 +12,7 @@ MAX_LENGTH = 8
 def _word(value):
     if isinstance(value, bool):
         raise TypeError("word must be a string")
-    if not isinstance(value, str):
+    if type(value) is not str:
         raise TypeError("word must be a string")
     if len(value) > MAX_LENGTH:
         raise ValueError("word too long")

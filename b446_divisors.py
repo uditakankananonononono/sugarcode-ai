@@ -13,7 +13,7 @@ MAX_ENTRY=100
 
 def _n(x):
     if isinstance(x,bool):raise TypeError("n must be an integer")
-    if not isinstance(x,int):raise TypeError("n must be an integer")
+    if type(x) is not int:raise TypeError("n must be an integer")
     if x<1 or x>MAX_N:raise ValueError("n out of range")
     return x
 
@@ -34,11 +34,11 @@ def _mobius(n):
 
 
 def _vector(values):
-    if not isinstance(values,(list,tuple)):raise TypeError("values must be a list or tuple")
+    if type(values) not in (list,tuple):raise TypeError("values must be a list or tuple")
     if not 1<=len(values)<=MAX_N:raise ValueError("vector size out of range")
     for x in values:
         if isinstance(x,bool):raise TypeError("entry must be an integer")
-        if not isinstance(x,int):raise TypeError("entry must be an integer")
+        if type(x) is not int:raise TypeError("entry must be an integer")
         if abs(x)>MAX_ENTRY:raise ValueError("entry out of range")
     return tuple(values)
 
@@ -69,7 +69,7 @@ def ramanujan_sum(n,k):
     """Integer Ramanujan sum c_n(k), including k=0 and negative k."""
     n=_n(n)
     if isinstance(k,bool):raise TypeError("k must be an integer")
-    if not isinstance(k,int):raise TypeError("k must be an integer")
+    if type(k) is not int:raise TypeError("k must be an integer")
     if abs(k)>MAX_N:raise ValueError("k out of range")
     return sum(d*_mobius(n//d) for d in _divisors(gcd(n,k)))
 

@@ -15,14 +15,14 @@ MAX_VALUE = 100
 
 def _int(x,name,low,high):
     if isinstance(x,bool):raise TypeError(name+" must be an integer")
-    if not isinstance(x,int):raise TypeError(name+" must be an integer")
+    if type(x) is not int:raise TypeError(name+" must be an integer")
     if x<low or x>high:raise ValueError(name+" out of range")
     return x
 
 
 def _vector(n,values):
     _int(n,'players',0,MAX_PLAYERS)
-    if not isinstance(values,(list,tuple)):raise TypeError("values must be a list or tuple")
+    if type(values) not in (list,tuple):raise TypeError("values must be a list or tuple")
     if len(values)!=1<<n:raise ValueError("values size mismatch")
     out=tuple(_int(x,'value',-MAX_VALUE,MAX_VALUE) for x in values)
     if out[0]!=0:raise ValueError("empty coalition must have value zero")
@@ -96,11 +96,11 @@ def is_superadditive(n,values):
 def efficiency_gap(n,values,allocation):
     """Grand-coalition value minus the sum of a bounded rational allocation."""
     data=_vector(n,values)
-    if not isinstance(allocation,(list,tuple)):raise TypeError("allocation must be a list or tuple")
+    if type(allocation) not in (list,tuple):raise TypeError("allocation must be a list or tuple")
     if len(allocation)!=n:raise ValueError("allocation size mismatch")
     for x in allocation:
         if isinstance(x,bool):raise TypeError("allocation must be int or Fraction")
-        if not isinstance(x,(int,Fraction)):raise TypeError("allocation must be int or Fraction")
+        if type(x) not in (int,Fraction):raise TypeError("allocation must be int or Fraction")
         if abs(x)>MAX_VALUE:raise ValueError("allocation magnitude out of range")
         if Fraction(x).denominator>100:raise ValueError("allocation denominator out of range")
     return Fraction(data[-1])-sum(allocation,Fraction(0))

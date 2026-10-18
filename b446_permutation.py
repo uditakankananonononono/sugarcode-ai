@@ -11,13 +11,13 @@ MAX_N=8
 
 def _int(x,name,low,high):
     if isinstance(x,bool):raise TypeError(name+" must be an integer")
-    if not isinstance(x,int):raise TypeError(name+" must be an integer")
+    if type(x) is not int:raise TypeError(name+" must be an integer")
     if x<low or x>high:raise ValueError(name+" out of range")
     return x
 
 
 def _permutation(p):
-    if not isinstance(p,(list,tuple)):raise TypeError("permutation must be a list or tuple")
+    if type(p) not in (list,tuple):raise TypeError("permutation must be a list or tuple")
     if len(p)>MAX_N:raise ValueError("permutation size out of range")
     seen=set()
     for x in p:

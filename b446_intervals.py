@@ -16,7 +16,7 @@ MAX_EXPONENT = 8
 def _number(x):
     if isinstance(x,bool):
         raise TypeError("endpoint must be int or Fraction")
-    if not isinstance(x,(int,Fraction)):
+    if type(x) not in (int,Fraction):
         raise TypeError("endpoint must be int or Fraction")
     if abs(x)>MAX_MAGNITUDE:
         raise ValueError("endpoint magnitude out of range")
@@ -27,7 +27,7 @@ def _number(x):
 
 
 def _interval(value):
-    if not isinstance(value,(list,tuple)):
+    if type(value) not in (list,tuple):
         raise TypeError("interval must be a list or tuple")
     if len(value)!=2:
         raise ValueError("interval must have two endpoints")
@@ -96,7 +96,7 @@ def interval_power(a,exponent):
     lo,hi = _interval(a)
     if isinstance(exponent,bool):
         raise TypeError("exponent must be an integer")
-    if not isinstance(exponent,int):
+    if type(exponent) is not int:
         raise TypeError("exponent must be an integer")
     if exponent<0 or exponent>MAX_EXPONENT:
         raise ValueError("exponent out of range")
