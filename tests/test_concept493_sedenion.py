@@ -103,3 +103,26 @@ def test_all_validations_caps_scope():
     assert m.CLAIMS=={'agi_like_intelligence':False,'production_ready':False,'global_zero_divisor_decision':False}
     assert m.SCOPE=='PARTIAL sedenion zero-divisor and failed-composition certificates, adjacent octonions disclosed'
     assert m.NOT_CLAIMED==('AGI-like intelligence','new octonion arithmetic','global zero-divisor decision','physical validity','production readiness')
+
+
+def test_catalogue_dimensions_endpoints_and_cross_side_identity():
+    cat=tuple(m._catalogue())
+    assert len(cat)==240 and len(set(cat))==240
+    assert all(type(v)is tuple and len(v)==16 and sum(x*x for x in v)==2 for v in cat)
+    assert cat[0]==(1,-1)+(0,)*14
+    assert cat[-1]==(0,)*14+(1,1)
+    value=(1,)+(0,)*15
+    for left in (True,False):
+        matrix=m._matrix(value,left)
+        assert len(matrix)==16 and all(len(row)==16 for row in matrix)
+        assert matrix==tuple(tuple(int(i==j) for j in range(16)) for i in range(16))
+    # Catalogue candidates with real part0 satisfy a*v+v*a =
+    # 2*a0*v -2*dot(imag(a),v)*1. For zero products both terms vanish.
+    samples=cat[::7]+tuple((0,)+tuple((i*j)%5-2 for j in range(1,16)) for i in range(8))
+    for a in samples:
+        for v in cat:
+            if v[0]:continue
+            av,va=mul(a,v),mul(v,a)
+            expected=tuple(2*a[0]*v[k] if k else -2*sum(a[j]*v[j] for j in range(1,16)) for k in range(16))
+            assert tuple(x+y for x,y in zip(av,va))==expected
+            assert (not any(av))==(not any(va))
