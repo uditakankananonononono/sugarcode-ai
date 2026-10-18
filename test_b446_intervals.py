@@ -53,6 +53,30 @@ class IntervalTests(unittest.TestCase):
             func((F(1,100),100))
         self.assertFalse(m.CLAIMS)
 
+    def test_maximum_bounds_and_nonclosure(self):
+        self.assertEqual(m.interval_reciprocal((F(1,100), 100)), (F(1,100), 100))
+        self.assertEqual(m.interval_multiply((-100, 100), (-100, 100)), (-10000, 10000))
+        self.assertEqual(m.interval_divide((-100, 100), (F(1,100), 100)), (-10000, 10000))
+        self.assertEqual(m.interval_width((-100, 100)), 200)
+        self.assertEqual(m.interval_power((-100, 100), 8), (0, 100**8))
+        # Arithmetic outputs are exact but not promised closed under input caps.
+        for result in (m.interval_add((100,100),(100,100)), m.interval_multiply((-100,100),(-100,100)), m.interval_power((100,100),8)):
+            with self.assertRaisesRegex(ValueError, "^endpoint magnitude out of range$"):
+                m.interval_width(result)
+        product = m.interval_multiply((F(1,100),F(1,100)),(F(1,100),F(1,100)))
+        with self.assertRaisesRegex(ValueError, "^endpoint denominator out of range$"):
+            m.interval_width(product)
+        self.assertEqual(m.interval_hull(m.interval_intersection((-100,100),(0,100)),(-100,0)), (-100,100))
+
+    def test_equivalent_survivor_boundaries(self):
+        for a in ((0, 0), (0, 3), (-3, 0)):
+            expected = (0, 0) if a == (0, 0) else (0, 3)
+            self.assertEqual(m.interval_absolute(a), expected)
+            for exponent in (2, 4, 6, 8):
+                self.assertEqual(m.interval_power(a, exponent), (0, 0 if a == (0, 0) else 3**exponent))
+        self.assertEqual(m.interval_intersection((0, 1), (1, 2)), (1, 1))
+        self.assertEqual(m.interval_intersection((0, 1), (2, 3)), None)
+
     def test_zero_and_exponent_refusals(self):
         for a in ((-1,0),(0,0),(0,1),(-1,1)):
             with self.assertRaisesRegex(ValueError,'^interval contains zero$'):m.interval_reciprocal(a)
