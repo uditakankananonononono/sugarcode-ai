@@ -209,3 +209,19 @@ def test_days_between_refusals():
     raises(ValueError, 'day does not exist in that month', days_between, 2001, 2, 29, 2000, 13, 1)
     raises(TypeError, 'd2 must not be a bool', days_between, 2000, 1, 1, 2000, 1, True)
     raises(ValueError, 'day does not exist in that month', days_between, 2000, 1, 1, 2001, 2, 29)
+
+
+def test_month_range_before_day_type():
+    raises(ValueError, 'm must be between 1 and 12', day_of_year, 2000, 13, 'x')
+    raises(ValueError, 'm must be between 1 and 12', day_of_year, 2000, 0, True)
+    raises(ValueError, 'y must be between 1 and 9999', day_of_year, 0, 'x', 'x')
+
+
+def test_era_ends():
+    assert date_from_rata_die(146097) == (400, 12, 31)
+    for k in range(1, 25):
+        n = 146097 * k
+        assert date_from_rata_die(n) == (400 * k, 12, 31)
+        assert D.fromordinal(n) == D(400 * k, 12, 31)
+        assert date_from_rata_die(n + 1) == (400 * k + 1, 1, 1) if 400 * k < 9999 else True
+        assert rata_die(400 * k, 12, 31) == n
